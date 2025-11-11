@@ -6,7 +6,15 @@ import { v } from "convex/values";
 // Helper to lazily import hianime and support both named and default exports
 async function getClient() {
   try {
-    const mod = await import("hianime");
+    // Dynamically obtain the import function at runtime to avoid TS module resolution errors
+    const dynamicImport = (Function("return import"))() as (path: string) => Promise<any>;
+    const mod = await dynamicImport("hianime").catch(() => null);
+    if (!mod) {
+      throw new Error(
+        "Backend dependency 'hianime' not installed. Please add it via: pnpm add hianime",
+      );
+    }
+
     const HianimeCtor = (mod as any).Hianime ?? (mod as any).default;
     if (!HianimeCtor) {
       throw new Error("Failed to resolve Hianime export.");
@@ -15,8 +23,7 @@ async function getClient() {
     const client = new HianimeCtor();
     return client;
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Unknown module import error";
+    const message = err instanceof Error ? err.message : "Unknown module import error";
     throw new Error(
       `Backend dependency 'hianime' not installed or failed to load: ${message}`,
     );
