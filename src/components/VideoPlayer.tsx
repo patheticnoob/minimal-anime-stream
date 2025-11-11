@@ -80,14 +80,19 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
               className="w-full h-full"
               controlsList="nodownload"
               crossOrigin="anonymous"
+              onError={(e) => {
+                console.error("Video error:", e);
+                setError(true);
+                setLoading(false);
+              }}
             >
-              {tracks?.map((track, idx) => (
+              {tracks && tracks.length > 0 && tracks.map((track, idx) => (
                 <track
                   key={idx}
                   src={track.file}
                   kind={track.kind || "subtitles"}
-                  label={track.label}
-                  srcLang={track.label?.toLowerCase() || "en"}
+                  label={track.label || `Subtitle ${idx + 1}`}
+                  srcLang={track.label?.toLowerCase().replace(/[^a-z]/g, '') || "en"}
                   default={idx === 0}
                 />
               ))}

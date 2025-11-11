@@ -131,18 +131,19 @@ export default function Landing() {
     setSelectedEpisode(ep);
     if (!ep?.id) return;
 
-    toast.loading("Loading video...");
+    const loadingToast = toast.loading("Loading video...");
     
     try {
       const servers = (await fetchServers({ episodeId: ep.id })) as EpisodeServers;
       
-      // Find HD-2 server (default working server)
-      const hd2Server = [...servers.sub, ...servers.dub].find(
-        (s) => s.name.toLowerCase().includes("hd-2")
+      // Find HD-2 server (case-insensitive search in both sub and dub)
+      const allServers = [...(servers.sub || []), ...(servers.dub || [])];
+      const hd2Server = allServers.find(
+        (s) => s.name && s.name.toLowerCase().includes("hd-2")
       );
       
       if (!hd2Server) {
-        toast.dismiss();
+        toast.dismiss(loadingToast);
         toast.error("HD-2 server not available for this episode.");
         return;
       }
@@ -150,18 +151,24 @@ export default function Landing() {
       const sources = (await fetchSources({ serverId: hd2Server.id })) as EpisodeSources;
       
       if (sources?.sources?.length) {
-        toast.dismiss();
+        toast.dismiss(loadingToast);
+        // Set video source and tracks (tracks can be empty array if not available)
         setVideoSource(sources.sources[0].file);
         setVideoTracks(sources.tracks || []);
         setSelected(null);
       } else {
-        toast.dismiss();
-        toast.error("No video sources available.");
+        toast.dismiss(loadingToast);
+        toast.error("No video sources available for this episode.");
       }
     } catch (err) {
-      toast.dismiss();
+      toast.dismiss(loadingToast);
       const msg = err instanceof Error ? err.message : "Failed to load video.";
-      toast.error(msg);
+      // Provide more helpful error message
+      if (msg.includes("nonce") || msg.includes("embed")) {
+        toast.error("This episode is temporarily unavailable. Please try another episode.");
+      } else {
+        toast.error(msg);
+      }
     }
   };
 

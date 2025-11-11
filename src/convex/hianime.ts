@@ -83,12 +83,22 @@ export const episodeSources = action({
     try {
       const client = await getClient();
       const res = await client.getEpisodeSources(args.serverId);
-      return res;
+      
+      // Log the response for debugging
+      console.log("Episode sources response:", JSON.stringify(res, null, 2));
+      
+      // Ensure we return a valid response even if tracks are missing
+      return {
+        sources: res.sources || [],
+        tracks: res.tracks || [],
+      };
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch sources";
+      console.error("Episode sources error:", message);
+      
       // Provide more helpful error message for common issues
       if (message.includes("nonce") || message.includes("embed")) {
-        throw new Error("This streaming source is temporarily unavailable. Please try a different server.");
+        throw new Error("This streaming source is temporarily unavailable. Please try a different episode.");
       }
       throw new Error(`Unable to load video sources: ${message}`);
     }
