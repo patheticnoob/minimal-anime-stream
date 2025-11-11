@@ -14,7 +14,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Search, Play } from "lucide-react";
+import { Loader2, Search, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type TopAiringResult = {
   page: number;
@@ -24,13 +26,13 @@ type TopAiringResult = {
     title?: string;
     image?: string;
     type?: string;
-    id?: string; // human readable id/path
-    dataId?: string; // numeric data id used for episodes
+    id?: string;
+    dataId?: string;
   }>;
 };
 
 type Episode = {
-  id: string; // episode id for servers
+  id: string;
   title?: string;
   number?: number;
 };
@@ -174,103 +176,159 @@ export default function Landing() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.35 }}
-      className="min-h-screen flex flex-col"
+      transition={{ duration: 0.5 }}
+      className="min-h-screen flex flex-col bg-background"
     >
-      {/* Header - Minimal */}
-      <header className="w-full flex items-center justify-between px-8 py-8">
-        <div className="flex items-center gap-3">
-          <img
-            src="./logo.svg"
-            alt="Logo"
-            width={32}
-            height={32}
-            className="rounded"
-          />
-          <span className="text-lg font-bold tracking-tight">Minimal Anime Stream</span>
-        </div>
-        <div className="w-full max-w-md hidden sm:block" />
-        <div className="w-full max-w-md">
-          <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search titles"
-              className="pl-9"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-20 items-center justify-between px-8 max-w-7xl mx-auto">
+          <motion.div 
+            className="flex items-center gap-3"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            <img
+              src="./logo.svg"
+              alt="Logo"
+              width={40}
+              height={40}
+              className="rounded"
             />
-          </div>
+            <span className="text-xl font-bold tracking-tight">Minimal Anime Stream</span>
+          </motion.div>
+          
+          <motion.div 
+            className="w-full max-w-md"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search anime titles..."
+                className="pl-9 h-10"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
+          </motion.div>
         </div>
       </header>
 
-      {/* Content */}
-      <main className="flex-1 px-8 pb-16">
+      {/* Main Content */}
+      <main className="flex-1 container px-8 py-12 max-w-7xl mx-auto">
         {loading ? (
           <div className="h-[60vh] flex items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin" />
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Loading anime...</p>
+            </div>
           </div>
         ) : (
           <>
-            {/* Grid */}
-            <div className="grid gap-8"
+            {/* Page Info */}
+            <motion.div 
+              className="mb-8"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h1 className="text-3xl font-bold tracking-tight mb-2">
+                {query ? "Search Results" : "Top Airing Anime"}
+              </h1>
+              <p className="text-muted-foreground">
+                {filtered.length} {filtered.length === 1 ? "title" : "titles"} found
+              </p>
+            </motion.div>
+
+            {/* Anime Grid */}
+            <motion.div 
+              className="grid gap-6 mb-12"
               style={{
-                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
               }}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
             >
               {filtered.map((item, idx) => (
                 <motion.button
                   key={(item.id ?? item.title ?? "item") + idx}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => openAnime(item)}
-                  className="text-left"
+                  className="text-left group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * idx }}
                 >
-                  <Card className="border">
+                  <Card className="border overflow-hidden transition-all duration-200 group-hover:border-primary/50">
                     <CardContent className="p-0">
-                      <div className="aspect-[3/4] w-full bg-muted" />
-                      {item.image ? (
-                        <img
-                          src={item.image}
-                          alt={item.title ?? "Poster"}
-                          className="w-full h-auto aspect-[3/4] object-cover -mt-[calc(100%+1px)]"
-                          loading="lazy"
-                        />
-                      ) : null}
+                      <div className="relative aspect-[3/4] w-full bg-muted overflow-hidden">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.title ?? "Poster"}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                            No Image
+                          </div>
+                        )}
+                        {item.type && (
+                          <Badge className="absolute top-2 right-2 bg-background/90 backdrop-blur">
+                            {item.type}
+                          </Badge>
+                        )}
+                      </div>
                       <div className="p-4">
-                        <div className="text-sm text-muted-foreground mb-1">
-                          {item.type ?? "TV"}
-                        </div>
-                        <div className="font-medium tracking-tight line-clamp-2 min-h-[2.5rem]">
+                        <h3 className="font-semibold tracking-tight line-clamp-2 min-h-[3rem] text-sm leading-tight">
                           {item.title ?? "Untitled"}
-                        </div>
+                        </h3>
                       </div>
                     </CardContent>
                   </Card>
                 </motion.button>
               ))}
-            </div>
+            </motion.div>
 
             {/* Pagination */}
             {data && (
-              <div className="flex items-center justify-center gap-4 mt-12">
+              <motion.div 
+                className="flex items-center justify-center gap-4"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
                 <Button
                   variant="outline"
+                  size="icon"
                   disabled={pageLoading || page <= 1}
                   onClick={() => loadPage(page - 1)}
                 >
-                  Previous
+                  <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm text-muted-foreground">
-                  Page {data.page} of {data.totalPage}
-                </span>
+                <div className="flex items-center gap-2 min-w-[120px] justify-center">
+                  <span className="text-sm font-medium">
+                    Page {data.page}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    of {data.totalPage}
+                  </span>
+                </div>
                 <Button
                   variant="outline"
+                  size="icon"
                   disabled={pageLoading || !data.hasNextPage}
                   onClick={() => loadPage(page + 1)}
                 >
-                  Next
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
-              </div>
+              </motion.div>
             )}
           </>
         )}
@@ -278,126 +336,179 @@ export default function Landing() {
 
       {/* Watch Dialog */}
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle className="tracking-tight font-bold">
+            <DialogTitle className="tracking-tight font-bold text-xl pr-8">
               {selected?.title ?? "Watch"}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Choose an episode, then a server to view available sources.
+              Select an episode and server to view streaming sources
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-8 sm:grid-cols-2">
-            {/* Poster */}
-            <div className="space-y-4">
-              <div className="aspect-[3/4] w-full bg-muted" />
-              {selected?.image ? (
-                <img
-                  src={selected.image}
-                  alt={selected.title ?? "Poster"}
-                  className="w-full h-auto aspect-[3/4] object-cover -mt-[calc(100%+1px)]"
-                />
-              ) : null}
+          <ScrollArea className="max-h-[calc(90vh-200px)]">
+            <div className="grid gap-8 md:grid-cols-[300px_1fr] pr-4">
+              {/* Poster */}
+              <div className="space-y-4">
+                <div className="relative aspect-[3/4] w-full bg-muted rounded-lg overflow-hidden">
+                  {selected?.image ? (
+                    <img
+                      src={selected.image}
+                      alt={selected.title ?? "Poster"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                      No Image
+                    </div>
+                  )}
+                </div>
+                {selected?.type && (
+                  <Badge variant="secondary" className="w-full justify-center">
+                    {selected.type}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Episodes / Servers / Sources */}
+              <div className="space-y-6">
+                {/* Episodes */}
+                <section>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                    Episodes
+                    {episodes.length > 0 && (
+                      <Badge variant="outline">{episodes.length}</Badge>
+                    )}
+                  </h3>
+                  {episodesLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+                      <Loader2 className="h-4 w-4 animate-spin" /> Loading episodes...
+                    </div>
+                  ) : episodes.length ? (
+                    <ScrollArea className="h-[200px] pr-4">
+                      <div className="grid grid-cols-5 gap-2">
+                        {episodes.map((ep) => (
+                          <Button
+                            key={ep.id}
+                            size="sm"
+                            variant={selectedEpisode?.id === ep.id ? "default" : "outline"}
+                            onClick={() => chooseEpisode(ep)}
+                            className="h-9"
+                          >
+                            {ep.number ?? "?"}
+                          </Button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  ) : (
+                    <p className="text-sm text-muted-foreground py-4">
+                      No episodes available
+                    </p>
+                  )}
+                </section>
+
+                {/* Servers */}
+                {selectedEpisode && (
+                  <section>
+                    <h3 className="text-sm font-semibold mb-3">
+                      Streaming Servers
+                    </h3>
+                    {serversLoading ? (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Loading servers...
+                      </div>
+                    ) : servers ? (
+                      <div className="space-y-3">
+                        {servers.sub && servers.sub.length > 0 && (
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-2">Subtitled</p>
+                            <div className="flex flex-wrap gap-2">
+                              {servers.sub.map((s) => (
+                                <Button
+                                  key={s.id}
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => getSources(s.id)}
+                                  className="h-8"
+                                >
+                                  {s.name}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {servers.dub && servers.dub.length > 0 && (
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-2">Dubbed</p>
+                            <div className="flex flex-wrap gap-2">
+                              {servers.dub.map((s) => (
+                                <Button
+                                  key={s.id}
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => getSources(s.id)}
+                                  className="h-8"
+                                >
+                                  {s.name}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground py-4">
+                        Select an episode to view servers
+                      </p>
+                    )}
+                  </section>
+                )}
+
+                {/* Sources */}
+                {sources && (
+                  <section>
+                    <h3 className="text-sm font-semibold mb-3">
+                      Available Sources
+                    </h3>
+                    {sourcesLoading ? (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Loading sources...
+                      </div>
+                    ) : sources?.sources?.length ? (
+                      <div className="space-y-2">
+                        {sources.sources.map((src, idx) => (
+                          <a
+                            key={src.file + idx}
+                            href={src.file}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Play className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                              <div>
+                                <p className="text-sm font-medium">{src.type}</p>
+                                <p className="text-xs text-muted-foreground">Click to open source</p>
+                              </div>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground py-4">
+                        No sources available
+                      </p>
+                    )}
+                  </section>
+                )}
+              </div>
             </div>
+          </ScrollArea>
 
-            {/* Episodes / Servers / Sources */}
-            <div className="space-y-6">
-              {/* Episodes */}
-              <section>
-                <div className="mb-2 text-sm text-muted-foreground">
-                  Episodes
-                </div>
-                {episodesLoading ? (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Loader2 className="h-4 w-4 animate-spin" /> Loading episodes...
-                  </div>
-                ) : episodes.length ? (
-                  <div className="flex flex-wrap gap-2 max-h-48 overflow-auto pr-1">
-                    {episodes.map((ep) => (
-                      <Button
-                        key={ep.id}
-                        size="sm"
-                        variant={selectedEpisode?.id === ep.id ? "default" : "outline"}
-                        onClick={() => chooseEpisode(ep)}
-                        className="rounded-md"
-                      >
-                        {ep.number ? `Ep ${ep.number}` : ep.title ?? "Episode"}
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">
-                    No episodes found.
-                  </div>
-                )}
-              </section>
-
-              {/* Servers */}
-              <section>
-                <div className="mb-2 text-sm text-muted-foreground">
-                  Servers
-                </div>
-                {serversLoading ? (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Loader2 className="h-4 w-4 animate-spin" /> Loading servers...
-                  </div>
-                ) : servers ? (
-                  <div className="flex flex-wrap gap-2">
-                    {[...(servers.sub ?? []), ...(servers.dub ?? [])].map((s) => (
-                      <Button
-                        key={s.id}
-                        size="sm"
-                        variant="outline"
-                        onClick={() => getSources(s.id)}
-                      >
-                        {s.name}
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">
-                    Select an episode to view servers.
-                  </div>
-                )}
-              </section>
-
-              {/* Sources */}
-              <section>
-                <div className="mb-2 text-sm text-muted-foreground">
-                  Sources
-                </div>
-                {sourcesLoading ? (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Loader2 className="h-4 w-4 animate-spin" /> Loading sources...
-                  </div>
-                ) : sources?.sources?.length ? (
-                  <div className="flex flex-col gap-2">
-                    {sources.sources.map((src, idx) => (
-                      <a
-                        key={src.file + idx}
-                        href={src.file}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm underline"
-                      >
-                        {src.type} — Open source
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">
-                    Select a server to view sources.
-                  </div>
-                )}
-              </section>
-            </div>
-          </div>
-
-          <DialogFooter className="mt-2">
-            <Button variant="default" disabled>
-              <Play className="h-4 w-4 mr-2" />
-              Player coming next
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setSelected(null)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
