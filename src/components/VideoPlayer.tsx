@@ -6,10 +6,11 @@ import { toast } from "sonner";
 type VideoPlayerProps = {
   source: string;
   title: string;
+  tracks?: Array<{ file: string; label: string; kind?: string }>;
   onClose: () => void;
 };
 
-export function VideoPlayer({ source, title, onClose }: VideoPlayerProps) {
+export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -78,7 +79,19 @@ export function VideoPlayer({ source, title, onClose }: VideoPlayerProps) {
               autoPlay
               className="w-full h-full"
               controlsList="nodownload"
-            />
+              crossOrigin="anonymous"
+            >
+              {tracks?.map((track, idx) => (
+                <track
+                  key={idx}
+                  src={track.file}
+                  kind={track.kind || "subtitles"}
+                  label={track.label}
+                  srcLang={track.label.toLowerCase()}
+                  default={idx === 0}
+                />
+              ))}
+            </video>
           )}
         </div>
       </div>

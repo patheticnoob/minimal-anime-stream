@@ -60,6 +60,7 @@ export default function Landing() {
   const [episodesLoading, setEpisodesLoading] = useState(false);
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
   const [videoSource, setVideoSource] = useState<string | null>(null);
+  const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -151,6 +152,7 @@ export default function Landing() {
       if (sources?.sources?.length) {
         toast.dismiss();
         setVideoSource(sources.sources[0].file);
+        setVideoTracks(sources.tracks || []);
         setSelected(null);
       } else {
         toast.dismiss();
@@ -315,7 +317,11 @@ export default function Landing() {
         <VideoPlayer
           source={videoSource}
           title={`${selected?.title ?? "Anime"} - Episode ${selectedEpisode?.number ?? "?"}`}
-          onClose={() => setVideoSource(null)}
+          tracks={videoTracks}
+          onClose={() => {
+            setVideoSource(null);
+            setVideoTracks([]);
+          }}
         />
       )}
     </>
