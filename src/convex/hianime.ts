@@ -6,9 +6,9 @@ import { v } from "convex/values";
 // Helper to lazily import hianime and support both named and default exports
 async function getClient() {
   try {
-    // Dynamically obtain the import function at runtime to avoid TS module resolution errors
-    const dynamicImport = (Function("return import"))() as (path: string) => Promise<any>;
-    const mod = await dynamicImport("hianime").catch(() => null);
+    // Use dynamic import with proper async/await
+    const mod = await import("hianime");
+    
     if (!mod) {
       throw new Error(
         "Backend dependency 'hianime' not installed. Please add it via: pnpm add hianime",
