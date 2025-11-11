@@ -166,7 +166,10 @@ export default function Landing() {
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : "Failed to load sources.";
-      toast.error(msg);
+      toast.error(msg, {
+        description: "Try selecting a different server or episode.",
+        duration: 5000,
+      });
     } finally {
       setSourcesLoading(false);
     }

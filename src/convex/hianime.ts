@@ -34,10 +34,15 @@ async function getClient() {
 export const topAiring = action({
   args: { page: v.optional(v.number()) },
   handler: async (_, args) => {
-    const client = await getClient();
-    const page = args.page ?? 1;
-    const res = await client.getTopAiring(page);
-    return res;
+    try {
+      const client = await getClient();
+      const page = args.page ?? 1;
+      const res = await client.getTopAiring(page);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch top airing anime";
+      throw new Error(`Unable to load anime list: ${message}`);
+    }
   },
 });
 
@@ -45,9 +50,14 @@ export const topAiring = action({
 export const episodes = action({
   args: { dataId: v.string() },
   handler: async (_, args) => {
-    const client = await getClient();
-    const res = await client.getEpisodes(args.dataId);
-    return res;
+    try {
+      const client = await getClient();
+      const res = await client.getEpisodes(args.dataId);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch episodes";
+      throw new Error(`Unable to load episodes: ${message}`);
+    }
   },
 });
 
@@ -55,9 +65,14 @@ export const episodes = action({
 export const episodeServers = action({
   args: { episodeId: v.string() },
   handler: async (_, args) => {
-    const client = await getClient();
-    const res = await client.getEpisodeServers(args.episodeId);
-    return res;
+    try {
+      const client = await getClient();
+      const res = await client.getEpisodeServers(args.episodeId);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch servers";
+      throw new Error(`Unable to load streaming servers: ${message}`);
+    }
   },
 });
 
@@ -65,8 +80,17 @@ export const episodeServers = action({
 export const episodeSources = action({
   args: { serverId: v.string() },
   handler: async (_, args) => {
-    const client = await getClient();
-    const res = await client.getEpisodeSources(args.serverId);
-    return res;
+    try {
+      const client = await getClient();
+      const res = await client.getEpisodeSources(args.serverId);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch sources";
+      // Provide more helpful error message for common issues
+      if (message.includes("nonce") || message.includes("embed")) {
+        throw new Error("This streaming source is temporarily unavailable. Please try a different server.");
+      }
+      throw new Error(`Unable to load video sources: ${message}`);
+    }
   },
 });
