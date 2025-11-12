@@ -46,13 +46,16 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
     video.addEventListener("error", handleError);
 
     // Load HLS if needed
-    if (source.includes(".m3u8")) {
+    if (source.includes(".m3u8") || source.includes("/proxy?url=")) {
       import("hls.js").then((HlsModule) => {
         const Hls = HlsModule.default;
         if (Hls.isSupported()) {
           const hls = new Hls({
             xhrSetup: (xhr) => {
-              xhr.setRequestHeader("Referer", "https://megacloud.blog/");
+              // Only set referer for non-proxied URLs
+              if (!source.includes("/proxy?url=")) {
+                xhr.setRequestHeader("Referer", "https://megacloud.blog/");
+              }
             },
           });
           hls.loadSource(source);
