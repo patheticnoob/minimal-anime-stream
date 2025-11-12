@@ -46,6 +46,54 @@ export const topAiring = action({
   },
 });
 
+// Get most popular anime
+export const mostPopular = action({
+  args: { page: v.optional(v.number()) },
+  handler: async (_, args) => {
+    try {
+      const client = await getClient();
+      const page = args.page ?? 1;
+      const res = await client.getMostPopular(page);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch popular anime";
+      throw new Error(`Unable to load popular anime: ${message}`);
+    }
+  },
+});
+
+// Get TV shows
+export const tvShows = action({
+  args: { page: v.optional(v.number()) },
+  handler: async (_, args) => {
+    try {
+      const client = await getClient();
+      const page = args.page ?? 1;
+      const res = await client.getTVShows(page);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch TV shows";
+      throw new Error(`Unable to load TV shows: ${message}`);
+    }
+  },
+});
+
+// Get movies
+export const movies = action({
+  args: { page: v.optional(v.number()) },
+  handler: async (_, args) => {
+    try {
+      const client = await getClient();
+      const page = args.page ?? 1;
+      const res = await client.getMovies(page);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch movies";
+      throw new Error(`Unable to load movies: ${message}`);
+    }
+  },
+});
+
 // Get episodes for an anime (by dataId)
 export const episodes = action({
   args: { dataId: v.string() },

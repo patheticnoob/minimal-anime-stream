@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -11,22 +11,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { AnimeCard } from "@/components/AnimeCard";
+import { Loader2, Search } from "lucide-react";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { EpisodeSelector } from "@/components/EpisodeSelector";
+import { HeroBanner } from "@/components/HeroBanner";
+import { ContentRail } from "@/components/ContentRail";
 
-type TopAiringResult = {
-  page: number;
-  totalPage: number;
-  hasNextPage: boolean;
-  results: Array<{
-    title?: string;
-    image?: string;
-    type?: string;
-    id?: string;
-    dataId?: string;
-  }>;
+type AnimeItem = {
+  id?: string;
+  image?: string;
+  title?: string;
+  type?: string;
+  dataId?: string;
+  language?: {
+    sub?: string;
+    dub?: string;
+  };
 };
 
 type Episode = {
@@ -47,73 +47,82 @@ type EpisodeSources = {
 
 export default function Landing() {
   const fetchTopAiring = useAction(api.hianime.topAiring);
+  const fetchMostPopular = useAction(api.hianime.mostPopular);
+  const fetchTVShows = useAction(api.hianime.tvShows);
+  const fetchMovies = useAction(api.hianime.movies);
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
 
   const [loading, setLoading] = useState(true);
-  const [pageLoading, setPageLoading] = useState(false);
-  const [data, setData] = useState<TopAiringResult | null>(null);
+  const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
+  const [topAiringItems, setTopAiringItems] = useState<AnimeItem[]>([]);
+  const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
+  const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
+  const [heroItems, setHeroItems] = useState<AnimeItem[]>([]);
+  
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<TopAiringResult["results"][number] | null>(null);
+  const [selected, setSelected] = useState<AnimeItem | null>(null);
   const [episodes, setEpisodes] = useState<Array<Episode>>([]);
   const [episodesLoading, setEpisodesLoading] = useState(false);
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
   const [videoSource, setVideoSource] = useState<string | null>(null);
   const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
-  const [page, setPage] = useState(1);
 
+  // Load all content rails in parallel
   useEffect(() => {
     let mounted = true;
     setLoading(true);
-    fetchTopAiring({ page: 1 })
-      .then((res) => {
+
+    Promise.all([
+      fetchMostPopular({ page: 1 }),
+      fetchTopAiring({ page: 1 }),
+      fetchTVShows({ page: 1 }),
+      fetchMovies({ page: 1 }),
+    ])
+      .then(([popular, topAiring, tvShows, movies]) => {
         if (!mounted) return;
-        setData(res as TopAiringResult);
+        
+        const popularResults = (popular as any)?.results || [];
+        const topAiringResults = (topAiring as any)?.results || [];
+        const tvShowResults = (tvShows as any)?.results || [];
+        const movieResults = (movies as any)?.results || [];
+
+        setPopularItems(popularResults);
+        setTopAiringItems(topAiringResults);
+        setTVShowItems(tvShowResults);
+        setMovieItems(movieResults);
+
+        // Create hero items from top popular and airing (dedupe by dataId)
+        const combined = [...popularResults.slice(0, 3), ...topAiringResults.slice(0, 2)];
+        const uniqueHero = combined.filter(
+          (item, index, self) => 
+            index === self.findIndex((t) => t.dataId === item.dataId)
+        );
+        setHeroItems(uniqueHero.slice(0, 5));
       })
       .catch((err) => {
-        const msg = err instanceof Error ? err.message : "Failed to load top airing.";
+        const msg = err instanceof Error ? err.message : "Failed to load content.";
         toast.error(msg);
       })
       .finally(() => mounted && setLoading(false));
+
     return () => {
       mounted = false;
     };
-  }, [fetchTopAiring]);
+  }, [fetchMostPopular, fetchTopAiring, fetchTVShows, fetchMovies]);
 
-  const filtered = useMemo(() => {
-    if (!data?.results) return [];
-    const q = query.trim().toLowerCase();
-    if (!q) return data.results;
-    return data.results.filter((a) =>
-      (a.title ?? "").toLowerCase().includes(q),
-    );
-  }, [data, query]);
-
-  const loadPage = async (nextPage: number) => {
-    if (nextPage < 1) return;
-    setPageLoading(true);
-    try {
-      const res = (await fetchTopAiring({ page: nextPage })) as TopAiringResult;
-      setData(res);
-      setPage(nextPage);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to change page.";
-      toast.error(msg);
-    } finally {
-      setPageLoading(false);
-    }
-  };
-
-  const openAnime = async (anime: TopAiringResult["results"][number]) => {
+  const openAnime = async (anime: AnimeItem) => {
     setSelected(anime);
     setSelectedEpisode(null);
     setVideoSource(null);
+    setVideoTracks([]);
+    
     if (!anime?.dataId) {
       toast("This title has no episodes available.");
       return;
     }
+    
     setEpisodes([]);
     setEpisodesLoading(true);
     try {
@@ -136,7 +145,6 @@ export default function Landing() {
     try {
       const servers = (await fetchServers({ episodeId: ep.id })) as EpisodeServers;
       
-      // Find HD-2 server (case-insensitive search in both sub and dub)
       const allServers = [...(servers.sub || []), ...(servers.dub || [])];
       const hd2Server = allServers.find(
         (s) => s.name && s.name.toLowerCase().includes("hd-2")
@@ -152,7 +160,6 @@ export default function Landing() {
       
       if (sources?.sources?.length) {
         toast.dismiss(loadingToast);
-        // Set video source and tracks (tracks can be empty array if not available)
         setVideoSource(sources.sources[0].file);
         setVideoTracks(sources.tracks || []);
         setSelected(null);
@@ -163,7 +170,6 @@ export default function Landing() {
     } catch (err) {
       toast.dismiss(loadingToast);
       const msg = err instanceof Error ? err.message : "Failed to load video.";
-      // Provide more helpful error message
       if (msg.includes("nonce") || msg.includes("embed")) {
         toast.error("This episode is temporarily unavailable. Please try another episode.");
       } else {
@@ -172,13 +178,17 @@ export default function Landing() {
     }
   };
 
+  const filteredPopular = query
+    ? popularItems.filter((a) => (a.title ?? "").toLowerCase().includes(query.toLowerCase()))
+    : popularItems;
+
   return (
     <>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="min-h-screen flex flex-col bg-background"
+        className="min-h-screen bg-background"
       >
         {/* Header */}
         <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -196,7 +206,7 @@ export default function Landing() {
                 height={32}
                 className="rounded"
               />
-              <span className="text-lg font-bold tracking-tight">Anime Stream</span>
+              <span className="text-lg font-bold tracking-tight">HiAnime</span>
             </motion.div>
             
             <motion.div 
@@ -219,105 +229,105 @@ export default function Landing() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 container px-6 py-8 max-w-7xl mx-auto">
-          {loading ? (
-            <div className="h-[60vh] flex items-center justify-center">
-              <div className="flex flex-col items-center gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">Loading anime...</p>
-              </div>
+        {loading ? (
+          <div className="h-[60vh] flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Loading content...</p>
             </div>
-          ) : (
-            <>
-              {/* Page Info */}
-              <motion.div 
-                className="mb-6"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                <h1 className="text-2xl font-bold tracking-tight mb-1">
-                  {query ? "Search Results" : "Top Airing"}
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  {filtered.length} {filtered.length === 1 ? "title" : "titles"}
-                </p>
-              </motion.div>
-
-              {/* Anime Grid */}
-              <motion.div 
-                className="grid gap-4 mb-8"
-                style={{
-                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-                }}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                {filtered.map((item, idx) => (
-                  <AnimeCard
-                    key={(item.id ?? item.title ?? "item") + idx}
-                    anime={item}
-                    index={idx}
-                    onClick={() => openAnime(item)}
-                  />
-                ))}
-              </motion.div>
-
-              {/* Pagination */}
-              {data && (
-                <motion.div 
-                  className="flex items-center justify-center gap-4"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={pageLoading || page <= 1}
-                    onClick={() => loadPage(page - 1)}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <div className="flex items-center gap-2 min-w-[100px] justify-center">
-                    <span className="text-sm font-medium">Page {data.page}</span>
-                    <span className="text-sm text-muted-foreground">of {data.totalPage}</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={pageLoading || !data.hasNextPage}
-                    onClick={() => loadPage(page + 1)}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </motion.div>
-              )}
-            </>
-          )}
-        </main>
-
-        {/* Episode Selection Dialog */}
-        <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-          <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold tracking-tight pr-8">
-                {selected?.title ?? "Select Episode"}
-              </DialogTitle>
-            </DialogHeader>
-
-            <div className="space-y-6 py-4">
-              <EpisodeSelector
-                episodes={episodes}
-                loading={episodesLoading}
-                selectedEpisode={selectedEpisode}
-                onSelectEpisode={playEpisode}
+          </div>
+        ) : (
+          <>
+            {/* Hero Banner */}
+            {!query && (
+              <HeroBanner
+                items={heroItems}
+                onPlay={openAnime}
+                onDetails={openAnime}
               />
+            )}
+
+            {/* Content Rails */}
+            <div className="py-8">
+              {query ? (
+                <div className="px-6">
+                  <h2 className="text-2xl font-bold mb-4">Search Results</h2>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    {filteredPopular.length} {filteredPopular.length === 1 ? "result" : "results"}
+                  </p>
+                  <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
+                    {filteredPopular.map((item, idx) => (
+                      <motion.div
+                        key={item.dataId || idx}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        onClick={() => openAnime(item)}
+                        className="cursor-pointer"
+                      >
+                        <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-muted mb-2">
+                          {item.image && (
+                            <img
+                              src={item.image}
+                              alt={item.title || "Poster"}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          )}
+                        </div>
+                        <h3 className="text-sm font-medium line-clamp-2">{item.title}</h3>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <ContentRail
+                    title="Popular Now"
+                    items={popularItems}
+                    onItemClick={openAnime}
+                  />
+                  <ContentRail
+                    title="Top Airing"
+                    items={topAiringItems}
+                    onItemClick={openAnime}
+                  />
+                  <ContentRail
+                    title="Series You'll Love"
+                    items={tvShowItems}
+                    onItemClick={openAnime}
+                  />
+                  <ContentRail
+                    title="Trending Movies"
+                    items={movieItems}
+                    onItemClick={openAnime}
+                  />
+                </>
+              )}
             </div>
-          </DialogContent>
-        </Dialog>
+          </>
+        )}
       </motion.div>
+
+      {/* Episode Selection Dialog */}
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold tracking-tight pr-8">
+              {selected?.title ?? "Select Episode"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            <EpisodeSelector
+              episodes={episodes}
+              loading={episodesLoading}
+              selectedEpisode={selectedEpisode}
+              onSelectEpisode={playEpisode}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Video Player */}
       {videoSource && (
