@@ -2,7 +2,34 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, X } from "lucide-react";
 import { toast } from "sonner";
-import Hls from "hls.js";
+ // Dynamically load hls.js from CDN if not present/installed
+const loadHls = async (): Promise<any> => {
+  if (typeof window !== "undefined" && (window as any).Hls) {
+    return (window as any).Hls;
+  }
+  const id = "hlsjs-cdn-script";
+  if (typeof document !== "undefined") {
+    const existing = document.getElementById(id) as HTMLScriptElement | null;
+    if (existing) {
+      if ((window as any).Hls) return (window as any).Hls;
+      await new Promise<void>((resolve, reject) => {
+        existing.addEventListener("load", () => resolve());
+        existing.addEventListener("error", () => reject(new Error("Failed to load HLS script")));
+      });
+      return (window as any).Hls;
+    }
+    await new Promise<void>((resolve, reject) => {
+      const s = document.createElement("script");
+      s.id = id;
+      s.src = "https://cdn.jsdelivr.net/npm/hls.js@1.5.14/dist/hls.min.js";
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Failed to load HLS script"));
+      document.head.appendChild(s);
+    });
+  }
+  return (window as any).Hls;
+};
 
 type VideoPlayerProps = {
   source: string;
@@ -46,60 +73,64 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
     video.addEventListener("error", handleError);
 
     if (isHls) {
-      if (Hls.isSupported()) {
-        // Add fetch/xhr setup to avoid blocked referrers on some hosts
-        const hls = new Hls({
-          maxBufferLength: 60,
-          // Cast to any to avoid strict type issues for config extension
-          ...( {
-            fetchSetup: (_ctx: any, init: any) => ({ ...(init || {}), referrerPolicy: "no-referrer" }),
-            xhrSetup: (xhr: any) => {
-              try { xhr.withCredentials = false; } catch { /* noop */ }
-            },
-          } as any),
-        });
-        hlsRef.current = hls;
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-          hls.loadSource(source);
-        });
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          setLoading(false);
-          video.play().catch(() => {});
-        });
-        hls.on(Hls.Events.ERROR, (_evt: any, data: any) => {
-          console.error("HLS error:", data);
-          if (data?.fatal) {
-            try {
-              if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                hls.startLoad();
-                return;
+      (async () => {
+        try {
+          const Hls: any = await loadHls();
+          if (Hls && Hls.isSupported()) {
+            const hls = new Hls({
+              maxBufferLength: 60,
+              ...( {
+                fetchSetup: (_ctx: any, init: any) => ({ ...(init || {}), referrerPolicy: "no-referrer" }),
+                xhrSetup: (xhr: any) => {
+                  try { xhr.withCredentials = false; } catch { /* noop */ }
+                },
+              } as any),
+            });
+            hlsRef.current = hls;
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+              hls.loadSource(source);
+            });
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              setLoading(false);
+              video.play().catch(() => {});
+            });
+            hls.on(Hls.Events.ERROR, (_evt: any, data: any) => {
+              console.error("HLS error:", data);
+              if (data?.fatal) {
+                try {
+                  if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                    hls.startLoad();
+                    return;
+                  }
+                  if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                    hls.recoverMediaError();
+                    return;
+                  }
+                } catch { /* noop */ }
+                setError(true);
+                setLoading(false);
+                toast.error("Stream error. Please try another episode or server.");
+                hls.destroy();
+                hlsRef.current = null;
               }
-              if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-                hls.recoverMediaError();
-                return;
-              }
-            } catch {
-              // fall through to final error handling
-            }
+            });
+          } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+            // Safari native HLS
+            video.src = source;
+            video.onloadedmetadata = () => setLoading(false);
+            video.play().catch(() => {});
+          } else {
             setError(true);
             setLoading(false);
-            toast.error("Stream error. Please try another episode or server.");
-            hls.destroy();
-            hlsRef.current = null;
+            toast.error("Your browser doesn't support HLS.");
           }
-        });
-      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        // Safari native HLS
-        video.src = source;
-        // mark ready when metadata is loaded
-        video.onloadedmetadata = () => setLoading(false);
-        video.play().catch(() => {});
-      } else {
-        setError(true);
-        setLoading(false);
-        toast.error("Your browser doesn't support HLS.");
-      }
+        } catch {
+          setError(true);
+          setLoading(false);
+          toast.error("Failed to load HLS library.");
+        }
+      })();
     } else {
       // MP4 or other directly playable source
       video.src = source;
