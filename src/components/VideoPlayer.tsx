@@ -55,8 +55,8 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
               xhr.setRequestHeader("Referer", "https://megacloud.blog/");
             },
           });
-          hls.attachMedia(video);
           hls.loadSource(source);
+          hls.attachMedia(video);
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             console.log("HLS manifest loaded successfully");
           });
