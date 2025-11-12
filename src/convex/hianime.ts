@@ -2,8 +2,6 @@
 
 import { action } from "./_generated/server";
 import { v } from "convex/values";
-import { writeFileSync } from "fs";
-import { join } from "path";
 
 // Helper to lazily import hianime and support both named and default exports
 async function getClient() {
@@ -32,28 +30,6 @@ async function getClient() {
   }
 }
 
-// Helper to log responses to file
-function logResponse(functionName: string, args: any, response: any) {
-  try {
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      function: functionName,
-      args,
-      response,
-    };
-    
-    const logLine = JSON.stringify(logEntry, null, 2) + "\n\n" + "=".repeat(80) + "\n\n";
-    
-    // Append to responses.txt in the project root
-    const filePath = join(process.cwd(), "responses.txt");
-    writeFileSync(filePath, logLine, { flag: "a" });
-    
-    console.log(`Logged response for ${functionName} to responses.txt`);
-  } catch (err) {
-    console.error("Failed to log response:", err);
-  }
-}
-
 // Get top airing anime list (paginated)
 export const topAiring = action({
   args: { page: v.optional(v.number()) },
@@ -62,10 +38,6 @@ export const topAiring = action({
       const client = await getClient();
       const page = args.page ?? 1;
       const res = await client.getTopAiring(page);
-      
-      // Log the response
-      logResponse("topAiring", { page }, res);
-      
       return res;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch top airing anime";
@@ -81,10 +53,6 @@ export const episodes = action({
     try {
       const client = await getClient();
       const res = await client.getEpisodes(args.dataId);
-      
-      // Log the response
-      logResponse("episodes", { dataId: args.dataId }, res);
-      
       return res;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch episodes";
@@ -100,10 +68,6 @@ export const episodeServers = action({
     try {
       const client = await getClient();
       const res = await client.getEpisodeServers(args.episodeId);
-      
-      // Log the response
-      logResponse("episodeServers", { episodeId: args.episodeId }, res);
-      
       return res;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch servers";
@@ -120,9 +84,8 @@ export const episodeSources = action({
       const client = await getClient();
       const res = await client.getEpisodeSources(args.serverId);
       
-      // Log the response for debugging
+      // Log the response for debugging (console only)
       console.log("Episode sources response:", JSON.stringify(res, null, 2));
-      logResponse("episodeSources", { serverId: args.serverId }, res);
       
       // Ensure we return a valid response even if tracks are missing
       return {
@@ -132,9 +95,6 @@ export const episodeSources = action({
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch sources";
       console.error("Episode sources error:", message);
-      
-      // Log the error
-      logResponse("episodeSources", { serverId: args.serverId }, { error: message });
       
       // Provide more helpful error message for common issues
       if (message.includes("nonce") || message.includes("embed")) {
