@@ -179,8 +179,8 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
               key={idx}
               kind={track.kind || "subtitles"}
               src={track.file}
-              label={track.label}
-              srcLang={track.label.toLowerCase()}
+              label={track.label || "Unknown"}
+              srcLang={track.label?.toLowerCase() || "en"}
             />
           ))}
         </video>
