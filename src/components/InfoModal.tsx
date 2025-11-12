@@ -346,6 +346,14 @@ export function InfoModal({
                     >
                       HD-2
                     </Button>
+                    <Button
+                      size="sm"
+                      variant={selectedServer === "hd-3" ? "default" : "outline"}
+                      onClick={() => updatePreferences({ serverName: "hd-3" })}
+                      className="flex-1"
+                    >
+                      HD-3
+                    </Button>
                   </div>
                 </div>
               </div>

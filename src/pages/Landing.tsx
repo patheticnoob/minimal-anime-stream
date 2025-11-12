@@ -187,8 +187,10 @@ export default function Landing() {
           ) || null;
         const first = hls || sources.sources[0];
 
+        console.log("Selected video source:", first.file);
+
         // Stable title with audio params visible (SUB/DUB) so you can verify
-        setVideoTitle(`${selected?.title ?? "Anime"} - Episode ${ep.number ?? "?"} • ${categoryUsed.toUpperCase()}`);
+        setVideoTitle(`${selected?.title ?? "Anime"} - Episode ${ep.number ?? "?"} • ${categoryUsed.toUpperCase()} • ${chosen.name}`);
 
         // Sanitize tracks (only valid files, default labels)
         const safeTracks = (sources.tracks || [])
@@ -202,11 +204,12 @@ export default function Landing() {
         setVideoSource(first.file);
         setVideoTracks(safeTracks);
         setSelected(null);
-        // Show exact server picked to verify SUB/DUB and HD-2 selection
-        toast(`Playing ${categoryUsed.toUpperCase()} • ${chosen.name || "HD-2"}`);
+        // Show exact server picked to verify SUB/DUB and server selection
+        toast.success(`Playing ${categoryUsed.toUpperCase()} • ${chosen.name}`);
       } else {
         toast.dismiss(loadingToast);
         toast.error("No video sources available for this episode.");
+        console.error("No sources in response");
       }
     } catch (err) {
       toast.dismiss(loadingToast);
