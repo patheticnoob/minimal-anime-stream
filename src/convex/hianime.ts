@@ -46,54 +46,6 @@ export const topAiring = action({
   },
 });
 
-// Get most popular anime
-export const mostPopular = action({
-  args: { page: v.optional(v.number()) },
-  handler: async (_, args) => {
-    try {
-      const client = await getClient();
-      const page = args.page ?? 1;
-      const res = await client.getMostPopular(page);
-      return res;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch popular anime";
-      throw new Error(`Unable to load popular anime: ${message}`);
-    }
-  },
-});
-
-// Get TV shows
-export const tvShows = action({
-  args: { page: v.optional(v.number()) },
-  handler: async (_, args) => {
-    try {
-      const client = await getClient();
-      const page = args.page ?? 1;
-      const res = await client.getTVShows(page);
-      return res;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch TV shows";
-      throw new Error(`Unable to load TV shows: ${message}`);
-    }
-  },
-});
-
-// Get movies
-export const movies = action({
-  args: { page: v.optional(v.number()) },
-  handler: async (_, args) => {
-    try {
-      const client = await getClient();
-      const page = args.page ?? 1;
-      const res = await client.getMovies(page);
-      return res;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch movies";
-      throw new Error(`Unable to load movies: ${message}`);
-    }
-  },
-});
-
 // Get episodes for an anime (by dataId)
 export const episodes = action({
   args: { dataId: v.string() },
@@ -131,22 +83,12 @@ export const episodeSources = action({
     try {
       const client = await getClient();
       const res = await client.getEpisodeSources(args.serverId);
-      
-      // Log the response for debugging (console only)
-      console.log("Episode sources response:", JSON.stringify(res, null, 2));
-      
-      // Ensure we return a valid response even if tracks are missing
-      return {
-        sources: res.sources || [],
-        tracks: res.tracks || [],
-      };
+      return res;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch sources";
-      console.error("Episode sources error:", message);
-      
       // Provide more helpful error message for common issues
       if (message.includes("nonce") || message.includes("embed")) {
-        throw new Error("This streaming source is temporarily unavailable. Please try a different episode.");
+        throw new Error("This streaming source is temporarily unavailable. Please try a different server.");
       }
       throw new Error(`Unable to load video sources: ${message}`);
     }

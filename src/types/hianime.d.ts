@@ -1,25 +1,19 @@
 declare module "hianime" {
-  export type AnimeItem = {
-    id?: string;
-    image?: string;
-    title?: string;
-    type?: string;
-    dataId?: string;
-    language?: {
-      sub?: string;
-      dub?: string;
-    };
-  };
-
   export type TopAiringResult = {
     page: number;
     totalPage: number;
     hasNextPage: boolean;
-    results: Array<AnimeItem>;
+    results: Array<{
+      title?: string;
+      image?: string;
+      type?: string;
+      id?: string; // human readable id/path
+      dataId?: string; // numeric data id used for episodes
+    }>;
   };
 
   export type Episode = {
-    id: string;
+    id: string; // episode id for servers
     title?: string;
     number?: number;
   };
@@ -37,9 +31,6 @@ declare module "hianime" {
   export class Hianime {
     constructor();
     getTopAiring(page?: number): Promise<TopAiringResult>;
-    getMostPopular(page?: number): Promise<TopAiringResult>;
-    getTVShows(page?: number): Promise<TopAiringResult>;
-    getMovies(page?: number): Promise<TopAiringResult>;
     getEpisodes(dataId: string): Promise<Array<Episode>>;
     getEpisodeServers(episodeId: string): Promise<EpisodeServers>;
     getEpisodeSources(serverId: string): Promise<EpisodeSources>;
