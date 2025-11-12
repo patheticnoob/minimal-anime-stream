@@ -79,12 +79,15 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
           if (Hls && Hls.isSupported()) {
             const hls = new Hls({
               maxBufferLength: 60,
-              ...( {
-                fetchSetup: (_ctx: any, init: any) => ({ ...(init || {}), referrerPolicy: "no-referrer" }),
-                xhrSetup: (xhr: any) => {
-                  try { xhr.withCredentials = false; } catch { /* noop */ }
-                },
-              } as any),
+              xhrSetup: (xhr: any, url: string) => {
+                try {
+                  xhr.withCredentials = false;
+                  // Set the required Referer header for megacloud streams
+                  xhr.setRequestHeader('Referer', 'https://megacloud.blog/');
+                } catch (e) {
+                  console.warn('Failed to set XHR headers:', e);
+                }
+              },
             });
             hlsRef.current = hls;
             hls.attachMedia(video);

@@ -188,6 +188,7 @@ export default function Landing() {
         const first = hls || sources.sources[0];
 
         console.log("Selected video source:", first.file);
+        console.log("Video source headers:", (sources as any).headers);
 
         // Stable title with audio params visible (SUB/DUB) so you can verify
         setVideoTitle(`${selected?.title ?? "Anime"} - Episode ${ep.number ?? "?"} • ${categoryUsed.toUpperCase()} • ${chosen.name}`);
