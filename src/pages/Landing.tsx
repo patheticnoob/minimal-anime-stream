@@ -63,6 +63,8 @@ export default function Landing() {
   const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
   const [videoSource, setVideoSource] = useState<string | null>(null);
   const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
+  // Add stable title used by player so it doesn't rely on `selected` after closing the modal
+  const [videoTitle, setVideoTitle] = useState<string | null>(null);
 
   // Load all content rails in parallel
   useEffect(() => {
@@ -112,6 +114,7 @@ export default function Landing() {
     setSelectedEpisode(null);
     setVideoSource(null);
     setVideoTracks([]);
+    setVideoTitle(null);
     
     if (!anime?.dataId) {
       toast("This title has no episodes available.");
@@ -136,28 +139,60 @@ export default function Landing() {
     if (!ep?.id) return;
 
     const loadingToast = toast.loading("Loading video...");
-    
+
     try {
       const servers = (await fetchServers({ episodeId: ep.id })) as EpisodeServers;
-      
-      const allServers = [...(servers.sub || []), ...(servers.dub || [])];
-      const hd2Server = allServers.find(
-        (s) => s.name && s.name.toLowerCase().includes("hd-2")
-      );
-      
-      if (!hd2Server) {
+
+      // Normalize server names and strictly match HD-2
+      const normalize = (s: string) => (s || "").toLowerCase().replace(/[\s\-_]/g, "");
+      const isHD2Strict = (name: string) => /\bhd[-_\s]*2\b/i.test(name) || normalize(name).includes("hd2");
+
+      // Guard for unexpected shapes
+      const subList: Array<{ id: string; name: string }> = Array.isArray((servers as any)?.sub) ? (servers as any).sub : [];
+      const dubList: Array<{ id: string; name: string }> = Array.isArray((servers as any)?.dub) ? (servers as any).dub : [];
+
+      const findHD2 = (arr: Array<{ id: string; name: string }>) => (arr || []).find((s) => isHD2Strict(s.name));
+
+      // Hardcode HD-2 only; prefer SUB then DUB
+      const hd2Sub = findHD2(subList);
+      const hd2Dub = findHD2(dubList);
+      const chosen = hd2Sub || hd2Dub;
+
+      const categoryUsed: "sub" | "dub" = hd2Sub ? "sub" : hd2Dub ? "dub" : "sub";
+
+      if (!chosen) {
         toast.dismiss(loadingToast);
         toast.error("HD-2 server not available for this episode.");
         return;
       }
 
-      const sources = (await fetchSources({ serverId: hd2Server.id })) as EpisodeSources;
-      
+      const sources = (await fetchSources({ serverId: chosen.id })) as EpisodeSources;
+
       if (sources?.sources?.length) {
+        // Prefer HLS if present, otherwise first source
+        const hls =
+          sources.sources.find(
+            (s) => (s.type && s.type.toLowerCase().includes("hls")) || /\.m3u8($|\?)/i.test(s.file),
+          ) || null;
+        const first = hls || sources.sources[0];
+
+        // Stable title with audio params visible (SUB/DUB) so you can verify
+        setVideoTitle(`${selected?.title ?? "Anime"} - Episode ${ep.number ?? "?"} • ${categoryUsed.toUpperCase()}`);
+
+        // Sanitize tracks (only valid files, default labels)
+        const safeTracks = (sources.tracks || [])
+          .filter((t) => t && t.file)
+          .map((t, i) => ({
+            ...t,
+            label: t.label || `Subtitle ${i + 1}`,
+          }));
+
         toast.dismiss(loadingToast);
-        setVideoSource(sources.sources[0].file);
-        setVideoTracks(sources.tracks || []);
+        setVideoSource(first.file);
+        setVideoTracks(safeTracks);
         setSelected(null);
+        // Show exact server picked to verify SUB/DUB and HD-2 selection
+        toast(`Playing ${categoryUsed.toUpperCase()} • ${chosen.name || "HD-2"}`);
       } else {
         toast.dismiss(loadingToast);
         toast.error("No video sources available for this episode.");
@@ -165,7 +200,7 @@ export default function Landing() {
     } catch (err) {
       toast.dismiss(loadingToast);
       const msg = err instanceof Error ? err.message : "Failed to load video.";
-      if (msg.includes("nonce") || msg.includes("embed")) {
+      if (msg.toLowerCase().includes("nonce") || msg.toLowerCase().includes("embed")) {
         toast.error("This episode is temporarily unavailable. Please try another episode.");
       } else {
         toast.error(msg);
@@ -318,11 +353,12 @@ export default function Landing() {
       {videoSource && (
         <VideoPlayer
           source={videoSource}
-          title={`${selected?.title ?? "Anime"} - Episode ${selectedEpisode?.number ?? "?"}`}
+          title={videoTitle ?? `${selected?.title ?? "Anime"} - Episode ${selectedEpisode?.number ?? "?"}`}
           tracks={videoTracks}
           onClose={() => {
             setVideoSource(null);
             setVideoTracks([]);
+            setVideoTitle(null);
           }}
         />
       )}
