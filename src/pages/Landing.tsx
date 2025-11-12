@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { VideoPlayer } from "@/components/VideoPlayer";
 
 type AnimeItem = {
   title?: string;
@@ -55,6 +56,9 @@ export default function Landing() {
   const [selected, setSelected] = useState<AnimeItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [episodesLoading, setEpisodesLoading] = useState(false);
+  const [videoSource, setVideoSource] = useState<string | null>(null);
+  const [videoTitle, setVideoTitle] = useState<string>("");
+  const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
 
   // Load all content on mount
   useEffect(() => {
@@ -131,14 +135,20 @@ export default function Landing() {
       }
 
       const sources = await fetchSources({ serverId: preferredServer.id });
-      const sourcesData = sources as { sources: Array<{ file: string; type: string }> };
+      const sourcesData = sources as { 
+        sources: Array<{ file: string; type: string }>;
+        tracks?: Array<{ file: string; label: string; kind?: string }>;
+      };
       
       if (sourcesData.sources && sourcesData.sources.length > 0) {
         const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
         const videoUrl = m3u8Source?.file || sourcesData.sources[0].file;
         
-        // Open in new tab for now (video player component can be added later)
-        window.open(videoUrl, "_blank");
+        // Set video player state
+        setVideoSource(videoUrl);
+        setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
+        setVideoTracks(sourcesData.tracks || []);
+        
         toast.success(`Playing Episode ${episode.number}`);
       } else {
         toast.error("No video sources available");
@@ -325,6 +335,20 @@ export default function Landing() {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      {/* Video Player */}
+      {videoSource && (
+        <VideoPlayer
+          source={videoSource}
+          title={videoTitle}
+          tracks={videoTracks}
+          onClose={() => {
+            setVideoSource(null);
+            setVideoTitle("");
+            setVideoTracks([]);
+          }}
+        />
+      )}
     </div>
   );
 }
