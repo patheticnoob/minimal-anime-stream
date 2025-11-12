@@ -80,23 +80,20 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
             const hls = new Hls({
               maxBufferLength: 60,
               xhrSetup: (xhr: any, url: string) => {
-                try {
-                  xhr.withCredentials = false;
-                  // Set the required Referer header for megacloud streams
-                  xhr.setRequestHeader('Referer', 'https://megacloud.blog/');
-                } catch (e) {
-                  console.warn('Failed to set XHR headers:', e);
-                }
+                xhr.withCredentials = false;
+                xhr.setRequestHeader('Referer', 'https://megacloud.blog/');
+                console.log("XHR setup for URL:", url);
               },
             });
             hlsRef.current = hls;
+            hls.loadSource(source);
             hls.attachMedia(video);
-            hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-              hls.loadSource(source);
-            });
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              console.log("HLS manifest parsed successfully");
               setLoading(false);
-              video.play().catch(() => {});
+              video.play().catch((err) => {
+                console.error("Video play error:", err);
+              });
             });
             hls.on(Hls.Events.ERROR, (_evt: any, data: any) => {
               console.error("HLS error:", data);
