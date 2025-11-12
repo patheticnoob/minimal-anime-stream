@@ -33,12 +33,51 @@ http.route({
         });
       }
 
+      const contentType = response.headers.get("Content-Type") || "";
+      
+      // If it's an m3u8 playlist, we need to rewrite URLs to go through our proxy
+      if (contentType.includes("mpegurl") || contentType.includes("m3u8") || targetUrl.includes(".m3u8")) {
+        const text = await response.text();
+        const baseUrl = targetUrl.substring(0, targetUrl.lastIndexOf("/") + 1);
+        
+        // Rewrite relative URLs in the playlist to go through our proxy
+        const rewrittenText = text.split("\n").map(line => {
+          // Skip comments and empty lines
+          if (line.startsWith("#") || line.trim() === "") {
+            return line;
+          }
+          
+          // If it's a relative URL, make it absolute and proxy it
+          if (!line.startsWith("http")) {
+            const absoluteUrl = baseUrl + line;
+            const proxyUrl = `/proxy?url=${encodeURIComponent(absoluteUrl)}`;
+            return proxyUrl;
+          }
+          
+          // If it's already absolute, proxy it
+          const proxyUrl = `/proxy?url=${encodeURIComponent(line)}`;
+          return proxyUrl;
+        }).join("\n");
+        
+        return new Response(rewrittenText, {
+          status: 200,
+          headers: {
+            "Content-Type": "application/vnd.apple.mpegurl",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Cache-Control": "no-cache",
+          },
+        });
+      }
+      
+      // For non-playlist content (video segments), just pass through
       const data = await response.arrayBuffer();
       
       return new Response(data, {
         status: 200,
         headers: {
-          "Content-Type": response.headers.get("Content-Type") || "application/vnd.apple.mpegurl",
+          "Content-Type": contentType || "application/octet-stream",
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, OPTIONS",
           "Access-Control-Allow-Headers": "*",

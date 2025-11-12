@@ -51,11 +51,14 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
         const Hls = HlsModule.default;
         if (Hls.isSupported()) {
           const hls = new Hls({
-            xhrSetup: (xhr) => {
-              // Only set referer for non-proxied URLs
-              if (!source.includes("/proxy?url=")) {
-                xhr.setRequestHeader("Referer", "https://megacloud.blog/");
+            xhrSetup: (xhr, url) => {
+              // For proxied sources, we need to proxy all segment requests too
+              if (source.includes("/proxy?url=")) {
+                // This is already a proxied URL, don't modify
+                return;
               }
+              // For direct URLs, set referer
+              xhr.setRequestHeader("Referer", "https://megacloud.blog/");
             },
           });
           hls.loadSource(source);
