@@ -141,6 +141,7 @@ export default function Landing() {
     const loadingToast = toast.loading("Loading video...");
 
     try {
+      // Step 1: Fetch servers using episode ID (string like "3303")
       const servers = (await fetchServers({ episodeId: ep.id })) as EpisodeServers;
 
       // Normalize server names and strictly match HD-2
@@ -166,6 +167,8 @@ export default function Landing() {
         return;
       }
 
+      // Step 2: Fetch sources using server ID (numeric string like "579601")
+      // The server.id is the unique identifier from the server object
       const sources = (await fetchSources({ serverId: chosen.id })) as EpisodeSources;
 
       if (sources?.sources?.length) {
@@ -181,7 +184,7 @@ export default function Landing() {
 
         // Sanitize tracks (only valid files, default labels)
         const safeTracks = (sources.tracks || [])
-          .filter((t) => t && t.file)
+          .filter((t) => t && t.file && t.kind !== "thumbnails")
           .map((t, i) => ({
             ...t,
             label: t.label || `Subtitle ${i + 1}`,
