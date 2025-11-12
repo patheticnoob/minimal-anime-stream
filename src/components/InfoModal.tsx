@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -43,7 +42,8 @@ type InfoModalProps = {
   anime: AnimeItem | null;
   episodes: Episode[];
   episodesLoading: boolean;
-  onPlayEpisode: (ep: Episode) => void;
+  // Allow async handler
+  onPlayEpisode: (ep: Episode) => void | Promise<void>;
 };
 
 export function InfoModal({
@@ -92,7 +92,7 @@ export function InfoModal({
     return sorted;
   }, [episodes, query, sort]);
 
-  const playResume = () => {
+  const playResume = async () => {
     if (!episodes?.length) {
       toast("No episodes available for this title.");
       return;

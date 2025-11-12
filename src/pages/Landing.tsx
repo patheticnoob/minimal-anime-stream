@@ -28,9 +28,6 @@ type Episode = {
   id: string;
   title?: string | null;
   number?: number | null;
-  thumbnail?: string | null;
-  duration?: string | null;
-  releaseDate?: string | null;
 };
 
 type EpisodeServers = {
