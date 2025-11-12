@@ -36,14 +36,21 @@ type Episode = {
   releaseDate?: string | null;
 };
 
+type ServerPreferences = {
+  category: "sub" | "dub";
+  serverName: string;
+};
+
 type InfoModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   anime: AnimeItem | null;
   episodes: Episode[];
   episodesLoading: boolean;
-  // Allow async handler
-  onPlayEpisode: (ep: Episode) => void | Promise<void>;
+  // Allow async handler with optional preferences
+  onPlayEpisode: (ep: Episode, preferences?: ServerPreferences) => void | Promise<void>;
+  serverPreferences?: ServerPreferences;
+  onServerPreferencesChange?: (prefs: ServerPreferences) => void;
 };
 
 export function InfoModal({
@@ -53,11 +60,25 @@ export function InfoModal({
   episodes,
   episodesLoading,
   onPlayEpisode,
+  serverPreferences,
+  onServerPreferencesChange,
 }: InfoModalProps) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"oldest" | "newest">("oldest");
   const [expanded, setExpanded] = useState(false);
   const [watchlisted, setWatchlisted] = useState(false);
+  
+  const selectedCategory = serverPreferences?.category || "sub";
+  const selectedServer = serverPreferences?.serverName || "hd-2";
+  
+  const updatePreferences = (updates: Partial<ServerPreferences>) => {
+    if (onServerPreferencesChange) {
+      onServerPreferencesChange({
+        category: updates.category !== undefined ? updates.category : selectedCategory,
+        serverName: updates.serverName !== undefined ? updates.serverName : selectedServer,
+      });
+    }
+  };
 
   const subCount = Number(anime?.language?.sub || 0);
   const dubCount = Number(anime?.language?.dub || 0);
@@ -101,7 +122,9 @@ export function InfoModal({
       sort === "oldest"
         ? filteredSortedEpisodes[0] || episodes[0]
         : filteredSortedEpisodes[0] || episodes[episodes.length - 1];
-    if (chosen) onPlayEpisode(chosen);
+    if (chosen) {
+      onPlayEpisode(chosen, { category: selectedCategory, serverName: selectedServer });
+    }
   };
 
   const toggleWatchlist = () => {
@@ -277,6 +300,59 @@ export function InfoModal({
 
             <Separator />
 
+            {/* Server & Audio Selection */}
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Playback Settings</h3>
+              <div className="flex flex-wrap gap-3">
+                <div className="flex-1 min-w-[200px]">
+                  <label className="text-xs text-muted-foreground mb-2 block">Audio</label>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant={selectedCategory === "sub" ? "default" : "outline"}
+                      onClick={() => updatePreferences({ category: "sub" })}
+                      disabled={!hasSub}
+                      className="flex-1"
+                    >
+                      Sub {hasSub && `(${subCount})`}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={selectedCategory === "dub" ? "default" : "outline"}
+                      onClick={() => updatePreferences({ category: "dub" })}
+                      disabled={!hasDub}
+                      className="flex-1"
+                    >
+                      Dub {hasDub && `(${dubCount})`}
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-[200px]">
+                  <label className="text-xs text-muted-foreground mb-2 block">Server</label>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant={selectedServer === "hd-1" ? "default" : "outline"}
+                      onClick={() => updatePreferences({ serverName: "hd-1" })}
+                      className="flex-1"
+                    >
+                      HD-1
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={selectedServer === "hd-2" ? "default" : "outline"}
+                      onClick={() => updatePreferences({ serverName: "hd-2" })}
+                      className="flex-1"
+                    >
+                      HD-2
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
             {/* Episodes */}
             <div>
               <div className="flex items-center justify-between mb-3">
@@ -397,7 +473,7 @@ export function InfoModal({
                           <Button
                             size="sm"
                             className="h-8"
-                            onClick={() => onPlayEpisode(ep)}
+                            onClick={() => onPlayEpisode(ep, { category: selectedCategory, serverName: selectedServer })}
                           >
                             <Play className="mr-1 h-3 w-3" fill="currentColor" />
                             Play

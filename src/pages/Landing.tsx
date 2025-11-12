@@ -30,6 +30,11 @@ type Episode = {
   number?: number | null;
 };
 
+type ServerPreferences = {
+  category: "sub" | "dub";
+  serverName: string;
+};
+
 type EpisodeServers = {
   sub: Array<{ id: string; name: string }>;
   dub: Array<{ id: string; name: string }>;
@@ -65,6 +70,7 @@ export default function Landing() {
   const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
   // Add stable title used by player so it doesn't rely on `selected` after closing the modal
   const [videoTitle, setVideoTitle] = useState<string | null>(null);
+  const [serverPreferences, setServerPreferences] = useState<ServerPreferences>({ category: "sub", serverName: "hd-2" });
 
   // Load all content rails in parallel
   useEffect(() => {
@@ -134,7 +140,8 @@ export default function Landing() {
     }
   };
 
-  const playEpisode = async (ep: Episode) => {
+  const playEpisode = async (ep: Episode, preferences?: ServerPreferences) => {
+    const prefs = preferences || serverPreferences;
     setSelectedEpisode(ep);
     if (!ep?.id) return;
 
@@ -144,28 +151,29 @@ export default function Landing() {
       // Step 1: Fetch servers using episode ID (string like "3303")
       const servers = (await fetchServers({ episodeId: ep.id })) as EpisodeServers;
 
-      // Normalize server names and strictly match HD-2
+      // Normalize server names for matching
       const normalize = (s: string) => (s || "").toLowerCase().replace(/[\s\-_]/g, "");
-      const isHD2Strict = (name: string) => /\bhd[-_\s]*2\b/i.test(name) || normalize(name).includes("hd2");
+      const matchesServer = (name: string, target: string) => {
+        const normalized = normalize(name);
+        const targetNorm = normalize(target);
+        return normalized.includes(targetNorm) || new RegExp(`\\b${target.replace("-", "[-_\\s]*")}\\b`, "i").test(name);
+      };
 
       // Guard for unexpected shapes
       const subList: Array<{ id: string; name: string }> = Array.isArray((servers as any)?.sub) ? (servers as any).sub : [];
       const dubList: Array<{ id: string; name: string }> = Array.isArray((servers as any)?.dub) ? (servers as any).dub : [];
 
-      const findHD2 = (arr: Array<{ id: string; name: string }>) => (arr || []).find((s) => isHD2Strict(s.name));
-
-      // Hardcode HD-2 only; prefer SUB then DUB
-      const hd2Sub = findHD2(subList);
-      const hd2Dub = findHD2(dubList);
-      const chosen = hd2Sub || hd2Dub;
-
-      const categoryUsed: "sub" | "dub" = hd2Sub ? "sub" : hd2Dub ? "dub" : "sub";
+      // Find server based on user preferences
+      const targetList = prefs.category === "sub" ? subList : dubList;
+      const chosen = targetList.find((s) => matchesServer(s.name, prefs.serverName));
 
       if (!chosen) {
         toast.dismiss(loadingToast);
-        toast.error("HD-2 server not available for this episode.");
+        toast.error(`${prefs.serverName.toUpperCase()} ${prefs.category.toUpperCase()} server not available for this episode.`);
         return;
       }
+
+      const categoryUsed = prefs.category;
 
       // Step 2: Fetch sources using server ID (numeric string like "579601")
       // The server.id is the unique identifier from the server object
@@ -350,6 +358,8 @@ export default function Landing() {
         episodes={episodes}
         episodesLoading={episodesLoading}
         onPlayEpisode={playEpisode}
+        serverPreferences={serverPreferences}
+        onServerPreferencesChange={setServerPreferences}
       />
 
       {/* Video Player */}
