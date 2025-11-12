@@ -1,34 +1,32 @@
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Loader2, Search } from "lucide-react";
+import { HeroBanner } from "@/components/HeroBanner";
+import { ContentRail } from "@/components/ContentRail";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Search, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type TopAiringResult = {
-  page: number;
-  totalPage: number;
-  hasNextPage: boolean;
-  results: Array<{
-    title?: string;
-    image?: string;
-    type?: string;
-    id?: string;
-    dataId?: string;
-  }>;
+type AnimeItem = {
+  title?: string;
+  image?: string;
+  type?: string;
+  id?: string;
+  dataId?: string;
+  language?: {
+    sub?: string | null;
+    dub?: string | null;
+  };
 };
 
 type Episode = {
@@ -37,90 +35,69 @@ type Episode = {
   number?: number;
 };
 
-type EpisodeServers = {
-  sub: Array<{ id: string; name: string }>;
-  dub: Array<{ id: string; name: string }>;
-};
-
-type EpisodeSources = {
-  sources: Array<{ file: string; type: string }>;
-  tracks?: Array<{ file: string; label: string; kind?: string }>;
-};
-
 export default function Landing() {
   const fetchTopAiring = useAction(api.hianime.topAiring);
+  const fetchMostPopular = useAction(api.hianime.mostPopular);
+  const fetchMovies = useAction(api.hianime.movies);
+  const fetchTVShows = useAction(api.hianime.tvShows);
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
 
   const [loading, setLoading] = useState(true);
-  const [pageLoading, setPageLoading] = useState(false);
-  const [data, setData] = useState<TopAiringResult | null>(null);
+  const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
+  const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
+  const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
+  const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
+  const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
+  
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<TopAiringResult["results"][number] | null>(null);
-  const [episodes, setEpisodes] = useState<Array<Episode>>([]);
+  const [selected, setSelected] = useState<AnimeItem | null>(null);
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [episodesLoading, setEpisodesLoading] = useState(false);
 
-  const [selectedEpisode, setSelectedEpisode] = useState<Episode | null>(null);
-  const [servers, setServers] = useState<EpisodeServers | null>(null);
-  const [serversLoading, setServersLoading] = useState(false);
-
-  const [sources, setSources] = useState<EpisodeSources | null>(null);
-  const [sourcesLoading, setSourcesLoading] = useState(false);
-
-  const [page, setPage] = useState(1);
-
+  // Load all content on mount
   useEffect(() => {
     let mounted = true;
     setLoading(true);
-    fetchTopAiring({ page: 1 })
-      .then((res) => {
+
+    Promise.all([
+      fetchMostPopular({ page: 1 }),
+      fetchTopAiring({ page: 1 }),
+      fetchMovies({ page: 1 }),
+      fetchTVShows({ page: 1 }),
+    ])
+      .then(([popular, airing, movies, tvShows]) => {
         if (!mounted) return;
-        setData(res as TopAiringResult);
+        
+        const popularData = popular as { results: AnimeItem[] };
+        const airingData = airing as { results: AnimeItem[] };
+        const moviesData = movies as { results: AnimeItem[] };
+        const tvShowsData = tvShows as { results: AnimeItem[] };
+
+        setPopularItems(popularData.results || []);
+        setAiringItems(airingData.results || []);
+        setMovieItems(moviesData.results || []);
+        setTVShowItems(tvShowsData.results || []);
+
+        // Set hero to first popular item
+        if (popularData.results && popularData.results.length > 0) {
+          setHeroAnime(popularData.results[0]);
+        }
       })
       .catch((err) => {
-        const msg =
-          err instanceof Error ? err.message : "Failed to load top airing.";
+        const msg = err instanceof Error ? err.message : "Failed to load content";
         toast.error(msg);
       })
       .finally(() => mounted && setLoading(false));
+
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows]);
 
-  const filtered = useMemo(() => {
-    if (!data?.results) return [];
-    const q = query.trim().toLowerCase();
-    if (!q) return data.results;
-    return data.results.filter((a) =>
-      (a.title ?? "").toLowerCase().includes(q),
-    );
-  }, [data, query]);
-
-  const loadPage = async (nextPage: number) => {
-    if (nextPage < 1) return;
-    setPageLoading(true);
-    try {
-      const res = (await fetchTopAiring({ page: nextPage })) as TopAiringResult;
-      setData(res);
-      setPage(nextPage);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to change page.";
-      toast.error(msg);
-    } finally {
-      setPageLoading(false);
-    }
-  };
-
-  const openAnime = async (anime: TopAiringResult["results"][number]) => {
+  const openAnime = async (anime: AnimeItem) => {
     setSelected(anime);
-    setSelectedEpisode(null);
-    setServers(null);
-    setSources(null);
     if (!anime?.dataId) {
       toast("This title has no episodes available.");
       return;
@@ -131,391 +108,223 @@ export default function Landing() {
       const eps = (await fetchEpisodes({ dataId: anime.dataId })) as Episode[];
       setEpisodes(eps);
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to load episodes.";
+      const msg = err instanceof Error ? err.message : "Failed to load episodes.";
       toast.error(msg);
     } finally {
       setEpisodesLoading(false);
     }
   };
 
-  const chooseEpisode = async (ep: Episode) => {
-    setSelectedEpisode(ep);
-    setServers(null);
-    setSources(null);
-    if (!ep?.id) return;
-    setServersLoading(true);
+  const playEpisode = async (episode: Episode) => {
+    toast("Loading video...");
     try {
-      const s = (await fetchServers({ episodeId: ep.id })) as EpisodeServers;
-      setServers(s);
+      const servers = await fetchServers({ episodeId: episode.id });
+      const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
+      
+      // Try to get HD-2 sub server first
+      const subServers = serverData.sub || [];
+      const preferredServer = subServers.find(s => s.name === "HD-2") || subServers[0];
+      
+      if (!preferredServer) {
+        toast.error("No streaming servers available");
+        return;
+      }
+
+      const sources = await fetchSources({ serverId: preferredServer.id });
+      const sourcesData = sources as { sources: Array<{ file: string; type: string }> };
+      
+      if (sourcesData.sources && sourcesData.sources.length > 0) {
+        const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
+        const videoUrl = m3u8Source?.file || sourcesData.sources[0].file;
+        
+        // Open in new tab for now (video player component can be added later)
+        window.open(videoUrl, "_blank");
+        toast.success(`Playing Episode ${episode.number}`);
+      } else {
+        toast.error("No video sources available");
+      }
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to load servers.";
+      const msg = err instanceof Error ? err.message : "Failed to load video";
       toast.error(msg);
-    } finally {
-      setServersLoading(false);
     }
   };
 
-  const getSources = async (serverId: string) => {
-    setSources(null);
-    setSourcesLoading(true);
-    try {
-      const res = (await fetchSources({ serverId })) as EpisodeSources;
-      setSources(res);
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Failed to load sources.";
-      toast.error(msg, {
-        description: "Try selecting a different server or episode.",
-        duration: 5000,
-      });
-    } finally {
-      setSourcesLoading(false);
-    }
-  };
+  const filteredPopular = popularItems.filter(item =>
+    query ? (item.title ?? "").toLowerCase().includes(query.toLowerCase()) : true
+  );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+          <p className="text-gray-400">Loading content...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen flex flex-col bg-background"
-    >
+    <div className="min-h-screen bg-[#0B0F19] text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-20 items-center justify-between px-8 max-w-7xl mx-auto">
-          <motion.div 
-            className="flex items-center gap-3"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-          >
-            <img
-              src="./logo.svg"
-              alt="Logo"
-              width={40}
-              height={40}
-              className="rounded"
-            />
-            <span className="text-xl font-bold tracking-tight">Minimal Anime Stream</span>
-          </motion.div>
-          
-          <motion.div 
-            className="w-full max-w-md"
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search anime titles..."
-                className="pl-9 h-10"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
-          </motion.div>
+      <header className="sticky top-0 z-50 w-full bg-[#0B0F19]/95 backdrop-blur border-b border-gray-800">
+        <div className="container mx-auto px-4 md:px-8 max-w-7xl">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <motion.div
+              className="flex items-center gap-3"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <img src="./logo.svg" alt="Logo" width={32} height={32} className="rounded" />
+              <span className="text-lg font-bold hidden md:block">Anime Stream</span>
+            </motion.div>
+
+            {/* Search */}
+            <motion.div
+              className="flex-1 max-w-md mx-4"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <Input
+                  placeholder="Search anime..."
+                  className="pl-10 bg-gray-900/50 border-gray-800 text-white placeholder:text-gray-500"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+            </motion.div>
+
+            {/* Profile placeholder */}
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 container px-8 py-12 max-w-7xl mx-auto">
-        {loading ? (
-          <div className="h-[60vh] flex items-center justify-center">
-            <div className="flex flex-col items-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Loading anime...</p>
+      <main className="container mx-auto px-4 md:px-8 max-w-7xl py-6">
+        {/* Hero Banner */}
+        {!query && heroAnime && (
+          <HeroBanner
+            anime={heroAnime}
+            onPlay={() => openAnime(heroAnime)}
+            onMoreInfo={() => openAnime(heroAnime)}
+          />
+        )}
+
+        {/* Content Rails */}
+        {query ? (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">Search Results</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {filteredPopular.map((item, idx) => (
+                <div key={item.id ?? idx} onClick={() => openAnime(item)}>
+                  <motion.div
+                    className="cursor-pointer"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-900">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt={item.title ?? "Anime"}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                    <p className="mt-2 text-sm text-white line-clamp-2">{item.title}</p>
+                  </motion.div>
+                </div>
+              ))}
             </div>
           </div>
         ) : (
           <>
-            {/* Page Info */}
-            <motion.div 
-              className="mb-8"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <h1 className="text-3xl font-bold tracking-tight mb-2">
-                {query ? "Search Results" : "Top Airing Anime"}
-              </h1>
-              <p className="text-muted-foreground">
-                {filtered.length} {filtered.length === 1 ? "title" : "titles"} found
-              </p>
-            </motion.div>
-
-            {/* Anime Grid */}
-            <motion.div 
-              className="grid gap-6 mb-12"
-              style={{
-                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-              }}
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              {filtered.map((item, idx) => (
-                <motion.button
-                  key={(item.id ?? item.title ?? "item") + idx}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => openAnime(item)}
-                  className="text-left group"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 * idx }}
-                >
-                  <Card className="border overflow-hidden transition-all duration-200 group-hover:border-primary/50">
-                    <CardContent className="p-0">
-                      <div className="relative aspect-[3/4] w-full bg-muted overflow-hidden">
-                        {item.image ? (
-                          <img
-                            src={item.image}
-                            alt={item.title ?? "Poster"}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            No Image
-                          </div>
-                        )}
-                        {item.type && (
-                          <Badge className="absolute top-2 right-2 bg-background/90 backdrop-blur">
-                            {item.type}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold tracking-tight line-clamp-2 min-h-[3rem] text-sm leading-tight">
-                          {item.title ?? "Untitled"}
-                        </h3>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.button>
-              ))}
-            </motion.div>
-
-            {/* Pagination */}
-            {data && (
-              <motion.div 
-                className="flex items-center justify-center gap-4"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                <Button
-                  variant="outline"
-                  size="icon"
-                  disabled={pageLoading || page <= 1}
-                  onClick={() => loadPage(page - 1)}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <div className="flex items-center gap-2 min-w-[120px] justify-center">
-                  <span className="text-sm font-medium">
-                    Page {data.page}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    of {data.totalPage}
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  disabled={pageLoading || !data.hasNextPage}
-                  onClick={() => loadPage(page + 1)}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </motion.div>
-            )}
+            <ContentRail
+              title="Trending Now"
+              items={popularItems}
+              onItemClick={openAnime}
+            />
+            <ContentRail
+              title="Top Airing"
+              items={airingItems}
+              onItemClick={openAnime}
+            />
+            <ContentRail
+              title="Popular Movies"
+              items={movieItems}
+              onItemClick={openAnime}
+            />
+            <ContentRail
+              title="TV Series"
+              items={tvShowItems}
+              onItemClick={openAnime}
+            />
           </>
         )}
       </main>
 
-      {/* Watch Dialog */}
+      {/* Info Modal */}
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh]">
+        <DialogContent className="sm:max-w-3xl bg-[#0B0F19] border-gray-800 text-white">
           <DialogHeader>
-            <DialogTitle className="tracking-tight font-bold text-xl pr-8">
-              {selected?.title ?? "Watch"}
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              Select an episode and server to view streaming sources
-            </DialogDescription>
+            <DialogTitle className="text-2xl font-bold">{selected?.title}</DialogTitle>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[calc(90vh-200px)]">
-            <div className="grid gap-8 md:grid-cols-[300px_1fr] pr-4">
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-6">
               {/* Poster */}
-              <div className="space-y-4">
-                <div className="relative aspect-[3/4] w-full bg-muted rounded-lg overflow-hidden">
-                  {selected?.image ? (
-                    <img
-                      src={selected.image}
-                      alt={selected.title ?? "Poster"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                {selected?.type && (
-                  <Badge variant="secondary" className="w-full justify-center">
-                    {selected.type}
-                  </Badge>
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900">
+                {selected?.image && (
+                  <img
+                    src={selected.image}
+                    alt={selected.title ?? "Anime"}
+                    className="w-full h-full object-cover"
+                  />
                 )}
               </div>
 
-              {/* Episodes / Servers / Sources */}
-              <div className="space-y-6">
-                {/* Episodes */}
-                <section>
-                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                    Episodes
-                    {episodes.length > 0 && (
-                      <Badge variant="outline">{episodes.length}</Badge>
-                    )}
-                  </h3>
-                  {episodesLoading ? (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
-                      <Loader2 className="h-4 w-4 animate-spin" /> Loading episodes...
-                    </div>
-                  ) : episodes.length ? (
-                    <ScrollArea className="h-[200px] pr-4">
-                      <div className="grid grid-cols-5 gap-2">
-                        {episodes.map((ep) => (
-                          <Button
-                            key={ep.id}
-                            size="sm"
-                            variant={selectedEpisode?.id === ep.id ? "default" : "outline"}
-                            onClick={() => chooseEpisode(ep)}
-                            className="h-9"
-                          >
-                            {ep.number ?? "?"}
-                          </Button>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  ) : (
-                    <p className="text-sm text-muted-foreground py-4">
-                      No episodes available
-                    </p>
-                  )}
-                </section>
+              {/* Badges */}
+              <div className="flex gap-2">
+                {selected?.type && <Badge className="bg-blue-600">{selected.type}</Badge>}
+                {selected?.language?.sub && <Badge className="bg-gray-700">SUB</Badge>}
+                {selected?.language?.dub && <Badge className="bg-gray-700">DUB</Badge>}
+              </div>
 
-                {/* Servers */}
-                {selectedEpisode && (
-                  <section>
-                    <h3 className="text-sm font-semibold mb-3">
-                      Streaming Servers
-                    </h3>
-                    {serversLoading ? (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
-                        <Loader2 className="h-4 w-4 animate-spin" /> Loading servers...
-                      </div>
-                    ) : servers ? (
-                      <div className="space-y-3">
-                        {servers.sub && servers.sub.length > 0 && (
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-2">Subtitled</p>
-                            <div className="flex flex-wrap gap-2">
-                              {servers.sub.map((s) => (
-                                <Button
-                                  key={s.id}
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => getSources(s.id)}
-                                  className="h-8"
-                                >
-                                  {s.name}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {servers.dub && servers.dub.length > 0 && (
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-2">Dubbed</p>
-                            <div className="flex flex-wrap gap-2">
-                              {servers.dub.map((s) => (
-                                <Button
-                                  key={s.id}
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => getSources(s.id)}
-                                  className="h-8"
-                                >
-                                  {s.name}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground py-4">
-                        Select an episode to view servers
-                      </p>
-                    )}
-                  </section>
-                )}
-
-                {/* Sources */}
-                {sources && (
-                  <section>
-                    <h3 className="text-sm font-semibold mb-3">
-                      Available Sources
-                    </h3>
-                    {sourcesLoading ? (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
-                        <Loader2 className="h-4 w-4 animate-spin" /> Loading sources...
-                      </div>
-                    ) : sources?.sources?.length ? (
-                      <div className="space-y-2">
-                        {sources.sources.map((src, idx) => (
-                          <a
-                            key={src.file + idx}
-                            href={src.file}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors group"
-                          >
-                            <div className="flex items-center gap-3">
-                              <Play className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                              <div>
-                                <p className="text-sm font-medium">{src.type}</p>
-                                <p className="text-xs text-muted-foreground">Click to open source</p>
-                              </div>
-                            </div>
-                            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                          </a>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground py-4">
-                        No sources available
-                      </p>
-                    )}
-                  </section>
+              {/* Episodes */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Episodes</h3>
+                {episodesLoading ? (
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading episodes...
+                  </div>
+                ) : episodes.length > 0 ? (
+                  <div className="grid grid-cols-5 gap-2 max-h-[200px] overflow-y-auto">
+                    {episodes.map((ep) => (
+                      <Button
+                        key={ep.id}
+                        size="sm"
+                        variant="outline"
+                        onClick={() => playEpisode(ep)}
+                        className="bg-gray-800 border-gray-700 hover:bg-gray-700"
+                      >
+                        {ep.number ?? "?"}
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-400">No episodes available</p>
                 )}
               </div>
             </div>
           </ScrollArea>
-
-          <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setSelected(null)}>
-              Close
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 }
