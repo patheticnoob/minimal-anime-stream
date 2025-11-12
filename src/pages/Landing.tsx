@@ -5,12 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { InfoModal } from "@/components/InfoModal";
 import { Loader2, Search } from "lucide-react";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { EpisodeSelector } from "@/components/EpisodeSelector";
@@ -310,24 +305,14 @@ export default function Landing() {
       </motion.div>
 
       {/* Episode Selection Dialog */}
-      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold tracking-tight pr-8">
-              {selected?.title ?? "Select Episode"}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-6 py-4">
-            <EpisodeSelector
-              episodes={episodes}
-              loading={episodesLoading}
-              selectedEpisode={selectedEpisode}
-              onSelectEpisode={playEpisode}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <InfoModal
+        open={!!selected}
+        onOpenChange={(o) => !o && setSelected(null)}
+        anime={selected}
+        episodes={episodes}
+        episodesLoading={episodesLoading}
+        onPlayEpisode={playEpisode}
+      />
 
       {/* Video Player */}
       {videoSource && (
