@@ -11,6 +11,7 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { EpisodeSelector } from "@/components/EpisodeSelector";
 import { HeroBanner } from "@/components/HeroBanner";
 import { ContentRail } from "@/components/ContentRail";
+import { TestVideoPlayer } from "@/components/TestVideoPlayer";
 
 type AnimeItem = {
   id?: string;
@@ -71,6 +72,10 @@ export default function Landing() {
   // Add stable title used by player so it doesn't rely on `selected` after closing the modal
   const [videoTitle, setVideoTitle] = useState<string | null>(null);
   const [serverPreferences, setServerPreferences] = useState<ServerPreferences>({ category: "sub", serverName: "hd-2" });
+
+  // Add test player state
+  const [testVideoUrl, setTestVideoUrl] = useState<string | null>(null);
+  const [testVideoTitle, setTestVideoTitle] = useState<string | null>(null);
 
   // Load all content rails in parallel
   useEffect(() => {
@@ -223,6 +228,61 @@ export default function Landing() {
     }
   };
 
+  const playTestEpisode = async (ep: Episode, preferences?: ServerPreferences) => {
+    const prefs = preferences || serverPreferences;
+    setSelectedEpisode(ep);
+    if (!ep?.id) return;
+
+    const loadingToast = toast.loading("Loading test video...");
+
+    try {
+      const servers = (await fetchServers({ episodeId: ep.id })) as EpisodeServers;
+      const subList: Array<{ id: string; name: string }> = Array.isArray((servers as any)?.sub) ? (servers as any).sub : [];
+      const dubList: Array<{ id: string; name: string }> = Array.isArray((servers as any)?.dub) ? (servers as any).dub : [];
+
+      const normalize = (s: string) => (s || "").toLowerCase().replace(/[\s\-_]/g, "");
+      const matchesServer = (name: string, target: string) => {
+        const normalized = normalize(name);
+        const targetNorm = normalize(target);
+        return normalized.includes(targetNorm) || new RegExp(`\\b${target.replace("-", "[-_\\s]*")}\\b`, "i").test(name);
+      };
+
+      const targetList = prefs.category === "sub" ? subList : dubList;
+      const chosen = targetList.find((s) => matchesServer(s.name, prefs.serverName));
+
+      if (!chosen) {
+        toast.dismiss(loadingToast);
+        toast.error(`${prefs.serverName.toUpperCase()} ${prefs.category.toUpperCase()} server not available for test.`);
+        return;
+      }
+
+      const sources = (await fetchSources({ serverId: chosen.id })) as EpisodeSources;
+
+      if (sources?.sources?.length) {
+        const hls =
+          sources.sources.find(
+            (s) => (s.type && s.type.toLowerCase().includes("hls")) || /\.m3u8($|\?)/i.test(s.file),
+          ) || null;
+        const first = hls || sources.sources[0];
+
+        console.log("[TEST] Selected video source:", first.file);
+
+        toast.dismiss(loadingToast);
+        setTestVideoUrl(first.file);
+        setTestVideoTitle(`[TEST] ${selected?.title ?? "Anime"} - Episode ${ep.number ?? "?"} • ${prefs.category.toUpperCase()} • ${chosen.name}`);
+        setSelected(null);
+        toast.success(`Test playing ${prefs.category.toUpperCase()} • ${chosen.name}`);
+      } else {
+        toast.dismiss(loadingToast);
+        toast.error("No test video sources available.");
+      }
+    } catch (err) {
+      toast.dismiss(loadingToast);
+      const msg = err instanceof Error ? err.message : "Failed to load test video.";
+      toast.error(msg);
+    }
+  };
+
   const filteredPopular = query
     ? popularItems.filter((a) => (a.title ?? "").toLowerCase().includes(query.toLowerCase()))
     : popularItems;
@@ -362,6 +422,7 @@ export default function Landing() {
         episodes={episodes}
         episodesLoading={episodesLoading}
         onPlayEpisode={playEpisode}
+        onTestEpisode={playTestEpisode}
         serverPreferences={serverPreferences}
         onServerPreferencesChange={setServerPreferences}
       />
@@ -376,6 +437,18 @@ export default function Landing() {
             setVideoSource(null);
             setVideoTracks([]);
             setVideoTitle(null);
+          }}
+        />
+      )}
+
+      {/* Test Video Player */}
+      {testVideoUrl && (
+        <TestVideoPlayer
+          m3u8Url={testVideoUrl}
+          title={testVideoTitle ?? "Test Video"}
+          onClose={() => {
+            setTestVideoUrl(null);
+            setTestVideoTitle(null);
           }}
         />
       )}

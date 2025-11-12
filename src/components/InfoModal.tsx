@@ -47,8 +47,8 @@ type InfoModalProps = {
   anime: AnimeItem | null;
   episodes: Episode[];
   episodesLoading: boolean;
-  // Allow async handler with optional preferences
   onPlayEpisode: (ep: Episode, preferences?: ServerPreferences) => void | Promise<void>;
+  onTestEpisode?: (ep: Episode, preferences?: ServerPreferences) => void | Promise<void>;
   serverPreferences?: ServerPreferences;
   onServerPreferencesChange?: (prefs: ServerPreferences) => void;
 };
@@ -60,6 +60,7 @@ export function InfoModal({
   episodes,
   episodesLoading,
   onPlayEpisode,
+  onTestEpisode,
   serverPreferences,
   onServerPreferencesChange,
 }: InfoModalProps) {
@@ -124,6 +125,21 @@ export function InfoModal({
         : filteredSortedEpisodes[0] || episodes[episodes.length - 1];
     if (chosen) {
       onPlayEpisode(chosen, { category: selectedCategory, serverName: selectedServer });
+    }
+  };
+
+  const testResume = async () => {
+    if (!onTestEpisode) return;
+    if (!episodes?.length) {
+      toast("No episodes available for this title.");
+      return;
+    }
+    const chosen =
+      sort === "oldest"
+        ? filteredSortedEpisodes[0] || episodes[0]
+        : filteredSortedEpisodes[0] || episodes[episodes.length - 1];
+    if (chosen) {
+      onTestEpisode(chosen, { category: selectedCategory, serverName: selectedServer });
     }
   };
 
@@ -248,6 +264,16 @@ export function InfoModal({
                         <Play className="mr-2 h-4 w-4" fill="currentColor" />
                         Play
                       </Button>
+                      {onTestEpisode && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={testResume}
+                          className="bg-blue-600 text-white hover:bg-blue-700"
+                        >
+                          Test
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         variant="outline"
