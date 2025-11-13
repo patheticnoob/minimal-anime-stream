@@ -45,6 +45,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
   const progressRef = useRef<HTMLDivElement>(null); // progress rail ref
   const [hoverTime, setHoverTime] = useState<number | null>(null);
   const [hoverX, setHoverX] = useState<number>(0);
+  const [showEpisodes, setShowEpisodes] = useState(false); // NEW: Episodes overlay toggle
 
   // New UI/UX state
   const [controlsTimer, setControlsTimer] = useState<number | null>(null);
@@ -67,6 +68,10 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
     const id = window.setTimeout(() => setShowControls(false), 2500);
     setControlsTimer(id);
   };
+
+  useEffect(() => {
+    setShowEpisodes(false); // close episodes overlay when source changes
+  }, [source]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -438,14 +443,14 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
           {showControls && (
             <motion.button
               onClick={togglePlay}
-              className="absolute inset-0 m-auto h-16 w-16 md:h-20 md:w-20 rounded-full bg-white/10 backdrop-blur flex items-center justify-center border border-white/20 hover:bg-white/20"
+              className="absolute inset-0 m-auto h-16 w-16 md:h-20 md:w-20 rounded-full bg-gradient-to-br from-white via-cyan-100 to-sky-500 border border-white/20 shadow-[0_18px_40px_rgba(0,0,0,0.95)] ring-4 ring-[rgba(0,175,255,0.25)] hover:ring-8 hover:ring-[rgba(0,175,255,0.32)] flex items-center justify-center"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               aria-label="Toggle play"
               style={{ width: "fit-content" }}
             >
-              {isPlaying ? <Pause className="h-8 w-8 text-white" /> : <Play className="h-8 w-8 text-white" />}
+              {isPlaying ? <Pause className="h-8 w-8 text-[#003366]" /> : <Play className="h-8 w-8 text-[#003366]" />}
             </motion.button>
           )}
         </AnimatePresence>
@@ -495,7 +500,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : 20 }}
         >
-          <div className="rounded-xl border border-white/10 bg-gradient-to-t from-black/70 to-black/30 backdrop-blur px-3 pt-3 pb-2">
+          <div className="rounded-2xl border border-white/15 bg-black/80 backdrop-blur-xl px-3 pt-3 pb-2 shadow-2xl">
             {/* Progress Rail with buffered + played */}
             <div
               ref={progressRef}
@@ -643,6 +648,20 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
                   </DropdownMenu>
                 )}
 
+                {/* Episodes overlay trigger - NEW */}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-white hover:bg-white/10"
+                  onClick={() => {
+                    setShowEpisodes(true);
+                    const v = videoRef.current;
+                    if (v) v.pause();
+                  }}
+                >
+                  Episodes
+                </Button>
+
                 <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="text-white hover:bg-white/10">
                   {isFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
                 </Button>
@@ -656,11 +675,12 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
           {showSkipIntro && (
             <motion.button
               onClick={handleSkipIntro}
-              className="absolute left-4 bottom-28 md:bottom-32 bg-white/15 text-white border border-white/20 px-3 py-1.5 rounded-full backdrop-blur hover:bg-white/25"
+              className="absolute left-4 bottom-28 md:bottom-32 bg-[#1e1e23]/90 text-white border border-white/25 px-3 py-1.5 rounded-full backdrop-blur shadow-lg hover:bg-white/25"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
             >
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 mr-2 shadow-[0_0_8px_rgba(0,225,255,0.9)]" />
               Skip Intro
             </motion.button>
           )}
@@ -683,6 +703,57 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
                 <Button size="sm" variant="ghost" className="text-white hover:bg-white/10" onClick={() => setShowControls(false)}>
                   Dismiss
                 </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Episodes Overlay - NEW */}
+        <AnimatePresence>
+          {showEpisodes && (
+            <motion.div
+              className="absolute inset-0 bg-black/90 backdrop-blur-md z-[90] flex flex-col"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+            >
+              <div className="p-4 text-base md:text-lg font-semibold">{title}</div>
+
+              <div className="px-4 pb-3 flex gap-2">
+                <Button
+                  size="sm"
+                  className="bg-white text-black hover:bg-gray-200"
+                  onClick={() => {
+                    setShowEpisodes(false);
+                    const v = videoRef.current;
+                    if (v) v.play();
+                  }}
+                >
+                  <Play className="h-4 w-4 mr-2" /> Continue
+                </Button>
+              </div>
+
+              <div className="px-4 text-xs uppercase text-white/70">Episodes</div>
+              <div className="p-4 grid grid-cols-5 gap-2 overflow-y-auto">
+                {(episodes || []).map((ep) => {
+                  const isActive = ep.number === currentEpisode;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => {
+                        setShowEpisodes(false);
+                        onSelectEpisode?.(ep);
+                      }}
+                      className={`px-2 py-2 rounded border text-sm ${
+                        isActive
+                          ? "bg-white text-black border-white"
+                          : "bg-[#050608] text-white border-white/25 hover:bg-white/10"
+                      }`}
+                    >
+                      {ep.number ?? "?"}
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           )}
