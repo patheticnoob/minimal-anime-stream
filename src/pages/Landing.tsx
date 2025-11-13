@@ -143,16 +143,27 @@ export default function Landing() {
       if (sourcesData.sources && sourcesData.sources.length > 0) {
         const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
         const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
-        
-        // Proxy the m3u8 URL through Convex
-        const convexUrl = import.meta.env.VITE_CONVEX_URL.replace('/.well-known/convex.json', '');
-        const proxiedUrl = `${convexUrl}/proxy?url=${encodeURIComponent(originalUrl)}`;
-        
+
+        // Build Convex HTTP endpoint base (.site), robust for various env formats
+        const raw = import.meta.env.VITE_CONVEX_URL as string;
+        let base = raw;
+        try {
+          const u = new URL(raw);
+          const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
+          base = `${u.protocol}//${hostname}`;
+        } catch {
+          base = raw.replace("convex.cloud", "convex.site");
+        }
+        base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+
+        // Proxy the m3u8 URL through Convex HTTP endpoint
+        const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
+
         // Set video player state
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
         setVideoTracks(sourcesData.tracks || []);
-        
+
         toast.success(`Playing Episode ${episode.number}`);
       } else {
         toast.error("No video sources available");
