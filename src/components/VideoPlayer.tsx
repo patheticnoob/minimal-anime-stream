@@ -13,6 +13,7 @@ interface VideoPlayerProps {
 export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -26,6 +27,17 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
     const video = videoRef.current;
     if (!video) return;
 
+    // Cleanup any previous HLS instance when source changes/unmounts
+    if (hlsRef.current) {
+      try {
+        hlsRef.current.destroy();
+      } catch {}
+      hlsRef.current = null;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
     const handleLoadStart = () => setIsLoading(true);
     const handleCanPlay = () => setIsLoading(false);
     const handleTimeUpdate = () => setCurrentTime(video.currentTime);
@@ -37,6 +49,12 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
       setIsLoading(false);
     };
 
+    // Extra buffering UX
+    const handleSeeking = () => setIsLoading(true);
+    const handleWaiting = () => setIsLoading(true);
+    const handlePlaying = () => setIsLoading(false);
+    const handleLoadedMetadata = () => setIsLoading(false);
+
     video.addEventListener("loadstart", handleLoadStart);
     video.addEventListener("canplay", handleCanPlay);
     video.addEventListener("timeupdate", handleTimeUpdate);
@@ -44,40 +62,86 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
     video.addEventListener("play", handlePlay);
     video.addEventListener("pause", handlePause);
     video.addEventListener("error", handleError);
+    video.addEventListener("seeking", handleSeeking);
+    video.addEventListener("waiting", handleWaiting);
+    video.addEventListener("playing", handlePlaying);
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
 
-    // Load HLS if needed
-    if (source.includes(".m3u8") || source.includes("/proxy?url=")) {
-      import("hls.js").then((HlsModule) => {
-        const Hls = HlsModule.default;
+    // HLS setup with robust config and recovery
+    const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
+
+    if (isHlsLike) {
+      import("hls.js").then(({ default: Hls }) => {
         if (Hls.isSupported()) {
-          const hls = new Hls({
-            xhrSetup: (xhr, url) => {
-              // For proxied sources, we need to proxy all segment requests too
-              if (source.includes("/proxy?url=")) {
-                // This is already a proxied URL, don't modify
-                return;
+          const hlsConfig = {
+            // Buffering and memory balance
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+            backBufferLength: 60,
+            maxBufferSize: 60 * 1000 * 1000, // ~60MB
+            liveBackBufferLength: 60,
+            lowLatencyMode: false,
+            // For direct sources, set Referer; for proxied, let server handle headers
+            xhrSetup: (xhr: XMLHttpRequest) => {
+              if (!source.includes("/proxy?url=")) {
+                try {
+                  xhr.setRequestHeader("Referer", "https://megacloud.blog/");
+                } catch {
+                  // Some environments disallow setting Referer; ignore
+                }
               }
-              // For direct URLs, set referer
-              xhr.setRequestHeader("Referer", "https://megacloud.blog/");
             },
-          });
-          hls.loadSource(source);
+          } as const;
+
+          const hls = new Hls(hlsConfig);
+          hlsRef.current = hls;
+
+          // Attach then load source
           hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            console.log("HLS manifest loaded successfully");
+          hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            hls.loadSource(source);
           });
-          hls.on(Hls.Events.ERROR, (_event, data) => {
+
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            setIsLoading(false);
+          });
+
+          hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
             console.error("HLS error:", data);
             if (data.fatal) {
-              setError("Failed to load video stream.");
-              setIsLoading(false);
+              switch (data.type) {
+                case Hls.ErrorTypes.NETWORK_ERROR:
+                  try {
+                    hls.startLoad();
+                  } catch {
+                    setError("Network error while loading stream.");
+                  }
+                  break;
+                case Hls.ErrorTypes.MEDIA_ERROR:
+                  try {
+                    hls.recoverMediaError();
+                  } catch {
+                    setError("Media error while playing stream.");
+                  }
+                  break;
+                default:
+                  hls.destroy();
+                  hlsRef.current = null;
+                  setError("Failed to load video stream.");
+                  break;
+              }
             }
           });
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          // Native HLS (Safari)
           video.src = source;
+        } else {
+          setError("This browser cannot play HLS streams.");
+          setIsLoading(false);
         }
       });
     } else {
+      // Non-HLS source
       video.src = source;
     }
 
@@ -89,6 +153,17 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
       video.removeEventListener("play", handlePlay);
       video.removeEventListener("pause", handlePause);
       video.removeEventListener("error", handleError);
+      video.removeEventListener("seeking", handleSeeking);
+      video.removeEventListener("waiting", handleWaiting);
+      video.removeEventListener("playing", handlePlaying);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+
+      if (hlsRef.current) {
+        try {
+          hlsRef.current.destroy();
+        } catch {}
+        hlsRef.current = null;
+      }
     };
   }, [source]);
 
@@ -183,6 +258,7 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
           className="w-full h-full object-contain"
           onClick={togglePlay}
           crossOrigin="anonymous"
+          playsInline
         >
           {tracks?.map((track, idx) => (
             <track
@@ -190,7 +266,10 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
               kind={track.kind || "subtitles"}
               src={track.file}
               label={track.label || "Unknown"}
-              srcLang={track.label?.toLowerCase() || "en"}
+              // Derive language code safely (e.g., "English" -> "en")
+              srcLang={(track.label?.slice(0, 2)?.toLowerCase() || "en")}
+              // Prefer default track when provided
+              default={(track as any)?.default === true}
             />
           ))}
         </video>
