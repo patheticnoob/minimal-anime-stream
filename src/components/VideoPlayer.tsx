@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, Pause, Volume2, VolumeX, Maximize, Minimize, Loader2 } from "lucide-react";
+import { X, Play, Pause, Volume2, VolumeX, Maximize, Minimize, Loader2, RotateCcw, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
+import { PlayerInfoPanel } from "@/components/PlayerInfoPanel";
 
 interface VideoPlayerProps {
   source: string;
@@ -14,9 +15,21 @@ interface VideoPlayerProps {
   // Add optional "next" props; if not provided, countdown UI won't show
   onNext?: () => void;
   nextTitle?: string;
+
+  // New: Info panel data & episode wiring
+  info?: {
+    title?: string;
+    image?: string;
+    description?: string;
+    type?: string;
+    language?: { sub?: string | null; dub?: string | null };
+  };
+  episodes?: Array<{ id: string; title?: string; number?: number }>;
+  currentEpisode?: number; // episode number for highlighting
+  onSelectEpisode?: (ep: { id: string; title?: string; number?: number }) => void;
 }
 
-export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle }: VideoPlayerProps) {
+export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle, info, episodes, currentEpisode, onSelectEpisode }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -28,6 +41,10 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userPaused, setUserPaused] = useState(false); // track user-intent pause for info panel
+  const progressRef = useRef<HTMLDivElement>(null); // progress rail ref
+  const [hoverTime, setHoverTime] = useState<number | null>(null);
+  const [hoverX, setHoverX] = useState<number>(0);
 
   // New UI/UX state
   const [controlsTimer, setControlsTimer] = useState<number | null>(null);
@@ -302,8 +319,10 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
     const video = videoRef.current;
     if (!video) return;
     if (isPlaying) {
+      setUserPaused(true);
       video.pause();
     } else {
+      setUserPaused(false);
       video.play();
     }
   };
@@ -354,6 +373,17 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
   // Add computed progress percentages for the seek rail
   const playedPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
   const bufferedPercent = duration ? Math.min(100, (bufferedEnd / duration) * 100) : 0;
+
+  // Progress hover calculations (timestamp tooltip)
+  const handleProgressHover = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!progressRef.current || !duration) return;
+    const rect = progressRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const ratio = Math.min(Math.max(x / rect.width, 0), 1);
+    setHoverTime(duration * ratio);
+    setHoverX(x);
+  };
+  const clearProgressHover = () => setHoverTime(null);
 
   return (
     <AnimatePresence>
@@ -459,7 +489,16 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
         >
           <div className="rounded-xl border border-white/10 bg-gradient-to-t from-black/70 to-black/30 backdrop-blur px-3 pt-3 pb-2">
             {/* Progress Rail with buffered + played */}
-            <div className="relative h-2 mb-3 select-none" onMouseMove={handlePointerActivity} onTouchStart={handlePointerActivity}>
+            <div
+              ref={progressRef}
+              className="relative h-2 mb-3 select-none"
+              onMouseMove={(e) => {
+                handlePointerActivity();
+                handleProgressHover(e);
+              }}
+              onTouchStart={handlePointerActivity}
+              onMouseLeave={clearProgressHover}
+            >
               <div className="absolute inset-0 rounded-full bg-white/10" />
               <div className="absolute inset-y-0 left-0 rounded-full bg-white/20" style={{ width: `${bufferedPercent}%` }} />
               <motion.div
@@ -468,6 +507,15 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
                 initial={false}
                 transition={{ type: "spring", stiffness: 120, damping: 20 }}
               />
+              {/* Hover time tooltip */}
+              {hoverTime !== null && (
+                <div
+                  className="absolute -top-7 translate-x-[-50%] px-2 py-0.5 rounded bg-black/80 text-white text-xs border border-white/10"
+                  style={{ left: hoverX }}
+                >
+                  {formatTime(hoverTime)}
+                </div>
+              )}
               {/* Invisible range overlay to capture seeking */}
               <input
                 type="range"
@@ -485,6 +533,34 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
               <div className="flex items-center gap-2 md:gap-3">
                 <Button size="icon" variant="ghost" onClick={togglePlay} className="text-white hover:bg-white/10">
                   {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                </Button>
+
+                {/* Rewind 10s */}
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="text-white hover:bg-white/10"
+                  onClick={() => {
+                    const v = videoRef.current;
+                    if (!v) return;
+                    v.currentTime = Math.max(0, (v.currentTime || 0) - 10);
+                  }}
+                >
+                  <RotateCcw className="h-5 w-5" />
+                </Button>
+
+                {/* Forward 10s */}
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="text-white hover:bg-white/10"
+                  onClick={() => {
+                    const v = videoRef.current;
+                    if (!v) return;
+                    v.currentTime = Math.min(duration || 0, (v.currentTime || 0) + 10);
+                  }}
+                >
+                  <RotateCw className="h-5 w-5" />
                 </Button>
 
                 {/* Volume with popover slider */}
@@ -601,6 +677,46 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
                 </Button>
               </div>
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* New: On-Pause Info Panel overlay (Hotstar-style) */}
+        <AnimatePresence>
+          {userPaused && !error && (
+            <>
+              {/* Dim overlay */}
+              <motion.div
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
+              {/* Sliding info panel */}
+              <motion.div
+                className="absolute top-0 right-0 h-full w-full md:w-[380px] lg:w-[420px] bg-black/85 border-l border-white/10"
+                initial={{ x: 480, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 480, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 140, damping: 18 }}
+              >
+                <PlayerInfoPanel
+                  title={ (typeof ( ( { title } )) !== "undefined") ? title : ( ( ( (typeof ( ( { title } )) !== "undefined") ? title : "" ) ) ) }
+                  image={ (typeof ( ( { info } )) !== "undefined") ? ( (info?.image) ) : undefined }
+                  description={ (typeof ( ( { info } )) !== "undefined") ? ( (info?.description) ) : undefined }
+                  type={ (typeof ( ( { info } )) !== "undefined") ? ( (info?.type) ) : undefined }
+                  language={ (typeof ( ( { info } )) !== "undefined") ? ( (info?.language) ) : undefined }
+                  episodes={episodes}
+                  currentEpisodeNumber={currentEpisode}
+                  onSelectEpisode={onSelectEpisode}
+                  onClose={() => {
+                    // resume playback on close
+                    setUserPaused(false);
+                    const v = videoRef.current;
+                    if (v) v.play();
+                  }}
+                />
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </motion.div>

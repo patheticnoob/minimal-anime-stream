@@ -59,6 +59,7 @@ export default function Landing() {
   const [videoSource, setVideoSource] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
+  const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState<number | null>(null);
 
   // Load all content on mount
   useEffect(() => {
@@ -111,6 +112,7 @@ export default function Landing() {
     try {
       const eps = (await fetchEpisodes({ dataId: anime.dataId })) as Episode[];
       setEpisodes(eps);
+      setCurrentEpisodeIndex(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load episodes.";
       toast.error(msg);
@@ -166,10 +168,12 @@ export default function Landing() {
           file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
         }));
 
-        // Set video player state
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
         setVideoTracks(proxiedTracks);
+
+        const idx = episodes.findIndex((e) => e.id === episode.id);
+        if (idx !== -1) setCurrentEpisodeIndex(idx);
 
         toast.success(`Playing Episode ${episode.number}`);
       } else {
@@ -364,6 +368,25 @@ export default function Landing() {
           source={videoSource}
           title={videoTitle}
           tracks={videoTracks}
+          info={{
+            title: selected?.title ?? "",
+            image: selected?.image,
+            type: selected?.type,
+            language: selected?.language,
+          }}
+          episodes={episodes}
+          currentEpisode={currentEpisodeIndex !== null ? episodes[currentEpisodeIndex]?.number : undefined}
+          onSelectEpisode={(ep) => playEpisode(ep)}
+          onNext={() => {
+            if (currentEpisodeIndex === null) return;
+            const next = episodes[currentEpisodeIndex + 1];
+            if (next) playEpisode(next);
+          }}
+          nextTitle={
+            currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
+              ? `${selected?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
+              : undefined
+          }
           onClose={() => {
             setVideoSource(null);
             setVideoTitle("");
