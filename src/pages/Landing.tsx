@@ -350,7 +350,7 @@ export default function Landing() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
-                          // Close the popup immediately and start playback on top
+                          // Ensure popup closes immediately so the player renders on top
                           setSelected(null);
                           playEpisode(ep);
                         }}

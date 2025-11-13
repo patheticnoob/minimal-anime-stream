@@ -90,8 +90,16 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
     const handleCanPlay = () => setIsLoading(false);
     const handleTimeUpdate = () => setCurrentTime(video.currentTime);
     const handleDurationChange = () => setDuration(video.duration);
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
+    const handlePlay = () => {
+      setIsPlaying(true);
+      // Mirror reference behavior: hide info panel when video plays
+      setUserPaused(false);
+    };
+    const handlePause = () => {
+      setIsPlaying(false);
+      // Mirror reference behavior: show info panel when paused
+      setUserPaused(true);
+    };
     const handleError = () => {
       setError("Failed to load video. Please try a different server.");
       setIsLoading(false);
@@ -389,7 +397,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
     <AnimatePresence>
       <motion.div
         ref={containerRef}
-        className="fixed inset-0 z-50 bg-black"
+        className="fixed inset-0 z-[80] bg-black"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -400,7 +408,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
       >
         {/* Close Button */}
         <motion.div
-          className="absolute top-4 right-4 z-10"
+          className="absolute top-4 right-4 z-10 pointer-events-auto"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : -20 }}
         >
