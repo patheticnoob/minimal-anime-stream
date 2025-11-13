@@ -184,20 +184,26 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
     setIsMuted(!isMuted);
   };
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = async () => {
     const container = containerRef.current;
     if (!container) return;
 
-    if (!isFullscreen) {
-      if (container.requestFullscreen) {
-        container.requestFullscreen();
+    try {
+      if (!isFullscreen) {
+        if (container.requestFullscreen) {
+          await container.requestFullscreen();
+          setIsFullscreen(true);
+        }
+      } else {
+        if (document.exitFullscreen && document.fullscreenElement) {
+          await document.exitFullscreen();
+          setIsFullscreen(false);
+        }
       }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
+    } catch (err) {
+      console.warn("Fullscreen operation failed:", err);
+      // Silently fail - fullscreen may be blocked by permissions policy in iframe
     }
-    setIsFullscreen(!isFullscreen);
   };
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
