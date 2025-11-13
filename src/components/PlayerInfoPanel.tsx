@@ -62,7 +62,11 @@ export function PlayerInfoPanel({
 
           {/* Quick actions */}
           <div className="flex gap-2">
-            <Button size="sm" className="bg-white text-black hover:bg-gray-200">
+            <Button
+              size="sm"
+              className="bg-white text-black hover:bg-gray-200"
+              onClick={onClose}
+            >
               <Play className="h-4 w-4 mr-2" /> Continue
             </Button>
             <Button size="sm" variant="outline" className="bg-white/10 border-white/10 text-white hover:bg-white/15">

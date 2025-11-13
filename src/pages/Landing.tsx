@@ -172,6 +172,9 @@ export default function Landing() {
         setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
         setVideoTracks(proxiedTracks);
 
+        // Close the info modal once playback is ready
+        setSelected(null);
+
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
@@ -346,7 +349,11 @@ export default function Landing() {
                         key={ep.id}
                         size="sm"
                         variant="outline"
-                        onClick={() => playEpisode(ep)}
+                        onClick={() => {
+                          // Close the popup immediately and start playback on top
+                          setSelected(null);
+                          playEpisode(ep);
+                        }}
                         className="bg-gray-800 border-gray-700 hover:bg-gray-700"
                       >
                         {ep.number ?? "?"}

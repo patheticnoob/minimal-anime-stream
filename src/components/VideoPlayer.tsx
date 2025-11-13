@@ -686,7 +686,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
             <>
               {/* Dim overlay */}
               <motion.div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-none"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
