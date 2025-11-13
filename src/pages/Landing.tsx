@@ -159,10 +159,17 @@ export default function Landing() {
         // Proxy the m3u8 URL through Convex HTTP endpoint
         const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
 
+        // Proxy subtitle tracks as well (CORS-safe) and ensure kind defaults to "subtitles"
+        const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
+          ...t,
+          kind: t.kind || "subtitles",
+          file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+        }));
+
         // Set video player state
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
-        setVideoTracks(sourcesData.tracks || []);
+        setVideoTracks(proxiedTracks);
 
         toast.success(`Playing Episode ${episode.number}`);
       } else {

@@ -84,7 +84,20 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
     const handleSeeking = () => setIsLoading(true);
     const handleWaiting = () => setIsLoading(true);
     const handlePlaying = () => setIsLoading(false);
-    const handleLoadedMetadata = () => setIsLoading(false);
+    const handleLoadedMetadata = () => {
+      setIsLoading(false);
+      // Auto-enable the first subtitle track if available
+      try {
+        const list = video.textTracks;
+        if (list && list.length > 0) {
+          for (let i = 0; i < list.length; i++) {
+            list[i].mode = "disabled";
+          }
+          list[0].mode = "showing";
+          setCurrentSubtitle(0);
+        }
+      } catch {}
+    };
 
     video.addEventListener("loadstart", handleLoadStart);
     video.addEventListener("canplay", handleCanPlay);
@@ -523,25 +536,6 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle 
                     {(videoRef.current?.textTracks ? Array.from(videoRef.current.textTracks) : []).map((t, i) => (
                       <DropdownMenuItem key={i} className="cursor-pointer" onClick={() => setSubtitle(i)}>
                         {currentSubtitle === i ? "✓ " : ""}{t.label || `Track ${i + 1}`}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                {/* Quality menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">HD</Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-44 bg-black/90 text-white border-white/10">
-                    <DropdownMenuLabel>Quality</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer" onClick={() => setQuality(-1)}>
-                      {currentQuality === -1 ? "✓ " : ""} Auto
-                    </DropdownMenuItem>
-                    {qualities.map((q) => (
-                      <DropdownMenuItem key={q.level} className="cursor-pointer" onClick={() => setQuality(q.level)}>
-                        {currentQuality === q.level ? "✓ " : ""} {q.label}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
