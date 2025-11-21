@@ -199,13 +199,13 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
     if (showControls) {
       style.textContent = `
         video::cue {
-          bottom: 120px !important;
+          bottom: 140px !important;
         }
       `;
     } else {
       style.textContent = `
         video::cue {
-          bottom: 20px !important;
+          bottom: 40px !important;
         }
       `;
     }
