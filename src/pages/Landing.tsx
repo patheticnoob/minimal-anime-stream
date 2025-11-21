@@ -29,7 +29,31 @@ type AnimeItem = {
 type Episode = {
   id: string;
   title?: string;
-  number?: number;
+  number?: number | string | null;
+};
+
+type AnimePlaybackInfo = {
+  animeId: string;
+  title: string;
+  image?: string | null;
+  type?: string;
+  language?: {
+    sub?: string | null;
+    dub?: string | null;
+  };
+};
+
+const normalizeEpisodeNumber = (value?: number | string | null) => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return 0;
 };
 
 export default function Landing() {
@@ -62,6 +86,7 @@ export default function Landing() {
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState<number | null>(null);
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
+  const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
 
   // Watch progress and watchlist
   const continueWatching = useQuery(api.watchProgress.getContinueWatching);
@@ -131,7 +156,11 @@ export default function Landing() {
     setEpisodesLoading(true);
     try {
       const eps = (await fetchEpisodes({ dataId: anime.dataId })) as Episode[];
-      setEpisodes(eps);
+      const normalizedEpisodes = eps.map((ep) => ({
+        ...ep,
+        number: normalizeEpisodeNumber(ep.number),
+      }));
+      setEpisodes(normalizedEpisodes);
       setCurrentEpisodeIndex(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load episodes.";
@@ -182,19 +211,29 @@ export default function Landing() {
       return;
     }
 
-    // Save initial progress immediately to show in Continue Watching
+    const normalizedEpisodeNumber = normalizeEpisodeNumber(episode.number);
+    const normalizedEpisode: Episode = { ...episode, number: normalizedEpisodeNumber };
+
+    const animeInfo: AnimePlaybackInfo = {
+      animeId: selected.dataId,
+      title: selected.title || "",
+      image: selected.image ?? null,
+      type: selected.type,
+      language: selected.language,
+    };
+    setCurrentAnimeInfo(animeInfo);
+
     try {
-      console.log("Saving initial progress for:", selected.title, episode.number);
+      console.log("Saving initial progress for:", selected.title, normalizedEpisodeNumber);
       await saveProgress({
-        animeId: selected.dataId,
-        animeTitle: selected.title || "",
-        animeImage: selected.image || null,
+        animeId: animeInfo.animeId,
+        animeTitle: animeInfo.title,
+        animeImage: animeInfo.image ?? null,
         episodeId: episode.id,
-        episodeNumber: episode.number || 0,
+        episodeNumber: normalizedEpisodeNumber,
         currentTime: 0,
         duration: 0,
       });
-      // toast.success("Added to Continue Watching"); // Optional: feedback for user
     } catch (err) {
       console.error("Failed to save initial progress:", err);
       toast.error("Failed to save progress to history");
@@ -203,7 +242,7 @@ export default function Landing() {
     toast("Loading video...");
     
     // Store episode data FIRST
-    setCurrentEpisodeData(episode);
+    setCurrentEpisodeData(normalizedEpisode);
     
     try {
       const servers = await fetchServers({ episodeId: episode.id });
@@ -251,13 +290,13 @@ export default function Landing() {
         }));
 
         setVideoSource(proxiedUrl);
-        setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
+        setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
         setVideoTracks(proxiedTracks);
 
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
-        toast.success(`Playing Episode ${episode.number}`);
+        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
       } else {
         toast.error("No video sources available");
       }
@@ -267,28 +306,29 @@ export default function Landing() {
     }
   };
 
-  // Save progress periodically during playback
   const handleProgressUpdate = useCallback(async (currentTime: number, duration: number) => {
     if (!isAuthenticated) return;
-    
-    if (!currentEpisodeData || !selected?.dataId) return;
+
+    if (!currentEpisodeData || !currentAnimeInfo) return;
 
     if (!duration || duration <= 0) return;
 
+    const episodeNumberForProgress = normalizeEpisodeNumber(currentEpisodeData.number);
+
     try {
       await saveProgress({
-        animeId: selected.dataId,
-        animeTitle: selected.title || "",
-        animeImage: selected.image || null,
+        animeId: currentAnimeInfo.animeId,
+        animeTitle: currentAnimeInfo.title,
+        animeImage: currentAnimeInfo.image ?? null,
         episodeId: currentEpisodeData.id,
-        episodeNumber: currentEpisodeData.number || 0,
+        episodeNumber: episodeNumberForProgress,
         currentTime: Math.floor(currentTime),
         duration: Math.floor(duration),
       });
     } catch (err) {
       console.error("❌ Failed to save progress:", err);
     }
-  }, [isAuthenticated, currentEpisodeData, selected, saveProgress]);
+  }, [isAuthenticated, currentEpisodeData, currentAnimeInfo, saveProgress]);
 
   const filteredPopular = popularItems.filter(item =>
     query ? (item.title ?? "").toLowerCase().includes(query.toLowerCase()) : true
@@ -479,10 +519,10 @@ export default function Landing() {
           title={videoTitle}
           tracks={videoTracks}
           info={{
-            title: selected?.title ?? "",
-            image: selected?.image,
-            type: selected?.type,
-            language: selected?.language,
+            title: currentAnimeInfo?.title ?? selected?.title ?? "",
+            image: (currentAnimeInfo?.image ?? selected?.image) ?? undefined,
+            type: currentAnimeInfo?.type ?? selected?.type,
+            language: currentAnimeInfo?.language ?? selected?.language,
           }}
           episodes={episodes}
           currentEpisode={currentEpisodeIndex !== null ? episodes[currentEpisodeIndex]?.number : undefined}
@@ -508,6 +548,7 @@ export default function Landing() {
             setVideoTitle("");
             setVideoTracks([]);
             setCurrentEpisodeData(null);
+            setCurrentAnimeInfo(null);
             // Reopen the modal with the last selected anime
             if (lastSelectedAnime) {
               setSelected(lastSelectedAnime);
