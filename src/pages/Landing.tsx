@@ -11,15 +11,7 @@ import { TopBar } from "@/components/TopBar";
 import { AnimeCard } from "@/components/AnimeCard";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { InfoModal } from "@/components/InfoModal";
 import { VideoPlayer } from "@/components/VideoPlayer";
 
 type AnimeItem = {
@@ -413,82 +405,19 @@ export default function Landing() {
       </main>
 
       {/* Info Modal */}
-      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="sm:max-w-3xl bg-[#1a1f2e] border-gray-800 text-white p-0 overflow-hidden gap-0">
-          <div className="relative aspect-video w-full">
-            {selected?.image && (
-              <img
-                src={selected.image}
-                alt={selected.title ?? "Anime"}
-                className="w-full h-full object-cover"
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1a1f2e] to-transparent" />
-            <div className="absolute bottom-0 left-0 p-6">
-              <DialogTitle className="text-3xl font-bold mb-2">{selected?.title}</DialogTitle>
-              <div className="flex gap-2">
-                {selected?.type && <Badge className="bg-blue-600 hover:bg-blue-700">{selected.type}</Badge>}
-                {selected?.language?.sub && <Badge variant="outline" className="border-gray-500">SUB</Badge>}
-                {selected?.language?.dub && <Badge variant="outline" className="border-gray-500">DUB</Badge>}
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {/* Watchlist Button */}
-            <div className="mb-4">
-              <Button
-                onClick={handleToggleWatchlist}
-                variant={isInWatchlist ? "default" : "outline"}
-                className={isInWatchlist ? "bg-blue-600 hover:bg-blue-700" : "border-gray-700 hover:bg-gray-800"}
-              >
-                {isInWatchlist ? (
-                  <>
-                    <Check className="h-4 w-4 mr-2" />
-                    In Watchlist
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add to Watchlist
-                  </>
-                )}
-              </Button>
-            </div>
-
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Play className="h-4 w-4 fill-current" />
-              Episodes
-            </h3>
-            <ScrollArea className="h-[300px] pr-4">
-              {episodesLoading ? (
-                <div className="flex items-center justify-center h-20 text-gray-400 gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Loading episodes...
-                </div>
-              ) : episodes.length > 0 ? (
-                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-                  {episodes.map((ep) => (
-                    <Button
-                      key={ep.id}
-                      variant="outline"
-                      onClick={() => {
-                        setSelected(null);
-                        playEpisode(ep);
-                      }}
-                      className="bg-gray-800/50 border-gray-700 hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all"
-                    >
-                      {ep.number ?? "?"}
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-400 text-center py-8">No episodes available</p>
-              )}
-            </ScrollArea>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <InfoModal
+        anime={selected}
+        isOpen={!!selected}
+        onClose={() => setSelected(null)}
+        episodes={episodes}
+        episodesLoading={episodesLoading}
+        onPlayEpisode={(ep) => {
+          setSelected(null);
+          playEpisode(ep);
+        }}
+        isInWatchlist={isInWatchlist}
+        onToggleWatchlist={handleToggleWatchlist}
+      />
 
       {/* Video Player */}
       {videoSource && (
