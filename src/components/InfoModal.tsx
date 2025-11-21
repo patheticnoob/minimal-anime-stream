@@ -93,6 +93,7 @@ export function InfoModal({
   return (
     <div className="detail-overlay" onClick={onClose}>
       <div className="detail-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="detail-drag-handle md:hidden" aria-hidden="true" />
         {/* Close button */}
         <button className="detail-close" onClick={onClose}>
           <X className="h-5 w-5" />
@@ -119,7 +120,7 @@ export function InfoModal({
                   <span>{episodes.length} Episodes</span>
                 </>
               )}
-              <div className="flex gap-2 ml-2">
+              <div className="detail-language-badges">
                 {anime.language?.sub && (
                   <Badge variant="outline" className="border-gray-500 text-gray-300 bg-transparent h-5 text-[10px]">
                     SUB
@@ -137,7 +138,7 @@ export function InfoModal({
             </p>
             <div className="detail-hero-actions">
               <Button
-                className="btn btn-primary"
+                className="btn btn-primary w-full sm:w-auto justify-center"
                 onClick={() => {
                   if (episodes.length > 0) {
                     onPlayEpisode(episodes[0]);
@@ -149,7 +150,7 @@ export function InfoModal({
                 Watch Now
               </Button>
               <Button
-                className="btn btn-secondary"
+                className="btn btn-secondary w-full sm:w-auto justify-center"
                 onClick={onToggleWatchlist}
               >
                 {isInWatchlist ? (
