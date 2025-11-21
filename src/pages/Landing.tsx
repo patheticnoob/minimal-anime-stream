@@ -14,6 +14,7 @@ import { useNavigate } from "react-router";
 import { InfoModal } from "@/components/InfoModal";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
+import { FullscreenLoader } from "@/components/FullscreenLoader";
 
 type AnimeItem = {
   title?: string;
@@ -394,12 +395,10 @@ export default function Landing() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-          <p className="text-gray-400">Loading content...</p>
-        </div>
-      </div>
+      <FullscreenLoader
+        label="Loading anime..."
+        subLabel="Summoning episodes from another world"
+      />
     );
   }
 
