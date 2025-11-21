@@ -323,7 +323,7 @@ export default function Landing() {
       <TopBar searchQuery={query} onSearchChange={setQuery} />
 
       {/* Main Content */}
-      <main className="ml-20 md:ml-24 pt-20 transition-all duration-300">
+      <main className="ml-20 pt-20 transition-all duration-300">
         <div className="px-6 md:px-10 pb-10 max-w-[2000px] mx-auto">
           {/* Hero Banner */}
           {!query && activeSection === "home" && heroAnime && (
