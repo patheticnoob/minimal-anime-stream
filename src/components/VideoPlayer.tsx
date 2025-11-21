@@ -99,6 +99,10 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
             } else {
               console.log("▶️ Starting from beginning");
             }
+            // Autoplay
+            video.play().catch((err) => {
+              console.log("Autoplay prevented:", err);
+            });
           });
 
           hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
@@ -125,6 +129,10 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
             } else {
               console.log("▶️ Starting from beginning");
             }
+            // Autoplay
+            video.play().catch((err) => {
+              console.log("Autoplay prevented:", err);
+            });
           });
         }
       });
@@ -137,6 +145,10 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
           hasRestoredProgress.current = true;
           console.log("Resuming from:", resumeFrom);
         }
+        // Autoplay
+        video.play().catch((err) => {
+          console.log("Autoplay prevented:", err);
+        });
       });
     }
   }, [source]);
