@@ -10,34 +10,25 @@ interface TopBarProps {
 
 export function TopBar({ searchQuery, onSearchChange }: TopBarProps) {
   return (
-    <motion.header
-      className="fixed top-0 left-20 md:left-64 right-0 h-16 bg-[#0B0F19]/95 backdrop-blur border-b border-gray-800 z-30"
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.1 }}
-    >
-      <div className="h-full px-4 md:px-8 flex items-center justify-between gap-4">
-        {/* Search */}
-        <div className="flex-1 max-w-xl">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-            <Input
-              placeholder="Search anime, movies, shows..."
-              className="pl-10 bg-gray-900/50 border-gray-800 text-white placeholder:text-gray-500"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
+    <header className="top-bar fixed top-0 left-0 md:left-20 right-0 z-30 bg-[#0B0F19]/95 backdrop-blur-xl border-b border-white/5">
+      <div className="max-w-[2000px] mx-auto px-4 md:px-10 py-4 flex items-center gap-4">
+        {/* Mobile Logo */}
+        <div className="md:hidden w-8 h-8">
+          <img src="/logo.svg" alt="Logo" className="w-full h-full object-contain" />
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2">
-          <Button size="icon" variant="ghost" className="text-gray-400 hover:text-white">
-            <Bell className="h-5 w-5" />
-          </Button>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+        {/* Search */}
+        <div className="relative flex-1 max-w-xl">
+          <Search className="search-icon absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search anime..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full bg-white/5 border border-white/10 rounded-full pl-12 pr-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+          />
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 }
