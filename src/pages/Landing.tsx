@@ -1,14 +1,16 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useAction } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { Loader2, Play } from "lucide-react";
+import { Loader2, Play, Plus, Check } from "lucide-react";
 import { HeroBanner } from "@/components/HeroBanner";
 import { ContentRail } from "@/components/ContentRail";
 import { Sidebar } from "@/components/Sidebar";
 import { TopBar } from "@/components/TopBar";
 import { AnimeCard } from "@/components/AnimeCard";
+import { useAuth } from "@/hooks/use-auth";
+import { useNavigate } from "react-router";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +41,9 @@ type Episode = {
 };
 
 export default function Landing() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  
   const fetchTopAiring = useAction(api.hianime.topAiring);
   const fetchMostPopular = useAction(api.hianime.mostPopular);
   const fetchMovies = useAction(api.hianime.movies);
@@ -63,6 +68,18 @@ export default function Landing() {
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState<number | null>(null);
+  const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
+
+  // Watch progress and watchlist
+  const continueWatching = useQuery(api.watchProgress.getContinueWatching);
+  const watchlist = useQuery(api.watchlist.getWatchlist);
+  const saveProgress = useMutation(api.watchProgress.saveProgress);
+  const addToWatchlist = useMutation(api.watchlist.addToWatchlist);
+  const removeFromWatchlist = useMutation(api.watchlist.removeFromWatchlist);
+  const isInWatchlist = useQuery(
+    api.watchlist.isInWatchlist,
+    selected?.dataId ? { animeId: selected.dataId } : "skip"
+  );
 
   // Load all content on mount
   useEffect(() => {
@@ -124,7 +141,42 @@ export default function Landing() {
     }
   };
 
+  const handleToggleWatchlist = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to use watchlist");
+      navigate("/auth");
+      return;
+    }
+
+    if (!selected?.dataId) return;
+
+    try {
+      if (isInWatchlist) {
+        await removeFromWatchlist({ animeId: selected.dataId });
+        toast.success("Removed from watchlist");
+      } else {
+        await addToWatchlist({
+          animeId: selected.dataId,
+          animeTitle: selected.title || "",
+          animeImage: selected.image,
+          animeType: selected.type,
+          language: selected.language,
+        });
+        toast.success("Added to watchlist");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to update watchlist";
+      toast.error(msg);
+    }
+  };
+
   const playEpisode = async (episode: Episode) => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to watch");
+      navigate("/auth");
+      return;
+    }
+
     toast("Loading video...");
     try {
       const servers = await fetchServers({ episodeId: episode.id });
@@ -174,6 +226,7 @@ export default function Landing() {
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
         setVideoTracks(proxiedTracks);
+        setCurrentEpisodeData(episode);
 
         // Close the info modal once playback is ready
         setSelected(null);
@@ -188,6 +241,25 @@ export default function Landing() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load video";
       toast.error(msg);
+    }
+  };
+
+  // Save progress periodically during playback
+  const handleProgressUpdate = async (currentTime: number, duration: number) => {
+    if (!isAuthenticated || !currentEpisodeData || !selected?.dataId) return;
+
+    try {
+      await saveProgress({
+        animeId: selected.dataId,
+        animeTitle: selected.title || "",
+        animeImage: selected.image,
+        episodeId: currentEpisodeData.id,
+        episodeNumber: currentEpisodeData.number || 0,
+        currentTime,
+        duration,
+      });
+    } catch (err) {
+      console.error("Failed to save progress:", err);
     }
   };
 
@@ -213,7 +285,25 @@ export default function Landing() {
 
   const sectionContent = getSectionContent();
 
-  if (loading) {
+  // Convert continue watching to AnimeItem format
+  const continueWatchingItems: AnimeItem[] = (continueWatching || []).map((item) => ({
+    title: item.animeTitle,
+    image: item.animeImage,
+    dataId: item.animeId,
+    id: item.animeId,
+  }));
+
+  // Convert watchlist to AnimeItem format
+  const watchlistItems: AnimeItem[] = (watchlist || []).map((item) => ({
+    title: item.animeTitle,
+    image: item.animeImage,
+    type: item.animeType,
+    dataId: item.animeId,
+    id: item.animeId,
+    language: item.language,
+  }));
+
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -253,7 +343,7 @@ export default function Landing() {
                   <AnimeCard 
                     key={item.id ?? idx} 
                     anime={item} 
-                    onClick={() => setHeroAnime(item)} 
+                    onClick={() => openAnime(item)} 
                     index={idx}
                   />
                 ))}
@@ -270,7 +360,7 @@ export default function Landing() {
                   <AnimeCard 
                     key={item.id ?? idx} 
                     anime={item} 
-                    onClick={() => setHeroAnime(item)} 
+                    onClick={() => openAnime(item)} 
                     index={idx}
                   />
                 ))}
@@ -279,25 +369,43 @@ export default function Landing() {
           ) : (
             /* Home view with content rails */
             <div className="space-y-8">
+              {/* Continue Watching */}
+              {isAuthenticated && continueWatchingItems.length > 0 && (
+                <ContentRail
+                  title="Continue Watching"
+                  items={continueWatchingItems}
+                  onItemClick={openAnime}
+                />
+              )}
+
+              {/* My Watchlist */}
+              {isAuthenticated && watchlistItems.length > 0 && (
+                <ContentRail
+                  title="My Watchlist"
+                  items={watchlistItems}
+                  onItemClick={openAnime}
+                />
+              )}
+
               <ContentRail
                 title="Trending Now"
                 items={popularItems}
-                onItemClick={setHeroAnime}
+                onItemClick={openAnime}
               />
               <ContentRail
                 title="Top Airing"
                 items={airingItems}
-                onItemClick={setHeroAnime}
+                onItemClick={openAnime}
               />
               <ContentRail
                 title="Popular Movies"
                 items={movieItems}
-                onItemClick={setHeroAnime}
+                onItemClick={openAnime}
               />
               <ContentRail
                 title="TV Series"
                 items={tvShowItems}
-                onItemClick={setHeroAnime}
+                onItemClick={openAnime}
               />
             </div>
           )}
@@ -327,6 +435,27 @@ export default function Landing() {
           </div>
 
           <div className="p-6">
+            {/* Watchlist Button */}
+            <div className="mb-4">
+              <Button
+                onClick={handleToggleWatchlist}
+                variant={isInWatchlist ? "default" : "outline"}
+                className={isInWatchlist ? "bg-blue-600 hover:bg-blue-700" : "border-gray-700 hover:bg-gray-800"}
+              >
+                {isInWatchlist ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    In Watchlist
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add to Watchlist
+                  </>
+                )}
+              </Button>
+            </div>
+
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Play className="h-4 w-4 fill-current" />
               Episodes
@@ -386,10 +515,12 @@ export default function Landing() {
               ? `${selected?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
               : undefined
           }
+          onProgressUpdate={handleProgressUpdate}
           onClose={() => {
             setVideoSource(null);
             setVideoTitle("");
             setVideoTracks([]);
+            setCurrentEpisodeData(null);
           }}
         />
       )}

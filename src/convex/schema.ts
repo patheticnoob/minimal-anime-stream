@@ -32,12 +32,36 @@ const schema = defineSchema(
       role: v.optional(roleValidator), // role of the user. do not remove
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
-    // add other tables here
+    // Watch progress tracking
+    watchProgress: defineTable({
+      userId: v.id("users"),
+      animeId: v.string(),
+      animeTitle: v.string(),
+      animeImage: v.optional(v.string()),
+      episodeId: v.string(),
+      episodeNumber: v.number(),
+      currentTime: v.number(),
+      duration: v.number(),
+      lastWatched: v.number(),
+    })
+      .index("by_user", ["userId"])
+      .index("by_user_and_anime", ["userId", "animeId"]),
 
-    // tableName: defineTable({
-    //   ...
-    //   // table fields
-    // }).index("by_field", ["field"])
+    // Watchlist
+    watchlist: defineTable({
+      userId: v.id("users"),
+      animeId: v.string(),
+      animeTitle: v.string(),
+      animeImage: v.optional(v.string()),
+      animeType: v.optional(v.string()),
+      language: v.optional(v.object({
+        sub: v.optional(v.union(v.string(), v.null())),
+        dub: v.optional(v.union(v.string(), v.null())),
+      })),
+      addedAt: v.number(),
+    })
+      .index("by_user", ["userId"])
+      .index("by_user_and_anime", ["userId", "animeId"]),
   },
   {
     schemaValidation: false,

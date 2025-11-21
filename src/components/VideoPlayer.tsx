@@ -33,9 +33,10 @@ interface VideoPlayerProps {
   episodes?: Array<{ id: string; title?: string; number?: number }>;
   currentEpisode?: number;
   onSelectEpisode?: (ep: { id: string; title?: string; number?: number }) => void;
+  onProgressUpdate?: (currentTime: number, duration: number) => void;
 }
 
-export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps) {
+export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -112,10 +113,12 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
     }
   }, [source]);
 
-  // Update progress
+  // Update progress - save every 10 seconds
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    let lastSavedTime = 0;
 
     const updateProgress = () => {
       setCurrentTime(video.currentTime);
@@ -125,10 +128,22 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
         const bufferedEnd = video.buffered.end(video.buffered.length - 1);
         setBuffered((bufferedEnd / video.duration) * 100);
       }
+
+      // Save progress every 10 seconds
+      if (onProgressUpdate && video.currentTime - lastSavedTime >= 10) {
+        onProgressUpdate(video.currentTime, video.duration);
+        lastSavedTime = video.currentTime;
+      }
     };
 
     const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
+    const handlePause = () => {
+      setIsPlaying(false);
+      // Save progress on pause
+      if (onProgressUpdate) {
+        onProgressUpdate(video.currentTime, video.duration);
+      }
+    };
     const handleWaiting = () => setIsLoading(true);
     const handleCanPlay = () => setIsLoading(false);
 
@@ -147,7 +162,7 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
       video.removeEventListener("canplay", handleCanPlay);
       video.removeEventListener("loadedmetadata", updateProgress);
     };
-  }, []);
+  }, [onProgressUpdate]);
 
   // Auto-hide controls
   useEffect(() => {
