@@ -148,10 +148,10 @@
 
 .sidebar-inner {
   height: 100%;
-  padding: 16px 10px;
+  padding: 24px 18px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  align-items: center;
 }
 
 .sidebar-logo {
@@ -165,15 +165,16 @@
   color: #fff;
   font-size: 20px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
-  margin-inline: auto;
   overflow: hidden;
+  margin-bottom: 20px;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .nav-item {
