@@ -173,6 +173,42 @@ export function VideoPlayer({ source, title, tracks, onClose }: VideoPlayerProps
     };
   }, [isPlaying]);
 
+  // Adjust subtitle position when controls are visible
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const style = document.createElement('style');
+    style.id = 'subtitle-position-style';
+    
+    if (showControls) {
+      style.textContent = `
+        video::cue {
+          bottom: 120px !important;
+        }
+      `;
+    } else {
+      style.textContent = `
+        video::cue {
+          bottom: 20px !important;
+        }
+      `;
+    }
+
+    const existingStyle = document.getElementById('subtitle-position-style');
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+    document.head.appendChild(style);
+
+    return () => {
+      const styleToRemove = document.getElementById('subtitle-position-style');
+      if (styleToRemove) {
+        styleToRemove.remove();
+      }
+    };
+  }, [showControls]);
+
   const handleMouseMove = () => {
     setShowControls(true);
     if (controlsTimeoutRef.current) {
