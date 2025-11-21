@@ -93,9 +93,11 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
             setIsLoading(false);
             // Resume from saved position
             if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
+              console.log("📍 Resuming playback from:", resumeFrom, "seconds");
               video.currentTime = resumeFrom;
               hasRestoredProgress.current = true;
-              console.log("Resuming from:", resumeFrom);
+            } else {
+              console.log("▶️ Starting from beginning");
             }
           });
 
@@ -117,9 +119,11 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
             setIsLoading(false);
             // Resume from saved position
             if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
+              console.log("📍 Resuming playback from:", resumeFrom, "seconds");
               video.currentTime = resumeFrom;
               hasRestoredProgress.current = true;
-              console.log("Resuming from:", resumeFrom);
+            } else {
+              console.log("▶️ Starting from beginning");
             }
           });
         }

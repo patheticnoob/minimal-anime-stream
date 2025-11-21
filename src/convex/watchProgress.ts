@@ -15,7 +15,19 @@ export const saveProgress = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) {
+      console.error("❌ saveProgress: User not authenticated");
+      throw new Error("Not authenticated");
+    }
+
+    console.log("💾 Saving progress:", {
+      userId,
+      animeId: args.animeId,
+      episodeId: args.episodeId,
+      episodeNumber: args.episodeNumber,
+      currentTime: args.currentTime,
+      duration: args.duration,
+    });
 
     // Check if progress already exists
     const existing = await ctx.db
@@ -38,10 +50,13 @@ export const saveProgress = mutation({
     };
 
     if (existing) {
+      console.log("📝 Updating existing progress record");
       await ctx.db.patch(existing._id, progressData);
       return existing._id;
     } else {
-      return await ctx.db.insert("watchProgress", progressData);
+      console.log("✨ Creating new progress record");
+      const id = await ctx.db.insert("watchProgress", progressData);
+      return id;
     }
   },
 });
