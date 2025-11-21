@@ -159,6 +159,28 @@ export default function Landing() {
     };
   }, [fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows]);
 
+  // Auto-rotate hero banner every 4 seconds
+  useEffect(() => {
+    if (!heroAnime || popularItems.length === 0 || airingItems.length === 0) return;
+
+    const heroPool = [
+      ...popularItems.slice(0, 5),
+      ...airingItems.slice(0, 5),
+    ];
+
+    if (heroPool.length === 0) return;
+
+    const interval = setInterval(() => {
+      setHeroIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % heroPool.length;
+        setHeroAnime(heroPool[nextIndex]);
+        return nextIndex;
+      });
+    }, 4000); // Rotate every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [heroAnime, popularItems, airingItems]);
+
   // Search handler with debounce
   useEffect(() => {
     if (!query.trim()) {
