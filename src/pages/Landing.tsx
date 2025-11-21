@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { Loader2, Search } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { HeroBanner } from "@/components/HeroBanner";
 import { ContentRail } from "@/components/ContentRail";
+import { Sidebar } from "@/components/Sidebar";
+import { TopBar } from "@/components/TopBar";
 import {
   Dialog,
   DialogContent,
@@ -53,6 +54,7 @@ export default function Landing() {
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
   
   const [query, setQuery] = useState("");
+  const [activeSection, setActiveSection] = useState("home");
   const [selected, setSelected] = useState<AnimeItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [episodesLoading, setEpisodesLoading] = useState(false);
@@ -192,6 +194,24 @@ export default function Landing() {
     query ? (item.title ?? "").toLowerCase().includes(query.toLowerCase()) : true
   );
 
+  // Filter content based on active section
+  const getSectionContent = () => {
+    switch (activeSection) {
+      case "tv":
+        return tvShowItems;
+      case "movies":
+        return movieItems;
+      case "popular":
+        return popularItems;
+      case "recent":
+        return airingItems;
+      default:
+        return null;
+    }
+  };
+
+  const sectionContent = getSectionContent();
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
@@ -205,106 +225,106 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full bg-[#0B0F19]/95 backdrop-blur border-b border-gray-800">
-        <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <motion.div
-              className="flex items-center gap-3"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <img src="./logo.svg" alt="Logo" width={32} height={32} className="rounded" />
-              <span className="text-lg font-bold hidden md:block">Anime Stream</span>
-            </motion.div>
+      {/* Sidebar */}
+      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
-            {/* Search */}
-            <motion.div
-              className="flex-1 max-w-md mx-4"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                <Input
-                  placeholder="Search anime..."
-                  className="pl-10 bg-gray-900/50 border-gray-800 text-white placeholder:text-gray-500"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
-            </motion.div>
-
-            {/* Profile placeholder */}
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
-          </div>
-        </div>
-      </header>
+      {/* Top Bar */}
+      <TopBar searchQuery={query} onSearchChange={setQuery} />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 md:px-8 max-w-7xl py-6">
-        {/* Hero Banner */}
-        {!query && heroAnime && (
-          <HeroBanner
-            anime={heroAnime}
-            onPlay={() => openAnime(heroAnime)}
-            onMoreInfo={() => openAnime(heroAnime)}
-          />
-        )}
+      <main className="ml-20 md:ml-64 pt-16">
+        <div className="px-4 md:px-8 py-6 max-w-[1920px] mx-auto">
+          {/* Hero Banner */}
+          {!query && activeSection === "home" && heroAnime && (
+            <HeroBanner
+              anime={heroAnime}
+              onPlay={() => openAnime(heroAnime)}
+              onMoreInfo={() => openAnime(heroAnime)}
+            />
+          )}
 
-        {/* Content Rails */}
-        {query ? (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Search Results</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {filteredPopular.map((item, idx) => (
-                <div key={item.id ?? idx} onClick={() => openAnime(item)}>
-                  <motion.div
-                    className="cursor-pointer"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-900">
-                      {item.image && (
-                        <img
-                          src={item.image}
-                          alt={item.title ?? "Anime"}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                    <p className="mt-2 text-sm text-white line-clamp-2">{item.title}</p>
-                  </motion.div>
-                </div>
-              ))}
+          {/* Search Results */}
+          {query ? (
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold mb-6 tracking-tight">Search Results</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {filteredPopular.map((item, idx) => (
+                  <div key={item.id ?? idx} onClick={() => openAnime(item)}>
+                    <motion.div
+                      className="cursor-pointer"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-900">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.title ?? "Anime"}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                      <p className="mt-2 text-sm text-white line-clamp-2">{item.title}</p>
+                    </motion.div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ) : (
-          <>
-            <ContentRail
-              title="Trending Now"
-              items={popularItems}
-              onItemClick={openAnime}
-            />
-            <ContentRail
-              title="Top Airing"
-              items={airingItems}
-              onItemClick={openAnime}
-            />
-            <ContentRail
-              title="Popular Movies"
-              items={movieItems}
-              onItemClick={openAnime}
-            />
-            <ContentRail
-              title="TV Series"
-              items={tvShowItems}
-              onItemClick={openAnime}
-            />
-          </>
-        )}
+          ) : sectionContent ? (
+            /* Section-specific content */
+            <div className="mt-8">
+              <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
+                {activeSection === "tv" ? "TV Shows" : activeSection === "recent" ? "Recently Added" : activeSection}
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {sectionContent.map((item, idx) => (
+                  <div key={item.id ?? idx} onClick={() => openAnime(item)}>
+                    <motion.div
+                      className="cursor-pointer"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-900">
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.title ?? "Anime"}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                      <p className="mt-2 text-sm text-white line-clamp-2">{item.title}</p>
+                    </motion.div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* Home view with content rails */
+            <>
+              <ContentRail
+                title="Trending Now"
+                items={popularItems}
+                onItemClick={openAnime}
+              />
+              <ContentRail
+                title="Top Airing"
+                items={airingItems}
+                onItemClick={openAnime}
+              />
+              <ContentRail
+                title="Popular Movies"
+                items={movieItems}
+                onItemClick={openAnime}
+              />
+              <ContentRail
+                title="TV Series"
+                items={tvShowItems}
+                onItemClick={openAnime}
+              />
+            </>
+          )}
+        </div>
       </main>
 
       {/* Info Modal */}
@@ -350,7 +370,6 @@ export default function Landing() {
                         size="sm"
                         variant="outline"
                         onClick={() => {
-                          // Ensure popup closes immediately so the player renders on top
                           setSelected(null);
                           playEpisode(ep);
                         }}
