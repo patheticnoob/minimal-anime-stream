@@ -38,13 +38,15 @@ export function TopBar({
           />
         </div>
 
-        <Button
-          variant="secondary"
-          onClick={() => onProfileClick?.()}
-          className="hidden sm:inline-flex h-10 rounded-full bg-white/10 text-white hover:bg-white/20"
-        >
-          {isAuthenticated ? "My Profile" : "Sign In"}
-        </Button>
+        {!isAuthenticated && (
+          <Button
+            variant="secondary"
+            onClick={() => onProfileClick?.()}
+            className="hidden sm:inline-flex h-10 rounded-full bg-white/10 text-white hover:bg-white/20"
+          >
+            Sign In
+          </Button>
+        )}
       </div>
     </motion.header>
   );

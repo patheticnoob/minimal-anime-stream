@@ -58,7 +58,7 @@ const normalizeEpisodeNumber = (value?: number | string | null) => {
 };
 
 export default function Landing() {
-  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
   const navigate = useNavigate();
   
   const fetchTopAiring = useAction(api.hianime.topAiring);
@@ -453,6 +453,11 @@ export default function Landing() {
               continueWatching={continueWatchingItems}
               watchlist={watchlistItems}
               onSelectAnime={openAnime}
+              onLogout={async () => {
+                await signOut();
+                toast.success("Logged out successfully");
+                setActiveSection("home");
+              }}
             />
           ) : (
             <>

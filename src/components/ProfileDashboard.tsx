@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { LogOut } from "lucide-react";
 
 type ProfileAnime = {
   title?: string;
@@ -19,6 +20,7 @@ interface ProfileDashboardProps {
   continueWatching: ProfileAnime[];
   watchlist: ProfileAnime[];
   onSelectAnime: (anime: ProfileAnime) => void;
+  onLogout?: () => void;
 }
 
 const shimmerHighlight =
@@ -30,6 +32,7 @@ export function ProfileDashboard({
   continueWatching,
   watchlist,
   onSelectAnime,
+  onLogout,
 }: ProfileDashboardProps) {
   const displayName = userName?.trim() || userEmail || "Anime Fan";
   const initials = displayName
@@ -199,12 +202,22 @@ export function ProfileDashboard({
               )}
             </div>
           </div>
-          <Button
-            variant="secondary"
-            className="h-12 w-full rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur md:w-auto"
-          >
-            Personalize Feed
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              variant="secondary"
+              className="h-12 rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur"
+            >
+              Personalize Feed
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={onLogout}
+              className="h-12 rounded-2xl bg-red-600/20 text-red-400 hover:bg-red-600/30 border border-red-500/30"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Log Out
+            </Button>
+          </div>
         </div>
       </motion.section>
 
