@@ -1,7 +1,13 @@
-import { useState } from "react";
-import { X, Play, Plus, Check } from "lucide-react";
+import { useState, useMemo } from "react";
+import { X, Play, Plus, Check, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Episode = {
   id: string;
@@ -45,6 +51,32 @@ export function InfoModal({
   onToggleWatchlist,
 }: InfoModalProps) {
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
+  const [episodeRange, setEpisodeRange] = useState(0);
+
+  // Calculate episode ranges (100 episodes per range)
+  const episodeRanges = useMemo(() => {
+    if (episodes.length <= 100) return [];
+    
+    const ranges: Array<{ label: string; start: number; end: number }> = [];
+    for (let i = 0; i < episodes.length; i += 100) {
+      const start = i + 1;
+      const end = Math.min(i + 100, episodes.length);
+      ranges.push({
+        label: `${start}-${end}`,
+        start: i,
+        end: Math.min(i + 100, episodes.length),
+      });
+    }
+    return ranges;
+  }, [episodes.length]);
+
+  // Filter episodes based on selected range
+  const displayedEpisodes = useMemo(() => {
+    if (episodeRanges.length === 0) return episodes;
+    
+    const range = episodeRanges[episodeRange];
+    return episodes.slice(range.start, range.start + range.end - range.start);
+  }, [episodes, episodeRange, episodeRanges]);
 
   if (!isOpen || !anime) return null;
 
@@ -153,12 +185,39 @@ export function InfoModal({
             <div className="detail-episodes">
               <div className="detail-season-header">
                 <span className="detail-season-title">All Episodes</span>
+                {episodeRanges.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="ml-3 h-8 bg-white/5 border-white/10 text-white hover:bg-white/10"
+                      >
+                        {episodeRanges[episodeRange].label}
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-black/95 border-white/10">
+                      {episodeRanges.map((range, idx) => (
+                        <DropdownMenuItem
+                          key={idx}
+                          onClick={() => setEpisodeRange(idx)}
+                          className={`text-white cursor-pointer hover:bg-white/10 ${
+                            episodeRange === idx ? "bg-blue-600/20 text-blue-400" : ""
+                          }`}
+                        >
+                          Episodes {range.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
               {episodesLoading ? (
                 <div className="detail-placeholder">Loading episodes...</div>
-              ) : episodes.length > 0 ? (
+              ) : displayedEpisodes.length > 0 ? (
                 <div className="detail-episode-list">
-                  {episodes.map((ep) => {
+                  {displayedEpisodes.map((ep) => {
                     const progressPercentage = ep.currentTime && ep.duration 
                       ? (ep.currentTime / ep.duration) * 100 
                       : 0;
