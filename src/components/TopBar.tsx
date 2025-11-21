@@ -10,7 +10,7 @@ interface TopBarProps {
 
 export function TopBar({ searchQuery, onSearchChange }: TopBarProps) {
   return (
-    <header className="top-bar fixed top-0 left-0 md:left-20 right-0 z-30 bg-[#0B0F19]/95 backdrop-blur-xl border-b border-white/5">
+    <header className="top-bar fixed top-0 left-0 md:left-20 right-0 z-50 bg-[#0B0F19]/95 backdrop-blur-xl border-b border-white/5">
       <div className="max-w-[2000px] mx-auto px-4 md:px-10 py-4 flex items-center gap-4">
         {/* Mobile Logo */}
         <div className="md:hidden w-8 h-8">

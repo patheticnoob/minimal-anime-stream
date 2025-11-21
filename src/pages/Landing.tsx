@@ -495,14 +495,19 @@ export default function Landing() {
         onClose={() => setSelected(null)}
         episodes={episodes.map(ep => {
           // Enrich episodes with progress data
+          const normalizedEp = {
+            id: ep.id,
+            title: ep.title,
+            number: typeof ep.number === 'number' ? ep.number : undefined,
+          };
           if (animeProgress && animeProgress.episodeId === ep.id) {
             return {
-              ...ep,
+              ...normalizedEp,
               currentTime: animeProgress.currentTime,
               duration: animeProgress.duration,
             };
           }
-          return ep;
+          return normalizedEp;
         })}
         episodesLoading={episodesLoading}
         onPlayEpisode={(ep) => {
@@ -524,8 +529,12 @@ export default function Landing() {
             type: currentAnimeInfo?.type ?? selected?.type,
             language: currentAnimeInfo?.language ?? selected?.language,
           }}
-          episodes={episodes}
-          currentEpisode={currentEpisodeIndex !== null ? episodes[currentEpisodeIndex]?.number : undefined}
+          episodes={episodes.map(ep => ({
+            id: ep.id,
+            title: ep.title,
+            number: typeof ep.number === 'number' ? ep.number : undefined,
+          }))}
+          currentEpisode={currentEpisodeIndex !== null && episodes[currentEpisodeIndex] ? (typeof episodes[currentEpisodeIndex].number === 'number' ? episodes[currentEpisodeIndex].number : undefined) : undefined}
           onSelectEpisode={(ep) => playEpisode(ep)}
           onNext={() => {
             if (currentEpisodeIndex === null) return;
