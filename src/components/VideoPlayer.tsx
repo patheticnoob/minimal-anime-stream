@@ -113,7 +113,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
     }
   }, [source]);
 
-  // Update progress - save every 10 seconds
+  // Update progress - save every 5 seconds and on key events
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -129,38 +129,63 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
         setBuffered((bufferedEnd / video.duration) * 100);
       }
 
-      // Save progress every 10 seconds
-      if (onProgressUpdate && video.currentTime - lastSavedTime >= 10) {
+      // Save progress every 5 seconds (more frequent)
+      if (onProgressUpdate && video.currentTime - lastSavedTime >= 5) {
         onProgressUpdate(video.currentTime, video.duration);
         lastSavedTime = video.currentTime;
       }
     };
 
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => {
-      setIsPlaying(false);
-      // Save progress on pause
-      if (onProgressUpdate) {
+    const handlePlay = () => {
+      setIsPlaying(true);
+      // Save progress when playback starts
+      if (onProgressUpdate && video.duration) {
         onProgressUpdate(video.currentTime, video.duration);
       }
     };
+
+    const handlePause = () => {
+      setIsPlaying(false);
+      // Save progress on pause
+      if (onProgressUpdate && video.duration) {
+        onProgressUpdate(video.currentTime, video.duration);
+      }
+    };
+
+    const handleSeeked = () => {
+      // Save progress after seeking
+      if (onProgressUpdate && video.duration) {
+        onProgressUpdate(video.currentTime, video.duration);
+      }
+    };
+
     const handleWaiting = () => setIsLoading(true);
     const handleCanPlay = () => setIsLoading(false);
+
+    const handleLoadedMetadata = () => {
+      updateProgress();
+      // Save initial progress when metadata loads
+      if (onProgressUpdate && video.duration) {
+        onProgressUpdate(video.currentTime, video.duration);
+      }
+    };
 
     video.addEventListener("timeupdate", updateProgress);
     video.addEventListener("play", handlePlay);
     video.addEventListener("pause", handlePause);
+    video.addEventListener("seeked", handleSeeked);
     video.addEventListener("waiting", handleWaiting);
     video.addEventListener("canplay", handleCanPlay);
-    video.addEventListener("loadedmetadata", updateProgress);
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
 
     return () => {
       video.removeEventListener("timeupdate", updateProgress);
       video.removeEventListener("play", handlePlay);
       video.removeEventListener("pause", handlePause);
+      video.removeEventListener("seeked", handleSeeked);
       video.removeEventListener("waiting", handleWaiting);
       video.removeEventListener("canplay", handleCanPlay);
-      video.removeEventListener("loadedmetadata", updateProgress);
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
   }, [onProgressUpdate]);
 

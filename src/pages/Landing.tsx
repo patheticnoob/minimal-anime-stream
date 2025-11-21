@@ -232,6 +232,23 @@ export default function Landing() {
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
+        // Save initial progress immediately when episode starts
+        if (selected?.dataId) {
+          try {
+            await saveProgress({
+              animeId: selected.dataId,
+              animeTitle: selected.title || "",
+              animeImage: selected.image,
+              episodeId: episode.id,
+              episodeNumber: episode.number || 0,
+              currentTime: 0,
+              duration: 0,
+            });
+          } catch (err) {
+            console.error("Failed to save initial progress:", err);
+          }
+        }
+
         toast.success(`Playing Episode ${episode.number}`);
       } else {
         toast.error("No video sources available");
