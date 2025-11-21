@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, Pause, Volume2, VolumeX, Maximize, Minimize, Loader2, RotateCcw, RotateCw } from "lucide-react";
+import { X, Play, Pause, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Slider } from "@/components/ui/slider";
 import { PlayerInfoPanel } from "@/components/PlayerInfoPanel";
+import { VideoPlayerControls } from "@/components/VideoPlayerControls";
 
 interface VideoPlayerProps {
   source: string;
@@ -41,24 +39,25 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userPaused, setUserPaused] = useState(false); // track user-intent pause for info panel
-  const progressRef = useRef<HTMLDivElement>(null); // progress rail ref
+  const [userPaused, setUserPaused] = useState(false);
+  const progressRef = useRef<HTMLDivElement>(null);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
   const [hoverX, setHoverX] = useState<number>(0);
-  const [showEpisodes, setShowEpisodes] = useState(false); // NEW: Episodes overlay toggle
+  const [showEpisodes, setShowEpisodes] = useState(false);
 
   // New UI/UX state
   const [controlsTimer, setControlsTimer] = useState<number | null>(null);
   const [bufferedEnd, setBufferedEnd] = useState(0);
   const [volume, setVolume] = useState(1);
   const [showVolume, setShowVolume] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1); // NEW: Playback speed
 
   // Quality and tracks
   const [qualities, setQualities] = useState<Array<{ label: string; level: number; height?: number }>>([]);
-  const [currentQuality, setCurrentQuality] = useState<number>(-1); // -1 = Auto
+  const [currentQuality, setCurrentQuality] = useState<number>(-1);
   const [audioTracks, setAudioTracks] = useState<Array<{ name: string; id: number }>>([]);
   const [currentAudio, setCurrentAudio] = useState<number>(0);
-  const [currentSubtitle, setCurrentSubtitle] = useState<number | -1>(-1); // -1 = Off
+  const [currentSubtitle, setCurrentSubtitle] = useState<number | -1>(-1);
 
   // Auto hide controls after inactivity
   const kickControlsTimer = () => {
@@ -67,6 +66,62 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
     }
     const id = window.setTimeout(() => setShowControls(false), 2500);
     setControlsTimer(id);
+  };
+
+  // NEW: Keyboard shortcuts handler
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      // Ignore if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      switch (e.key.toLowerCase()) {
+        case ' ':
+        case 'k':
+          e.preventDefault();
+          togglePlay();
+          break;
+        case 'f':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case 'm':
+          e.preventDefault();
+          toggleMute();
+          break;
+        case 'arrowright':
+          e.preventDefault();
+          video.currentTime = Math.min(duration || 0, (video.currentTime || 0) + 10);
+          break;
+        case 'arrowleft':
+          e.preventDefault();
+          video.currentTime = Math.max(0, (video.currentTime || 0) - 10);
+          break;
+        case 'arrowup':
+          e.preventDefault();
+          video.volume = Math.min(1, video.volume + 0.1);
+          setVolume(video.volume);
+          break;
+        case 'arrowdown':
+          e.preventDefault();
+          video.volume = Math.max(0, video.volume - 0.1);
+          setVolume(video.volume);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [duration, isPlaying, isFullscreen, isMuted]);
+
+  // NEW: Playback rate handler
+  const handleSetPlaybackRate = (rate: number) => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.playbackRate = rate;
+    setPlaybackRate(rate);
   };
 
   useEffect(() => {
@@ -398,6 +453,22 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
   };
   const clearProgressHover = () => setHoverTime(null);
 
+  const handleVolumeChange = (v: number[]) => {
+    const video = videoRef.current;
+    if (!video) return;
+    const val = (v?.[0] ?? 100) / 100;
+    video.volume = val;
+    video.muted = val === 0;
+    setVolume(val);
+    setIsMuted(val === 0);
+  };
+
+  const handleShowEpisodes = () => {
+    setShowEpisodes(true);
+    const v = videoRef.current;
+    if (v) v.pause();
+  };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -410,6 +481,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
         onMouseLeave={() => isPlaying && setShowControls(false)}
         onTouchStart={handlePointerActivity}
         transition={{ duration: 0.25, ease: "easeOut" }}
+        data-testid="video-player-container"
       >
         {/* Close Button */}
         <motion.div
@@ -422,6 +494,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
             variant="ghost"
             onClick={onClose}
             className="bg-black/50 hover:bg-black/70 text-white"
+            data-testid="close-button"
           >
             <X className="h-6 w-6" />
           </Button>
@@ -449,6 +522,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
               exit={{ opacity: 0 }}
               aria-label="Toggle play"
               style={{ width: "fit-content" }}
+              data-testid="video-center-button"
             >
               {isPlaying ? <Pause className="h-8 w-8 text-[#003366]" /> : <Play className="h-8 w-8 text-[#003366]" />}
             </motion.button>
@@ -462,6 +536,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
           onClick={togglePlay}
           crossOrigin="anonymous"
           playsInline
+          data-testid="video-element"
         >
           {tracks?.map((track, idx) => (
             <track
@@ -477,7 +552,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
 
         {/* Loading Spinner */}
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center" data-testid="video-loading">
             <Loader2 className="h-16 w-16 animate-spin text-white" />
           </div>
         )}
@@ -499,6 +574,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
           className="absolute bottom-0 left-0 right-0 p-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : 20 }}
+          data-testid="video-controls"
         >
           <div className="rounded-2xl border border-white/15 bg-black/80 backdrop-blur-xl px-3 pt-3 pb-2 shadow-2xl">
             {/* Progress Rail with buffered + played */}
@@ -511,6 +587,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
               }}
               onTouchStart={handlePointerActivity}
               onMouseLeave={clearProgressHover}
+              data-testid="video-progress-bar"
             >
               <div className="absolute inset-0 rounded-full bg-white/10" />
               <div className="absolute inset-y-0 left-0 rounded-full bg-white/20" style={{ width: `${bufferedPercent}%` }} />
@@ -541,132 +618,40 @@ export function VideoPlayer({ source, title, tracks, onClose, onNext, nextTitle,
             </div>
 
             {/* Bottom controls row */}
-            <div className="flex items-center justify-between gap-3">
-              {/* Left cluster */}
-              <div className="flex items-center gap-2 md:gap-3">
-                <Button size="icon" variant="ghost" onClick={togglePlay} className="text-white hover:bg-white/10">
-                  {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                </Button>
-
-                {/* Rewind 10s */}
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="text-white hover:bg-white/10"
-                  onClick={() => {
-                    const v = videoRef.current;
-                    if (!v) return;
-                    v.currentTime = Math.max(0, (v.currentTime || 0) - 10);
-                  }}
-                >
-                  <RotateCcw className="h-5 w-5" />
-                </Button>
-
-                {/* Forward 10s */}
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="text-white hover:bg-white/10"
-                  onClick={() => {
-                    const v = videoRef.current;
-                    if (!v) return;
-                    v.currentTime = Math.min(duration || 0, (v.currentTime || 0) + 10);
-                  }}
-                >
-                  <RotateCw className="h-5 w-5" />
-                </Button>
-
-                {/* Volume with popover slider */}
-                <Popover open={showVolume} onOpenChange={setShowVolume}>
-                  <PopoverTrigger asChild>
-                    <Button size="icon" variant="ghost" className="text-white hover:bg-white/10">
-                      {isMuted || volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent align="start" className="w-40 bg-black/90 border-white/10 text-white">
-                    <div className="px-2 py-1">
-                      <Slider
-                        value={[Math.round((volume || 0) * 100)]}
-                        onValueChange={(v) => {
-                          const video = videoRef.current;
-                          if (!video) return;
-                          const val = (v?.[0] ?? 100) / 100;
-                          video.volume = val;
-                          video.muted = val === 0;
-                          setVolume(val);
-                          setIsMuted(val === 0);
-                        }}
-                      />
-                    </div>
-                  </PopoverContent>
-                </Popover>
-
-                <span className="text-white/90 text-xs md:text-sm tabular-nums">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </span>
-              </div>
-
-              {/* Right cluster */}
-              <div className="flex items-center gap-1 md:gap-2">
-                {/* Subtitles menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">CC</Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-black/90 text-white border-white/10">
-                    <DropdownMenuLabel>Subtitles</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      className="cursor-pointer"
-                      onClick={() => setSubtitle(-1)}
-                    >
-                      {currentSubtitle === -1 ? "✓ " : ""} Off
-                    </DropdownMenuItem>
-                    {(videoRef.current?.textTracks ? Array.from(videoRef.current.textTracks) : []).map((t, i) => (
-                      <DropdownMenuItem key={i} className="cursor-pointer" onClick={() => setSubtitle(i)}>
-                        {currentSubtitle === i ? "✓ " : ""}{t.label || `Track ${i + 1}`}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                {/* Audio menu (if any) */}
-                {audioTracks.length > 1 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">Audio</Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44 bg-black/90 text-white border-white/10">
-                      <DropdownMenuLabel>Audio Track</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {audioTracks.map((a) => (
-                        <DropdownMenuItem key={a.id} className="cursor-pointer" onClick={() => setAudio(a.id)}>
-                          {currentAudio === a.id ? "✓ " : ""} {a.name}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-
-                {/* Episodes overlay trigger - NEW */}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-white hover:bg-white/10"
-                  onClick={() => {
-                    setShowEpisodes(true);
-                    const v = videoRef.current;
-                    if (v) v.pause();
-                  }}
-                >
-                  Episodes
-                </Button>
-
-                <Button size="icon" variant="ghost" onClick={toggleFullscreen} className="text-white hover:bg-white/10">
-                  {isFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
-                </Button>
-              </div>
-            </div>
+            <VideoPlayerControls
+              isPlaying={isPlaying}
+              isMuted={isMuted}
+              isFullscreen={isFullscreen}
+              volume={volume}
+              currentTime={currentTime}
+              duration={duration}
+              showVolume={showVolume}
+              playbackRate={playbackRate}
+              currentSubtitle={currentSubtitle}
+              audioTracks={audioTracks}
+              currentAudio={currentAudio}
+              videoRef={videoRef}
+              onTogglePlay={togglePlay}
+              onToggleMute={toggleMute}
+              onToggleFullscreen={toggleFullscreen}
+              onVolumeChange={handleVolumeChange}
+              onSetVolume={setShowVolume}
+              onSkipBackward={() => {
+                const v = videoRef.current;
+                if (!v) return;
+                v.currentTime = Math.max(0, (v.currentTime || 0) - 10);
+              }}
+              onSkipForward={() => {
+                const v = videoRef.current;
+                if (!v) return;
+                v.currentTime = Math.min(duration || 0, (v.currentTime || 0) + 10);
+              }}
+              onSetPlaybackRate={handleSetPlaybackRate}
+              onSetSubtitle={setSubtitle}
+              onSetAudio={setAudio}
+              onShowEpisodes={handleShowEpisodes}
+              formatTime={formatTime}
+            />
           </div>
         </motion.div>
 
