@@ -46,6 +46,25 @@ export const topAiring = action({
   },
 });
 
+// Search anime by query
+export const search = action({
+  args: { 
+    query: v.string(),
+    page: v.optional(v.number()) 
+  },
+  handler: async (_, args) => {
+    try {
+      const client = await getClient();
+      const page = args.page ?? 1;
+      const res = await client.search(args.query, page);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to search anime";
+      throw new Error(`Unable to search anime: ${message}`);
+    }
+  },
+});
+
 // Get most popular anime list (paginated)
 export const mostPopular = action({
   args: { page: v.optional(v.number()) },

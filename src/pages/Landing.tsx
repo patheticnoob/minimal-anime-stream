@@ -67,6 +67,7 @@ export default function Landing() {
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
+  const searchAnime = useAction(api.hianime.search);
 
   const [loading, setLoading] = useState(true);
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
@@ -76,6 +77,8 @@ export default function Landing() {
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
   
   const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<AnimeItem[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [selected, setSelected] = useState<AnimeItem | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
@@ -144,6 +147,32 @@ export default function Landing() {
       mounted = false;
     };
   }, [fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows]);
+
+  // Search handler with debounce
+  useEffect(() => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    const timeoutId = setTimeout(async () => {
+      try {
+        const results = await searchAnime({ query: query.trim(), page: 1 });
+        const searchData = results as { results: AnimeItem[] };
+        setSearchResults(searchData.results || []);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Search failed";
+        toast.error(msg);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [query, searchAnime]);
 
   const openAnime = async (anime: AnimeItem) => {
     setSelected(anime);
@@ -330,10 +359,6 @@ export default function Landing() {
     }
   }, [isAuthenticated, currentEpisodeData, currentAnimeInfo, saveProgress]);
 
-  const filteredPopular = popularItems.filter(item =>
-    query ? (item.title ?? "").toLowerCase().includes(query.toLowerCase()) : true
-  );
-
   // Filter content based on active section
   const getSectionContent = () => {
     switch (activeSection) {
@@ -413,17 +438,30 @@ export default function Landing() {
           {/* Search Results */}
           {query ? (
             <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-6 tracking-tight">Search Results</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                {filteredPopular.map((item, idx) => (
-                  <AnimeCard 
-                    key={item.id ?? idx} 
-                    anime={item} 
-                    onClick={() => openAnime(item)} 
-                    index={idx}
-                  />
-                ))}
-              </div>
+              <h2 className="text-2xl font-bold mb-6 tracking-tight">
+                {isSearching ? "Searching..." : `Search Results for "${query}"`}
+              </h2>
+              {isSearching ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+                </div>
+              ) : searchResults.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                  {searchResults.map((item, idx) => (
+                    <AnimeCard 
+                      key={item.id ?? idx} 
+                      anime={item} 
+                      onClick={() => openAnime(item)} 
+                      index={idx}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-gray-400 text-lg">No results found for "{query}"</p>
+                  <p className="text-gray-500 mt-2">Try a different search term</p>
+                </div>
+              )}
             </div>
           ) : sectionContent ? (
             /* Section-specific content */
