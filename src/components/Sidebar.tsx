@@ -1,4 +1,4 @@
-import { Home, Tv, Film, Sparkles, History, User } from "lucide-react";
+import { Home, Tv, Film, Sparkles, History, User, Search } from "lucide-react";
 
 interface SidebarProps {
   activeSection?: string;
@@ -8,6 +8,7 @@ interface SidebarProps {
 export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProps) {
   const navItems = [
     { id: "home", label: "Home", icon: Home },
+    { id: "search", label: "Search", icon: Search },
     { id: "tv", label: "TV Shows", icon: Tv },
     { id: "movies", label: "Movies", icon: Film },
     { id: "popular", label: "Popular", icon: Sparkles },

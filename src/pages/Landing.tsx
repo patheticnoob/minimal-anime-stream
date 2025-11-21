@@ -447,20 +447,55 @@ export default function Landing() {
             navigate("/auth");
             return;
           }
+          if (section === "search") {
+            setQuery(""); // Reset search when entering search section
+          }
           setActiveSection(section);
         }}
       />
 
-      <TopBar
-        searchQuery={query}
-        onSearchChange={setQuery}
-        onProfileClick={handleProfileCTA}
-        isAuthenticated={isAuthenticated}
-      />
-
-      <main className="md:ml-20 pt-16 md:pt-20 transition-all duration-300">
-        <div className="px-6 md:px-10 pb-10 max-w-[2000px] mx-auto">
-          {activeSection === "profile" ? (
+      <main className="md:ml-20 transition-all duration-300">
+        <div className="px-6 md:px-10 pb-10 pt-8 max-w-[2000px] mx-auto">
+          {activeSection === "search" ? (
+            <div className="mt-8">
+              <h2 className="text-3xl font-bold mb-6 tracking-tight">Search Anime</h2>
+              <div className="relative max-w-2xl mb-8">
+                <input
+                  type="text"
+                  placeholder="Search for anime..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  autoFocus
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-6 py-4 text-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                />
+              </div>
+              {isSearching ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+                </div>
+              ) : searchResults.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                  {searchResults.map((item, idx) => (
+                    <AnimeCard 
+                      key={item.id ?? idx} 
+                      anime={item} 
+                      onClick={() => openAnime(item)} 
+                      index={idx}
+                    />
+                  ))}
+                </div>
+              ) : query ? (
+                <div className="text-center py-20">
+                  <p className="text-gray-400 text-lg">No results found for "{query}"</p>
+                  <p className="text-gray-500 mt-2">Try a different search term</p>
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <p className="text-gray-400 text-lg">Start typing to search for anime</p>
+                </div>
+              )}
+            </div>
+          ) : activeSection === "profile" ? (
             <ProfileDashboard
               userName={user?.name}
               userEmail={user?.email}
@@ -476,7 +511,7 @@ export default function Landing() {
           ) : (
             <>
               {/* Hero Banner */}
-              {!query && activeSection === "home" && heroAnime && (
+              {activeSection === "home" && heroAnime && (
                 <HeroBanner
                   anime={heroAnime}
                   onPlay={() => openAnime(heroAnime)}
@@ -484,35 +519,8 @@ export default function Landing() {
                 />
               )}
 
-              {/* Search Results */}
-              {query ? (
-                <div className="mt-8">
-                  <h2 className="text-2xl font-bold mb-6 tracking-tight">
-                    {isSearching ? "Searching..." : `Search Results for "${query}"`}
-                  </h2>
-                  {isSearching ? (
-                    <div className="flex items-center justify-center py-20">
-                      <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-                    </div>
-                  ) : searchResults.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                      {searchResults.map((item, idx) => (
-                        <AnimeCard 
-                          key={item.id ?? idx} 
-                          anime={item} 
-                          onClick={() => openAnime(item)} 
-                          index={idx}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-20">
-                      <p className="text-gray-400 text-lg">No results found for "{query}"</p>
-                      <p className="text-gray-500 mt-2">Try a different search term</p>
-                    </div>
-                  )}
-                </div>
-              ) : sectionContent ? (
+              {/* Section-specific content */}
+              {sectionContent ? (
                 /* Section-specific content */
                 <div className="mt-8">
                   <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
