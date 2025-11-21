@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
-import { X, Play, Plus, Check, ChevronDown } from "lucide-react";
+import { X, Play, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,6 +58,15 @@ export function InfoModal({
   useEffect(() => {
     setEpisodeRange(0);
   }, [anime?.dataId]);
+
+  useEffect(() => {
+    if (!isOpen || typeof document === "undefined") return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   // Calculate episode ranges (100 episodes per range)
   const episodeRanges = useMemo(() => {
@@ -197,36 +207,25 @@ export function InfoModal({
               <div className="detail-season-header">
                 <span className="detail-season-title">All Episodes</span>
                 {episodeRanges.length > 0 && (
-                  <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="ml-3 h-8 bg-white/5 border-white/10 text-white hover:bg-white/10"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {episodeRanges[episodeRange].label}
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="end" 
-                      className="bg-black/95 border-white/10 z-[100]"
-                      onClick={(e) => e.stopPropagation()}
-                    >
+                  <Select
+                    value={String(episodeRange)}
+                    onValueChange={(value) => setEpisodeRange(Number(value))}
+                  >
+                    <SelectTrigger className="ml-3 h-8 w-32 bg-white/5 border-white/10 text-white text-xs tracking-wide uppercase">
+                      <SelectValue placeholder="Episodes range" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-black/95 border-white/10 text-white">
                       {episodeRanges.map((range, idx) => (
-                        <DropdownMenuItem
-                          key={idx}
-                          onSelect={() => setEpisodeRange(idx)}
-                          className={`text-white cursor-pointer hover:bg-white/10 ${
-                            episodeRange === idx ? "bg-blue-600/20 text-blue-400" : ""
-                          }`}
+                        <SelectItem
+                          key={range.label}
+                          value={String(idx)}
+                          className="cursor-pointer focus:bg-white/10 data-[state=checked]:bg-blue-600/20 data-[state=checked]:text-blue-400"
                         >
                           Episodes {range.label}
-                        </DropdownMenuItem>
+                        </SelectItem>
                       ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    </SelectContent>
+                  </Select>
                 )}
               </div>
               {episodesLoading ? (

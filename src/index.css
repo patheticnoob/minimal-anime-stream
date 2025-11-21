@@ -1109,6 +1109,16 @@
     height: 36px;
     background: rgba(0, 0, 0, 0.85);
   }
+
+  .detail-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 18px;
+    padding-inline: 16px;
+  }
+  .detail-tabs::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ───────── Tablet Breakpoint (1024px) ───────── */
