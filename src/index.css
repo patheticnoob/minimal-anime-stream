@@ -133,3 +133,351 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ========================================
+   HOTSTAR-STYLE HERO BANNER
+   ======================================== */
+.hero-banner {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  min-height: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #050814;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+  transform: translateY(0);
+  transition:
+    transform 300ms ease-out,
+    box-shadow 300ms ease-out;
+  cursor: pointer;
+}
+
+.hero-banner-bg-wrapper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero-banner-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 500ms ease-out;
+}
+
+.hero-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(5, 8, 20, 0.95) 0%,
+    rgba(5, 8, 20, 0.8) 28%,
+    rgba(5, 8, 20, 0.25) 55%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  transition: opacity 300ms ease-out;
+  opacity: 0.98;
+}
+
+.hero-banner-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  padding: 40px 60px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transform: translateY(8px);
+  opacity: 0.96;
+  transition:
+    transform 300ms ease-out,
+    opacity 300ms ease-out;
+}
+
+.hero-banner-title {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  margin: 0 0 12px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+}
+
+.hero-banner-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #b0bedf;
+  margin-bottom: 16px;
+}
+
+.meta-pill-primary {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.9);
+  color: white;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.meta-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(10, 14, 35, 0.9);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.meta-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.hero-banner-description {
+  max-width: 520px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d0daf8;
+}
+
+.hero-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-hero-primary {
+  background: #ffffff;
+  color: #050814;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 12px 28px;
+  height: auto;
+  border-radius: 999px;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.7);
+  transition:
+    transform 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+
+.btn-hero-primary:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9);
+}
+
+.btn-hero-secondary {
+  background: rgba(11, 15, 35, 0.95);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-weight: 600;
+  font-size: 16px;
+  padding: 12px 28px;
+  height: auto;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  transition:
+    transform 200ms ease-out,
+    background 200ms ease-out;
+}
+
+.btn-hero-secondary:hover {
+  background: rgba(11, 15, 35, 1);
+  transform: translateY(-2px);
+}
+
+.btn-hero-icon {
+  background: rgba(11, 15, 35, 0.95);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  transition:
+    transform 200ms ease-out,
+    background 200ms ease-out;
+}
+
+.btn-hero-icon:hover {
+  background: rgba(11, 15, 35, 1);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  justify-content: center;
+  align-items: center;
+  background: #050814;
+  color: #ffffff;
+  margin-right: 8px;
+}
+
+/* Hero hover state (Hotstar feel) */
+.hero-banner:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.9);
+}
+
+.hero-banner:hover .hero-banner-bg {
+  transform: scale(1.06);
+}
+
+.hero-banner:hover .hero-banner-overlay {
+  opacity: 1;
+}
+
+.hero-banner:hover .hero-banner-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Responsive hero */
+@media (max-width: 768px) {
+  .hero-banner {
+    height: 320px;
+    min-height: 320px;
+    border-radius: 14px;
+  }
+  .hero-banner-content {
+    padding: 22px;
+  }
+  .hero-banner-title {
+    font-size: 2rem;
+  }
+  .hero-banner-actions {
+    flex-wrap: wrap;
+  }
+}
+
+/* ========================================
+   HOTSTAR-STYLE ANIME CARDS
+   ======================================== */
+.anime-card {
+  position: relative;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out;
+}
+
+.anime-card-poster-wrapper {
+  position: relative;
+  aspect-ratio: 2/3;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #141c33;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  transition:
+    box-shadow 220ms ease-out,
+    background 220ms ease-out;
+}
+
+.anime-card-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.0);
+  transition: transform 300ms ease-out;
+}
+
+.anime-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 16px;
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+.anime-card-play-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.anime-card-top-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+}
+
+.anime-card-footer {
+  padding: 12px 4px 0;
+}
+
+.anime-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e7ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 200ms ease-out;
+}
+
+.anime-card-chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+/* Hover – Hotstar-like lift + glow */
+.anime-card:hover {
+  transform: translateY(-8px) scale(1.03);
+}
+
+.anime-card:hover .anime-card-poster-wrapper {
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.9),
+    0 0 0 2px rgba(37, 99, 235, 0.75);
+  background: #182447;
+}
+
+.anime-card:hover .anime-card-poster {
+  transform: scale(1.06);
+}
+
+.anime-card:hover .anime-card-overlay {
+  opacity: 1;
+}
+
+.anime-card:hover .anime-card-title {
+  color: #60a5fa;
+}
