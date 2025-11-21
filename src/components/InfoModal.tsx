@@ -38,11 +38,6 @@ interface InfoModalProps {
   onPlayEpisode: (episode: Episode) => void;
   isInWatchlist?: boolean;
   onToggleWatchlist?: () => void;
-  serverPreferences?: {
-    category: "sub" | "dub";
-    serverName: string;
-  };
-  onServerPreferencesChange?: (prefs: { category: "sub" | "dub"; serverName: string }) => void;
 }
 
 export function InfoModal({
@@ -54,13 +49,9 @@ export function InfoModal({
   onPlayEpisode,
   isInWatchlist,
   onToggleWatchlist,
-  serverPreferences = { category: "sub", serverName: "HD-1" },
-  onServerPreferencesChange,
 }: InfoModalProps) {
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState<"sub" | "dub">(serverPreferences.category);
-  const [selectedServer, setSelectedServer] = useState(serverPreferences.serverName);
 
   // Reset episode range when anime changes
   useEffect(() => {
@@ -149,7 +140,6 @@ export function InfoModal({
                 className="btn btn-primary"
                 onClick={() => {
                   if (episodes.length > 0) {
-                    onServerPreferencesChange?.({ category: selectedCategory, serverName: selectedServer });
                     onPlayEpisode(episodes[0]);
                   }
                 }}
@@ -173,39 +163,6 @@ export function InfoModal({
                     Watchlist
                   </>
                 )}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* PLAYBACK SETTINGS */}
-        <div className="px-6 py-4 border-b border-white/5">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex gap-2 items-center">
-              <span className="text-sm text-gray-400">Audio:</span>
-              <Button
-                size="sm"
-                variant={selectedCategory === "sub" ? "default" : "outline"}
-                onClick={() => {
-                  setSelectedCategory("sub");
-                  onServerPreferencesChange?.({ category: "sub", serverName: "HD-2" });
-                }}
-                disabled={!anime?.language?.sub}
-                className="h-8"
-              >
-                Sub
-              </Button>
-              <Button
-                size="sm"
-                variant={selectedCategory === "dub" ? "default" : "outline"}
-                onClick={() => {
-                  setSelectedCategory("dub");
-                  onServerPreferencesChange?.({ category: "dub", serverName: "HD-2" });
-                }}
-                disabled={!anime?.language?.dub}
-                className="h-8"
-              >
-                Dub
               </Button>
             </div>
           </div>
@@ -284,10 +241,7 @@ export function InfoModal({
                       <button
                         key={ep.id}
                         className="detail-episode"
-                        onClick={() => {
-                          onServerPreferencesChange?.({ category: selectedCategory, serverName: selectedServer });
-                          onPlayEpisode(ep);
-                        }}
+                        onClick={() => onPlayEpisode(ep)}
                       >
                         <div className="detail-episode-thumb-wrapper">
                           <div className="detail-episode-thumb placeholder relative">

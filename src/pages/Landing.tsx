@@ -91,15 +91,6 @@ export default function Landing() {
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
-  
-  // Server preferences for playback
-  const [serverPreferences, setServerPreferences] = useState<{
-    category: "sub" | "dub";
-    serverName: string;
-  }>({
-    category: "sub",
-    serverName: "HD-1",
-  });
 
   // Watch progress and watchlist
   const continueWatching = useQuery(api.watchProgress.getContinueWatching);
@@ -238,7 +229,7 @@ export default function Landing() {
     }
   };
 
-  const playEpisode = async (episode: Episode, preferences = serverPreferences) => {
+  const playEpisode = async (episode: Episode) => {
     if (!isAuthenticated) {
       toast.error("Please sign in to watch");
       navigate("/auth");
@@ -262,24 +253,20 @@ export default function Landing() {
     };
     setCurrentAnimeInfo(animeInfo);
 
-    // Only save initial progress if there's no existing progress for this episode
-    // This prevents resetting the progress bar when clicking on a partially watched episode
-    if (!animeProgress || animeProgress.episodeId !== episode.id) {
-      try {
-        console.log("Saving initial progress for:", selected.title, normalizedEpisodeNumber);
-        await saveProgress({
-          animeId: animeInfo.animeId,
-          animeTitle: animeInfo.title,
-          animeImage: animeInfo.image ?? null,
-          episodeId: episode.id,
-          episodeNumber: normalizedEpisodeNumber,
-          currentTime: 0,
-          duration: 0,
-        });
-      } catch (err) {
-        console.error("Failed to save initial progress:", err);
-        toast.error("Failed to save progress to history");
-      }
+    try {
+      console.log("Saving initial progress for:", selected.title, normalizedEpisodeNumber);
+      await saveProgress({
+        animeId: animeInfo.animeId,
+        animeTitle: animeInfo.title,
+        animeImage: animeInfo.image ?? null,
+        episodeId: episode.id,
+        episodeNumber: normalizedEpisodeNumber,
+        currentTime: 0,
+        duration: 0,
+      });
+    } catch (err) {
+      console.error("Failed to save initial progress:", err);
+      toast.error("Failed to save progress to history");
     }
 
     toast("Loading video...");
@@ -291,19 +278,12 @@ export default function Landing() {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
       
-      // Normalize server names for matching (case-insensitive, handle spaces/hyphens)
-      const normalizeServerName = (name: string) => name.toLowerCase().replace(/[\s-]/g, "");
-      
-      // Get servers for the selected category (sub or dub)
-      const categoryServers = serverData[preferences.category] || [];
-      
-      // Try to find the preferred server by name
-      const preferredServer = categoryServers.find(
-        s => normalizeServerName(s.name) === normalizeServerName(preferences.serverName)
-      ) || categoryServers[0];
+      // Try to get HD-2 sub server first
+      const subServers = serverData.sub || [];
+      const preferredServer = subServers.find(s => s.name === "HD-2") || subServers[0];
       
       if (!preferredServer) {
-        toast.error(`${preferences.serverName} ${preferences.category.toUpperCase()} server not available`);
+        toast.error("No streaming servers available");
         return;
       }
 
@@ -346,7 +326,7 @@ export default function Landing() {
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
-        toast.success(`Playing ${preferences.category.toUpperCase()} • ${preferredServer.name}`);
+        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
       } else {
         toast.error("No video sources available");
       }
@@ -588,8 +568,6 @@ export default function Landing() {
         anime={selected}
         isOpen={!!selected}
         onClose={() => setSelected(null)}
-        serverPreferences={serverPreferences}
-        onServerPreferencesChange={setServerPreferences}
         episodes={episodes.map(ep => {
           // Enrich episodes with progress data
           const normalizedEp = {
