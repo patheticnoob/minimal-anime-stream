@@ -186,18 +186,23 @@ export function InfoModal({
               <div className="detail-season-header">
                 <span className="detail-season-title">All Episodes</span>
                 {episodeRanges.length > 0 && (
-                  <DropdownMenu>
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <Button 
                         variant="outline" 
                         size="sm"
                         className="ml-3 h-8 bg-white/5 border-white/10 text-white hover:bg-white/10"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {episodeRanges[episodeRange].label}
                         <ChevronDown className="ml-2 h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-black/95 border-white/10">
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="bg-black/95 border-white/10 z-[100]"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {episodeRanges.map((range, idx) => (
                         <DropdownMenuItem
                           key={idx}
