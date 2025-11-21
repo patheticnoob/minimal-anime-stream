@@ -178,6 +178,28 @@ export default function Landing() {
     }
 
     toast("Loading video...");
+    
+    // Store episode data FIRST
+    setCurrentEpisodeData(episode);
+    
+    // Save initial progress immediately when episode is clicked
+    if (selected?.dataId) {
+      try {
+        await saveProgress({
+          animeId: selected.dataId,
+          animeTitle: selected.title || "",
+          animeImage: selected.image,
+          episodeId: episode.id,
+          episodeNumber: episode.number || 0,
+          currentTime: 0,
+          duration: 0,
+        });
+        console.log("Initial progress saved for episode:", episode.id);
+      } catch (err) {
+        console.error("Failed to save initial progress:", err);
+      }
+    }
+
     try {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
@@ -223,31 +245,12 @@ export default function Landing() {
           file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
         }));
 
-        // Store episode data before setting video source
-        setCurrentEpisodeData(episode);
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
         setVideoTracks(proxiedTracks);
 
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
-
-        // Save initial progress immediately when episode starts
-        if (selected?.dataId) {
-          try {
-            await saveProgress({
-              animeId: selected.dataId,
-              animeTitle: selected.title || "",
-              animeImage: selected.image,
-              episodeId: episode.id,
-              episodeNumber: episode.number || 0,
-              currentTime: 0,
-              duration: 0,
-            });
-          } catch (err) {
-            console.error("Failed to save initial progress:", err);
-          }
-        }
 
         toast.success(`Playing Episode ${episode.number}`);
       } else {
@@ -461,7 +464,7 @@ export default function Landing() {
       />
 
       {/* Video Player */}
-      {videoSource && (
+      {videoSource && currentEpisodeData && (
         <VideoPlayer
           source={videoSource}
           title={videoTitle}
@@ -484,6 +487,11 @@ export default function Landing() {
             currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
               ? `${selected?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
               : undefined
+          }
+          resumeFrom={
+            animeProgress && animeProgress.episodeId === currentEpisodeData.id
+              ? animeProgress.currentTime
+              : 0
           }
           onProgressUpdate={handleProgressUpdate}
           onClose={() => {

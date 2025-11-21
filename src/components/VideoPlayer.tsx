@@ -34,17 +34,20 @@ interface VideoPlayerProps {
   currentEpisode?: number;
   onSelectEpisode?: (ep: { id: string; title?: string; number?: number }) => void;
   onProgressUpdate?: (currentTime: number, duration: number) => void;
+  resumeFrom?: number;
 }
 
-export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }: VideoPlayerProps) {
+export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
+  const hasRestoredProgress = useRef(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [resumeTime, setResumeTime] = useState<number | null>(null);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -57,11 +60,12 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
   const [currentSubtitle, setCurrentSubtitle] = useState(-1);
   const [buffered, setBuffered] = useState(0);
 
-  // Initialize HLS
+  // Initialize HLS and resume from saved position
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !source) return;
 
+    hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
 
     if (isHlsLike) {
@@ -87,6 +91,12 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             setIsLoading(false);
+            // Resume from saved position
+            if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
+              video.currentTime = resumeFrom;
+              hasRestoredProgress.current = true;
+              console.log("Resuming from:", resumeFrom);
+            }
           });
 
           hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
@@ -105,13 +115,27 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
           video.src = source;
           video.addEventListener("loadedmetadata", () => {
             setIsLoading(false);
+            // Resume from saved position
+            if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
+              video.currentTime = resumeFrom;
+              hasRestoredProgress.current = true;
+              console.log("Resuming from:", resumeFrom);
+            }
           });
         }
       });
     } else {
       video.src = source;
+      video.addEventListener("loadedmetadata", () => {
+        // Resume from saved position
+        if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
+          video.currentTime = resumeFrom;
+          hasRestoredProgress.current = true;
+          console.log("Resuming from:", resumeFrom);
+        }
+      });
     }
-  }, [source]);
+  }, [source, resumeFrom]);
 
   // Update progress - save every 5 seconds and on key events
   useEffect(() => {
