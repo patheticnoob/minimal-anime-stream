@@ -404,7 +404,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
     setShowSubtitles(false);
   };
 
-  // Load subtitle tracks
+  // Load subtitle tracks and enable English by default
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -419,6 +419,27 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
         });
       }
       setSubtitles(tracksList);
+
+      // Auto-enable English subtitles by default
+      let englishTrackIndex = -1;
+      for (let i = 0; i < video.textTracks.length; i++) {
+        const track = video.textTracks[i];
+        const label = (track.label || "").toLowerCase();
+        const lang = (track.language || "").toLowerCase();
+        
+        // Check if track is English
+        if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
+          englishTrackIndex = i;
+          break;
+        }
+      }
+
+      // Enable English track if found
+      if (englishTrackIndex >= 0) {
+        video.textTracks[englishTrackIndex].mode = "showing";
+        setCurrentSubtitle(englishTrackIndex);
+        console.log("✅ English subtitles enabled by default");
+      }
     };
 
     video.addEventListener("loadedmetadata", updateSubtitles);
