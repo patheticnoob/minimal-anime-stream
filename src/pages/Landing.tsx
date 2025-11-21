@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -250,33 +250,14 @@ export default function Landing() {
   };
 
   // Save progress periodically during playback
-  const handleProgressUpdate = async (currentTime: number, duration: number) => {
-    if (!isAuthenticated) {
-      console.log("⚠️ User not authenticated, skipping progress save");
-      return;
-    }
+  const handleProgressUpdate = useCallback(async (currentTime: number, duration: number) => {
+    if (!isAuthenticated) return;
     
-    if (!currentEpisodeData || !selected?.dataId) {
-      console.log("⚠️ Missing episode or anime data:", {
-        hasEpisodeData: !!currentEpisodeData,
-        hasAnimeId: !!selected?.dataId,
-      });
-      return;
-    }
+    if (!currentEpisodeData || !selected?.dataId) return;
 
-    if (!duration || duration <= 0) {
-      console.log("⚠️ Invalid duration, skipping progress save:", duration);
-      return;
-    }
+    if (!duration || duration <= 0) return;
 
     try {
-      console.log("💾 Saving progress:", {
-        animeId: selected.dataId,
-        episodeId: currentEpisodeData.id,
-        currentTime: Math.floor(currentTime),
-        duration: Math.floor(duration),
-      });
-      
       await saveProgress({
         animeId: selected.dataId,
         animeTitle: selected.title || "",
@@ -286,14 +267,10 @@ export default function Landing() {
         currentTime: Math.floor(currentTime),
         duration: Math.floor(duration),
       });
-      
-      console.log("✅ Progress saved successfully");
     } catch (err) {
       console.error("❌ Failed to save progress:", err);
-      const errorMsg = err instanceof Error ? err.message : "Unknown error";
-      console.error("Error details:", errorMsg);
     }
-  };
+  }, [isAuthenticated, currentEpisodeData, selected, saveProgress]);
 
   const filteredPopular = popularItems.filter(item =>
     query ? (item.title ?? "").toLowerCase().includes(query.toLowerCase()) : true

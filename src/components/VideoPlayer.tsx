@@ -139,7 +139,7 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
         }
       });
     }
-  }, [source, resumeFrom]);
+  }, [source]);
 
   // Update progress - save every 5 seconds and on key events
   useEffect(() => {
