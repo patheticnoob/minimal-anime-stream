@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { X, Play, Plus, Check, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +53,11 @@ export function InfoModal({
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
 
+  // Reset episode range when anime changes
+  useEffect(() => {
+    setEpisodeRange(0);
+  }, [anime?.dataId]);
+
   // Calculate episode ranges (100 episodes per range)
   const episodeRanges = useMemo(() => {
     if (episodes.length <= 100) return [];
@@ -74,7 +79,12 @@ export function InfoModal({
   const displayedEpisodes = useMemo(() => {
     if (episodeRanges.length === 0) return episodes;
     
-    const range = episodeRanges[episodeRange];
+    // Safety check: ensure episodeRange is valid
+    const currentIndex = episodeRange >= episodeRanges.length ? 0 : episodeRange;
+    const range = episodeRanges[currentIndex];
+    
+    if (!range) return episodes;
+    
     return episodes.slice(range.start, range.end);
   }, [episodes, episodeRange, episodeRanges]);
 
