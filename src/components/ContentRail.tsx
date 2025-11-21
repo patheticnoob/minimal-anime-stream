@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { AnimeCard } from "./AnimeCard";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,12 +25,7 @@ export function ContentRail({ title, items, onItemClick, onViewAll }: ContentRai
   if (!items || items.length === 0) return null;
 
   return (
-    <motion.section
-      className="mb-8"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <section className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
           {title}
@@ -65,6 +59,6 @@ export function ContentRail({ title, items, onItemClick, onViewAll }: ContentRai
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

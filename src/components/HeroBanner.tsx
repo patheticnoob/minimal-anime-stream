@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Play, Plus, Info, Star, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -23,107 +22,88 @@ interface HeroBannerProps {
 
 export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={anime.id || anime.dataId}
-        className="hero-banner group"
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Background Image */}
-        <div className="hero-banner-bg-wrapper">
-          {anime.image ? (
-            <img
-              src={anime.image}
-              alt={anime.title ?? "Hero"}
-              className="hero-banner-bg"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-900 to-black" />
+    <div className="hero-banner group">
+      {/* Background Image */}
+      {anime.image ? (
+        <img
+          src={anime.image}
+          alt={anime.title ?? "Hero"}
+          className="hero-banner-bg"
+        />
+      ) : (
+        <div className="hero-banner-bg bg-gradient-to-br from-blue-900 to-black" />
+      )}
+
+      {/* Overlay */}
+      <div className="hero-banner-overlay" />
+
+      {/* Content */}
+      <div className="hero-banner-content max-w-3xl">
+        {/* Title */}
+        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-none mb-4 drop-shadow-lg">
+          {anime.title ?? "Featured Anime"}
+        </h1>
+
+        {/* Meta Data */}
+        <div className="flex flex-wrap items-center gap-3 text-sm md:text-base font-medium text-gray-300 mb-6">
+          {anime.type && (
+            <span className="px-2 py-0.5 rounded bg-white/10 border border-white/20 text-blue-400 text-xs font-bold uppercase tracking-wider">
+              {anime.type}
+            </span>
           )}
+          <div className="flex gap-2">
+            {anime.language?.sub && (
+              <Badge variant="outline" className="border-gray-500 text-gray-300 bg-transparent h-5 text-[10px]">SUB</Badge>
+            )}
+            {anime.language?.dub && (
+              <Badge variant="outline" className="border-gray-500 text-gray-300 bg-transparent h-5 text-[10px]">DUB</Badge>
+            )}
+          </div>
+          <span className="w-1 h-1 bg-gray-500 rounded-full" />
+          <div className="flex items-center gap-1 text-yellow-500">
+            <Star className="h-3.5 w-3.5 fill-current" />
+            <span>4.8</span>
+          </div>
+          <span className="w-1 h-1 bg-gray-500 rounded-full" />
+          <div className="flex items-center gap-1">
+            <Calendar className="h-3.5 w-3.5" />
+            <span>2024</span>
+          </div>
         </div>
 
-        {/* Gradient Overlay */}
-        <div className="hero-banner-overlay" />
+        {/* Description */}
+        <p className="text-gray-300/90 text-base md:text-lg line-clamp-3 leading-relaxed mb-8 max-w-xl">
+          Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.
+        </p>
 
-        {/* Content */}
-        <div className="hero-banner-content">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="max-w-2xl space-y-6"
+        {/* Actions */}
+        <div className="flex flex-wrap gap-3">
+          <Button
+            size="lg"
+            onClick={onPlay}
+            className="h-12 px-8 bg-white text-black hover:bg-gray-200 font-bold text-base rounded-lg transition-transform hover:scale-105"
           >
-            {/* Title */}
-            <h1 className="hero-banner-title">
-              {anime.title ?? "Featured Anime"}
-            </h1>
-
-            {/* Meta Data Row */}
-            <div className="hero-banner-meta">
-              {anime.type && (
-                <span className="meta-pill-primary">{anime.type}</span>
-              )}
-              <span className="meta-dot" />
-              <div className="flex gap-2">
-                {anime.language?.sub && (
-                  <span className="meta-pill">SUB</span>
-                )}
-                {anime.language?.dub && (
-                  <span className="meta-pill">DUB</span>
-                )}
-              </div>
-              <span className="meta-dot" />
-              <div className="flex items-center gap-1 text-yellow-500">
-                <Star className="h-4 w-4 fill-current" />
-                <span>4.8</span>
-              </div>
-              <span className="meta-dot" />
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                <span>2024</span>
-              </div>
-            </div>
-
-            {/* Description */}
-            <p className="hero-banner-description">
-              Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.
-            </p>
-
-            {/* Action Buttons */}
-            <div className="hero-banner-actions">
-              <Button
-                size="lg"
-                onClick={onPlay}
-                className="btn-hero-primary"
-              >
-                <div className="btn-icon">
-                  <Play className="h-4 w-4 fill-black" />
-                </div>
-                Watch Now
-              </Button>
-              <Button
-                size="lg"
-                variant="secondary"
-                onClick={onMoreInfo}
-                className="btn-hero-secondary"
-              >
-                <Info className="mr-2 h-5 w-5" />
-                More Info
-              </Button>
-              <Button
-                size="lg"
-                variant="secondary"
-                className="btn-hero-icon"
-              >
-                <Plus className="h-5 w-5" />
-              </Button>
-            </div>
-          </motion.div>
+            <Play className="mr-2 h-5 w-5 fill-black" />
+            Watch Now
+          </Button>
+          <Button
+            size="lg"
+            variant="secondary"
+            onClick={onMoreInfo}
+            className="h-12 px-8 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm font-semibold text-base rounded-lg"
+          >
+            <Info className="mr-2 h-5 w-5" />
+            More Info
+          </Button>
+          <Button
+            size="lg"
+            variant="secondary"
+            className="h-12 w-12 p-0 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm rounded-lg"
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
         </div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+    </div>
   );
 }
