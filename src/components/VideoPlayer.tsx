@@ -150,7 +150,9 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
 
     const updateProgress = () => {
       setCurrentTime(video.currentTime);
-      setDuration(video.duration);
+      if (Number.isFinite(video.duration)) {
+        setDuration(video.duration);
+      }
 
       if (video.buffered.length > 0) {
         const bufferedEnd = video.buffered.end(video.buffered.length - 1);
@@ -311,10 +313,13 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !Number.isFinite(duration) || duration <= 0) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const pos = (e.clientX - rect.left) / rect.width;
-    video.currentTime = pos * duration;
+    const newTime = pos * duration;
+    if (Number.isFinite(newTime)) {
+      video.currentTime = newTime;
+    }
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -366,7 +371,12 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
   const skip = (seconds: number) => {
     const video = videoRef.current;
     if (!video) return;
-    video.currentTime = Math.max(0, Math.min(video.currentTime + seconds, duration));
+    const targetTime = video.currentTime + seconds;
+    if (Number.isFinite(duration) && duration > 0) {
+      video.currentTime = Math.max(0, Math.min(targetTime, duration));
+    } else {
+      video.currentTime = Math.max(0, targetTime);
+    }
   };
 
   const changePlaybackRate = (rate: number) => {
