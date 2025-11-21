@@ -253,26 +253,10 @@ export default function Landing() {
     };
     setCurrentAnimeInfo(animeInfo);
 
-    try {
-      console.log("Saving initial progress for:", selected.title, normalizedEpisodeNumber);
-      await saveProgress({
-        animeId: animeInfo.animeId,
-        animeTitle: animeInfo.title,
-        animeImage: animeInfo.image ?? null,
-        episodeId: episode.id,
-        episodeNumber: normalizedEpisodeNumber,
-        currentTime: 0,
-        duration: 0,
-      });
-    } catch (err) {
-      console.error("Failed to save initial progress:", err);
-      toast.error("Failed to save progress to history");
-    }
+    // Store episode data FIRST (before any async operations)
+    setCurrentEpisodeData(normalizedEpisode);
 
     toast("Loading video...");
-    
-    // Store episode data FIRST
-    setCurrentEpisodeData(normalizedEpisode);
     
     try {
       const servers = await fetchServers({ episodeId: episode.id });
@@ -622,7 +606,10 @@ export default function Landing() {
               : undefined
           }
           resumeFrom={
-            animeProgress && animeProgress.episodeId === currentEpisodeData.id
+            animeProgress && 
+            animeProgress.episodeId === currentEpisodeData.id && 
+            animeProgress.currentTime > 0 && 
+            animeProgress.duration > 0
               ? animeProgress.currentTime
               : 0
           }
