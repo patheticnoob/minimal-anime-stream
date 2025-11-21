@@ -7,7 +7,7 @@ export const saveProgress = mutation({
   args: {
     animeId: v.string(),
     animeTitle: v.string(),
-    animeImage: v.optional(v.string()),
+    animeImage: v.optional(v.union(v.string(), v.null())),
     episodeId: v.string(),
     episodeNumber: v.number(),
     currentTime: v.number(),

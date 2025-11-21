@@ -37,7 +37,7 @@ const schema = defineSchema(
       userId: v.id("users"),
       animeId: v.string(),
       animeTitle: v.string(),
-      animeImage: v.optional(v.string()),
+      animeImage: v.optional(v.union(v.string(), v.null())),
       episodeId: v.string(),
       episodeNumber: v.number(),
       currentTime: v.number(),

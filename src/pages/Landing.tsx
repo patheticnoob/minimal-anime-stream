@@ -184,17 +184,20 @@ export default function Landing() {
 
     // Save initial progress immediately to show in Continue Watching
     try {
+      console.log("Saving initial progress for:", selected.title, episode.number);
       await saveProgress({
         animeId: selected.dataId,
         animeTitle: selected.title || "",
-        animeImage: selected.image,
+        animeImage: selected.image || null,
         episodeId: episode.id,
         episodeNumber: episode.number || 0,
         currentTime: 0,
         duration: 0,
       });
+      // toast.success("Added to Continue Watching"); // Optional: feedback for user
     } catch (err) {
       console.error("Failed to save initial progress:", err);
+      toast.error("Failed to save progress to history");
     }
 
     toast("Loading video...");
@@ -276,7 +279,7 @@ export default function Landing() {
       await saveProgress({
         animeId: selected.dataId,
         animeTitle: selected.title || "",
-        animeImage: selected.image,
+        animeImage: selected.image || null,
         episodeId: currentEpisodeData.id,
         episodeNumber: currentEpisodeData.number || 0,
         currentTime: Math.floor(currentTime),
@@ -312,7 +315,7 @@ export default function Landing() {
   // Convert continue watching to AnimeItem format with progress
   const continueWatchingItems: AnimeItem[] = (continueWatching || []).map((item) => ({
     title: item.animeTitle,
-    image: item.animeImage,
+    image: item.animeImage || undefined,
     dataId: item.animeId,
     id: item.animeId,
     episodeNumber: item.episodeNumber,

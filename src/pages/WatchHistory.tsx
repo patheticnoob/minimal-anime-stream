@@ -25,7 +25,7 @@ export default function WatchHistory() {
 
   const watchHistoryItems: AnimeItem[] = (continueWatching || []).map((item) => ({
     title: item.animeTitle,
-    image: item.animeImage,
+    image: item.animeImage || undefined,
     dataId: item.animeId,
     id: item.animeId,
     episodeNumber: item.episodeNumber,
