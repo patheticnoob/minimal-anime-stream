@@ -182,6 +182,21 @@ export default function Landing() {
       return;
     }
 
+    // Save initial progress immediately to show in Continue Watching
+    try {
+      await saveProgress({
+        animeId: selected.dataId,
+        animeTitle: selected.title || "",
+        animeImage: selected.image,
+        episodeId: episode.id,
+        episodeNumber: episode.number || 0,
+        currentTime: 0,
+        duration: 0,
+      });
+    } catch (err) {
+      console.error("Failed to save initial progress:", err);
+    }
+
     toast("Loading video...");
     
     // Store episode data FIRST

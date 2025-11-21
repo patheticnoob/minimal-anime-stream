@@ -157,8 +157,8 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
         setBuffered((bufferedEnd / video.duration) * 100);
       }
 
-      // Save progress every 5 seconds (more frequent)
-      if (onProgressUpdate && video.currentTime - lastSavedTime >= 5) {
+      // Save progress every 10 seconds
+      if (onProgressUpdate && video.currentTime - lastSavedTime >= 10) {
         onProgressUpdate(video.currentTime, video.duration);
         lastSavedTime = video.currentTime;
       }
