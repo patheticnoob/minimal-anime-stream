@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Play } from "lucide-react";
 import { HeroBanner } from "@/components/HeroBanner";
 import { ContentRail } from "@/components/ContentRail";
 import { Sidebar } from "@/components/Sidebar";
 import { TopBar } from "@/components/TopBar";
+import { AnimeCard } from "@/components/AnimeCard";
 import {
   Dialog,
   DialogContent,
@@ -224,7 +225,7 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-white">
+    <div className="min-h-screen bg-[#0B0F19] text-white font-sans selection:bg-blue-500/30">
       {/* Sidebar */}
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
 
@@ -232,8 +233,8 @@ export default function Landing() {
       <TopBar searchQuery={query} onSearchChange={setQuery} />
 
       {/* Main Content */}
-      <main className="ml-20 md:ml-64 pt-16">
-        <div className="px-4 md:px-8 py-6 max-w-[1920px] mx-auto">
+      <main className="ml-20 md:ml-24 pt-20 transition-all duration-300">
+        <div className="px-6 md:px-10 pb-10 max-w-[2000px] mx-auto">
           {/* Hero Banner */}
           {!query && activeSection === "home" && heroAnime && (
             <HeroBanner
@@ -247,26 +248,14 @@ export default function Landing() {
           {query ? (
             <div className="mt-8">
               <h2 className="text-2xl font-bold mb-6 tracking-tight">Search Results</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                 {filteredPopular.map((item, idx) => (
-                  <div key={item.id ?? idx} onClick={() => openAnime(item)}>
-                    <motion.div
-                      className="cursor-pointer"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-900">
-                        {item.image && (
-                          <img
-                            src={item.image}
-                            alt={item.title ?? "Anime"}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <p className="mt-2 text-sm text-white line-clamp-2">{item.title}</p>
-                    </motion.div>
-                  </div>
+                  <AnimeCard 
+                    key={item.id ?? idx} 
+                    anime={item} 
+                    onClick={() => setHeroAnime(item)} 
+                    index={idx}
+                  />
                 ))}
               </div>
             </div>
@@ -276,115 +265,99 @@ export default function Landing() {
               <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
                 {activeSection === "tv" ? "TV Shows" : activeSection === "recent" ? "Recently Added" : activeSection}
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                 {sectionContent.map((item, idx) => (
-                  <div key={item.id ?? idx} onClick={() => openAnime(item)}>
-                    <motion.div
-                      className="cursor-pointer"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-900">
-                        {item.image && (
-                          <img
-                            src={item.image}
-                            alt={item.title ?? "Anime"}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <p className="mt-2 text-sm text-white line-clamp-2">{item.title}</p>
-                    </motion.div>
-                  </div>
+                  <AnimeCard 
+                    key={item.id ?? idx} 
+                    anime={item} 
+                    onClick={() => setHeroAnime(item)} 
+                    index={idx}
+                  />
                 ))}
               </div>
             </div>
           ) : (
             /* Home view with content rails */
-            <>
+            <div className="space-y-8">
               <ContentRail
                 title="Trending Now"
                 items={popularItems}
-                onItemClick={openAnime}
+                onItemClick={setHeroAnime}
               />
               <ContentRail
                 title="Top Airing"
                 items={airingItems}
-                onItemClick={openAnime}
+                onItemClick={setHeroAnime}
               />
               <ContentRail
                 title="Popular Movies"
                 items={movieItems}
-                onItemClick={openAnime}
+                onItemClick={setHeroAnime}
               />
               <ContentRail
                 title="TV Series"
                 items={tvShowItems}
-                onItemClick={openAnime}
+                onItemClick={setHeroAnime}
               />
-            </>
+            </div>
           )}
         </div>
       </main>
 
       {/* Info Modal */}
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="sm:max-w-3xl bg-[#0B0F19] border-gray-800 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">{selected?.title}</DialogTitle>
-          </DialogHeader>
-
-          <ScrollArea className="max-h-[60vh]">
-            <div className="space-y-6">
-              {/* Poster */}
-              <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900">
-                {selected?.image && (
-                  <img
-                    src={selected.image}
-                    alt={selected.title ?? "Anime"}
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-
-              {/* Badges */}
+        <DialogContent className="sm:max-w-3xl bg-[#1a1f2e] border-gray-800 text-white p-0 overflow-hidden gap-0">
+          <div className="relative aspect-video w-full">
+            {selected?.image && (
+              <img
+                src={selected.image}
+                alt={selected.title ?? "Anime"}
+                className="w-full h-full object-cover"
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1a1f2e] to-transparent" />
+            <div className="absolute bottom-0 left-0 p-6">
+              <DialogTitle className="text-3xl font-bold mb-2">{selected?.title}</DialogTitle>
               <div className="flex gap-2">
-                {selected?.type && <Badge className="bg-blue-600">{selected.type}</Badge>}
-                {selected?.language?.sub && <Badge className="bg-gray-700">SUB</Badge>}
-                {selected?.language?.dub && <Badge className="bg-gray-700">DUB</Badge>}
-              </div>
-
-              {/* Episodes */}
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Episodes</h3>
-                {episodesLoading ? (
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading episodes...
-                  </div>
-                ) : episodes.length > 0 ? (
-                  <div className="grid grid-cols-5 gap-2 max-h-[200px] overflow-y-auto">
-                    {episodes.map((ep) => (
-                      <Button
-                        key={ep.id}
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setSelected(null);
-                          playEpisode(ep);
-                        }}
-                        className="bg-gray-800 border-gray-700 hover:bg-gray-700"
-                      >
-                        {ep.number ?? "?"}
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-400">No episodes available</p>
-                )}
+                {selected?.type && <Badge className="bg-blue-600 hover:bg-blue-700">{selected.type}</Badge>}
+                {selected?.language?.sub && <Badge variant="outline" className="border-gray-500">SUB</Badge>}
+                {selected?.language?.dub && <Badge variant="outline" className="border-gray-500">DUB</Badge>}
               </div>
             </div>
-          </ScrollArea>
+          </div>
+
+          <div className="p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Play className="h-4 w-4 fill-current" />
+              Episodes
+            </h3>
+            <ScrollArea className="h-[300px] pr-4">
+              {episodesLoading ? (
+                <div className="flex items-center justify-center h-20 text-gray-400 gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Loading episodes...
+                </div>
+              ) : episodes.length > 0 ? (
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                  {episodes.map((ep) => (
+                    <Button
+                      key={ep.id}
+                      variant="outline"
+                      onClick={() => {
+                        setSelected(null);
+                        playEpisode(ep);
+                      }}
+                      className="bg-gray-800/50 border-gray-700 hover:bg-blue-600 hover:border-blue-600 hover:text-white transition-all"
+                    >
+                      {ep.number ?? "?"}
+                    </Button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 text-center py-8">No episodes available</p>
+              )}
+            </ScrollArea>
+          </div>
         </DialogContent>
       </Dialog>
 

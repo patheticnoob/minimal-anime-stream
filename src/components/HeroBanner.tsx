@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Play, Plus, Info } from "lucide-react";
+import { Play, Plus, Info, Star, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type AnimeItem = {
@@ -23,92 +23,106 @@ interface HeroBannerProps {
 
 export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
   return (
-    <motion.div
-      className="relative w-full h-[60vh] md:h-[70vh] mb-8 overflow-hidden rounded-lg"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-    >
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        {anime.image ? (
-          <img
-            src={anime.image}
-            alt={anime.title ?? "Hero"}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-blue-900 to-black" />
-        )}
-      </div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={anime.id || anime.dataId}
+        className="relative w-full h-[50vh] md:h-[65vh] mb-10 overflow-hidden rounded-2xl shadow-2xl group"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          {anime.image ? (
+            <img
+              src={anime.image}
+              alt={anime.title ?? "Hero"}
+              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-blue-900 to-black" />
+          )}
+        </div>
 
-      {/* Gradient Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-transparent to-transparent" />
+        {/* Gradient Overlays - Hotstar style (Left to Right) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0F19] via-[#0B0F19]/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-transparent to-transparent" />
 
-      {/* Content */}
-      <div className="relative h-full flex flex-col justify-end p-8 md:p-12 max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="max-w-2xl"
-        >
-          {/* Badges */}
-          <div className="flex gap-2 mb-4">
-            {anime.type && (
-              <Badge className="bg-blue-600 text-white border-0">
-                {anime.type}
-              </Badge>
-            )}
-            {anime.language?.sub && (
-              <Badge className="bg-gray-800 text-white border-0">SUB</Badge>
-            )}
-            {anime.language?.dub && (
-              <Badge className="bg-gray-800 text-white border-0">DUB</Badge>
-            )}
-          </div>
+        {/* Content */}
+        <div className="relative h-full flex flex-col justify-center p-8 md:p-16 max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="max-w-2xl space-y-6"
+          >
+            {/* Title */}
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-none drop-shadow-lg">
+              {anime.title ?? "Featured Anime"}
+            </h1>
 
-          {/* Title */}
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 tracking-tight">
-            {anime.title ?? "Featured Anime"}
-          </h1>
+            {/* Meta Data Row */}
+            <div className="flex flex-wrap items-center gap-4 text-sm md:text-base font-medium text-gray-300">
+              {anime.type && (
+                <span className="text-blue-400 font-bold uppercase tracking-wider">{anime.type}</span>
+              )}
+              <span className="w-1 h-1 bg-gray-500 rounded-full" />
+              <div className="flex gap-2">
+                {anime.language?.sub && (
+                  <Badge variant="outline" className="border-gray-500 text-gray-300 bg-transparent">SUB</Badge>
+                )}
+                {anime.language?.dub && (
+                  <Badge variant="outline" className="border-gray-500 text-gray-300 bg-transparent">DUB</Badge>
+                )}
+              </div>
+              <span className="w-1 h-1 bg-gray-500 rounded-full" />
+              <div className="flex items-center gap-1 text-yellow-500">
+                <Star className="h-4 w-4 fill-current" />
+                <span>4.8</span>
+              </div>
+              <span className="w-1 h-1 bg-gray-500 rounded-full" />
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>2024</span>
+              </div>
+            </div>
 
-          {/* Description placeholder */}
-          <p className="text-gray-300 text-sm md:text-base mb-6 line-clamp-3">
-            Watch the latest episodes and enjoy high-quality streaming with multiple audio options.
-          </p>
+            {/* Description */}
+            <p className="text-gray-300/90 text-base md:text-lg line-clamp-3 leading-relaxed max-w-xl">
+              Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.
+            </p>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3">
-            <Button
-              size="lg"
-              onClick={onPlay}
-              className="bg-white text-black hover:bg-gray-200 font-semibold"
-            >
-              <Play className="mr-2 h-5 w-5 fill-black" />
-              Play Now
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={onMoreInfo}
-              className="bg-gray-800/80 text-white border-gray-700 hover:bg-gray-700"
-            >
-              <Info className="mr-2 h-5 w-5" />
-              More Info
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="bg-gray-800/80 text-white border-gray-700 hover:bg-gray-700"
-            >
-              <Plus className="mr-2 h-5 w-5" />
-              Watchlist
-            </Button>
-          </div>
-        </motion.div>
-      </div>
-    </motion.div>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4 pt-4">
+              <Button
+                size="lg"
+                onClick={onPlay}
+                className="h-14 px-8 bg-white text-black hover:bg-gray-200 font-bold text-lg rounded-lg transition-transform hover:scale-105"
+              >
+                <Play className="mr-2 h-6 w-6 fill-black" />
+                Watch Now
+              </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={onMoreInfo}
+                className="h-14 px-8 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm font-semibold text-lg rounded-lg"
+              >
+                <Info className="mr-2 h-6 w-6" />
+                More Info
+              </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                className="h-14 w-14 p-0 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm rounded-lg"
+              >
+                <Plus className="h-6 w-6" />
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
