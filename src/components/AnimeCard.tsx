@@ -28,6 +28,7 @@ export function AnimeCard({ anime, onClick }: AnimeCardProps) {
     ? (anime.currentTime / anime.duration) * 100 
     : 0;
 
+  // Trigger rebuild for shadow fix
   return (
     <div 
       className="anime-card group" 
