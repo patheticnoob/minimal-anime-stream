@@ -262,20 +262,24 @@ export default function Landing() {
     };
     setCurrentAnimeInfo(animeInfo);
 
-    try {
-      console.log("Saving initial progress for:", selected.title, normalizedEpisodeNumber);
-      await saveProgress({
-        animeId: animeInfo.animeId,
-        animeTitle: animeInfo.title,
-        animeImage: animeInfo.image ?? null,
-        episodeId: episode.id,
-        episodeNumber: normalizedEpisodeNumber,
-        currentTime: 0,
-        duration: 0,
-      });
-    } catch (err) {
-      console.error("Failed to save initial progress:", err);
-      toast.error("Failed to save progress to history");
+    // Only save initial progress if there's no existing progress for this episode
+    // This prevents resetting the progress bar when clicking on a partially watched episode
+    if (!animeProgress || animeProgress.episodeId !== episode.id) {
+      try {
+        console.log("Saving initial progress for:", selected.title, normalizedEpisodeNumber);
+        await saveProgress({
+          animeId: animeInfo.animeId,
+          animeTitle: animeInfo.title,
+          animeImage: animeInfo.image ?? null,
+          episodeId: episode.id,
+          episodeNumber: normalizedEpisodeNumber,
+          currentTime: 0,
+          duration: 0,
+        });
+      } catch (err) {
+        console.error("Failed to save initial progress:", err);
+        toast.error("Failed to save progress to history");
+      }
     }
 
     toast("Loading video...");

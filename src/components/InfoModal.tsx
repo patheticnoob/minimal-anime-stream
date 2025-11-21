@@ -188,7 +188,7 @@ export function InfoModal({
                 variant={selectedCategory === "sub" ? "default" : "outline"}
                 onClick={() => {
                   setSelectedCategory("sub");
-                  onServerPreferencesChange?.({ category: "sub", serverName: selectedServer });
+                  onServerPreferencesChange?.({ category: "sub", serverName: "HD-2" });
                 }}
                 disabled={!anime?.language?.sub}
                 className="h-8"
@@ -200,30 +200,13 @@ export function InfoModal({
                 variant={selectedCategory === "dub" ? "default" : "outline"}
                 onClick={() => {
                   setSelectedCategory("dub");
-                  onServerPreferencesChange?.({ category: "dub", serverName: selectedServer });
+                  onServerPreferencesChange?.({ category: "dub", serverName: "HD-2" });
                 }}
                 disabled={!anime?.language?.dub}
                 className="h-8"
               >
                 Dub
               </Button>
-            </div>
-            <div className="flex gap-2 items-center">
-              <span className="text-sm text-gray-400">Server:</span>
-              {["HD-1", "HD-2", "HD-3"].map((server) => (
-                <Button
-                  key={server}
-                  size="sm"
-                  variant={selectedServer === server ? "default" : "outline"}
-                  onClick={() => {
-                    setSelectedServer(server);
-                    onServerPreferencesChange?.({ category: selectedCategory, serverName: server });
-                  }}
-                  className="h-8"
-                >
-                  {server}
-                </Button>
-              ))}
             </div>
           </div>
         </div>
