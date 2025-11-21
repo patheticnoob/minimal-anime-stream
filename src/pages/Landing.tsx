@@ -187,31 +187,6 @@ export default function Landing() {
     // Store episode data FIRST
     setCurrentEpisodeData(episode);
     
-    // Save initial progress immediately when episode is clicked
-    try {
-      console.log("Saving initial progress for:", {
-        animeId: selected.dataId,
-        episodeId: episode.id,
-        episodeNumber: episode.number,
-      });
-      
-      await saveProgress({
-        animeId: selected.dataId,
-        animeTitle: selected.title || "",
-        animeImage: selected.image,
-        episodeId: episode.id,
-        episodeNumber: episode.number || 0,
-        currentTime: 0,
-        duration: 0,
-      });
-      
-      console.log("✅ Initial progress saved successfully");
-      toast.success("Progress tracking started");
-    } catch (err) {
-      console.error("❌ Failed to save initial progress:", err);
-      toast.error("Failed to save progress");
-    }
-
     try {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
@@ -276,28 +251,47 @@ export default function Landing() {
 
   // Save progress periodically during playback
   const handleProgressUpdate = async (currentTime: number, duration: number) => {
-    if (!isAuthenticated || !currentEpisodeData || !selected?.dataId) {
-      console.log("⚠️ Cannot save progress:", {
-        isAuthenticated,
+    if (!isAuthenticated) {
+      console.log("⚠️ User not authenticated, skipping progress save");
+      return;
+    }
+    
+    if (!currentEpisodeData || !selected?.dataId) {
+      console.log("⚠️ Missing episode or anime data:", {
         hasEpisodeData: !!currentEpisodeData,
         hasAnimeId: !!selected?.dataId,
       });
       return;
     }
 
+    if (!duration || duration <= 0) {
+      console.log("⚠️ Invalid duration, skipping progress save:", duration);
+      return;
+    }
+
     try {
+      console.log("💾 Saving progress:", {
+        animeId: selected.dataId,
+        episodeId: currentEpisodeData.id,
+        currentTime: Math.floor(currentTime),
+        duration: Math.floor(duration),
+      });
+      
       await saveProgress({
         animeId: selected.dataId,
         animeTitle: selected.title || "",
         animeImage: selected.image,
         episodeId: currentEpisodeData.id,
         episodeNumber: currentEpisodeData.number || 0,
-        currentTime,
-        duration,
+        currentTime: Math.floor(currentTime),
+        duration: Math.floor(duration),
       });
-      console.log("✅ Progress saved:", { currentTime, duration });
+      
+      console.log("✅ Progress saved successfully");
     } catch (err) {
       console.error("❌ Failed to save progress:", err);
+      const errorMsg = err instanceof Error ? err.message : "Unknown error";
+      console.error("Error details:", errorMsg);
     }
   };
 

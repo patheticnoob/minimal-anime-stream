@@ -192,8 +192,9 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
 
     const handleLoadedMetadata = () => {
       updateProgress();
-      // Save initial progress when metadata loads
-      if (onProgressUpdate && video.duration) {
+      // Save initial progress when metadata loads (this ensures we have duration)
+      if (onProgressUpdate && video.duration && video.duration > 0) {
+        console.log("📊 Saving initial progress with duration:", video.duration);
         onProgressUpdate(video.currentTime, video.duration);
       }
     };
