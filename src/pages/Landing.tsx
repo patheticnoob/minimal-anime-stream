@@ -77,6 +77,7 @@ export default function Landing() {
   const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
+  const [heroIndex, setHeroIndex] = useState(0);
   
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<AnimeItem[]>([]);
@@ -134,9 +135,17 @@ export default function Landing() {
         setMovieItems(moviesData.results || []);
         setTVShowItems(tvShowsData.results || []);
 
-        // Set hero to first popular item
-        if (popularData.results && popularData.results.length > 0) {
-          setHeroAnime(popularData.results[0]);
+        // Combine popular and airing for hero rotation
+        const heroPool = [
+          ...(popularData.results || []).slice(0, 5),
+          ...(airingData.results || []).slice(0, 5),
+        ];
+        
+        // Set random hero from pool
+        if (heroPool.length > 0) {
+          const randomIndex = Math.floor(Math.random() * heroPool.length);
+          setHeroAnime(heroPool[randomIndex]);
+          setHeroIndex(randomIndex);
         }
       })
       .catch((err) => {
