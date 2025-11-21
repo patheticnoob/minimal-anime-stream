@@ -75,7 +75,7 @@ export function InfoModal({
     if (episodeRanges.length === 0) return episodes;
     
     const range = episodeRanges[episodeRange];
-    return episodes.slice(range.start, range.start + range.end - range.start);
+    return episodes.slice(range.start, range.end);
   }, [episodes, episodeRange, episodeRanges]);
 
   if (!isOpen || !anime) return null;
