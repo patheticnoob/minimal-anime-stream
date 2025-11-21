@@ -131,20 +131,7 @@ export default function Landing() {
     setEpisodesLoading(true);
     try {
       const eps = (await fetchEpisodes({ dataId: anime.dataId })) as Episode[];
-      
-      // Enrich episodes with progress data if available
-      const enrichedEps = eps.map(ep => {
-        if (animeProgress && animeProgress.episodeId === ep.id) {
-          return {
-            ...ep,
-            currentTime: animeProgress.currentTime,
-            duration: animeProgress.duration,
-          };
-        }
-        return ep;
-      });
-      
-      setEpisodes(enrichedEps);
+      setEpisodes(eps);
       setCurrentEpisodeIndex(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load episodes.";
@@ -236,10 +223,11 @@ export default function Landing() {
           file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
         }));
 
+        // Store episode data before setting video source
+        setCurrentEpisodeData(episode);
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
         setVideoTracks(proxiedTracks);
-        setCurrentEpisodeData(episode);
 
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
@@ -436,7 +424,17 @@ export default function Landing() {
         anime={selected}
         isOpen={!!selected}
         onClose={() => setSelected(null)}
-        episodes={episodes}
+        episodes={episodes.map(ep => {
+          // Enrich episodes with progress data
+          if (animeProgress && animeProgress.episodeId === ep.id) {
+            return {
+              ...ep,
+              currentTime: animeProgress.currentTime,
+              duration: animeProgress.duration,
+            };
+          }
+          return ep;
+        })}
         episodesLoading={episodesLoading}
         onPlayEpisode={(ep) => {
           playEpisode(ep);
