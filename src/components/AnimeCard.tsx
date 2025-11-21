@@ -11,6 +11,10 @@ type AnimeItem = {
     sub?: string | null;
     dub?: string | null;
   };
+  // Progress tracking fields
+  episodeNumber?: number;
+  currentTime?: number;
+  duration?: number;
 };
 
 interface AnimeCardProps {
@@ -20,6 +24,10 @@ interface AnimeCardProps {
 }
 
 export function AnimeCard({ anime, onClick }: AnimeCardProps) {
+  const progressPercentage = anime.currentTime && anime.duration 
+    ? (anime.currentTime / anime.duration) * 100 
+    : 0;
+
   return (
     <div 
       className="anime-card group" 
@@ -45,6 +53,25 @@ export function AnimeCard({ anime, onClick }: AnimeCardProps) {
             <Badge className="bg-black/60 backdrop-blur-md text-white border-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5">
               {anime.type}
             </Badge>
+          </div>
+        )}
+
+        {/* Episode number badge */}
+        {anime.episodeNumber && (
+          <div className="absolute top-2 left-2">
+            <Badge className="bg-blue-600/80 backdrop-blur-md text-white border-0 text-[10px] font-bold px-2 py-0.5">
+              EP {anime.episodeNumber}
+            </Badge>
+          </div>
+        )}
+
+        {/* Progress bar */}
+        {progressPercentage > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/80">
+            <div 
+              className="h-full bg-blue-500 transition-all"
+              style={{ width: `${progressPercentage}%` }}
+            />
           </div>
         )}
 

@@ -1,4 +1,4 @@
-import { Home, Tv, Film, Trophy, Sparkles, Clock } from "lucide-react";
+import { Home, Tv, Film, Trophy, Sparkles, Clock, History } from "lucide-react";
 
 interface SidebarProps {
   activeSection?: string;
@@ -13,6 +13,7 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
     { id: "sports", label: "Sports", icon: Trophy },
     { id: "popular", label: "Popular", icon: Sparkles },
     { id: "recent", label: "Recently Added", icon: Clock },
+    { id: "history", label: "Watch History", icon: History },
   ];
 
   return (

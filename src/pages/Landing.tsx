@@ -74,6 +74,12 @@ export default function Landing() {
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
 
+  // Get progress for selected anime
+  const animeProgress = useQuery(
+    api.watchProgress.getProgress,
+    selected?.dataId ? { animeId: selected.dataId } : "skip"
+  );
+
   // Load all content on mount
   useEffect(() => {
     let mounted = true;
@@ -125,7 +131,20 @@ export default function Landing() {
     setEpisodesLoading(true);
     try {
       const eps = (await fetchEpisodes({ dataId: anime.dataId })) as Episode[];
-      setEpisodes(eps);
+      
+      // Enrich episodes with progress data if available
+      const enrichedEps = eps.map(ep => {
+        if (animeProgress && animeProgress.episodeId === ep.id) {
+          return {
+            ...ep,
+            currentTime: animeProgress.currentTime,
+            duration: animeProgress.duration,
+          };
+        }
+        return ep;
+      });
+      
+      setEpisodes(enrichedEps);
       setCurrentEpisodeIndex(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load episodes.";
@@ -276,12 +295,15 @@ export default function Landing() {
 
   const sectionContent = getSectionContent();
 
-  // Convert continue watching to AnimeItem format
+  // Convert continue watching to AnimeItem format with progress
   const continueWatchingItems: AnimeItem[] = (continueWatching || []).map((item) => ({
     title: item.animeTitle,
     image: item.animeImage,
     dataId: item.animeId,
     id: item.animeId,
+    episodeNumber: item.episodeNumber,
+    currentTime: item.currentTime,
+    duration: item.duration,
   }));
 
   // Convert watchlist to AnimeItem format
@@ -308,7 +330,13 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white font-sans selection:bg-blue-500/30">
       {/* Sidebar */}
-      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+      <Sidebar activeSection={activeSection} onSectionChange={(section) => {
+        if (section === "history") {
+          navigate("/history");
+        } else {
+          setActiveSection(section);
+        }
+      }} />
 
       {/* Top Bar */}
       <TopBar searchQuery={query} onSearchChange={setQuery} />

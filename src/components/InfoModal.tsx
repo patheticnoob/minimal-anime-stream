@@ -7,6 +7,9 @@ type Episode = {
   id: string;
   title?: string;
   number?: number;
+  // Progress tracking
+  currentTime?: number;
+  duration?: number;
 };
 
 type AnimeDetail = {
@@ -155,34 +158,54 @@ export function InfoModal({
                 <div className="detail-placeholder">Loading episodes...</div>
               ) : episodes.length > 0 ? (
                 <div className="detail-episode-list">
-                  {episodes.map((ep) => (
-                    <button
-                      key={ep.id}
-                      className="detail-episode"
-                      onClick={() => onPlayEpisode(ep)}
-                    >
-                      <div className="detail-episode-thumb-wrapper">
-                        <div className="detail-episode-thumb placeholder">
-                          <span className="play-icon">
-                            <Play className="h-4 w-4 fill-white" />
-                          </span>
+                  {episodes.map((ep) => {
+                    const progressPercentage = ep.currentTime && ep.duration 
+                      ? (ep.currentTime / ep.duration) * 100 
+                      : 0;
+
+                    return (
+                      <button
+                        key={ep.id}
+                        className="detail-episode"
+                        onClick={() => onPlayEpisode(ep)}
+                      >
+                        <div className="detail-episode-thumb-wrapper">
+                          <div className="detail-episode-thumb placeholder relative">
+                            <span className="play-icon">
+                              <Play className="h-4 w-4 fill-white" />
+                            </span>
+                            {/* Progress bar on episode thumbnail */}
+                            {progressPercentage > 0 && (
+                              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/80">
+                                <div 
+                                  className="h-full bg-blue-500 transition-all"
+                                  style={{ width: `${progressPercentage}%` }}
+                                />
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div className="detail-episode-info">
-                        <div className="detail-episode-title-row">
-                          <span className="detail-episode-title">
-                            {ep.title || `Episode ${ep.number ?? "?"}`}
-                          </span>
-                          <span className="detail-episode-meta">
-                            Episode {ep.number ?? "?"}
-                          </span>
+                        <div className="detail-episode-info">
+                          <div className="detail-episode-title-row">
+                            <span className="detail-episode-title">
+                              {ep.title || `Episode ${ep.number ?? "?"}`}
+                            </span>
+                            <span className="detail-episode-meta">
+                              Episode {ep.number ?? "?"}
+                              {progressPercentage > 0 && (
+                                <span className="ml-2 text-blue-400">
+                                  • {Math.round(progressPercentage)}% watched
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                          <p className="detail-episode-description">
+                            Watch this exciting episode now in high quality.
+                          </p>
                         </div>
-                        <p className="detail-episode-description">
-                          Watch this exciting episode now in high quality.
-                        </p>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="detail-placeholder">No episodes available</div>
