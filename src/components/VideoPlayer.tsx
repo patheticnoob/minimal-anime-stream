@@ -197,17 +197,17 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
     style.id = 'subtitle-position-style';
     
     if (showControls) {
+      // Move subtitles way up when controls are visible (controls take ~150px)
       style.textContent = `
         video::cue {
-          bottom: 180px !important;
-          margin-bottom: 0 !important;
+          line: -8 !important;
         }
       `;
     } else {
+      // Default position when controls are hidden
       style.textContent = `
         video::cue {
-          bottom: 60px !important;
-          margin-bottom: 0 !important;
+          line: -2 !important;
         }
       `;
     }
