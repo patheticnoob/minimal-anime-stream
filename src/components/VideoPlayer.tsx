@@ -199,13 +199,15 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
     if (showControls) {
       style.textContent = `
         video::cue {
-          bottom: 140px !important;
+          bottom: 180px !important;
+          margin-bottom: 0 !important;
         }
       `;
     } else {
       style.textContent = `
         video::cue {
-          bottom: 40px !important;
+          bottom: 60px !important;
+          margin-bottom: 0 !important;
         }
       `;
     }
