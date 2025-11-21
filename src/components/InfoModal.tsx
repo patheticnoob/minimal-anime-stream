@@ -201,7 +201,7 @@ export function InfoModal({
                       {episodeRanges.map((range, idx) => (
                         <DropdownMenuItem
                           key={idx}
-                          onClick={() => setEpisodeRange(idx)}
+                          onSelect={() => setEpisodeRange(idx)}
                           className={`text-white cursor-pointer hover:bg-white/10 ${
                             episodeRange === idx ? "bg-blue-600/20 text-blue-400" : ""
                           }`}
