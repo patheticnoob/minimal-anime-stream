@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
 import { InfoModal } from "@/components/InfoModal";
 import { VideoPlayer } from "@/components/VideoPlayer";
+import { ProfileDashboard } from "@/components/ProfileDashboard";
 
 type AnimeItem = {
   title?: string;
@@ -57,7 +58,7 @@ const normalizeEpisodeNumber = (value?: number | string | null) => {
 };
 
 export default function Landing() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const navigate = useNavigate();
   
   const fetchTopAiring = useAction(api.hianime.topAiring);
@@ -377,6 +378,15 @@ export default function Landing() {
 
   const sectionContent = getSectionContent();
 
+  const handleProfileCTA = () => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to view your profile");
+      navigate("/auth");
+      return;
+    }
+    setActiveSection("profile");
+  };
+
   // Convert continue watching to AnimeItem format with progress
   const continueWatchingItems: AnimeItem[] = (continueWatching || []).map((item) => ({
     title: item.animeTitle,
@@ -411,117 +421,139 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white font-sans selection:bg-blue-500/30">
-      {/* Sidebar */}
-      <Sidebar activeSection={activeSection} onSectionChange={(section) => {
-        if (section === "history") {
-          navigate("/history");
-        } else {
+      <Sidebar
+        activeSection={activeSection}
+        onSectionChange={(section) => {
+          if (section === "history") {
+            navigate("/history");
+            return;
+          }
+          if (section === "profile" && !isAuthenticated) {
+            toast.error("Please sign in to view your profile");
+            navigate("/auth");
+            return;
+          }
           setActiveSection(section);
-        }
-      }} />
+        }}
+      />
 
-      {/* Top Bar */}
-      <TopBar searchQuery={query} onSearchChange={setQuery} />
+      <TopBar
+        searchQuery={query}
+        onSearchChange={setQuery}
+        onProfileClick={handleProfileCTA}
+        isAuthenticated={isAuthenticated}
+      />
 
-      {/* Main Content */}
       <main className="md:ml-20 pt-16 md:pt-20 transition-all duration-300">
         <div className="px-6 md:px-10 pb-10 max-w-[2000px] mx-auto">
-          {/* Hero Banner */}
-          {!query && activeSection === "home" && heroAnime && (
-            <HeroBanner
-              anime={heroAnime}
-              onPlay={() => openAnime(heroAnime)}
-              onMoreInfo={() => openAnime(heroAnime)}
+          {activeSection === "profile" ? (
+            <ProfileDashboard
+              userName={user?.name}
+              userEmail={user?.email}
+              continueWatching={continueWatchingItems}
+              watchlist={watchlistItems}
+              onSelectAnime={openAnime}
             />
-          )}
+          ) : (
+            <>
+              {/* Hero Banner */}
+              {!query && activeSection === "home" && heroAnime && (
+                <HeroBanner
+                  anime={heroAnime}
+                  onPlay={() => openAnime(heroAnime)}
+                  onMoreInfo={() => openAnime(heroAnime)}
+                />
+              )}
 
-          {/* Search Results */}
-          {query ? (
-            <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-6 tracking-tight">
-                {isSearching ? "Searching..." : `Search Results for "${query}"`}
-              </h2>
-              {isSearching ? (
-                <div className="flex items-center justify-center py-20">
-                  <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+              {/* Search Results */}
+              {query ? (
+                <div className="mt-8">
+                  <h2 className="text-2xl font-bold mb-6 tracking-tight">
+                    {isSearching ? "Searching..." : `Search Results for "${query}"`}
+                  </h2>
+                  {isSearching ? (
+                    <div className="flex items-center justify-center py-20">
+                      <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                      {searchResults.map((item, idx) => (
+                        <AnimeCard 
+                          key={item.id ?? idx} 
+                          anime={item} 
+                          onClick={() => openAnime(item)} 
+                          index={idx}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-20">
+                      <p className="text-gray-400 text-lg">No results found for "{query}"</p>
+                      <p className="text-gray-500 mt-2">Try a different search term</p>
+                    </div>
+                  )}
                 </div>
-              ) : searchResults.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                  {searchResults.map((item, idx) => (
-                    <AnimeCard 
-                      key={item.id ?? idx} 
-                      anime={item} 
-                      onClick={() => openAnime(item)} 
-                      index={idx}
-                    />
-                  ))}
+              ) : sectionContent ? (
+                /* Section-specific content */
+                <div className="mt-8">
+                  <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
+                    {activeSection === "tv" ? "TV Shows" : activeSection === "recent" ? "Recently Added" : activeSection}
+                  </h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                    {sectionContent.map((item, idx) => (
+                      <AnimeCard 
+                        key={item.id ?? idx} 
+                        anime={item} 
+                        onClick={() => openAnime(item)} 
+                        index={idx}
+                      />
+                    ))}
+                  </div>
                 </div>
               ) : (
-                <div className="text-center py-20">
-                  <p className="text-gray-400 text-lg">No results found for "{query}"</p>
-                  <p className="text-gray-500 mt-2">Try a different search term</p>
+                /* Home view with content rails */
+                <div className="space-y-8">
+                  {/* Continue Watching */}
+                  {isAuthenticated && continueWatchingItems.length > 0 && (
+                    <ContentRail
+                      title="Continue Watching"
+                      items={continueWatchingItems}
+                      onItemClick={openAnime}
+                    />
+                  )}
+
+                  {/* My Watchlist */}
+                  {isAuthenticated && watchlistItems.length > 0 && (
+                    <ContentRail
+                      title="My Watchlist"
+                      items={watchlistItems}
+                      onItemClick={openAnime}
+                    />
+                  )}
+
+                  <ContentRail
+                    title="Trending Now"
+                    items={popularItems}
+                    onItemClick={openAnime}
+                  />
+                  <ContentRail
+                    title="Top Airing"
+                    items={airingItems}
+                    onItemClick={openAnime}
+                  />
+                  <ContentRail
+                    title="Popular Movies"
+                    items={movieItems}
+                    onItemClick={openAnime}
+                  />
+                  <ContentRail
+                    title="TV Series"
+                    items={tvShowItems}
+                    onItemClick={openAnime}
+                  />
                 </div>
               )}
-            </div>
-          ) : sectionContent ? (
-            /* Section-specific content */
-            <div className="mt-8">
-              <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
-                {activeSection === "tv" ? "TV Shows" : activeSection === "recent" ? "Recently Added" : activeSection}
-              </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                {sectionContent.map((item, idx) => (
-                  <AnimeCard 
-                    key={item.id ?? idx} 
-                    anime={item} 
-                    onClick={() => openAnime(item)} 
-                    index={idx}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            /* Home view with content rails */
-            <div className="space-y-8">
-              {/* Continue Watching */}
-              {isAuthenticated && continueWatchingItems.length > 0 && (
-                <ContentRail
-                  title="Continue Watching"
-                  items={continueWatchingItems}
-                  onItemClick={openAnime}
-                />
-              )}
-
-              {/* My Watchlist */}
-              {isAuthenticated && watchlistItems.length > 0 && (
-                <ContentRail
-                  title="My Watchlist"
-                  items={watchlistItems}
-                  onItemClick={openAnime}
-                />
-              )}
-
-              <ContentRail
-                title="Trending Now"
-                items={popularItems}
-                onItemClick={openAnime}
-              />
-              <ContentRail
-                title="Top Airing"
-                items={airingItems}
-                onItemClick={openAnime}
-              />
-              <ContentRail
-                title="Popular Movies"
-                items={movieItems}
-                onItemClick={openAnime}
-              />
-              <ContentRail
-                title="TV Series"
-                items={tvShowItems}
-                onItemClick={openAnime}
-              />
-            </div>
+            </>
           )}
         </div>
       </main>
