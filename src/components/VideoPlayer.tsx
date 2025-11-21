@@ -207,13 +207,13 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
         }
       `;
     } else {
-      // Default position
+      // Add bottom padding when controls are hidden
       style.textContent = `
         video::-webkit-media-text-track-container {
-          transform: translateY(0) !important;
+          transform: translateY(-60px) !important;
         }
         video::cue {
-          transform: translateY(0) !important;
+          transform: translateY(-60px) !important;
         }
       `;
     }
