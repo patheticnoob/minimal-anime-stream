@@ -38,6 +38,11 @@ interface InfoModalProps {
   onPlayEpisode: (episode: Episode) => void;
   isInWatchlist?: boolean;
   onToggleWatchlist?: () => void;
+  serverPreferences?: {
+    category: "sub" | "dub";
+    serverName: string;
+  };
+  onServerPreferencesChange?: (prefs: { category: "sub" | "dub"; serverName: string }) => void;
 }
 
 export function InfoModal({
@@ -49,9 +54,13 @@ export function InfoModal({
   onPlayEpisode,
   isInWatchlist,
   onToggleWatchlist,
+  serverPreferences = { category: "sub", serverName: "HD-1" },
+  onServerPreferencesChange,
 }: InfoModalProps) {
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<"sub" | "dub">(serverPreferences.category);
+  const [selectedServer, setSelectedServer] = useState(serverPreferences.serverName);
 
   // Reset episode range when anime changes
   useEffect(() => {
@@ -140,6 +149,7 @@ export function InfoModal({
                 className="btn btn-primary"
                 onClick={() => {
                   if (episodes.length > 0) {
+                    onServerPreferencesChange?.({ category: selectedCategory, serverName: selectedServer });
                     onPlayEpisode(episodes[0]);
                   }
                 }}
@@ -164,6 +174,56 @@ export function InfoModal({
                   </>
                 )}
               </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* PLAYBACK SETTINGS */}
+        <div className="px-6 py-4 border-b border-white/5">
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-gray-400">Audio:</span>
+              <Button
+                size="sm"
+                variant={selectedCategory === "sub" ? "default" : "outline"}
+                onClick={() => {
+                  setSelectedCategory("sub");
+                  onServerPreferencesChange?.({ category: "sub", serverName: selectedServer });
+                }}
+                disabled={!anime?.language?.sub}
+                className="h-8"
+              >
+                Sub
+              </Button>
+              <Button
+                size="sm"
+                variant={selectedCategory === "dub" ? "default" : "outline"}
+                onClick={() => {
+                  setSelectedCategory("dub");
+                  onServerPreferencesChange?.({ category: "dub", serverName: selectedServer });
+                }}
+                disabled={!anime?.language?.dub}
+                className="h-8"
+              >
+                Dub
+              </Button>
+            </div>
+            <div className="flex gap-2 items-center">
+              <span className="text-sm text-gray-400">Server:</span>
+              {["HD-1", "HD-2", "HD-3"].map((server) => (
+                <Button
+                  key={server}
+                  size="sm"
+                  variant={selectedServer === server ? "default" : "outline"}
+                  onClick={() => {
+                    setSelectedServer(server);
+                    onServerPreferencesChange?.({ category: selectedCategory, serverName: server });
+                  }}
+                  className="h-8"
+                >
+                  {server}
+                </Button>
+              ))}
             </div>
           </div>
         </div>
@@ -241,7 +301,10 @@ export function InfoModal({
                       <button
                         key={ep.id}
                         className="detail-episode"
-                        onClick={() => onPlayEpisode(ep)}
+                        onClick={() => {
+                          onServerPreferencesChange?.({ category: selectedCategory, serverName: selectedServer });
+                          onPlayEpisode(ep);
+                        }}
                       >
                         <div className="detail-episode-thumb-wrapper">
                           <div className="detail-episode-thumb placeholder relative">

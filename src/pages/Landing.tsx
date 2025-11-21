@@ -91,6 +91,15 @@ export default function Landing() {
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
+  
+  // Server preferences for playback
+  const [serverPreferences, setServerPreferences] = useState<{
+    category: "sub" | "dub";
+    serverName: string;
+  }>({
+    category: "sub",
+    serverName: "HD-1",
+  });
 
   // Watch progress and watchlist
   const continueWatching = useQuery(api.watchProgress.getContinueWatching);
@@ -229,7 +238,7 @@ export default function Landing() {
     }
   };
 
-  const playEpisode = async (episode: Episode) => {
+  const playEpisode = async (episode: Episode, preferences = serverPreferences) => {
     if (!isAuthenticated) {
       toast.error("Please sign in to watch");
       navigate("/auth");
@@ -278,12 +287,19 @@ export default function Landing() {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
       
-      // Try to get HD-2 sub server first
-      const subServers = serverData.sub || [];
-      const preferredServer = subServers.find(s => s.name === "HD-2") || subServers[0];
+      // Normalize server names for matching (case-insensitive, handle spaces/hyphens)
+      const normalizeServerName = (name: string) => name.toLowerCase().replace(/[\s-]/g, "");
+      
+      // Get servers for the selected category (sub or dub)
+      const categoryServers = serverData[preferences.category] || [];
+      
+      // Try to find the preferred server by name
+      const preferredServer = categoryServers.find(
+        s => normalizeServerName(s.name) === normalizeServerName(preferences.serverName)
+      ) || categoryServers[0];
       
       if (!preferredServer) {
-        toast.error("No streaming servers available");
+        toast.error(`${preferences.serverName} ${preferences.category.toUpperCase()} server not available`);
         return;
       }
 
@@ -326,7 +342,7 @@ export default function Landing() {
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
-        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+        toast.success(`Playing ${preferences.category.toUpperCase()} • ${preferredServer.name}`);
       } else {
         toast.error("No video sources available");
       }
@@ -568,6 +584,8 @@ export default function Landing() {
         anime={selected}
         isOpen={!!selected}
         onClose={() => setSelected(null)}
+        serverPreferences={serverPreferences}
+        onServerPreferencesChange={setServerPreferences}
         episodes={episodes.map(ep => {
           // Enrich episodes with progress data
           const normalizedEp = {
