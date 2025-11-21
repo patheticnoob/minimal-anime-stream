@@ -43,8 +43,8 @@ export function ContentRail({ title, items, onItemClick, onViewAll }: ContentRai
         )}
       </div>
 
-      <div className="relative">
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-1">
+      <div className="relative -mx-1 px-1">
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-2">
           {items.slice(0, 12).map((item, idx) => (
             <div
               key={item.id ?? item.dataId ?? idx}
