@@ -197,17 +197,23 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate }
     style.id = 'subtitle-position-style';
     
     if (showControls) {
-      // Move subtitles way up when controls are visible (controls take ~150px)
+      // Move subtitles up when controls are visible
       style.textContent = `
+        video::-webkit-media-text-track-container {
+          transform: translateY(-120px) !important;
+        }
         video::cue {
-          line: -8 !important;
+          transform: translateY(-120px) !important;
         }
       `;
     } else {
-      // Default position when controls are hidden
+      // Default position
       style.textContent = `
+        video::-webkit-media-text-track-container {
+          transform: translateY(0) !important;
+        }
         video::cue {
-          line: -2 !important;
+          transform: translateY(0) !important;
         }
       `;
     }
