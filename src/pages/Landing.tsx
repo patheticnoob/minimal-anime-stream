@@ -61,6 +61,7 @@ export default function Landing() {
   const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState<number | null>(null);
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
+  const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
 
   // Watch progress and watchlist
   const continueWatching = useQuery(api.watchProgress.getContinueWatching);
@@ -115,6 +116,7 @@ export default function Landing() {
 
   const openAnime = async (anime: AnimeItem) => {
     setSelected(anime);
+    setLastSelectedAnime(anime);
     if (!anime?.dataId) {
       toast("This title has no episodes available.");
       return;
@@ -219,9 +221,6 @@ export default function Landing() {
         setVideoTitle(`${selected?.title} - Episode ${episode.number}`);
         setVideoTracks(proxiedTracks);
         setCurrentEpisodeData(episode);
-
-        // Close the info modal once playback is ready
-        setSelected(null);
 
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
@@ -412,7 +411,6 @@ export default function Landing() {
         episodes={episodes}
         episodesLoading={episodesLoading}
         onPlayEpisode={(ep) => {
-          setSelected(null);
           playEpisode(ep);
         }}
         isInWatchlist={isInWatchlist}
@@ -450,6 +448,10 @@ export default function Landing() {
             setVideoTitle("");
             setVideoTracks([]);
             setCurrentEpisodeData(null);
+            // Reopen the modal with the last selected anime
+            if (lastSelectedAnime) {
+              setSelected(lastSelectedAnime);
+            }
           }}
         />
       )}
