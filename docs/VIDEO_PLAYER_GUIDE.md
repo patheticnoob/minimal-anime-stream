@@ -1,33 +1,28 @@
 # Video Player Documentation
 
 ## Overview
-A professional HLS video player component with Hotstar-inspired UI, integrated with Convex backend proxy for secure streaming.
+A professional HLS video player component with clean UI, integrated with Convex backend proxy for secure streaming.
 
 ## Features
 
 ### Core Playback
 - ✅ **HLS Adaptive Streaming** - Automatically adjusts quality via HLS.js
 - ✅ **Playback Speed Control** - 0.5x, 0.75x, 1x, 1.25x, 1.5x, 2x speeds
-- ✅ **Subtitle Support** - Proxied through Convex for CORS safety, auto-enabled
+- ✅ **Subtitle Support** - Proxied through Convex for CORS safety
 - ✅ **Play/Pause Controls** - Center overlay and bottom bar
-- ✅ **Seek/Scrub** - Click progress bar with hover timestamp preview
-- ✅ **Volume Control** - Adjustable with mute toggle
+- ✅ **Seek/Scrub** - Click progress bar to seek
+- ✅ **Volume Control** - Adjustable with mute toggle (hover to expand slider)
 - ✅ **Skip Forward/Backward** - 10-second skip buttons
 - ✅ **Fullscreen Mode** - Native fullscreen support
 
 ### Advanced Features
 - ✅ **Keyboard Shortcuts** - Full keyboard navigation (see below)
-- ✅ **Episodes Overlay** - Grid view of all episodes with quick selection
-- ✅ **Info Panel on Pause** - Hotstar-style panel showing anime details
-- ✅ **Next Episode Countdown** - Auto-play next episode near end
-- ✅ **Skip Intro** - Smart detection and skip button
-- ✅ **Auto-hide Controls** - Fade after 2.5 seconds of inactivity
+- ✅ **Auto-hide Controls** - Fade after 3 seconds of inactivity
 - ✅ **Buffer Progress** - Visual indicator of buffered content
 - ✅ **Test IDs** - All elements have data-testid for testing
 
 ### UI/UX
-- ✅ **Cinematic Gradients** - Beautiful overlays and effects
-- ✅ **Glassy Control Bar** - Modern backdrop blur design
+- ✅ **Clean Gradients** - Beautiful overlays and effects
 - ✅ **Smooth Animations** - Framer Motion powered
 - ✅ **Responsive Design** - Works on desktop, tablet, mobile
 - ✅ **Loading Spinner** - Shows during buffering
@@ -47,4 +42,3 @@ A professional HLS video player component with Hotstar-inspired UI, integrated w
 ## Usage
 
 ### Basic Usage
-
