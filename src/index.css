@@ -1196,7 +1196,7 @@
   }
 }
 
-/* ───────── Fullscreen Loader ───────── */
+/* ───────── Fullscreen Loader (Sharingan) ───────── */
 .fullscreen-loader {
   position: fixed;
   inset: 0;
@@ -1204,7 +1204,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at top, #1b2340 0, #050509 40%, #000 100%);
+  background: radial-gradient(circle at center, #1a0000 0%, #000000 100%);
   overflow: hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -1212,183 +1212,204 @@
 .loader-backdrop {
   position: absolute;
   inset: 0;
-  backdrop-filter: blur(6px);
-  opacity: 0.75;
+  backdrop-filter: blur(8px);
+  opacity: 0.9;
 }
 
 .loader-content {
   position: relative;
   text-align: center;
-  padding: 32px 28px 26px;
-  border-radius: 24px;
-  background: radial-gradient(circle at top left, rgba(95, 116, 232, 0.18), transparent 55%)
-    rgba(6, 10, 25, 0.96);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.03),
-    0 22px 45px rgba(0, 0, 0, 0.75);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
 }
 
-.loader-orb {
+/* Sharingan Eye Container */
+.sharingan-loader {
   position: relative;
-  width: 92px;
-  height: 92px;
-  margin: 0 auto;
-  border-radius: 999px;
-  padding: 3px;
-  background: conic-gradient(from 180deg, #ff6bcb, #857fff, #2edcff, #ffb86c, #ff6bcb);
-  box-shadow:
-    0 0 25px rgba(85, 163, 255, 0.9),
-    0 0 55px rgba(255, 107, 203, 0.7);
-  animation: loader-spin 1.1s linear infinite;
-}
-
-.loader-orb::before {
-  content: "";
-  position: absolute;
-  inset: -9px;
-  border-radius: inherit;
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  filter: blur(1px);
-  animation: loader-pulse 1.8s ease-out infinite;
-}
-
-.loader-orb-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
+  width: 180px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 30% 30%, #ffffff 0, #10152a 55%, #050509 100%);
 }
 
-.play-icon {
-  width: 0;
-  height: 0;
-  border-left: 20px solid #ffffff;
-  border-top: 12px solid transparent;
-  border-bottom: 12px solid transparent;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9));
+.sharingan-eye {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff0000 0%, #cc0000 40%, #8b0000 100%);
+  box-shadow: 
+    0 0 40px rgba(255, 0, 0, 0.8),
+    0 0 80px rgba(255, 0, 0, 0.5),
+    inset 0 0 30px rgba(0, 0, 0, 0.5);
+  animation: sharingan-pulse 2s ease-in-out infinite;
+}
+
+/* Central Pupil */
+.sharingan-pupil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #000000;
+  box-shadow: 
+    0 0 20px rgba(0, 0, 0, 0.9),
+    inset 0 0 10px rgba(255, 0, 0, 0.3);
+  z-index: 3;
+}
+
+/* Tomoe Container (rotating) */
+.sharingan-tomoe-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  animation: sharingan-rotate 3s linear infinite;
+}
+
+/* Individual Tomoe */
+.sharingan-tomoe {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #000000;
+  border-radius: 50% 50% 0 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.sharingan-tomoe::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #000000;
+  border-radius: 50%;
+  top: -6px;
+  left: 6px;
+}
+
+/* Position each tomoe at 120° intervals */
+.tomoe-1 {
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+}
+
+.tomoe-2 {
+  top: 65%;
+  left: 20%;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.tomoe-3 {
+  top: 65%;
+  left: 80%;
+  transform: translate(-50%, -50%) rotate(210deg);
 }
 
 .loader-title {
-  margin-top: 24px;
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #f5f5ff;
+  color: #ff0000;
   text-shadow:
-    0 0 12px rgba(135, 149, 255, 0.9),
-    0 0 22px rgba(210, 115, 255, 0.7);
+    0 0 20px rgba(255, 0, 0, 0.8),
+    0 0 40px rgba(255, 0, 0, 0.5);
+  animation: text-glow 2s ease-in-out infinite;
 }
 
 .loader-subtitle {
-  margin-top: 6px;
-  font-size: 0.96rem;
-  color: #a7b2ff;
-  opacity: 0.9;
+  font-size: 0.95rem;
+  color: #ff6666;
+  opacity: 0.8;
+  letter-spacing: 0.05em;
 }
 
-.progress-bar {
-  margin: 22px auto 0;
-  width: min(320px, 74vw);
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  overflow: hidden;
-  position: relative;
-}
-
-.progress-bar-fill {
-  position: absolute;
-  inset: 0;
-  width: 40%;
-  background: linear-gradient(90deg, #ff6bcb, #ffb86c, #2edcff, #857fff);
-  box-shadow: 0 0 12px rgba(115, 182, 255, 0.9);
-  animation: loader-slide 1.4s ease-in-out infinite;
-}
-
-.loader-dots {
-  display: inline-flex;
-  gap: 6px;
-  margin-top: 12px;
-}
-
-.loader-dots span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #7fa2ff;
-  box-shadow: 0 0 10px rgba(127, 162, 255, 0.9);
-  opacity: 0.4;
-  animation: loader-dot-pulse 1.1s ease-in-out infinite;
-}
-
-.loader-dots span:nth-child(2) {
-  animation-delay: 0.18s;
-}
-
-.loader-dots span:nth-child(3) {
-  animation-delay: 0.36s;
-}
-
-@keyframes loader-spin {
+/* Animations */
+@keyframes sharingan-rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
   to {
-    transform: rotate(360deg);
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
-@keyframes loader-pulse {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.2);
-  }
-}
-
-@keyframes loader-slide {
-  0% {
-    transform: translateX(-110%);
-  }
-  100% {
-    transform: translateX(260%);
-  }
-}
-
-@keyframes loader-dot-pulse {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: translateY(0) scale(0.9);
+@keyframes sharingan-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 40px rgba(255, 0, 0, 0.8),
+      0 0 80px rgba(255, 0, 0, 0.5),
+      inset 0 0 30px rgba(0, 0, 0, 0.5);
   }
   50% {
-    opacity: 1;
-    transform: translateY(-2px) scale(1.1);
+    box-shadow: 
+      0 0 60px rgba(255, 0, 0, 1),
+      0 0 120px rgba(255, 0, 0, 0.7),
+      inset 0 0 30px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes text-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 20px rgba(255, 0, 0, 0.8),
+      0 0 40px rgba(255, 0, 0, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(255, 0, 0, 1),
+      0 0 60px rgba(255, 0, 0, 0.7);
   }
 }
 
 @media (max-width: 480px) {
   .loader-content {
-    padding: 24px 20px 22px;
-    border-radius: 20px;
+    padding: 30px 20px;
   }
-  .loader-orb {
-    width: 78px;
-    height: 78px;
+  
+  .sharingan-loader {
+    width: 140px;
+    height: 140px;
   }
+  
+  .sharingan-eye {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .sharingan-pupil {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .sharingan-tomoe {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .sharingan-tomoe::before {
+    width: 9px;
+    height: 9px;
+    top: -4px;
+    left: 4px;
+  }
+  
   .loader-title {
     font-size: 1.2rem;
-    letter-spacing: 0.12em;
   }
+  
   .loader-subtitle {
-    font-size: 0.86rem;
+    font-size: 0.85rem;
   }
 }

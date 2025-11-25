@@ -6,8 +6,8 @@ interface FullscreenLoaderProps {
 }
 
 export function FullscreenLoader({
-  label = "Loading anime...",
-  subLabel = "Summoning episodes from another world",
+  label = "Loading...",
+  subLabel = "",
 }: FullscreenLoaderProps) {
   return (
     <div className="fullscreen-loader">
@@ -18,21 +18,18 @@ export function FullscreenLoader({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="loader-orb">
-          <div className="loader-orb-inner">
-            <span className="play-icon" />
+        <div className="sharingan-loader">
+          <div className="sharingan-eye">
+            <div className="sharingan-pupil" />
+            <div className="sharingan-tomoe-container">
+              <div className="sharingan-tomoe tomoe-1" />
+              <div className="sharingan-tomoe tomoe-2" />
+              <div className="sharingan-tomoe tomoe-3" />
+            </div>
           </div>
         </div>
-        <h2 className="loader-title">{label}</h2>
-        <p className="loader-subtitle">{subLabel}</p>
-        <div className="progress-bar">
-          <div className="progress-bar-fill" />
-        </div>
-        <div className="loader-dots">
-          <span />
-          <span />
-          <span />
-        </div>
+        {label && <h2 className="loader-title">{label}</h2>}
+        {subLabel && <p className="loader-subtitle">{subLabel}</p>}
       </motion.div>
     </div>
   );
