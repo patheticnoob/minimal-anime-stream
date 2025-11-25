@@ -20,6 +20,8 @@ interface VideoPlayerProps {
   source: string;
   title: string;
   tracks?: Array<{ file: string; label: string; kind?: string }>;
+  intro?: { start: number; end: number } | null;
+  outro?: { start: number; end: number } | null;
   onClose: () => void;
   onNext?: () => void;
   nextTitle?: string;
@@ -37,7 +39,7 @@ interface VideoPlayerProps {
   resumeFrom?: number;
 }
 
-export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode }: VideoPlayerProps) {
+export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onNext, nextTitle }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -59,6 +61,8 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
   const [subtitles, setSubtitles] = useState<Array<{ index: number; label: string; language: string }>>([]);
   const [currentSubtitle, setCurrentSubtitle] = useState(-1);
   const [buffered, setBuffered] = useState(0);
+  const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [showSkipOutro, setShowSkipOutro] = useState(false);
 
   // Initialize HLS and resume from saved position
   useEffect(() => {
@@ -175,6 +179,20 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
       if (onProgressUpdate && video.currentTime - lastSavedTime >= 10) {
         onProgressUpdate(video.currentTime, video.duration);
         lastSavedTime = video.currentTime;
+      }
+
+      // Show/hide skip intro button
+      if (intro && video.currentTime >= intro.start && video.currentTime < intro.end) {
+        setShowSkipIntro(true);
+      } else {
+        setShowSkipIntro(false);
+      }
+
+      // Show/hide skip outro button
+      if (outro && video.currentTime >= outro.start && video.currentTime < outro.end) {
+        setShowSkipOutro(true);
+      } else {
+        setShowSkipOutro(false);
       }
     };
 
@@ -391,6 +409,20 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
     }
   };
 
+  const skipIntro = () => {
+    const video = videoRef.current;
+    if (!video || !intro) return;
+    video.currentTime = intro.end;
+    setShowSkipIntro(false);
+  };
+
+  const skipOutro = () => {
+    const video = videoRef.current;
+    if (!video || !outro) return;
+    video.currentTime = outro.end;
+    setShowSkipOutro(false);
+  };
+
   const changePlaybackRate = (rate: number) => {
     const video = videoRef.current;
     if (!video) return;
@@ -585,6 +617,52 @@ export function VideoPlayer({ source, title, tracks, onClose, onProgressUpdate, 
             <Loader2 className="h-16 w-16 animate-spin text-white" />
           </div>
         )}
+
+        {/* Skip Intro Button */}
+        <AnimatePresence>
+          {showSkipIntro && (
+            <motion.div
+              className="absolute bottom-24 right-8 z-20"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+            >
+              <Button
+                onClick={skipIntro}
+                className="bg-white/90 hover:bg-white text-black font-semibold px-6 py-2 rounded-md shadow-lg"
+              >
+                Skip Intro
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Skip Outro & Next Episode Buttons */}
+        <AnimatePresence>
+          {showSkipOutro && (
+            <motion.div
+              className="absolute bottom-24 right-8 z-20 flex gap-3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+            >
+              <Button
+                onClick={skipOutro}
+                className="bg-white/90 hover:bg-white text-black font-semibold px-6 py-2 rounded-md shadow-lg"
+              >
+                Skip Outro
+              </Button>
+              {onNext && nextTitle && (
+                <Button
+                  onClick={onNext}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md shadow-lg"
+                >
+                  Next Episode
+                </Button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Center Play/Pause Button */}
         <AnimatePresence>

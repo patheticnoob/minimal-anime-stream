@@ -89,6 +89,8 @@ export default function Landing() {
   const [videoSource, setVideoSource] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
+  const [videoIntro, setVideoIntro] = useState<{ start: number; end: number } | null>(null);
+  const [videoOutro, setVideoOutro] = useState<{ start: number; end: number } | null>(null);
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState<number | null>(null);
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
@@ -307,6 +309,8 @@ export default function Landing() {
       const sourcesData = sources as { 
         sources: Array<{ file: string; type: string }>;
         tracks?: Array<{ file: string; label: string; kind?: string }>;
+        intro?: { start: number; end: number };
+        outro?: { start: number; end: number };
       };
       
       if (sourcesData.sources && sourcesData.sources.length > 0) {
@@ -338,6 +342,8 @@ export default function Landing() {
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
         setVideoTracks(proxiedTracks);
+        setVideoIntro(sourcesData.intro || null);
+        setVideoOutro(sourcesData.outro || null);
 
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
@@ -620,6 +626,8 @@ export default function Landing() {
           source={videoSource}
           title={videoTitle}
           tracks={videoTracks}
+          intro={videoIntro}
+          outro={videoOutro}
           info={{
             title: currentAnimeInfo?.title ?? selected?.title ?? "",
             image: (currentAnimeInfo?.image ?? selected?.image) ?? undefined,
@@ -656,6 +664,8 @@ export default function Landing() {
             setVideoSource(null);
             setVideoTitle("");
             setVideoTracks([]);
+            setVideoIntro(null);
+            setVideoOutro(null);
             setCurrentEpisodeData(null);
             setCurrentAnimeInfo(null);
             // Reopen the modal with the last selected anime
