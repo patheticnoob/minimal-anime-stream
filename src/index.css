@@ -1234,6 +1234,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease-out;
 }
 
 .sharingan-eye {
@@ -1241,12 +1242,13 @@
   width: 160px;
   height: 160px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ff0000 0%, #cc0000 40%, #8b0000 100%);
+  background: radial-gradient(circle at 35% 35%, #ff1a1a 0%, #e60000 40%, #b30000 100%);
   box-shadow: 
-    0 0 40px rgba(255, 0, 0, 0.8),
-    0 0 80px rgba(255, 0, 0, 0.5),
-    inset 0 0 30px rgba(0, 0, 0, 0.5);
+    0 0 50px rgba(255, 26, 26, 0.9),
+    0 0 100px rgba(255, 26, 26, 0.6),
+    inset 0 0 40px rgba(0, 0, 0, 0.6);
   animation: sharingan-pulse 2s ease-in-out infinite;
+  transition: all 0.5s ease-in-out;
 }
 
 /* Central Pupil */
@@ -1260,9 +1262,10 @@
   border-radius: 50%;
   background: #000000;
   box-shadow: 
-    0 0 20px rgba(0, 0, 0, 0.9),
-    inset 0 0 10px rgba(255, 0, 0, 0.3);
+    0 0 25px rgba(0, 0, 0, 0.95),
+    inset 0 0 15px rgba(255, 26, 26, 0.4);
   z-index: 3;
+  transition: all 0.5s ease-in-out;
 }
 
 /* Tomoe Container (rotating) */
@@ -1276,6 +1279,10 @@
   animation: sharingan-rotate 3s linear infinite;
 }
 
+.sharingan-tomoe-container.mangekyou {
+  animation: sharingan-rotate-mangekyou 4s linear infinite;
+}
+
 /* Individual Tomoe */
 .sharingan-tomoe {
   position: absolute;
@@ -1283,7 +1290,8 @@
   height: 24px;
   background: #000000;
   border-radius: 50% 50% 0 50%;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.9);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .sharingan-tomoe::before {
@@ -1295,6 +1303,27 @@
   border-radius: 50%;
   top: -6px;
   left: 6px;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Mangekyou Transformation - Blade-like fins */
+.sharingan-tomoe.mangekyou-fin {
+  width: 60px;
+  height: 80px;
+  border-radius: 50% 0% 50% 0%;
+  background: #000000;
+  box-shadow: 
+    0 0 20px rgba(0, 0, 0, 0.95),
+    inset 0 0 10px rgba(255, 26, 26, 0.3);
+}
+
+.sharingan-tomoe.mangekyou-fin::before {
+  width: 30px;
+  height: 40px;
+  border-radius: 50% 0% 50% 0%;
+  top: 10px;
+  left: 15px;
+  box-shadow: inset 0 0 8px rgba(255, 26, 26, 0.2);
 }
 
 /* Position each tomoe at 120° intervals */
@@ -1304,10 +1333,22 @@
   transform: translate(-50%, -50%) rotate(-30deg);
 }
 
+.tomoe-1.mangekyou-fin {
+  top: 15%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg) scale(1.2);
+}
+
 .tomoe-2 {
   top: 65%;
   left: 20%;
   transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.tomoe-2.mangekyou-fin {
+  top: 70%;
+  left: 15%;
+  transform: translate(-50%, -50%) rotate(90deg) scale(1.2);
 }
 
 .tomoe-3 {
@@ -1316,22 +1357,28 @@
   transform: translate(-50%, -50%) rotate(210deg);
 }
 
+.tomoe-3.mangekyou-fin {
+  top: 70%;
+  left: 85%;
+  transform: translate(-50%, -50%) rotate(210deg) scale(1.2);
+}
+
 .loader-title {
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #ff0000;
+  color: #ff1a1a;
   text-shadow:
-    0 0 20px rgba(255, 0, 0, 0.8),
-    0 0 40px rgba(255, 0, 0, 0.5);
+    0 0 25px rgba(255, 26, 26, 0.9),
+    0 0 50px rgba(255, 26, 26, 0.6);
   animation: text-glow 2s ease-in-out infinite;
 }
 
 .loader-subtitle {
   font-size: 0.95rem;
   color: #ff6666;
-  opacity: 0.8;
+  opacity: 0.85;
   letter-spacing: 0.05em;
 }
 
@@ -1345,31 +1392,40 @@
   }
 }
 
+@keyframes sharingan-rotate-mangekyou {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
 @keyframes sharingan-pulse {
   0%, 100% {
     box-shadow: 
-      0 0 40px rgba(255, 0, 0, 0.8),
-      0 0 80px rgba(255, 0, 0, 0.5),
-      inset 0 0 30px rgba(0, 0, 0, 0.5);
+      0 0 50px rgba(255, 26, 26, 0.9),
+      0 0 100px rgba(255, 26, 26, 0.6),
+      inset 0 0 40px rgba(0, 0, 0, 0.6);
   }
   50% {
     box-shadow: 
-      0 0 60px rgba(255, 0, 0, 1),
-      0 0 120px rgba(255, 0, 0, 0.7),
-      inset 0 0 30px rgba(0, 0, 0, 0.5);
+      0 0 70px rgba(255, 26, 26, 1),
+      0 0 140px rgba(255, 26, 26, 0.8),
+      inset 0 0 40px rgba(0, 0, 0, 0.6);
   }
 }
 
 @keyframes text-glow {
   0%, 100% {
     text-shadow:
-      0 0 20px rgba(255, 0, 0, 0.8),
-      0 0 40px rgba(255, 0, 0, 0.5);
+      0 0 25px rgba(255, 26, 26, 0.9),
+      0 0 50px rgba(255, 26, 26, 0.6);
   }
   50% {
     text-shadow:
-      0 0 30px rgba(255, 0, 0, 1),
-      0 0 60px rgba(255, 0, 0, 0.7);
+      0 0 35px rgba(255, 26, 26, 1),
+      0 0 70px rgba(255, 26, 26, 0.8);
   }
 }
 
@@ -1403,6 +1459,18 @@
     height: 9px;
     top: -4px;
     left: 4px;
+  }
+
+  .sharingan-tomoe.mangekyou-fin {
+    width: 45px;
+    height: 60px;
+  }
+
+  .sharingan-tomoe.mangekyou-fin::before {
+    width: 22px;
+    height: 30px;
+    top: 8px;
+    left: 11px;
   }
   
   .loader-title {
