@@ -776,7 +776,24 @@
     max-width: 100%;
   }
   .detail-hero {
-    height: 260px;
+    height: auto;
+    min-height: 260px;
+    padding-bottom: 20px;
+    overflow: visible;
+  }
+  .detail-hero-content {
+    padding: 20px 16px 24px;
+  }
+  .detail-hero-meta {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .detail-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .detail-hero-actions .btn {
+    width: 100%;
   }
   .detail-hero-title {
     font-size: 30px;
