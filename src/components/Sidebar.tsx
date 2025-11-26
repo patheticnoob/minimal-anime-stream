@@ -9,11 +9,10 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
   const navItems = [
     { id: "home", label: "Home", icon: Home },
     { id: "search", label: "Search", icon: Search },
-    { id: "tv", label: "TV Shows", icon: Tv },
+    { id: "tv", label: "TV", icon: Tv },
     { id: "movies", label: "Movies", icon: Film },
-    { id: "popular", label: "Popular", icon: Sparkles },
-    { id: "history", label: "History", icon: History },
-    { id: "profile", label: "My Profile", icon: User },
+    { id: "popular", label: "Hot", icon: Sparkles },
+    { id: "profile", label: "My Space", icon: User },
   ];
 
   return (
@@ -39,7 +38,7 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
                   onClick={() => onSectionChange?.(item.id)}
                 >
                   <span className="nav-icon">
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
                   </span>
                   <span className="nav-label">{item.label}</span>
                 </button>
@@ -61,7 +60,7 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
               className={`mobile-nav-item ${isActive ? "mobile-nav-item--active" : ""}`}
               onClick={() => onSectionChange?.(item.id)}
             >
-              <Icon />
+              <Icon strokeWidth={isActive ? 2.5 : 1.5} />
               <span>{item.label}</span>
             </button>
           );
