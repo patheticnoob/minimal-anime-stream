@@ -23,7 +23,7 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
         <div className="sidebar-inner">
           {/* Logo */}
           <div className="sidebar-logo">
-            <img src="/logo.svg" alt="Logo" className="w-full h-full object-contain" />
+            <img src="/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png" alt="Anime Logo" className="w-full h-full object-contain" />
           </div>
 
           {/* Navigation */}

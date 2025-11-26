@@ -23,7 +23,7 @@ export function TopBar({
     >
       <div className="max-w-[2000px] mx-auto px-4 md:px-10 py-4 flex items-center gap-4">
         <div className="md:hidden w-8 h-8">
-          <img src="/logo.svg" alt="Logo" className="w-full h-full object-contain" />
+          <img src="/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png" alt="Anime Logo" className="w-full h-full object-contain" />
         </div>
 
         <div className="relative flex-1 max-w-xl">
