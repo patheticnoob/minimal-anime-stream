@@ -15,7 +15,6 @@ import { InfoModal } from "@/components/InfoModal";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
-import { AdSlot } from "@/components/AdSlot";
 
 type AnimeItem = {
   title?: string;
@@ -45,6 +44,8 @@ type AnimePlaybackInfo = {
     dub?: string | null;
   };
 };
+
+const AD_SCRIPT_SNIPPET = `(function(solth){var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];s.settings = solth || {};s.src = "//excitableminor.com/b.XJVVsed/GIlb0yYHW-ce/aeTmc9Hu/ZcUWlSkSPuTcYT3nMrTQQ/1pNdzEYPtlNyjRc_xyNZDsU/3RNfwg";s.async = true;s.referrerPolicy = 'no-referrer-when-downgrade';l.parentNode.insertBefore(s, l);})({});`;
 
 const normalizeEpisodeNumber = (value?: number | string | null) => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -96,10 +97,6 @@ export default function Landing() {
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
-
-  const renderAdSlot = (placement: "guestHero" | "continueWatching") => (
-    <AdSlot placement={placement} />
-  );
 
   // Watch progress and watchlist
   const continueWatching = useQuery(api.watchProgress.getContinueWatching);
@@ -535,7 +532,9 @@ export default function Landing() {
                 />
               )}
 
-              {!isAuthenticated && activeSection === "home" && renderAdSlot("guestHero")}
+              {!isAuthenticated && activeSection === "home" && (
+                <script dangerouslySetInnerHTML={{ __html: AD_SCRIPT_SNIPPET }} />
+              )}
 
               {/* Section-specific content */}
               {sectionContent ? (
@@ -566,7 +565,7 @@ export default function Landing() {
                         items={continueWatchingItems}
                         onItemClick={openAnime}
                       />
-                      {renderAdSlot("continueWatching")}
+                      <script dangerouslySetInnerHTML={{ __html: AD_SCRIPT_SNIPPET }} />
                     </>
                   )}
 
