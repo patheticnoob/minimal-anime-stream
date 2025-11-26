@@ -290,6 +290,11 @@ export default function Landing() {
     // Store episode data FIRST (before any async operations)
     setCurrentEpisodeData(normalizedEpisode);
 
+    // Reset video state to prevent old data from carrying over
+    setVideoSource(null);
+    setVideoIntro(null);
+    setVideoOutro(null);
+
     toast("Loading video...");
     
     try {
@@ -653,6 +658,7 @@ export default function Landing() {
           }
           resumeFrom={
             animeProgress && 
+            currentEpisodeData &&
             animeProgress.episodeId === currentEpisodeData.id && 
             animeProgress.currentTime > 0 && 
             animeProgress.duration > 0

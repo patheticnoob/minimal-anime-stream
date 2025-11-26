@@ -69,6 +69,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
     const video = videoRef.current;
     if (!video || !source) return;
 
+    // Reset the restored progress flag when source changes
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
 
