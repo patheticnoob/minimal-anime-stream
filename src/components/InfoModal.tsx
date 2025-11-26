@@ -214,7 +214,7 @@ export function InfoModal({
                     <SelectTrigger className="ml-3 h-8 w-32 bg-white/5 border-white/10 text-white text-xs tracking-wide uppercase">
                       <SelectValue placeholder="Episodes range" />
                     </SelectTrigger>
-                    <SelectContent className="bg-black/95 border-white/10 text-white">
+                    <SelectContent className="bg-black/95 border-white/10 text-white z-[100]">
                       {episodeRanges.map((range, idx) => (
                         <SelectItem
                           key={range.label}
