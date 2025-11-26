@@ -1,4 +1,5 @@
-import { Home, Tv, Film, Sparkles, History, User, Search } from "lucide-react";
+import { Home, Tv, Film, Sparkles, History, User, Search, Menu, X } from "lucide-react";
+import { useState } from "react";
 
 interface SidebarProps {
   activeSection?: string;
@@ -6,6 +7,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const navItems = [
     { id: "home", label: "Home", icon: Home },
     { id: "search", label: "Search", icon: Search },
@@ -14,6 +17,11 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
     { id: "popular", label: "Hot", icon: Sparkles },
     { id: "profile", label: "My Space", icon: User },
   ];
+
+  const handleNavClick = (sectionId: string) => {
+    onSectionChange?.(sectionId);
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <>
@@ -48,24 +56,75 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
         </div>
       </aside>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="mobile-bottom-nav md:hidden">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeSection === item.id;
-          
-          return (
-            <button
-              key={item.id}
-              className={`mobile-nav-item ${isActive ? "mobile-nav-item--active" : ""}`}
-              onClick={() => onSectionChange?.(item.id)}
-            >
-              <Icon strokeWidth={isActive ? 2.5 : 1.5} />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
+      {/* Mobile Top Navigation Bar */}
+      <nav className="mobile-top-nav md:hidden">
+        <button
+          className="mobile-menu-button"
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Open menu"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+
+        <div className="mobile-nav-logo">
+          <img src="/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png" alt="Anime Logo" className="w-full h-full object-contain" />
+        </div>
+
+        <div className="mobile-nav-actions">
+          <button
+            className={`mobile-nav-icon-btn ${activeSection === "search" ? "active" : ""}`}
+            onClick={() => handleNavClick("search")}
+            aria-label="Search"
+          >
+            <Search className="h-5 w-5" />
+          </button>
+          <button
+            className={`mobile-nav-icon-btn ${activeSection === "profile" ? "active" : ""}`}
+            onClick={() => handleNavClick("profile")}
+            aria-label="My Space"
+          >
+            <User className="h-5 w-5" />
+          </button>
+        </div>
       </nav>
+
+      {/* Mobile Side Panel Overlay */}
+      {isMobileMenuOpen && (
+        <div className="mobile-side-panel-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="mobile-side-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-side-panel-header">
+              <div className="mobile-side-panel-logo">
+                <img src="/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png" alt="Anime Logo" className="w-full h-full object-contain" />
+              </div>
+              <button
+                className="mobile-side-panel-close"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <nav className="mobile-side-panel-nav">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSection === item.id;
+                
+                return (
+                  <button
+                    key={item.id}
+                    className={`mobile-side-panel-item ${isActive ? "active" : ""}`}
+                    onClick={() => handleNavClick(item.id)}
+                  >
+                    <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        </div>
+      )}
     </>
   );
 }
