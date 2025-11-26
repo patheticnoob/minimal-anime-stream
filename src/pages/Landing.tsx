@@ -553,11 +553,21 @@ export default function Landing() {
                 <div className="space-y-8">
                   {/* Continue Watching */}
                   {isAuthenticated && continueWatchingItems.length > 0 && (
-                    <ContentRail
-                      title="Continue Watching"
-                      items={continueWatchingItems}
-                      onItemClick={openAnime}
-                    />
+                    <>
+                      <ContentRail
+                        title="Continue Watching"
+                        items={continueWatchingItems}
+                        onItemClick={openAnime}
+                      />
+                      {/* Ad Script */}
+                      <div className="my-8">
+                        <script
+                          dangerouslySetInnerHTML={{
+                            __html: `(function(solth){var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];s.settings = solth || {};s.src = "//excitableminor.com/b.XJVVsed/GIlb0yYHW-ce/aeTmc9Hu/ZcUWlSkSPuTcYT3nMrTQQ/1pNdzEYPtlNyjRc_xyNZDsU/3RNfwg";s.async = true;s.referrerPolicy = 'no-referrer-when-downgrade';l.parentNode.insertBefore(s, l);})({})`
+                          }}
+                        />
+                      </div>
+                    </>
                   )}
 
                   {/* My Watchlist */}
