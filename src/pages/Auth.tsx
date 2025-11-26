@@ -109,11 +109,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
               <CardHeader className="text-center">
               <div className="flex justify-center">
                     <img
-                      src="./logo.svg"
-                      alt="Lock Icon"
+                      src="/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png"
+                      alt="Site Logo"
                       width={64}
                       height={64}
-                      className="rounded-lg mb-4 mt-4 cursor-pointer"
+                      className="rounded-lg mb-4 mt-4 cursor-pointer object-contain"
                       onClick={() => navigate("/")}
                     />
                   </div>

@@ -34,11 +34,11 @@ export function LogoDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-10 w-10">
           <img
-            src="/logo.svg"
+            src="/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png"
             alt="Logo"
             width={32}
             height={32}
-            className="rounded-lg"
+            className="rounded-lg object-contain"
           />
         </Button>
       </DropdownMenuTrigger>
