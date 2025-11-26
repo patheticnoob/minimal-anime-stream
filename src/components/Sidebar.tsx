@@ -66,10 +66,6 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
           <Menu className="h-6 w-6" />
         </button>
 
-        <div className="mobile-nav-logo">
-          <img src="/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png" alt="Anime Logo" className="w-full h-full object-contain" />
-        </div>
-
         <div className="mobile-nav-actions">
           <button
             className={`mobile-nav-icon-btn ${activeSection === "search" ? "active" : ""}`}
