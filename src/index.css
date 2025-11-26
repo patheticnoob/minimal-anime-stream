@@ -1247,21 +1247,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at center, #4d4d4d 0%, #2f2f2f 60%, #1b1b1b 100%);
+  background: #808080;
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 .loader-backdrop {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.65));
-  backdrop-filter: blur(4px);
+  background: transparent;
 }
 
 .loader-content {
   position: relative;
   text-align: center;
-  gap: 18px;
+  gap: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1270,85 +1269,71 @@
 
 .sharingan-loader {
   position: relative;
+  width: 200px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
 }
 
 .sharingan-eye {
   position: relative;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  background: radial-gradient(circle at 40% 30%, #ff4d4d 0%, #dc1515 55%, #a40808 100%);
-  border: 5px solid #090909;
-  box-shadow:
-    inset 0 0 18px rgba(0, 0, 0, 0.6),
-    0 0 30px rgba(255, 0, 0, 0.3);
-}
-
-.sharingan-ring {
-  position: absolute;
-  inset: 12%;
-  border: 2px solid rgba(0, 0, 0, 0.25);
-  border-radius: 50%;
-}
-
-.sharingan-ring.inner-ring {
-  inset: 26%;
+  background: #ff6b6b;
+  border: 6px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sharingan-pupil {
   position: absolute;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: #050505;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
-}
-
-.sharingan-tomoe-container {
-  position: absolute;
-  inset: 0;
+  background: #1a1a1a;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
 }
 
 .sharingan-tomoe {
   position: absolute;
-  width: 32px;
-  height: 32px;
-  border-radius: 50% 50% 50% 0;
-  background: #050505;
-  transform-origin: 50% 50%;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6);
+  width: 28px;
+  height: 28px;
+  background: #1a1a1a;
+  border-radius: 50%;
 }
 
 .sharingan-tomoe::after {
   content: "";
   position: absolute;
-  width: 14px;
-  height: 14px;
-  background: #050505;
+  width: 16px;
+  height: 16px;
+  background: #1a1a1a;
   border-radius: 50%;
-  top: 50%;
-  right: -6px;
-  transform: translateY(-50%);
+  top: -8px;
+  left: 6px;
 }
 
 .sharingan-tomoe.tomoe-1 {
-  top: 18%;
+  top: 25%;
   left: 50%;
-  transform: translate(-50%, -50%) rotate(-20deg);
+  transform: translateX(-50%);
 }
 
 .sharingan-tomoe.tomoe-2 {
-  bottom: 18%;
-  left: 22%;
-  transform: translate(-50%, 50%) rotate(100deg);
+  bottom: 30%;
+  left: 20%;
 }
 
 .sharingan-tomoe.tomoe-3 {
-  bottom: 18%;
-  right: 22%;
-  transform: translate(50%, 50%) rotate(220deg);
+  bottom: 30%;
+  right: 20%;
 }
 
 .loader-title {
@@ -1356,73 +1341,25 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: #1a1a1a;
 }
 
 .loader-subtitle {
   font-size: 0.9rem;
   opacity: 0.75;
-}
-
-/* Animations */
-@keyframes sharingan-rotate {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-@keyframes sharingan-rotate-mangekyou {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-@keyframes sharingan-pulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 50px rgba(255, 26, 26, 0.9),
-      0 0 100px rgba(255, 26, 26, 0.6),
-      inset 0 0 40px rgba(0, 0, 0, 0.6);
-  }
-  50% {
-    box-shadow: 
-      0 0 70px rgba(255, 26, 26, 1),
-      0 0 140px rgba(255, 26, 26, 0.8),
-      inset 0 0 40px rgba(0, 0, 0, 0.6);
-  }
-}
-
-@keyframes text-glow {
-  0%, 100% {
-    text-shadow:
-      0 0 25px rgba(255, 26, 26, 0.9),
-      0 0 50px rgba(255, 26, 26, 0.6);
-  }
-  50% {
-    text-shadow:
-      0 0 35px rgba(255, 26, 26, 1),
-      0 0 70px rgba(255, 26, 26, 0.8);
-  }
+  color: #1a1a1a;
 }
 
 @media (max-width: 480px) {
-  .loader-content {
-    padding: 30px 20px;
-  }
-  
   .sharingan-loader {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
   }
   
   .sharingan-eye {
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
+    border: 5px solid #1a1a1a;
   }
   
   .sharingan-pupil {
@@ -1431,31 +1368,19 @@
   }
   
   .sharingan-tomoe {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
   }
   
-  .sharingan-tomoe::before {
-    width: 9px;
-    height: 9px;
-    top: -4px;
-    left: 4px;
-  }
-
-  .sharingan-tomoe.mangekyou-fin {
-    width: 45px;
-    height: 60px;
-  }
-
-  .sharingan-tomoe.mangekyou-fin::before {
-    width: 22px;
-    height: 30px;
-    top: 8px;
-    left: 11px;
+  .sharingan-tomoe::after {
+    width: 12px;
+    height: 12px;
+    top: -6px;
+    left: 5px;
   }
   
   .loader-title {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
   
   .loader-subtitle {
