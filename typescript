@@ -1,0 +1,31 @@
+import { InfoModal, type BroadcastInfo } from "@/components/InfoModal";
+
+type AnimeDetail = {
+  // ...
+};
+
+export type BroadcastInfo = {
+  summary?: string | null;
+  day?: string | null;
+  time?: string | null;
+  timezone?: string | null;
+};
+
+interface InfoModalProps {
+
+}
+
+if (!broadcastInfo?.day || !broadcastInfo?.time || !broadcastInfo?.timezone) {
+  return null;
+}
+
+const normalizedDay = broadcastInfo.day.toLowerCase().replace(/s$/, "");
+
+return {
+  broadcast: {
+    day: anime.broadcast.day ?? null,
+    time: anime.broadcast.time ?? null,
+    timezone: anime.broadcast.timezone ?? null,
+    string: anime.broadcast.string ?? null,
+  },
+};

@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { BroadcastInfo } from "@/types/broadcast";
 
 type Episode = {
   id: string;
@@ -29,13 +30,6 @@ type AnimeDetail = {
     sub?: string | null;
     dub?: string | null;
   };
-};
-
-export type BroadcastInfo = {
-  summary?: string | null;
-  day?: string | null;
-  time?: string | null;
-  timezone?: string | null;
 };
 
 interface InfoModalProps {
@@ -63,6 +57,9 @@ export function InfoModal({
   broadcastInfo,
   broadcastLoading,
 }: InfoModalProps) {
+  // Debug log to ensure component is rendering
+  // console.log("InfoModal rendering", { isOpen, anime });
+  
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
 

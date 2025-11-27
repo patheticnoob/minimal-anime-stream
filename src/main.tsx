@@ -57,3 +57,5 @@ createRoot(document.getElementById("root")!).render(
     </InstrumentationProvider>
   </StrictMode>,
 );
+
+// Force reload to clear any stale module states
