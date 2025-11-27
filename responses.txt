@@ -2552,3 +2552,43 @@
   ],
   "total_pages": 212
 }
+
+## 7. Episodes List
+**Endpoint:** hianime.episodes
+**Action:** api.hianime.episodes({ dataId: string })
+**Parameter Required:** dataId (obtained from any anime list API response - mostPopular, topAiring, movies, tvShows, search)
+**Parameter Path:** results[].dataId
+**Command Example:** npx convex run hianime:episodes '{"dataId": "one-piece-100"}'
+
+✖ Failed to run function "hianime:episodes":
+Error: [Request ID: 9d5f3697aa114f85] Server Error
+Uncaught Error: Unable to load episodes: Request failed with status code 404
+    at handler (../src/convex/hianime.ts:126:4)
+
+## 8. Episode Servers
+**Endpoint:** hianime.episodeServers
+**Action:** api.hianime.episodeServers({ episodeId: string })
+**Parameter Required:** episodeId (obtained from episodes API response)
+**Parameter Path:** episodes[].id
+**Command Example:** npx convex run hianime:episodeServers '{"episodeId": "one-piece-100?ep=1"}'
+
+✖ Failed to run function "hianime:episodeServers":
+Error: [Request ID: f64023acebeef36d] Server Error
+Uncaught Error: Unable to load streaming servers: cheerio.load() expects a string
+    at handler (../src/convex/hianime.ts:141:4)
+
+## 9. Episode Sources (Streaming URLs)
+**Endpoint:** hianime.episodeSources
+**Action:** api.hianime.episodeSources({ serverId: string })
+**Parameter Required:** serverId (obtained from episodeServers API response)
+**Parameter Path:** sub[].id or dub[].id
+**Command Example:** npx convex run hianime:episodeSources '{"serverId": "server-id-here"}'
+
+Note: The serverId is obtained from the episodeServers response. You need to select a server from either the 'sub' or 'dub' array.
+
+## API Call Flow:
+1. Get anime list (mostPopular/topAiring/movies/tvShows/search) → Extract `dataId`
+2. Use `dataId` to get episodes list → Extract `episodeId` (episode.id)
+3. Use `episodeId` to get available servers → Extract `serverId` (from sub[] or dub[] array)
+4. Use `serverId` to get streaming sources → Get video URLs and subtitles
+
