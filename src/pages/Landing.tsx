@@ -27,6 +27,7 @@ type AnimeItem = {
     sub?: string | null;
     dub?: string | null;
   };
+  sourceCategory?: "continueWatching" | "watchlist" | "recentEpisodes";
 };
 
 type Episode = {
@@ -80,6 +81,7 @@ export default function Landing() {
   const fetchSources = useAction(api.hianime.episodeSources);
   const searchAnime = useAction(api.hianime.search);
   const fetchRecentEpisodes = useAction(api.yumaApi.recentEpisodes);
+  const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
   const [loading, setLoading] = useState(true);
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
@@ -106,6 +108,8 @@ export default function Landing() {
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
+  const [broadcastInfo, setBroadcastInfo] = useState<string | null>(null);
+  const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
 
   // Watch progress and watchlist
   const continueWatching = useQuery(api.watchProgress.getContinueWatching);
@@ -182,6 +186,7 @@ export default function Landing() {
               sub: item.sub ? String(item.sub) : null,
               dub: item.dub ? String(item.dub) : null,
             },
+            sourceCategory: "recentEpisodes" as const,
           }));
           setRecentEpisodesItems(mappedRecent);
           setRecentEpisodesHasMore(recentData.has_next_page || false);
@@ -313,6 +318,7 @@ export default function Landing() {
                 sub: item.sub ? String(item.sub) : null,
                 dub: item.dub ? String(item.dub) : null,
               },
+              sourceCategory: "recentEpisodes" as const,
             }));
             setRecentEpisodesItems((prev: AnimeItem[]) => [...prev, ...mappedRecent]);
             setRecentEpisodesPage(nextPage);
@@ -339,6 +345,38 @@ export default function Landing() {
   const openAnime = async (anime: AnimeItem) => {
     setSelected(anime);
     setLastSelectedAnime(anime);
+    setBroadcastInfo(null);
+    setIsBroadcastLoading(false);
+    const shouldFetchBroadcast =
+      ["continueWatching", "watchlist", "recentEpisodes"].includes(
+        anime.sourceCategory ?? "",
+      );
+    if (shouldFetchBroadcast && anime.title) {
+      setIsBroadcastLoading(true);
+      fetchBroadcastInfo({ title: anime.title })
+        .then((result) => {
+          const broadcast = result?.broadcast;
+          if (!broadcast) return;
+          const summaryParts: string[] = [];
+          if (broadcast.string) {
+            summaryParts.push(broadcast.string);
+          } else {
+            if (broadcast.day) summaryParts.push(broadcast.day);
+            if (broadcast.time) summaryParts.push(broadcast.time);
+          }
+          let summary = summaryParts.join(" • ");
+          if (broadcast.timezone) {
+            summary = summary ? `${summary} (${broadcast.timezone})` : broadcast.timezone;
+          }
+          if (summary) {
+            setBroadcastInfo(summary);
+          }
+        })
+        .catch(() => {
+          setBroadcastInfo(null);
+        })
+        .finally(() => setIsBroadcastLoading(false));
+    }
     if (!anime?.dataId) {
       toast("This title has no episodes available.");
       return;
@@ -550,6 +588,7 @@ export default function Landing() {
     episodeNumber: item.episodeNumber,
     currentTime: item.currentTime,
     duration: item.duration,
+    sourceCategory: "continueWatching" as const,
   }));
 
   // Convert watchlist to AnimeItem format
@@ -560,6 +599,7 @@ export default function Landing() {
     dataId: item.animeId,
     id: item.animeId,
     language: item.language,
+    sourceCategory: "watchlist" as const,
   }));
 
   if (loading || authLoading) {
@@ -761,6 +801,8 @@ export default function Landing() {
         }}
         isInWatchlist={isInWatchlist}
         onToggleWatchlist={handleToggleWatchlist}
+        broadcastInfo={broadcastInfo}
+        broadcastLoading={isBroadcastLoading}
       />
 
       {/* Video Player */}

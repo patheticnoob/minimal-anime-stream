@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { X, Play, Plus, Check } from "lucide-react";
+import { X, Play, Plus, Check, Clock3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -39,6 +39,8 @@ interface InfoModalProps {
   onPlayEpisode: (episode: Episode) => void;
   isInWatchlist?: boolean;
   onToggleWatchlist?: () => void;
+  broadcastInfo?: string | null;
+  broadcastLoading?: boolean;
 }
 
 export function InfoModal({
@@ -50,6 +52,8 @@ export function InfoModal({
   onPlayEpisode,
   isInWatchlist,
   onToggleWatchlist,
+  broadcastInfo,
+  broadcastLoading,
 }: InfoModalProps) {
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
@@ -143,6 +147,16 @@ export function InfoModal({
                 )}
               </div>
             </div>
+            {(broadcastLoading || broadcastInfo) && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-blue-300">
+                <Clock3 className="h-4 w-4" />
+                <span>
+                  {broadcastLoading
+                    ? "Fetching upcoming schedule..."
+                    : `Next broadcast: ${broadcastInfo}`}
+                </span>
+              </div>
+            )}
             <p className="detail-hero-description">
               Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available.
             </p>
