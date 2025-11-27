@@ -1,3 +1,10 @@
+# HiAnime API Responses
+
+## 1. Most Popular
+**Endpoint:** hianime.mostPopular
+**Action:** api.hianime.mostPopular({ page: 1 })
+**Command:** npx convex run hianime:mostPopular '{"page": 1}'
+
 {
   "hasNextPage": true,
   "page": 1,
@@ -98,9 +105,359 @@
         "dub": "11",
         "sub": "11"
       },
+      "title": "Demon Slayer: Kimetsu no Yaiba Swordsmith Village Arc",
+      "type": "TV"
+    },
+    {
+      "dataId": "534",
+      "id": "/jujutsu-kaisen-tv-534",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/82402f796b7d84d7071ab1e03ff7747a.jpg",
+      "language": {
+        "dub": "24",
+        "sub": "24"
+      },
+      "title": "Jujutsu Kaisen (TV)",
+      "type": "TV"
+    },
+    {
+      "dataId": "18718",
+      "id": "/solo-leveling-18718",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/b147d331e311a5d5c8ee81269725fc92.png",
+      "language": {
+        "dub": "12",
+        "sub": "12"
+      },
+      "title": "Solo Leveling",
+      "type": "TV"
+    },
+    {
+      "dataId": "2",
+      "id": "/hunter-x-hunter-2",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/993c0361975cce4c7fbb11f8558f9664.jpg",
+      "language": {
+        "dub": "148",
+        "sub": "148"
+      },
+      "title": "Hunter x Hunter",
+      "type": "TV"
+    },
+    {
+      "dataId": "17889",
+      "id": "/blue-lock-17889",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/fced51e392ffd80041b3a1581ba7de2f.jpg",
+      "language": {
+        "dub": "24",
+        "sub": "24"
+      },
+      "title": "Blue Lock",
+      "type": "TV"
+    },
+    {
+      "dataId": "17977",
+      "id": "/spy-x-family-17977",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/88bd17534dc4884f23027035d23d74e5.jpg",
+      "language": {
+        "dub": "12",
+        "sub": "12"
+      },
+      "title": "Spy x Family",
+      "type": "TV"
+    },
+    {
+      "dataId": "112",
+      "id": "/attack-on-titan-112",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/debf027d032c6d40b91fab16b2ff9bd4.jpg",
+      "language": {
+        "dub": "25",
+        "sub": "25"
+      },
+      "title": "Attack on Titan",
+      "type": "TV"
+    },
+    {
+      "dataId": "47",
+      "id": "/demon-slayer-kimetsu-no-yaiba-47",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/30df93feaa422101659e14d0a2a2f582.jpg",
+      "language": {
+        "dub": "26",
+        "sub": "26"
+      },
+      "title": "Demon Slayer: Kimetsu no Yaiba",
+      "type": "TV"
+    },
+    {
+      "dataId": "17483",
+      "id": "/demon-slayer-entertainment-district-arc-17483",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/3e13d0ab2ce8799c9da8ed59548b96e9.jpg",
+      "language": {
+        "dub": "11",
+        "sub": "11"
+      },
+      "title": "Demon Slayer: Entertainment District Arc",
+      "type": "TV"
+    },
+    {
+      "dataId": "19318",
+      "id": "/blue-lock-season-2-19318",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/8ed3a4df2e8f22be9916959c96e5e3e2.jpg",
+      "language": {
+        "dub": "14",
+        "sub": "14"
+      },
+      "title": "Blue Lock Season 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "19319",
+      "id": "/dan-da-dan-19319",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/a8b56a7589ff9edb6c86977c31e27a06.jpg",
+      "language": {
+        "dub": "12",
+        "sub": "12"
+      },
+      "title": "Dan Da Dan",
+      "type": "TV"
+    },
+    {
+      "dataId": "17473",
+      "id": "/the-eminence-in-shadow-17473",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/bca4a71e271a30fb1b44d33d56db8f8f.jpg",
+      "language": {
+        "dub": "20",
+        "sub": "20"
+      },
+      "title": "The Eminence in Shadow",
+      "type": "TV"
+    },
+    {
+      "dataId": "18154",
+      "id": "/my-hero-academia-season-6-18154",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/20b7580c1abdf45a6eaf4826fc9fdf33.jpg",
+      "language": {
+        "dub": "25",
+        "sub": "25"
+      },
+      "title": "My Hero Academia Season 6",
+      "type": "TV"
+    },
+    {
+      "dataId": "325",
+      "id": "/dragon-ball-z-325",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/2ac32c050b4dff7747fcc7f64c01edbd.jpg",
+      "language": {
+        "dub": "291",
+        "sub": "291"
+      },
+      "title": "Dragon Ball Z",
+      "type": "TV"
+    },
+    {
+      "dataId": "17406",
+      "id": "/chainsaw-man-17406",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/b3da1326e07269ddd8d73475c5dabf2c.jpg",
+      "language": {
+        "dub": "12",
+        "sub": "12"
+      },
+      "title": "Chainsaw Man",
+      "type": "TV"
+    },
+    {
+      "dataId": "60",
+      "id": "/death-note-60",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/5e61f3e7c0045e46b670d31a5bb39c68.jpg",
+      "language": {
+        "dub": "37",
+        "sub": "37"
+      },
+      "title": "Death Note",
+      "type": "TV"
+    },
+    {
+      "dataId": "1692",
+      "id": "/dragon-ball-super-1692",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/6908f85a069414d40530042f2cdd8c8a.jpg",
+      "language": {
+        "dub": "131",
+        "sub": "131"
+      },
+      "title": "Dragon Ball Super",
+      "type": "TV"
+    },
+    {
+      "dataId": "19107",
+      "id": "/demon-slayer-kimetsu-no-yaiba-hashira-training-arc-19107",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/1f06eb0baf5520aa639b546fc189400d.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "Demon Slayer: Kimetsu no Yaiba Hashira Training Arc",
+      "type": "TV"
+    },
+    {
+      "dataId": "18332",
+      "id": "/hells-paradise-18332",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/5fd0a7d4f0e1a9088c85bc0dcb2f176a.png",
+      "language": {
+        "dub": "13",
+        "sub": "13"
+      },
+      "title": "Hell's Paradise",
+      "type": "TV"
+    },
+    {
+      "dataId": "19322",
+      "id": "/bleach-thousand-year-blood-war-the-conflict-19322",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/b87a9e986e6e403ffddb520d24f5040a.jpg",
+      "language": {
+        "dub": "14",
+        "sub": "14"
+      },
+      "title": "Bleach: Thousand-Year Blood War - The Conflict",
+      "type": "TV"
+    },
+    {
+      "dataId": "85",
+      "id": "/attack-on-titan-season-3-85",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/98b21bfbd9fa3d49ec80ba8fe75ed5cd.jpg",
+      "language": {
+        "dub": "22",
+        "sub": "22"
+      },
+      "title": "Attack on Titan Season 3",
+      "type": "TV"
+    },
+    {
+      "dataId": "19785",
+      "id": "/gachiakuta-19785",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/acad8581f1a2eafa8c9d68b899bb1b21.jpg",
+      "language": {
+        "dub": "18",
+        "sub": "20"
+      },
+      "title": "Gachiakuta",
+      "type": "TV"
+    },
+    {
+      "dataId": "17753",
+      "id": "/attack-on-titan-final-season-part-2-17753",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/160831b6a0c1303e1439925d8f8c7395.jpg",
+      "language": {
+        "dub": "12",
+        "sub": "12"
+      },
+      "title": "Attack on Titan: Final Season, Part 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "19146",
+      "id": "/my-hero-academia-season-7-19146",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/af4938d7388aad3438e443e74b02531e.jpg",
+      "language": {
+        "dub": "21",
+        "sub": "21"
+      },
+      "title": "My Hero Academia Season 7",
+      "type": "TV"
+    },
+    {
+      "dataId": "15548",
+      "id": "/attack-on-titan-final-season-part-1-15548",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/83da53919d7a20332be01686141f18f6.jpg",
+      "language": {
+        "dub": "16",
+        "sub": "16"
+      },
+      "title": "Attack on Titan: Final Season, Part 1",
+      "type": "TV"
+    },
+    {
+      "dataId": "19431",
+      "id": "/sakamoto-days-19431",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/2bbe7ece956bbefc6f385a7a447c182c.jpg",
+      "language": {
+        "dub": "11",
+        "sub": "11"
+      },
+      "title": "Sakamoto Days",
+      "type": "TV"
+    },
+    {
+      "dataId": "18339",
+      "id": "/mashle-magic-and-muscles-18339",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/9faf29fb396c436d19ed83fa82a31e2f.jpg",
+      "language": {
+        "dub": "12",
+        "sub": "12"
+      },
+      "title": "Mashle: Magic and Muscles",
+      "type": "TV"
+    },
+    {
+      "dataId": "18343",
+      "id": "/i-got-a-cheat-skill-in-another-world-and-became-unrivaled-in-the-real-world-too-18343",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0ad5356f28ee75bccfde8b69ea6a5e54.jpg",
+      "language": {
+        "dub": "13",
+        "sub": "13"
+      },
+      "title": "I Got a Cheat Skill in Another World and Became Unrivaled in The Real World, Too",
+      "type": "TV"
+    },
+    {
+      "dataId": "509",
+      "id": "/dragon-ball-509",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/cbe9999ab6606992fb000566ebf5d99b.jpg",
+      "language": {
+        "dub": "153",
+        "sub": "153"
+      },
+      "title": "Dragon Ball",
+      "type": "TV"
+    },
+    {
+      "dataId": "930",
+      "id": "/fairy-tail-930",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/ccbc20fd8ddf9b2000bf23894a787436.jpg",
+      "language": {
+        "dub": "175",
+        "sub": "175"
+      },
+      "title": "Fairy Tail",
+      "type": "TV"
+    },
+    {
+      "dataId": "19324",
+      "id": "/shangri-la-frontier-season-2-19324",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0fc66f9879a3a4a15408c325e1677e17.jpg",
+      "language": {
+        "dub": "25",
+        "sub": "25"
+      },
+      "title": "Shangri-La Frontier Season 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "18542",
+      "id": "/frieren-beyond-journeys-end-18542",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/5e766fbd23e796462040a67203345a7b.jpg",
+      "language": {
+        "dub": "28",
+        "sub": "28"
+      },
+      "title": "Frieren: Beyond Journey's End",
+      "type": "TV"
+    }
+  ],
+  "totalPage": 50
+}
 
+## 2. Top Airing
+**Endpoint:** hianime.topAiring
+**Action:** api.hianime.topAiring({ page: 1 })
+**Command:** npx convex run hianime:topAiring '{"page": 1}'
 
-=== TOP AIRING ===
 {
   "hasNextPage": true,
   "page": 1,
@@ -201,9 +558,359 @@
         "dub": "4",
         "sub": "10"
       },
+      "title": "Hero Without a Class: Who Even Needs Skills?!",
+      "type": "TV"
+    },
+    {
+      "dataId": "19722",
+      "id": "/demon-slayer-kimetsu-no-yaiba-infinity-castle-19722",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/61297ee36cf2c6c51a4a055b2999a709.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Demon Slayer: Kimetsu no Yaiba Infinity Castle",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19779",
+      "id": "/tougen-anki-19779",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/e5e326f8234a54e407d7e3c86f9d68e2.jpg",
+      "language": {
+        "dub": "19",
+        "sub": "19"
+      },
+      "title": "Tougen Anki",
+      "type": "TV"
+    },
+    {
+      "dataId": "18397",
+      "id": "/pokemon-horizons-the-series-18397",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/4b145f650126e400b69e783e3d6cdd2a.jpg",
+      "language": {
+        "dub": "100",
+        "sub": "118"
+      },
+      "title": "Pokémon Horizons: The Series",
+      "type": "TV"
+    },
+    {
+      "dataId": "19902",
+      "id": "/the-banished-court-magician-aims-to-become-the-strongest-19902",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/22867d66fcdc249a69bd8f669a83707a.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "8"
+      },
+      "title": "The Banished Court Magician Aims to Become the Strongest",
+      "type": "TV"
+    },
+    {
+      "dataId": "19928",
+      "id": "/campfire-cooking-in-another-world-with-my-absurd-skill-season-2-19928",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0e05c4d1a105058516d1f96bc78a33d5.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "Campfire Cooking in Another World with My Absurd Skill Season 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "19901",
+      "id": "/a-gatherers-adventure-in-isekai-19901",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c514b6042ba1d9092b292ea84be8ae23.jpg",
+      "language": {
+        "dub": "7",
+        "sub": "9"
+      },
+      "title": "A Gatherer's Adventure in Isekai",
+      "type": "TV"
+    },
+    {
+      "dataId": "19931",
+      "id": "/spy-x-family-season-3-19931",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/162bbe5c3e6529b2449e735ae48c270e.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "8"
+      },
+      "title": "Spy x Family Season 3",
+      "type": "TV"
+    },
+    {
+      "dataId": "19640",
+      "id": "/please-put-them-on-takamine-san-uncensored-19640",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/427526598ffeb6a0521ed6ca8c78b549.jpg",
+      "language": {
+        "dub": null,
+        "sub": "12"
+      },
+      "title": "Please Put Them On, Takamine-san [UNCENSORED]",
+      "type": "TV"
+    },
+    {
+      "dataId": "9688",
+      "id": "/super-dragon-ball-heroes-9688",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/fc1904280b9effa1624c0d2b2652aa52.jpg",
+      "language": {
+        "dub": null,
+        "sub": "20"
+      },
+      "title": "Super Dragon Ball Heroes",
+      "type": "ONA"
+    },
+    {
+      "dataId": "19909",
+      "id": "/a-wild-last-boss-appeared-19909",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/6bbde70a6ecf5cfce152f122da1d9cb0.jpg",
+      "language": {
+        "dub": null,
+        "sub": "9"
+      },
+      "title": "A Wild Last Boss Appeared!",
+      "type": "TV"
+    },
+    {
+      "dataId": "18119",
+      "id": "/battle-through-the-heavens-5th-season-18119",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/069e39f99972004849bab4a2946d968c.jpg",
+      "language": {
+        "dub": "52",
+        "sub": "174"
+      },
+      "title": "Battle Through The Heavens 5th Season",
+      "type": "ONA"
+    },
+    {
+      "dataId": "19927",
+      "id": "/may-i-ask-for-one-final-thing-19927",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c47d9623085a6057088ccffdc6198492.jpg",
+      "language": {
+        "dub": "9",
+        "sub": "9"
+      },
+      "title": "May I Ask for One Final Thing?",
+      "type": "TV"
+    },
+    {
+      "dataId": "19769",
+      "id": "/watari-kuns-is-about-to-collapse-19769",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/7353719ac2fd26e6af72fe773c37a06a.jpg",
+      "language": {
+        "dub": "19",
+        "sub": "21"
+      },
+      "title": "Watari-kun's ****** Is about to Collapse",
+      "type": "TV"
+    },
+    {
+      "dataId": "17970",
+      "id": "/super-dragon-ball-heroes-big-bang-mission-17970",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/440f62e68ca62b339b712bd3051e2133.jpg",
+      "language": {
+        "dub": null,
+        "sub": "19"
+      },
+      "title": "Super Dragon Ball Heroes: Big Bang Mission!!!",
+      "type": "TV"
+    },
+    {
+      "dataId": "19905",
+      "id": "/dusk-beyond-the-end-of-the-world-19905",
+      "image": "https://cdn.myanimelist.net/images/anime/1294/151734l.jpg",
+      "language": {
+        "dub": null,
+        "sub": "9"
+      },
+      "title": "Dusk Beyond the End of the World",
+      "type": "TV"
+    },
+    {
+      "dataId": "19925",
+      "id": "/let-this-grieving-soul-retire-part-2-19925",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/deffd7486cbd190f596bc6cb4239bcc1.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Let This Grieving Soul Retire Part 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "18632",
+      "id": "/beyblade-x-18632",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/ead47129d7080b87764abe4117d0c92e.png",
+      "language": {
+        "dub": "68",
+        "sub": "104"
+      },
+      "title": "Beyblade X",
+      "type": "TV"
+    },
+    {
+      "dataId": "19911",
+      "id": "/dad-is-a-hero-mom-is-a-spirit-im-a-reincarnator-19911",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/769091e549c5d0db95b91dddd2ac9646.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Dad is a Hero, Mom is a Spirit, I'm a Reincarnator",
+      "type": "TV"
+    },
+    {
+      "dataId": "18416",
+      "id": "/soul-land-2-peerless-tang-sect-18416",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c7e6c128b8320125011627ced44aaced.jpg",
+      "language": {
+        "dub": null,
+        "sub": "128"
+      },
+      "title": "Soul Land 2: Peerless Tang Sect",
+      "type": "ONA"
+    },
+    {
+      "dataId": "18018",
+      "id": "/swallowed-star-2nd-season-18018",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/23cc8e120b74d5fc55050b0e88f00758.jpg",
+      "language": {
+        "dub": null,
+        "sub": "172"
+      },
+      "title": "Swallowed Star 2nd Season",
+      "type": "ONA"
+    },
+    {
+      "dataId": "18573",
+      "id": "/renegade-immortal-18573",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/1c22744a486998778432fd1f92216129.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "116"
+      },
+      "title": "Renegade Immortal",
+      "type": "ONA"
+    },
+    {
+      "dataId": "19943",
+      "id": "/hands-off-sawaranaide-kotesashi-kun-uncensored-19943",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/f26bf6c5f79a0f4860411e3bc9a75aa5.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Hands Off: Sawaranaide Kotesashi-kun [UNCENSORED]",
+      "type": "TV"
+    },
+    {
+      "dataId": "17507",
+      "id": "/my-friends-little-sister-has-it-in-for-me-17507",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c9db45e342f285a771967ee6ec351848.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "My Friend's Little Sister Has It In for Me",
+      "type": "TV"
+    },
+    {
+      "dataId": "1058",
+      "id": "/shin-chan-1058",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/e823a4a4b8b1445deac56a7075aa8748.jpg",
+      "language": {
+        "dub": "78",
+        "sub": "78"
+      },
+      "title": "Shin Chan",
+      "type": "TV"
+    },
+    {
+      "dataId": "19875",
+      "id": "/the-fated-magical-princess-who-made-me-a-princess-19875",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/76bf5d4a75c79a3b89c8c4c6e15f5a1f.jpg",
+      "language": {
+        "dub": null,
+        "sub": "11"
+      },
+      "title": "The Fated Magical Princess: Who Made Me a Princess",
+      "type": "ONA"
+    },
+    {
+      "dataId": "19913",
+      "id": "/pass-the-monster-meat-milady-19913",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/6db8bf0e0f56f1daf8dd5f6543100319.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "9"
+      },
+      "title": "Pass the Monster Meat, Milady!",
+      "type": "TV"
+    },
+    {
+      "dataId": "19920",
+      "id": "/sanda-19920",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/567fb055ca20bb27ae8b59bda06ed3eb.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "Sanda",
+      "type": "TV"
+    },
+    {
+      "dataId": "17492",
+      "id": "/perfect-world-17492",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/76a4c54d2b7d76cc4aecd8151b977e25.jpg",
+      "language": {
+        "dub": null,
+        "sub": "242"
+      },
+      "title": "Perfect World",
+      "type": "ONA"
+    },
+    {
+      "dataId": "19929",
+      "id": "/to-your-eternity-season-3-19929",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/8387c83ff77997e7e0a97dde036a384b.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "To Your Eternity Season 3",
+      "type": "TV"
+    },
+    {
+      "dataId": "19914",
+      "id": "/kingdom-season-6-19914",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/1f5f2d39e92ac10eb0e809e39bd430aa.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Kingdom: Season 6",
+      "type": "TV"
+    },
+    {
+      "dataId": "19892",
+      "id": "/tojima-tanzaburo-wants-to-be-a-masked-rider-19892",
+      "image": "https://cdn.myanimelist.net/images/anime/1100/152037l.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "8"
+      },
+      "title": "Tojima Tanzaburo Wants to Be a Masked Rider",
+      "type": "TV"
+    }
+  ],
+  "totalPage": 11
+}
 
+## 3. Movies
+**Endpoint:** hianime.movies
+**Action:** api.hianime.movies({ page: 1 })
+**Command:** npx convex run hianime:movies '{"page": 1}'
 
-=== MOVIES ===
 {
   "hasNextPage": true,
   "page": 1,
@@ -304,9 +1011,293 @@
         "dub": null,
         "sub": "1"
       },
+      "title": "Galaxy Apartment Cosmo Hills",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19847",
+      "id": "/doraemon-the-movie-nobitas-earth-symphony-19847",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/7768fbb8bd603a4925f83fff539c755f.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Doraemon the Movie: Nobita's Earth Symphony",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19835",
+      "id": "/ne-zha-2-19835",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/61538876bc30bcc5e8f7ba9c43eb6de3.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Ne Zha 2",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19834",
+      "id": "/new-gods-nezha-reborn-19834",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/41cf0de655170b7903d4be477874b230.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "New Gods: Nezha Reborn",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19730",
+      "id": "/fureru-19730",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/a48ca2168948ea5e38820c35a5a0fddb.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Fureru.",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19722",
+      "id": "/demon-slayer-kimetsu-no-yaiba-infinity-castle-19722",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/61297ee36cf2c6c51a4a055b2999a709.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Demon Slayer: Kimetsu no Yaiba Infinity Castle",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19721",
+      "id": "/chainsaw-man-the-movie-reze-arc-19721",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0842136396fcf806b5f7d51e3432552e.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Chainsaw Man the Movie: Reze Arc",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19716",
+      "id": "/little-sharks-outings-19716",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/fb0b65d734bdd1e51cefb37aaa3c2b07.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Little Shark's Outings",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19705",
+      "id": "/thunderbolt-fantasy-the-final-chapter-19705",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/dd6c0640cdf2312ff8f8c438eb652701.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Thunderbolt Fantasy - The Final Chapter",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19690",
+      "id": "/gaksital-19690",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/9d3ecf7508ef23a08fed474a3d996863.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Gaksital",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19666",
+      "id": "/rascal-does-not-dream-of-a-knapsack-kid-19666",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/83d4718dbbb724294a89b6931b98990a.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Rascal Does Not Dream of a Knapsack Kid",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19652",
+      "id": "/ultraman-company-19652",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/3e5c79e8e8a42a10507952a41cedf831.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Ultraman Company",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19651",
+      "id": "/given-the-movie-3-to-the-sea-19651",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/192073dedb9d3c11c458ad8144fb6e17.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Given the Movie 3: To The Sea",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19490",
+      "id": "/binan-koukou-chikyuu-bouei-bu-eternal-love-19490",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/86bf849617a7df87e75102b376a7ead3.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Binan Koukou Chikyuu Bouei-bu Eternal Love!",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19489",
+      "id": "/batman-ninja-vs-yakuza-league-19489",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/f4ab884b46d2a0b3cc0ebc8f3241f91c.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Batman Ninja vs. Yakuza League",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19487",
+      "id": "/colorful-stage-the-movie-a-miku-who-cant-sing-19487",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/a993688cd549607a42691c4f63a6e172.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Colorful Stage! The Movie: A Miku Who Can't Sing",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19486",
+      "id": "/mononoke-the-movie-chapter-ii-fire-rat-19486",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/acedab0b31f38e98f8eda9628e70d8de.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Mononoke the Movie: Chapter II - Fire Rat",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19485",
+      "id": "/senpai-wa-otokonoko-movie-ame-nochi-hare-19485",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/fab50f1fb054140d7fea3893bdd45788.jpg",
+      "language": {
+        "dub": null,
+        "sub": "4"
+      },
+      "title": "Senpai wa Otokonoko Movie: Ame Nochi Hare",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19484",
+      "id": "/the-rose-of-versailles-movie-19484",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/f702e7d74c6ae7d7c7944387e1ea8e5b.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "The Rose of Versailles (Movie)",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19483",
+      "id": "/kaiju-no-8-movie-19483",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/9b52c15d1af305498c24d2f2a849c25e.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Kaiju No. 8 Movie",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19428",
+      "id": "/kizumonogatari-koyomi-vamp-19428",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c3445be1bff97246f6f9b1d6fba2b1df.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Kizumonogatari: Koyomi Vamp",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19427",
+      "id": "/ssssdynazenon-movie-19427",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/049f94ac8dda02ae66f84ae917053d01.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "SSSS.Dynazenon Movie",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19424",
+      "id": "/ensemble-stars-road-to-show-19424",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/19de34e8d175ded3869e0efae120523b.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Ensemble Stars!! Road to Show!!",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19408",
+      "id": "/crayon-shin-chan-movie-30-mononoke-ninja-chinpuuden-19408",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/8614ce4086001d5e8ad17e065b7133f1.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Crayon Shin-chan Movie 30: Mononoke Ninja Chinpuuden",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19393",
+      "id": "/give-it-all-19393",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/5919c430ae29ebb7ff9175043fc2b66c.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Give It All",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19392",
+      "id": "/solo-leveling-reawakening-19392",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/a4721548991d6cb4887256c53fb61c66.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Solo Leveling: ReAwakening",
+      "type": "MOVIE"
+    }
+  ],
+  "totalPage": 37
+}
 
+## 4. TV Shows
+**Endpoint:** hianime.tvShows
+**Action:** api.hianime.tvShows({ page: 1 })
+**Command:** npx convex run hianime:tvShows '{"page": 1}'
 
-=== TV SHOWS ===
 {
   "hasNextPage": true,
   "page": 1,
@@ -407,9 +1398,293 @@
         "dub": "6",
         "sub": "8"
       },
+      "title": "My Hero Academia Final Season",
+      "type": "TV"
+    },
+    {
+      "dataId": "19929",
+      "id": "/to-your-eternity-season-3-19929",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/8387c83ff77997e7e0a97dde036a384b.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "To Your Eternity Season 3",
+      "type": "TV"
+    },
+    {
+      "dataId": "19928",
+      "id": "/campfire-cooking-in-another-world-with-my-absurd-skill-season-2-19928",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0e05c4d1a105058516d1f96bc78a33d5.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "Campfire Cooking in Another World with My Absurd Skill Season 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "19927",
+      "id": "/may-i-ask-for-one-final-thing-19927",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c47d9623085a6057088ccffdc6198492.jpg",
+      "language": {
+        "dub": "9",
+        "sub": "9"
+      },
+      "title": "May I Ask for One Final Thing?",
+      "type": "TV"
+    },
+    {
+      "dataId": "19926",
+      "id": "/ranma-2024-2nd-season-19926",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/52efb4fd826d3563df095495fef52d27.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "Ranma ½ (2024) 2nd Season",
+      "type": "TV"
+    },
+    {
+      "dataId": "19925",
+      "id": "/let-this-grieving-soul-retire-part-2-19925",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/deffd7486cbd190f596bc6cb4239bcc1.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Let This Grieving Soul Retire Part 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "19924",
+      "id": "/gintama-3-z-ginpachi-sensei-19924",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/d2c591f2a9ca18b8738615bec4a0f879.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "Gintama: 3-Z Ginpachi Sensei",
+      "type": "TV"
+    },
+    {
+      "dataId": "19923",
+      "id": "/this-monster-wants-to-eat-me-19923",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/cd6d01f1b67067e85271fdf78b690c2f.jpg",
+      "language": {
+        "dub": null,
+        "sub": "9"
+      },
+      "title": "This Monster Wants to Eat Me",
+      "type": "TV"
+    },
+    {
+      "dataId": "19922",
+      "id": "/my-status-as-an-assassin-obviously-exceeds-the-heros-19922",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/01673a7d3c4080cb4773e105a1aaa215.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "My Status as an Assassin Obviously Exceeds the Hero's",
+      "type": "TV"
+    },
+    {
+      "dataId": "19921",
+      "id": "/tales-of-wedding-rings-season-2-19921",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/b4df2e94f170a2ec11149f0ae16f3934.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "8"
+      },
+      "title": "Tales of Wedding Rings Season 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "19920",
+      "id": "/sanda-19920",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/567fb055ca20bb27ae8b59bda06ed3eb.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "Sanda",
+      "type": "TV"
+    },
+    {
+      "dataId": "19919",
+      "id": "/kakuriyo-bed-and-breakfast-for-spirits-2-19919",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/502c056094ff25ca5fe7cbd1ff6bb38e.jpg",
+      "language": {
+        "dub": "7",
+        "sub": "9"
+      },
+      "title": "Kakuriyo: Bed and Breakfast for Spirits 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "19918",
+      "id": "/awkward-senpai-19918",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/7875b4e4be9b36a0b02342b24b72da53.jpg",
+      "language": {
+        "dub": null,
+        "sub": "9"
+      },
+      "title": "Awkward Senpai",
+      "type": "TV"
+    },
+    {
+      "dataId": "19917",
+      "id": "/umamusume-cinderella-gray-part-2-19917",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/d0dd18f216d65eb1e768f07e3490d744.jpg",
+      "language": {
+        "dub": null,
+        "sub": "6"
+      },
+      "title": "Umamusume: Cinderella Gray Part 2",
+      "type": "TV"
+    },
+    {
+      "dataId": "19916",
+      "id": "/chitose-is-in-the-ramune-bottle-19916",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/4758edde5ee74d0be518cc17c20f7705.jpg",
+      "language": {
+        "dub": null,
+        "sub": "5"
+      },
+      "title": "Chitose Is in the Ramune Bottle",
+      "type": "TV"
+    },
+    {
+      "dataId": "19915",
+      "id": "/wandance-19915",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0e540925c474669bf2176db7124fa205.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "8"
+      },
+      "title": "Wandance",
+      "type": "TV"
+    },
+    {
+      "dataId": "19914",
+      "id": "/kingdom-season-6-19914",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/1f5f2d39e92ac10eb0e809e39bd430aa.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Kingdom: Season 6",
+      "type": "TV"
+    },
+    {
+      "dataId": "19913",
+      "id": "/pass-the-monster-meat-milady-19913",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/6db8bf0e0f56f1daf8dd5f6543100319.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "9"
+      },
+      "title": "Pass the Monster Meat, Milady!",
+      "type": "TV"
+    },
+    {
+      "dataId": "19912",
+      "id": "/hero-without-a-class-who-even-needs-skills-19912",
+      "image": "https://cdn.myanimelist.net/images/anime/1721/151097l.jpg",
+      "language": {
+        "dub": "4",
+        "sub": "10"
+      },
+      "title": "Hero Without a Class: Who Even Needs Skills?!",
+      "type": "TV"
+    },
+    {
+      "dataId": "19911",
+      "id": "/dad-is-a-hero-mom-is-a-spirit-im-a-reincarnator-19911",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/769091e549c5d0db95b91dddd2ac9646.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Dad is a Hero, Mom is a Spirit, I'm a Reincarnator",
+      "type": "TV"
+    },
+    {
+      "dataId": "19909",
+      "id": "/a-wild-last-boss-appeared-19909",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/6bbde70a6ecf5cfce152f122da1d9cb0.jpg",
+      "language": {
+        "dub": null,
+        "sub": "9"
+      },
+      "title": "A Wild Last Boss Appeared!",
+      "type": "TV"
+    },
+    {
+      "dataId": "19908",
+      "id": "/my-gift-lvl-9999-unlimited-gacha-backstabbed-in-a-backwater-dungeon-im-out-for-revenge-19908",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/d771473a4b74662f3a969a33d0e7951e.jpg",
+      "language": {
+        "dub": "2",
+        "sub": "8"
+      },
+      "title": "My Gift Lvl 9999 Unlimited Gacha: Backstabbed in a Backwater Dungeon, I'm Out for Revenge!",
+      "type": "TV"
+    },
+    {
+      "dataId": "19907",
+      "id": "/inexpressive-kashiwada-and-expressive-oota-19907",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/defcbdf882b0a217002e1e4c2eae6be6.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Inexpressive Kashiwada and Expressive Oota",
+      "type": "TV"
+    },
+    {
+      "dataId": "19906",
+      "id": "/yano-kuns-ordinary-days-19906",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/91f39fe0301bd4916b354604a7625fd2.jpg",
+      "language": {
+        "dub": null,
+        "sub": "9"
+      },
+      "title": "Yano-kun's Ordinary Days",
+      "type": "TV"
+    },
+    {
+      "dataId": "19905",
+      "id": "/dusk-beyond-the-end-of-the-world-19905",
+      "image": "https://cdn.myanimelist.net/images/anime/1294/151734l.jpg",
+      "language": {
+        "dub": null,
+        "sub": "9"
+      },
+      "title": "Dusk Beyond the End of the World",
+      "type": "TV"
+    },
+    {
+      "dataId": "19904",
+      "id": "/the-blue-orchestra-season-2-19904",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/818b8d0df6e81a1b7d8dc9abd2127608.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "The Blue Orchestra Season 2",
+      "type": "TV"
+    }
+  ],
+  "totalPage": 124
+}
 
+## 5. Search
+**Endpoint:** hianime.search
+**Action:** api.hianime.search({ query: "naruto", page: 1 })
+**Command:** npx convex run hianime:search '{"query": "naruto", "page": 1}'
 
-=== SEARCH ===
 {
   "hasNextPage": false,
   "page": 1,
@@ -510,17 +1785,770 @@
         "dub": "1",
         "sub": "1"
       },
-✖ Failed to run function "hianime:episodes":
-Error: [Request ID: 20455de9d6b244a0] Server Error
-Uncaught Error: Unable to load episodes: Request failed with status code 404
-    at handler (../src/convex/hianime.ts:126:4)
+      "title": "Naruto: Shippuuden Movie 5 - Blood Prison",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "4005",
+      "id": "/watch/naruto-the-movie-3-guardians-of-the-crescent-moon-kingdom-4005",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/73d003618cd260df44e93a5baf9acb56.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto the Movie 3: Guardians of the Crescent Moon Kingdom",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "4004",
+      "id": "/watch/naruto-the-movie-2-legend-of-the-stone-of-gelel-4004",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/111f06edfffba5f46f5cac05db2a6bce.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto the Movie 2: Legend of the Stone of Gelel",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "3657",
+      "id": "/watch/naruto-ova5-naruto-the-genie-and-the-three-wishes-3657",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/57935a347fb4328e0132c76afdd85822.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Naruto OVA5: Naruto, The Genie, and The Three Wishes!!",
+      "type": "OVA"
+    },
+    {
+      "dataId": "4291",
+      "id": "/watch/naruto-the-cross-roads-4291",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/99d7c753d9535c0d91858e4dd2a8d939.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Naruto: The Cross Roads",
+      "type": "SPECIAL"
+    },
+    {
+      "dataId": "4485",
+      "id": "/watch/naruto-narutimate-hero-3-tsuini-gekitotsu-jounin-vs-genin-musabetsu-dairansen-taikai-kaisai-4485",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/939f107dc40ca24056b90c0b215bd475.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Naruto Narutimate Hero 3: Tsuini Gekitotsu! Jounin vs. Genin!! Musabetsu Dairansen Taikai Kaisai!!",
+      "type": "OVA"
+    },
+    {
+      "dataId": "4538",
+      "id": "/watch/naruto-ova2-the-lost-story-mission-protect-the-waterfall-village-4538",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/ed2ca489d8c438c880056ea507efc93c.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto OVA2: The Lost Story - Mission: Protect the Waterfall Village",
+      "type": "SPECIAL"
+    },
+    {
+      "dataId": "4136",
+      "id": "/watch/naruto-ova3-hidden-leaf-village-grand-sports-festival-4136",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/b4bb0d2caaa9591fdb3c442738d7f87a.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto OVA3: Hidden Leaf Village Grand Sports Festival",
+      "type": "SPECIAL"
+    },
+    {
+      "dataId": "2346",
+      "id": "/watch/naruto-shippuden-the-movie-2-bonds-2346",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/74a112674ab92212933e41cb532689a5.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto: Shippuden the Movie 2 -Bonds-",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "2306",
+      "id": "/watch/naruto-shippuden-the-movie-2306",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/071ca93201eccc34a9e088013bc27807.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto: Shippuden the Movie",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "2044",
+      "id": "/watch/naruto-shippuuden-movie-3-inheritors-of-will-of-fire-2044",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/1b9aad793b15265876f479c53ca7bfe1.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto Shippuuden Movie 3: Inheritors of Will of Fire",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "1840",
+      "id": "/watch/naruto-x-ut-1840",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/be66602efedb73c4688e302303b0a422.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Naruto x UT",
+      "type": "OVA"
+    },
+    {
+      "dataId": "1821",
+      "id": "/watch/naruto-shippuuden-movie-4-the-lost-tower-1821",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/68c5ae4e5b496eb0474920659a9a85e2.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto: Shippuuden Movie 4 - The Lost Tower",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "1805",
+      "id": "/watch/boruto-naruto-the-movie-the-day-naruto-became-the-hokage-1805",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/b19c06fae70eab67b1f390ed3cd905d8.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Boruto: Naruto the Movie - The Day Naruto Became the Hokage",
+      "type": "SPECIAL"
+    },
+    {
+      "dataId": "1916",
+      "id": "/watch/naruto-ova9-sunny-side-battle-1916",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/94c836b7aff106f515b53f8eb440ccdf.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Naruto OVA9: Sunny Side Battle",
+      "type": "SPECIAL"
+    },
+    {
+      "dataId": "355",
+      "id": "/watch/naruto-shippuden-355",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/9cbcf87f54194742e7686119089478f8.jpg",
+      "language": {
+        "dub": "500",
+        "sub": "500"
+      },
+      "title": "Naruto: Shippuden",
+      "type": "TV"
+    },
+    {
+      "dataId": "677",
+      "id": "/watch/naruto-677",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/5db400c33f7494bc8ae96f9e634958d0.jpg",
+      "language": {
+        "dub": "220",
+        "sub": "220"
+      },
+      "title": "Naruto",
+      "type": "TV"
+    },
+    {
+      "dataId": "882",
+      "id": "/watch/the-last-naruto-the-movie-882",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/8d42031c8f566e744d84de02d42466bc.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "The Last: Naruto the Movie",
+      "type": "MOVIE"
+    }
+  ],
+  "totalPage": 1
+}
 
+## 6. Recent Episodes (Yuma API)
+**Endpoint:** yumaApi.recentEpisodes
+**Action:** api.yumaApi.recentEpisodes({ page: 1 })
+**URL:** https://yumaapi.vercel.app/recent-episodes?page=1
+**Command:** npx convex run yumaApi:recentEpisodes '{"page": 1}'
 
-=== EPISODES ADDED ===
-✖ Failed to run function "hianime:episodeServers":
-Error: [Request ID: 3926d170c6680537] Server Error
-Uncaught Error: Unable to load streaming servers: cheerio.load() expects a string
-    at handler (../src/convex/hianime.ts:141:4)
-
-
-=== EPISODE SERVERS ADDED ===
+{
+  "current_page": 1,
+  "has_next_page": true,
+  "results": [
+    {
+      "dub": 0,
+      "duration": "24m",
+      "episodes": 9,
+      "id": "potion-wagami-wo-tasukeru-19886",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/042bdac9a03e8c072106eaf40b768ae5.jpg",
+      "japanese_title": "Potion, Wagami wo Tasukeru",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "Potion, Wagami wo Tasukeru",
+      "type": "TV",
+      "url": "https://hianime.to/potion-wagami-wo-tasukeru-19886"
+    },
+    {
+      "dub": 6,
+      "duration": "24m",
+      "episodes": 9,
+      "id": "pass-the-monster-meat-milady-19913",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/6db8bf0e0f56f1daf8dd5f6543100319.jpg",
+      "japanese_title": "Akujiki Reijou to Kyouketsu Koushaku",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "Pass the Monster Meat, Milady!",
+      "type": "TV",
+      "url": "https://hianime.to/pass-the-monster-meat-milady-19913"
+    },
+    {
+      "dub": 0,
+      "duration": "24m",
+      "episodes": 21,
+      "id": "solo-camping-for-two-19752",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/352ec6644247a3fb28cd1f9199f991f4.jpg",
+      "japanese_title": "Futari Solo Camp",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 21,
+      "title": "Solo Camping for Two",
+      "type": "TV",
+      "url": "https://hianime.to/solo-camping-for-two-19752"
+    },
+    {
+      "dub": 8,
+      "duration": "24m",
+      "episodes": 9,
+      "id": "a-star-brighter-than-the-sun-19898",
+      "image": "https://cdn.myanimelist.net/images/anime/1971/149410l.jpg",
+      "japanese_title": "Taiyou yori mo Mabushii Hoshi",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "A Star Brighter Than the Sun",
+      "type": "TV",
+      "url": "https://hianime.to/a-star-brighter-than-the-sun-19898"
+    },
+    {
+      "dub": 0,
+      "duration": "24m",
+      "episodes": 12,
+      "id": "dusk-beyond-the-end-of-the-world-19905",
+      "image": "https://cdn.myanimelist.net/images/anime/1294/151734l.jpg",
+      "japanese_title": "Towa no Yuugure",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "Dusk Beyond the End of the World",
+      "type": "TV",
+      "url": "https://hianime.to/dusk-beyond-the-end-of-the-world-19905"
+    },
+    {
+      "dub": 0,
+      "duration": "24m",
+      "episodes": 13,
+      "id": "this-monster-wants-to-eat-me-19923",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/cd6d01f1b67067e85271fdf78b690c2f.jpg",
+      "japanese_title": "Watashi wo Tabetai, Hitodenashi",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "This Monster Wants to Eat Me",
+      "type": "TV",
+      "url": "https://hianime.to/this-monster-wants-to-eat-me-19923"
+    },
+    {
+      "dub": 0,
+      "duration": "24m",
+      "episodes": 12,
+      "id": "awkward-senpai-19918",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/7875b4e4be9b36a0b02342b24b72da53.jpg",
+      "japanese_title": "Bukiyou na Senpai.",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "Awkward Senpai",
+      "type": "TV",
+      "url": "https://hianime.to/awkward-senpai-19918"
+    },
+    {
+      "dub": 0,
+      "duration": "2m",
+      "episodes": 52,
+      "id": "bang-dream-chan-19874",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/2f4dbd949a934a04ba51cd091edd0818.jpg",
+      "japanese_title": "Ganzo! Bandori-chan",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "BanG Dream-chan",
+      "type": "ONA",
+      "url": "https://hianime.to/bang-dream-chan-19874"
+    },
+    {
+      "dub": 0,
+      "duration": "1m",
+      "episodes": 9,
+      "id": "koalas-diary-19871",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/9c7da888c9af90d9b67ad7ff5d736900.jpg",
+      "japanese_title": "Koala Enikki",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "Koala's Diary",
+      "type": "ONA",
+      "url": "https://hianime.to/koalas-diary-19871"
+    },
+    {
+      "dub": 0,
+      "duration": "10m",
+      "episodes": 36,
+      "id": "reborn-as-a-cat-20013",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/668c46b074ae236ad5893e1c125fb50d.jpg",
+      "japanese_title": "Wei Miao Rensheng",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 5,
+      "title": "Reborn as a Cat",
+      "type": "ONA",
+      "url": "https://hianime.to/reborn-as-a-cat-20013"
+    },
+    {
+      "dub": 0,
+      "duration": "10m",
+      "episodes": 151,
+      "id": "peerless-battle-spirit-19209",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c6666eaccda15aeebd73e90a95a0df2f.jpg",
+      "japanese_title": "Jueshi Zhan Hun",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 151,
+      "title": "Peerless Battle Spirit",
+      "type": "ONA",
+      "url": "https://hianime.to/peerless-battle-spirit-19209"
+    },
+    {
+      "dub": 0,
+      "duration": "10m",
+      "episodes": 129,
+      "id": "lingwu-continent-19295",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/d2bcdd3a87a9d9b38cf28f165e4479a7.jpg",
+      "japanese_title": "Ling Wu Dalu",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 129,
+      "title": "Lingwu Continent",
+      "type": "ONA",
+      "url": "https://hianime.to/lingwu-continent-19295"
+    },
+    {
+      "dub": 0,
+      "duration": "10m",
+      "episodes": 46,
+      "id": "celestial-above-all-19825",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0d9f0ae9f25f1229dd87d3a2f418e339.jpg",
+      "japanese_title": "Ling Tian Du Zun",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 46,
+      "title": "Celestial Above All",
+      "type": "ONA",
+      "url": "https://hianime.to/celestial-above-all-19825"
+    },
+    {
+      "dub": 0,
+      "duration": "10m",
+      "episodes": 32,
+      "id": "martial-shattered-galaxy-19844",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/d21e9cf902763ae6cbb6c3d4a491f4e7.jpg",
+      "japanese_title": "Wu Sui Xinghe",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 32,
+      "title": "Martial Shattered Galaxy",
+      "type": "ONA",
+      "url": "https://hianime.to/martial-shattered-galaxy-19844"
+    },
+    {
+      "dub": 0,
+      "duration": "22m",
+      "episodes": 26,
+      "id": "love-between-fairy-and-devil-2nd-season-19818",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/8ac67f7a6216609585a552172bb18d11.jpg",
+      "japanese_title": "Cang Lan Jue 2",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 21,
+      "title": "Love Between Fairy and Devil 2nd Season",
+      "type": "ONA",
+      "url": "https://hianime.to/love-between-fairy-and-devil-2nd-season-19818"
+    },
+    {
+      "dub": 0,
+      "duration": "20m",
+      "episodes": 20,
+      "id": "ascendants-of-the-nine-suns-20021",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/6a383354f8ef4ab0bb5ffcd37868daea.jpg",
+      "japanese_title": "Jiu Yang Wushen",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 3,
+      "title": "Ascendants of the Nine Suns",
+      "type": "ONA",
+      "url": "https://hianime.to/ascendants-of-the-nine-suns-20021"
+    },
+    {
+      "dub": 0,
+      "duration": "22m",
+      "episodes": 26,
+      "id": "wind-driver-in-tang-dynasty-19936",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/7f792e433225ac600c4e3d806bdc9f25.jpg",
+      "japanese_title": "Da Tang Chengfeng Lu",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 11,
+      "title": "Wind Driver In Tang Dynasty",
+      "type": "ONA",
+      "url": "https://hianime.to/wind-driver-in-tang-dynasty-19936"
+    },
+    {
+      "dub": 7,
+      "duration": "24m",
+      "episodes": 12,
+      "id": "lets-play-19891",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/bf6b65b575c0d90c2709087d9af45d83.jpg",
+      "japanese_title": "Let's Play: Quest-darake no My Life",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "Let's Play",
+      "type": "TV",
+      "url": "https://hianime.to/lets-play-19891"
+    },
+    {
+      "dub": 5,
+      "duration": "25m",
+      "episodes": 8,
+      "id": "disney-twisted-wonderland-the-animation-episode-of-heartslabyul-19878",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/dc23b09242e1346f5e41c3cc7a03afad.jpg",
+      "japanese_title": "Disney Twisted-Wonderland The Animation: Episode of Heartslabyul",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 5,
+      "title": "Disney Twisted-Wonderland The Animation: Episode of Heartslabyul",
+      "type": "ONA",
+      "url": "https://hianime.to/disney-twisted-wonderland-the-animation-episode-of-heartslabyul-19878"
+    },
+    {
+      "dub": 6,
+      "duration": "24m",
+      "episodes": 8,
+      "id": "the-dark-history-of-the-reincarnated-villainess-19903",
+      "image": "https://cdn.myanimelist.net/images/anime/1347/150603l.jpg",
+      "japanese_title": "Tensei Akujo no Kuro Rekishi",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "The Dark History of the Reincarnated Villainess",
+      "type": "TV",
+      "url": "https://hianime.to/the-dark-history-of-the-reincarnated-villainess-19903"
+    },
+    {
+      "dub": 6,
+      "duration": "24m",
+      "episodes": 8,
+      "id": "wandance-19915",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0e540925c474669bf2176db7124fa205.jpg",
+      "japanese_title": "Wandance",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "Wandance",
+      "type": "TV",
+      "url": "https://hianime.to/wandance-19915"
+    },
+    {
+      "dub": 7,
+      "duration": "24m",
+      "episodes": 9,
+      "id": "kakuriyo-bed-and-breakfast-for-spirits-2-19919",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/502c056094ff25ca5fe7cbd1ff6bb38e.jpg",
+      "japanese_title": "Kakuriyo no Yadomeshi Ni",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "Kakuriyo: Bed and Breakfast for Spirits 2",
+      "type": "TV",
+      "url": "https://hianime.to/kakuriyo-bed-and-breakfast-for-spirits-2-19919"
+    },
+    {
+      "dub": 0,
+      "duration": "24m",
+      "episodes": 21,
+      "id": "the-blue-orchestra-season-2-19904",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/818b8d0df6e81a1b7d8dc9abd2127608.jpg",
+      "japanese_title": "Ao no Orchestra Season 2",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "The Blue Orchestra Season 2",
+      "type": "TV",
+      "url": "https://hianime.to/the-blue-orchestra-season-2-19904"
+    },
+    {
+      "dub": 0,
+      "duration": "3m",
+      "episodes": 7,
+      "id": "ugoku-neko-mukashibanashi-19872",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/93175218ad139d910053473b4f3036db.jpg",
+      "japanese_title": "Ugoku! Neko Mukashibanashi",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 7,
+      "title": "Ugoku! Neko Mukashibanashi",
+      "type": "ONA",
+      "url": "https://hianime.to/ugoku-neko-mukashibanashi-19872"
+    },
+    {
+      "dub": 4,
+      "duration": "24m",
+      "episodes": 10,
+      "id": "hero-without-a-class-who-even-needs-skills-19912",
+      "image": "https://cdn.myanimelist.net/images/anime/1721/151097l.jpg",
+      "japanese_title": "Mushoku no Eiyuu: Betsu ni Skill Nanka Iranakatta n da ga",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 10,
+      "title": "Hero Without a Class: Who Even Needs Skills?!",
+      "type": "TV",
+      "url": "https://hianime.to/hero-without-a-class-who-even-needs-skills-19912"
+    },
+    {
+      "dub": 0,
+      "duration": "24m",
+      "episodes": 9,
+      "id": "yano-kuns-ordinary-days-19906",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/91f39fe0301bd4916b354604a7625fd2.jpg",
+      "japanese_title": "Yano-kun no Futsuu no Hibi",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "Yano-kun's Ordinary Days",
+      "type": "TV",
+      "url": "https://hianime.to/yano-kuns-ordinary-days-19906"
+    },
+    {
+      "dub": 0,
+      "duration": "5m",
+      "episodes": 13,
+      "id": "forget-that-night-your-majesty-19881",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/7345272ef9f0c66bd005f2087117fa48.jpg",
+      "japanese_title": "Heika Watashi wo Wasurete Kudasai",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "Forget That Night, Your Majesty",
+      "type": "TV",
+      "url": "https://hianime.to/forget-that-night-your-majesty-19881"
+    },
+    {
+      "dub": 8,
+      "duration": "23m",
+      "episodes": 8,
+      "id": "ninja-vs-gokudo-19887",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/81c6934a8a2a942025682d55bac93f29.jpg",
+      "japanese_title": "Ninja to Gokudou",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "Ninja vs. Gokudo",
+      "type": "TV",
+      "url": "https://hianime.to/ninja-vs-gokudo-19887"
+    },
+    {
+      "dub": 8,
+      "duration": "24m",
+      "episodes": 8,
+      "id": "campfire-cooking-in-another-world-with-my-absurd-skill-season-2-19928",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0e05c4d1a105058516d1f96bc78a33d5.jpg",
+      "japanese_title": "Tondemo Skill de Isekai Hourou Meshi 2",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "Campfire Cooking in Another World with My Absurd Skill Season 2",
+      "type": "TV",
+      "url": "https://hianime.to/campfire-cooking-in-another-world-with-my-absurd-skill-season-2-19928"
+    },
+    {
+      "dub": 5,
+      "duration": "24m",
+      "episodes": 7,
+      "id": "with-you-our-love-will-make-it-through-19899",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/41a6a9c03c0272dda7d1a4b74cc8e081.jpg",
+      "japanese_title": "Kimi to Koete Koi ni Naru",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 7,
+      "title": "With You, Our Love Will Make It Through",
+      "type": "TV",
+      "url": "https://hianime.to/with-you-our-love-will-make-it-through-19899"
+    },
+    {
+      "dub": 0,
+      "duration": "12m",
+      "episodes": 290,
+      "id": "one-hundred-thousand-years-of-qi-refining-19182",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/6aa3770a48ac6a8500d378819d0de918.jpg",
+      "japanese_title": "Lian Qi Shi Wan Nian",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 290,
+      "title": "One Hundred Thousand Years of Qi Refining",
+      "type": "ONA",
+      "url": "https://hianime.to/one-hundred-thousand-years-of-qi-refining-19182"
+    },
+    {
+      "dub": 0,
+      "duration": "7m",
+      "episodes": 538,
+      "id": "supreme-god-emperor-season-2-18402",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/a1abaa7f5d440c98591010827e2fe60b.jpg",
+      "japanese_title": "Wu Shang Shen Di 2nd Season",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 538,
+      "title": "Supreme God Emperor Season 2",
+      "type": "ONA",
+      "url": "https://hianime.to/supreme-god-emperor-season-2-18402"
+    },
+    {
+      "dub": 0,
+      "duration": "8m",
+      "episodes": 596,
+      "id": "the-god-of-war-dominates-4037",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/fd7927e81e521af7fb95ed010d6f3fcf.jpg",
+      "japanese_title": "Wushen Zhuzai",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 596,
+      "title": "The God of War Dominates",
+      "type": "ONA",
+      "url": "https://hianime.to/the-god-of-war-dominates-4037"
+    },
+    {
+      "dub": 0,
+      "duration": "17m",
+      "episodes": 286,
+      "id": "perfect-world-17492",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/76a4c54d2b7d76cc4aecd8151b977e25.jpg",
+      "japanese_title": "Wanmei Shijie",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 242,
+      "title": "Perfect World",
+      "type": "ONA",
+      "url": "https://hianime.to/perfect-world-17492"
+    },
+    {
+      "dub": 0,
+      "duration": "21m",
+      "episodes": 160,
+      "id": "throne-of-seal-2nd-season-18643",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/e7eae90b00f92055c4cb250605b10879.jpg",
+      "japanese_title": "Shen Yin Wangzuo 2nd Season",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 160,
+      "title": "Throne of Seal 2nd Season",
+      "type": "ONA",
+      "url": "https://hianime.to/throne-of-seal-2nd-season-18643"
+    },
+    {
+      "dub": 0,
+      "duration": "22m",
+      "episodes": 14,
+      "id": "on-the-edge-season-3-19961",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c22a1b15e25023916d25b373cb3f648f.jpg",
+      "japanese_title": "Zhen Dao Ge 3rd Season",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "On The Edge Season 3",
+      "type": "ONA",
+      "url": "https://hianime.to/on-the-edge-season-3-19961"
+    },
+    {
+      "dub": 8,
+      "duration": "24m",
+      "episodes": 8,
+      "id": "my-status-as-an-assassin-obviously-exceeds-the-heros-19922",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/01673a7d3c4080cb4773e105a1aaa215.jpg",
+      "japanese_title": "Ansatsusha de Aru Ore no Status ga Yuusha yori mo Akiraka ni Tsuyoi no da ga",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "My Status as an Assassin Obviously Exceeds the Hero's",
+      "type": "TV",
+      "url": "https://hianime.to/my-status-as-an-assassin-obviously-exceeds-the-heros-19922"
+    },
+    {
+      "dub": 8,
+      "duration": "24m",
+      "episodes": 8,
+      "id": "gintama-3-z-ginpachi-sensei-19924",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/d2c591f2a9ca18b8738615bec4a0f879.jpg",
+      "japanese_title": "3-nen Z-gumi Ginpachi-sensei",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "Gintama: 3-Z Ginpachi Sensei",
+      "type": "TV",
+      "url": "https://hianime.to/gintama-3-z-ginpachi-sensei-19924"
+    },
+    {
+      "dub": 7,
+      "duration": "23m",
+      "episodes": 12,
+      "id": "a-gatherers-adventure-in-isekai-19901",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c514b6042ba1d9092b292ea84be8ae23.jpg",
+      "japanese_title": "Sozai Saishuka no Isekai Ryokouki",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 9,
+      "title": "A Gatherer's Adventure in Isekai",
+      "type": "TV",
+      "url": "https://hianime.to/a-gatherers-adventure-in-isekai-19901"
+    },
+    {
+      "dub": 0,
+      "duration": "24m",
+      "episodes": 8,
+      "id": "plus-sized-misadventures-in-love-19890",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/86c3c1ffbc4da69ad24a1e3e5561197a.jpg",
+      "japanese_title": "Debu to Love to Ayamachi to!",
+      "nsfw": false,
+      "other_data": {},
+      "sub": 8,
+      "title": "Plus-sized Misadventures in Love!",
+      "type": "TV",
+      "url": "https://hianime.to/plus-sized-misadventures-in-love-19890"
+    }
+  ],
+  "total_pages": 212
+}
