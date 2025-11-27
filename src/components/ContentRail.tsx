@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimeCard } from "./AnimeCard";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type AnimeItem = {
@@ -39,11 +39,46 @@ export function ContentRail({
   isLoadingMore = false
 }: ContentRailProps) {
   const [displayCount, setDisplayCount] = useState(12);
-
-  if (!items || items.length === 0) return null;
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const displayedItems = enableInfiniteScroll ? items : items.slice(0, displayCount);
   const canShowMore = !enableInfiniteScroll && items.length > displayCount;
+
+  const updateScrollState = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 16);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 16);
+  };
+
+  useEffect(() => {
+    updateScrollState();
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const handleScroll = () => updateScrollState();
+    el.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [items.length, displayedItems.length]);
+
+  if (!items || items.length === 0) return null;
+
+  const scrollRail = (direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const scrollAmount = el.clientWidth * 0.85;
+    el.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
 
   const handleShowMore = () => {
     if (enableInfiniteScroll && onLoadMore && hasMore) {
@@ -79,7 +114,29 @@ export function ContentRail({
         {/* Right Fade */}
         <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#050814] to-transparent z-10 pointer-events-none md:hidden" />
 
-        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-4 md:px-0">
+        {canScrollLeft && (
+          <button
+            aria-label="Scroll left"
+            onClick={() => scrollRail("left")}
+            className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition"
+          >
+            <ChevronLeft className="h-5 w-5 mx-auto" />
+          </button>
+        )}
+        {canScrollRight && (
+          <button
+            aria-label="Scroll right"
+            onClick={() => scrollRail("right")}
+            className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition"
+          >
+            <ChevronRight className="h-5 w-5 mx-auto" />
+          </button>
+        )}
+
+        <div
+          ref={scrollRef}
+          className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-4 md:px-0"
+        >
           {displayedItems.map((item, idx) => (
             <div
               key={item.id ?? item.dataId ?? idx}
