@@ -105,6 +105,10 @@ export function InfoModal({
     };
   }, [broadcastInfo]);
 
+  const isBroadcastActive =
+    broadcastInfo?.status === "airing" || broadcastInfo?.status === "upcoming";
+  const shouldShowBroadcast = broadcastLoading || isBroadcastActive;
+
   // Reset episode range when anime changes
   useEffect(() => {
     setEpisodeRange(0);
@@ -194,7 +198,7 @@ export function InfoModal({
                 )}
               </div>
             </div>
-            {(broadcastLoading || broadcastInfo) && (
+            {shouldShowBroadcast && (
               <div className="mt-2 flex items-start gap-2 text-sm text-blue-300">
                 <Clock3 className="h-4 w-4 mt-0.5" />
                 {broadcastLoading ? (

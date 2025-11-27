@@ -21,10 +21,23 @@ export const searchBroadcast = action({
       const anime = payload?.data?.[0];
       if (!anime || !anime.broadcast) return null;
 
+      const rawStatus = typeof anime.status === "string" ? anime.status.toLowerCase() : null;
+      let normalizedStatus: "airing" | "complete" | "upcoming" | null = null;
+      if (rawStatus) {
+        if (rawStatus.includes("current") || rawStatus === "airing") {
+          normalizedStatus = "airing";
+        } else if (rawStatus.includes("not yet") || rawStatus.includes("upcoming")) {
+          normalizedStatus = "upcoming";
+        } else if (rawStatus.includes("finish") || rawStatus.includes("complete")) {
+          normalizedStatus = "complete";
+        }
+      }
+
       return {
         malId: anime.mal_id ?? null,
         title: anime.title ?? args.title,
         airing: anime.airing ?? null,
+        status: normalizedStatus,
         broadcast: {
           day: anime.broadcast.day ?? null,
           time: anime.broadcast.time ?? null,

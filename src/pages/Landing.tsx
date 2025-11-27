@@ -356,8 +356,15 @@ export default function Landing() {
       setIsBroadcastLoading(true);
       fetchBroadcastInfo({ title: anime.title })
         .then((result) => {
+          const status = result?.status ?? null;
+          if (status !== "airing" && status !== "upcoming") {
+            setBroadcastInfo(null);
+            return;
+          }
+
           const broadcast = result?.broadcast;
           if (!broadcast) return;
+
           const summaryParts: string[] = [];
           if (broadcast.string) {
             summaryParts.push(broadcast.string);
@@ -365,16 +372,20 @@ export default function Landing() {
             if (broadcast.day) summaryParts.push(broadcast.day);
             if (broadcast.time) summaryParts.push(broadcast.time);
           }
+
           let summary = summaryParts.join(" • ");
           if (broadcast.timezone) {
             summary = summary ? `${summary} (${broadcast.timezone})` : broadcast.timezone;
           }
+
           const info: BroadcastInfo = {
             summary: summary || null,
             day: broadcast.day ?? null,
             time: broadcast.time ?? null,
             timezone: broadcast.timezone ?? null,
+            status,
           };
+
           if (info.summary || info.day || info.time || info.timezone) {
             setBroadcastInfo(info);
           }

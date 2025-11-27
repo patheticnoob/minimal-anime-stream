@@ -3,4 +3,5 @@ export type BroadcastInfo = {
   day?: string | null;
   time?: string | null;
   timezone?: string | null;
+  status?: "airing" | "complete" | "upcoming" | null;
 };
