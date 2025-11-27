@@ -1,0 +1,106 @@
+/* Hotstar-inspired Dark Theme */
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.08 0.03 260);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.12 0.04 260);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.10 0.04 260);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.55 0.25 260);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.20 0.04 260);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.18 0.04 260);
+  --muted-foreground: oklch(0.70 0.02 260);
+  --accent: oklch(0.22 0.04 260);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.20 0.04 260);
+  --input: oklch(0.20 0.04 260);
+  --ring: oklch(0.55 0.25 260);
+  --chart-1: oklch(0.60 0.20 250);
+  --chart-2: oklch(0.55 0.18 200);
+  --chart-3: oklch(0.50 0.15 280);
+  --chart-4: oklch(0.65 0.18 180);
+  --chart-5: oklch(0.58 0.16 220);
+  --sidebar: oklch(0.08 0.03 260);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.55 0.25 260);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.18 0.04 260);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.20 0.04 260);
+  --sidebar-ring: oklch(0.55 0.25 260);
+}
+
+.dark {
+  --background: oklch(0.08 0.03 260);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.12 0.04 260);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.10 0.04 260);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.55 0.25 260);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.20 0.04 260);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.18 0.04 260);
+  --muted-foreground: oklch(0.70 0.02 260);
+  --accent: oklch(0.22 0.04 260);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.20 0.04 260);
+  --input: oklch(0.20 0.04 260);
+  --ring: oklch(0.55 0.25 260);
+  --chart-1: oklch(0.60 0.20 250);
+  --chart-2: oklch(0.55 0.18 200);
+  --chart-3: oklch(0.50 0.15 280);
+  --chart-4: oklch(0.65 0.18 180);
+  --chart-5: oklch(0.58 0.16 220);
+  --sidebar: oklch(0.08 0.03 260);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.55 0.25 260);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.18 0.04 260);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.20 0.04 260);
+  --sidebar-ring: oklch(0.55 0.25 260);
+}
+
+/* ───────── Button Styles ───────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #673AB7 0%, #512DA8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(103, 58, 183, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(103, 58, 183, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
