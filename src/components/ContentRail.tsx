@@ -118,18 +118,18 @@ export function ContentRail({
           <button
             aria-label="Scroll left"
             onClick={() => scrollRail("left")}
-            className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition"
+            className="hidden md:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition"
           >
-            <ChevronLeft className="h-5 w-5 mx-auto" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
         )}
         {canScrollRight && (
           <button
             aria-label="Scroll right"
             onClick={() => scrollRail("right")}
-            className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition"
+            className="hidden md:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition"
           >
-            <ChevronRight className="h-5 w-5 mx-auto" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         )}
 
