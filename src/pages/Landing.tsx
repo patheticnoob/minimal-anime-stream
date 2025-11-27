@@ -15,6 +15,7 @@ import { InfoModal } from "@/components/InfoModal";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
+import { SearchSection } from "@/components/SearchSection";
 
 type AnimeItem = {
   title?: string;
@@ -115,6 +116,19 @@ export default function Landing() {
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
 
+  // Add pagination state for each section
+  const [popularPage, setPopularPage] = useState(1);
+  const [airingPage, setAiringPage] = useState(1);
+  const [moviePage, setMoviePage] = useState(1);
+  const [tvShowPage, setTVShowPage] = useState(1);
+  
+  const [popularHasMore, setPopularHasMore] = useState(false);
+  const [airingHasMore, setAiringHasMore] = useState(false);
+  const [movieHasMore, setMovieHasMore] = useState(false);
+  const [tvShowHasMore, setTVShowHasMore] = useState(false);
+  
+  const [loadingMore, setLoadingMore] = useState<string | null>(null);
+
   // Load all content on mount
   useEffect(() => {
     let mounted = true;
@@ -129,15 +143,20 @@ export default function Landing() {
       .then(([popular, airing, movies, tvShows]) => {
         if (!mounted) return;
         
-        const popularData = popular as { results: AnimeItem[] };
-        const airingData = airing as { results: AnimeItem[] };
-        const moviesData = movies as { results: AnimeItem[] };
-        const tvShowsData = tvShows as { results: AnimeItem[] };
+        const popularData = popular as { results: AnimeItem[]; hasNextPage: boolean };
+        const airingData = airing as { results: AnimeItem[]; hasNextPage: boolean };
+        const moviesData = movies as { results: AnimeItem[]; hasNextPage: boolean };
+        const tvShowsData = tvShows as { results: AnimeItem[]; hasNextPage: boolean };
 
         setPopularItems(popularData.results || []);
         setAiringItems(airingData.results || []);
         setMovieItems(moviesData.results || []);
         setTVShowItems(tvShowsData.results || []);
+        
+        setPopularHasMore(popularData.hasNextPage || false);
+        setAiringHasMore(airingData.hasNextPage || false);
+        setMovieHasMore(moviesData.hasNextPage || false);
+        setTVShowHasMore(tvShowsData.hasNextPage || false);
 
         // Combine popular and airing for hero rotation
         const heroPool = [
@@ -145,7 +164,6 @@ export default function Landing() {
           ...(airingData.results || []).slice(0, 5),
         ];
         
-        // Set random hero from pool
         if (heroPool.length > 0) {
           const randomIndex = Math.floor(Math.random() * heroPool.length);
           setHeroAnime(heroPool[randomIndex]);
@@ -210,6 +228,62 @@ export default function Landing() {
 
     return () => clearTimeout(timeoutId);
   }, [query, searchAnime]);
+
+  // Add function to load more items for a specific category
+  const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows') => {
+    setLoadingMore(category);
+    
+    try {
+      let nextPage = 1;
+      let fetchFunction;
+      let setItems;
+      let setPage;
+      let setHasMore;
+      
+      switch (category) {
+        case 'popular':
+          nextPage = popularPage + 1;
+          fetchFunction = fetchMostPopular;
+          setItems = setPopularItems;
+          setPage = setPopularPage;
+          setHasMore = setPopularHasMore;
+          break;
+        case 'airing':
+          nextPage = airingPage + 1;
+          fetchFunction = fetchTopAiring;
+          setItems = setAiringItems;
+          setPage = setAiringPage;
+          setHasMore = setAiringHasMore;
+          break;
+        case 'movies':
+          nextPage = moviePage + 1;
+          fetchFunction = fetchMovies;
+          setItems = setMovieItems;
+          setPage = setMoviePage;
+          setHasMore = setMovieHasMore;
+          break;
+        case 'tvShows':
+          nextPage = tvShowPage + 1;
+          fetchFunction = fetchTVShows;
+          setItems = setTVShowItems;
+          setPage = setTVShowPage;
+          setHasMore = setTVShowHasMore;
+          break;
+      }
+      
+      const result = await fetchFunction({ page: nextPage });
+      const data = result as { results: AnimeItem[]; hasNextPage: boolean };
+      
+      setItems((prev: AnimeItem[]) => [...prev, ...(data.results || [])]);
+      setPage(nextPage);
+      setHasMore(data.hasNextPage || false);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to load more items";
+      toast.error(msg);
+    } finally {
+      setLoadingMore(null);
+    }
+  };
 
   const openAnime = async (anime: AnimeItem) => {
     setSelected(anime);
@@ -461,7 +535,7 @@ export default function Landing() {
             return;
           }
           if (section === "search") {
-            setQuery(""); // Reset search when entering search section
+            setQuery("");
           }
           setActiveSection(section);
         }}
@@ -482,31 +556,7 @@ export default function Landing() {
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-6 py-4 text-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
                 />
               </div>
-              {isSearching ? (
-                <div className="flex items-center justify-center py-20">
-                  <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-                </div>
-              ) : searchResults.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                  {searchResults.map((item, idx) => (
-                    <AnimeCard 
-                      key={item.id ?? idx} 
-                      anime={item} 
-                      onClick={() => openAnime(item)} 
-                      index={idx}
-                    />
-                  ))}
-                </div>
-              ) : query ? (
-                <div className="text-center py-20">
-                  <p className="text-gray-400 text-lg">No results found for "{query}"</p>
-                  <p className="text-gray-500 mt-2">Try a different search term</p>
-                </div>
-              ) : (
-                <div className="text-center py-20">
-                  <p className="text-gray-400 text-lg">Start typing to search for anime</p>
-                </div>
-              )}
+              <SearchSection query={query} onItemClick={openAnime} />
             </div>
           ) : activeSection === "profile" ? (
             <ProfileDashboard
@@ -538,7 +588,6 @@ export default function Landing() {
 
               {/* Section-specific content */}
               {sectionContent ? (
-                /* Section-specific content */
                 <div className="mt-8">
                   <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
                     {activeSection === "tv" ? "TV Shows" : activeSection === "recent" ? "Recently Added" : activeSection}
@@ -582,21 +631,37 @@ export default function Landing() {
                     title="Trending Now"
                     items={popularItems}
                     onItemClick={openAnime}
+                    enableInfiniteScroll
+                    onLoadMore={() => loadMoreItems('popular')}
+                    hasMore={popularHasMore}
+                    isLoadingMore={loadingMore === 'popular'}
                   />
                   <ContentRail
                     title="Top Airing"
                     items={airingItems}
                     onItemClick={openAnime}
+                    enableInfiniteScroll
+                    onLoadMore={() => loadMoreItems('airing')}
+                    hasMore={airingHasMore}
+                    isLoadingMore={loadingMore === 'airing'}
                   />
                   <ContentRail
                     title="Popular Movies"
                     items={movieItems}
                     onItemClick={openAnime}
+                    enableInfiniteScroll
+                    onLoadMore={() => loadMoreItems('movies')}
+                    hasMore={movieHasMore}
+                    isLoadingMore={loadingMore === 'movies'}
                   />
                   <ContentRail
                     title="TV Series"
                     items={tvShowItems}
                     onItemClick={openAnime}
+                    enableInfiniteScroll
+                    onLoadMore={() => loadMoreItems('tvShows')}
+                    hasMore={tvShowHasMore}
+                    isLoadingMore={loadingMore === 'tvShows'}
                   />
                 </div>
               )}
