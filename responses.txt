@@ -1,0 +1,526 @@
+{
+  "hasNextPage": true,
+  "page": 1,
+  "results": [
+    {
+      "dataId": "100",
+      "id": "/one-piece-100",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/bcd84731a3eda4f4a306250769675065.jpg",
+      "language": {
+        "dub": "1143",
+        "sub": "1150"
+      },
+      "title": "One Piece",
+      "type": "TV"
+    },
+    {
+      "dataId": "355",
+      "id": "/naruto-shippuden-355",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/9cbcf87f54194742e7686119089478f8.jpg",
+      "language": {
+        "dub": "500",
+        "sub": "500"
+      },
+      "title": "Naruto: Shippuden",
+      "type": "TV"
+    },
+    {
+      "dataId": "806",
+      "id": "/bleach-806",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/bd5ae1d387a59c5abcf5e1a6a616728c.jpg",
+      "language": {
+        "dub": "366",
+        "sub": "366"
+      },
+      "title": "Bleach",
+      "type": "TV"
+    },
+    {
+      "dataId": "2404",
+      "id": "/black-clover-2404",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/f58b0204c20ae3310f65ae7b8cb9987e.jpg",
+      "language": {
+        "dub": "170",
+        "sub": "170"
+      },
+      "title": "Black Clover",
+      "type": "TV"
+    },
+    {
+      "dataId": "19413",
+      "id": "/solo-leveling-season-2-arise-from-the-shadow-19413",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/65f92e6e315a931ef872da4b312442b8.jpg",
+      "language": {
+        "dub": "13",
+        "sub": "13"
+      },
+      "title": "Solo Leveling Season 2: Arise from the Shadow",
+      "type": "TV"
+    },
+    {
+      "dataId": "18413",
+      "id": "/jujutsu-kaisen-2nd-season-18413",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/b51f863b05f30576cf9d85fa9b911bb5.png",
+      "language": {
+        "dub": "23",
+        "sub": "23"
+      },
+      "title": "Jujutsu Kaisen 2nd Season",
+      "type": "TV"
+    },
+    {
+      "dataId": "677",
+      "id": "/naruto-677",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/5db400c33f7494bc8ae96f9e634958d0.jpg",
+      "language": {
+        "dub": "220",
+        "sub": "220"
+      },
+      "title": "Naruto",
+      "type": "TV"
+    },
+    {
+      "dataId": "8143",
+      "id": "/boruto-naruto-next-generations-8143",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/32c83e2ad4a43229996356840db3982c.jpg",
+      "language": {
+        "dub": "293",
+        "sub": "293"
+      },
+      "title": "Boruto: Naruto Next Generations",
+      "type": "TV"
+    },
+    {
+      "dataId": "18056",
+      "id": "/demon-slayer-kimetsu-no-yaiba-swordsmith-village-arc-18056",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/db2f3ce7b9cab7fdc160b005bffb899a.png",
+      "language": {
+        "dub": "11",
+        "sub": "11"
+      },
+
+
+=== TOP AIRING ===
+{
+  "hasNextPage": true,
+  "page": 1,
+  "results": [
+    {
+      "dataId": "100",
+      "id": "/one-piece-100",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/bcd84731a3eda4f4a306250769675065.jpg",
+      "language": {
+        "dub": "1143",
+        "sub": "1150"
+      },
+      "title": "One Piece",
+      "type": "TV"
+    },
+    {
+      "dataId": "19785",
+      "id": "/gachiakuta-19785",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/acad8581f1a2eafa8c9d68b899bb1b21.jpg",
+      "language": {
+        "dub": "18",
+        "sub": "20"
+      },
+      "title": "Gachiakuta",
+      "type": "TV"
+    },
+    {
+      "dataId": "323",
+      "id": "/case-closed-323",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/3b185ed9d10aa300bb0cb7fc35b84999.jpg",
+      "language": {
+        "dub": "123",
+        "sub": "1182"
+      },
+      "title": "Case Closed",
+      "type": "TV"
+    },
+    {
+      "dataId": "19930",
+      "id": "/my-hero-academia-final-season-19930",
+      "image": "https://cdn.myanimelist.net/images/anime/1959/151055l.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "8"
+      },
+      "title": "My Hero Academia Final Season",
+      "type": "TV"
+    },
+    {
+      "dataId": "19922",
+      "id": "/my-status-as-an-assassin-obviously-exceeds-the-heros-19922",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/01673a7d3c4080cb4773e105a1aaa215.jpg",
+      "language": {
+        "dub": "8",
+        "sub": "8"
+      },
+      "title": "My Status as an Assassin Obviously Exceeds the Hero's",
+      "type": "TV"
+    },
+    {
+      "dataId": "19932",
+      "id": "/one-punch-man-season-3-19932",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/269a2fc7ec4b9c0592493ef192ad2a9d.jpg",
+      "language": {
+        "dub": null,
+        "sub": "7"
+      },
+      "title": "One-Punch Man Season 3",
+      "type": "TV"
+    },
+    {
+      "dataId": "19247",
+      "id": "/no-longer-allowed-in-another-world-19247",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/8b97e75f9de748632c4458eefb3ec8d8.jpg",
+      "language": {
+        "dub": "12",
+        "sub": "12"
+      },
+      "title": "No Longer Allowed In Another World",
+      "type": "TV"
+    },
+    {
+      "dataId": "19908",
+      "id": "/my-gift-lvl-9999-unlimited-gacha-backstabbed-in-a-backwater-dungeon-im-out-for-revenge-19908",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/d771473a4b74662f3a969a33d0e7951e.jpg",
+      "language": {
+        "dub": "2",
+        "sub": "8"
+      },
+      "title": "My Gift Lvl 9999 Unlimited Gacha: Backstabbed in a Backwater Dungeon, I'm Out for Revenge!",
+      "type": "TV"
+    },
+    {
+      "dataId": "19912",
+      "id": "/hero-without-a-class-who-even-needs-skills-19912",
+      "image": "https://cdn.myanimelist.net/images/anime/1721/151097l.jpg",
+      "language": {
+        "dub": "4",
+        "sub": "10"
+      },
+
+
+=== MOVIES ===
+{
+  "hasNextPage": true,
+  "page": 1,
+  "results": [
+    {
+      "dataId": "20017",
+      "id": "/fuuto-pi-the-portrait-of-kamen-rider-skull-20017",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/d736887d1ee54456b5fc93e3da795af0.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Fuuto PI: The Portrait of Kamen Rider Skull",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19957",
+      "id": "/​volicia-of-pluto-chapter-2-ultramarine-19957",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/69fbd4f84d8fbc4543fec81440e00b41.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "​Volicia of Pluto Chapter 2: Ultramarine",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19954",
+      "id": "/garden-of-remembrance-19954",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/a1c633b2cc903d522be121a2606f725a.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Garden of Remembrance",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19953",
+      "id": "/tropical-rouge-precure-snow-princess-and-the-miracle-ring-19953",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/2cd2e57bd490dd0be1954089d6c033a5.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Tropical Rouge! Precure Snow Princess and The Miracle Ring!",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19950",
+      "id": "/dakaichi-im-being-harassed-by-the-sexiest-man-of-the-year-the-movie-spain-arc-19950",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/236ba92baa678de2e76e355afd4f88de.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "DAKAICHI -I'm being harassed by the sexiest man of the year- the Movie: Spain Arc",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19938",
+      "id": "/pretty-cure-all-stars-movie-f-19938",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/ab951efc86315bf5f8e0408785a609f4.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Pretty Cure All Stars Movie F",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19933",
+      "id": "/baan-the-boundary-of-adulthood-19933",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0998aaece9a99d786dd1493f730dc9b5.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Bâan: The Boundary of Adulthood",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19855",
+      "id": "/little-sharks-outings-x-nights-with-a-cat-manner-movie-19855",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/c88d6fc439e6520ae845aee684dfa279.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Little Shark's Outings x Nights with a Cat Manner Movie",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "19853",
+      "id": "/galaxy-apartment-cosmo-hills-19853",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/0ae962dc01e1cbd616475ee11492eb90.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+
+
+=== TV SHOWS ===
+{
+  "hasNextPage": true,
+  "page": 1,
+  "results": [
+    {
+      "dataId": "19997",
+      "id": "/the-lenticulars-19997",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/7da6e584653b987265b6a171c7f3198d.jpg",
+      "language": {
+        "dub": null,
+        "sub": "4"
+      },
+      "title": "The Lenticulars",
+      "type": "TV"
+    },
+    {
+      "dataId": "19951",
+      "id": "/isekai-quartet-3-19951",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/34698a4f6129d788e087b6435c7cb35b.jpg",
+      "language": {
+        "dub": "5",
+        "sub": "7"
+      },
+      "title": "Isekai Quartet 3",
+      "type": "TV"
+    },
+    {
+      "dataId": "19947",
+      "id": "/2200-nen-neko-no-kuni-nippon-19947",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/8c5ffc12bb1a88c998baa32987d65389.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "2200-nen Neko no Kuni Nippon",
+      "type": "TV"
+    },
+    {
+      "dataId": "19943",
+      "id": "/hands-off-sawaranaide-kotesashi-kun-uncensored-19943",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/f26bf6c5f79a0f4860411e3bc9a75aa5.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Hands Off: Sawaranaide Kotesashi-kun [UNCENSORED]",
+      "type": "TV"
+    },
+    {
+      "dataId": "19942",
+      "id": "/anila-to-cocora-19942",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/2bc06c0c06cac03acdb596b5a5991b82.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Anila to Cocora",
+      "type": "TV"
+    },
+    {
+      "dataId": "19935",
+      "id": "/digimon-beatbreak-19935",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/701bfffb1d5c305ecc626de6ce36f599.jpg",
+      "language": {
+        "dub": null,
+        "sub": "8"
+      },
+      "title": "Digimon Beatbreak",
+      "type": "TV"
+    },
+    {
+      "dataId": "19932",
+      "id": "/one-punch-man-season-3-19932",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/269a2fc7ec4b9c0592493ef192ad2a9d.jpg",
+      "language": {
+        "dub": null,
+        "sub": "7"
+      },
+      "title": "One-Punch Man Season 3",
+      "type": "TV"
+    },
+    {
+      "dataId": "19931",
+      "id": "/spy-x-family-season-3-19931",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/162bbe5c3e6529b2449e735ae48c270e.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "8"
+      },
+      "title": "Spy x Family Season 3",
+      "type": "TV"
+    },
+    {
+      "dataId": "19930",
+      "id": "/my-hero-academia-final-season-19930",
+      "image": "https://cdn.myanimelist.net/images/anime/1959/151055l.jpg",
+      "language": {
+        "dub": "6",
+        "sub": "8"
+      },
+
+
+=== SEARCH ===
+{
+  "hasNextPage": false,
+  "page": 1,
+  "results": [
+    {
+      "dataId": "18220",
+      "id": "/watch/road-of-naruto-18220",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/fd414879634ea83ad2c4fc1c33e8ac43.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Road of Naruto",
+      "type": "ONA"
+    },
+    {
+      "dataId": "8143",
+      "id": "/watch/boruto-naruto-next-generations-8143",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/32c83e2ad4a43229996356840db3982c.jpg",
+      "language": {
+        "dub": "293",
+        "sub": "293"
+      },
+      "title": "Boruto: Naruto Next Generations",
+      "type": "TV"
+    },
+    {
+      "dataId": "5694",
+      "id": "/watch/naruto-find-the-crimson-four-leaf-clover-5694",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/da3a3d57e29aa0dba87cd6e1596b78e9.jpg",
+      "language": {
+        "dub": null,
+        "sub": "1"
+      },
+      "title": "Naruto: Find the Crimson Four-leaf Clover!",
+      "type": "SPECIAL"
+    },
+    {
+      "dataId": "3162",
+      "id": "/watch/naruto-the-movie-ninja-clash-in-the-land-of-snow-3162",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/a1ab85f1eb75ec0a986e4c9d5fe04b49.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto Movie 1: Ninja Clash in the Land of Snow",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "2928",
+      "id": "/watch/naruto-ova7-chunin-exam-on-fire-and-naruto-vs-konohamaru-2928",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/44246cdf24c85468599ff2b9496c27cb.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto OVA7: Chunin Exam on Fire! and Naruto vs. Konohamaru!",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "2992",
+      "id": "/watch/naruto-spin-off-rock-lee-his-ninja-pals-2992",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/37f8b16b0f693e433207117abe5daf44.jpg",
+      "language": {
+        "dub": "51",
+        "sub": "51"
+      },
+      "title": "NARUTO Spin-Off: Rock Lee & His Ninja Pals",
+      "type": "TV"
+    },
+    {
+      "dataId": "1391",
+      "id": "/watch/boruto-naruto-the-movie-1391",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/f0ad5b3ee01703cc817638973b535aa2.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Boruto: Naruto the Movie",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "1066",
+      "id": "/watch/naruto-shippuuden-movie-6-road-to-ninja-1066",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/dde4a8a8ddd19648711845448d02d6d8.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+      "title": "Naruto: Shippuuden Movie 6: Road to Ninja",
+      "type": "MOVIE"
+    },
+    {
+      "dataId": "1642",
+      "id": "/watch/naruto-shippuuden-movie-5-blood-prison-1642",
+      "image": "https://cdn.noitatnemucod.net/thumbnail/300x400/100/23a436a4ae640fa191a587b5e417bf7d.jpg",
+      "language": {
+        "dub": "1",
+        "sub": "1"
+      },
+✖ Failed to run function "hianime:episodes":
+Error: [Request ID: 20455de9d6b244a0] Server Error
+Uncaught Error: Unable to load episodes: Request failed with status code 404
+    at handler (../src/convex/hianime.ts:126:4)
+
+
+=== EPISODES ADDED ===
+✖ Failed to run function "hianime:episodeServers":
+Error: [Request ID: 3926d170c6680537] Server Error
+Uncaught Error: Unable to load streaming servers: cheerio.load() expects a string
+    at handler (../src/convex/hianime.ts:141:4)
+
+
+=== EPISODE SERVERS ADDED ===
