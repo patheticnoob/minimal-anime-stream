@@ -73,12 +73,14 @@ export default function Landing() {
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
   const searchAnime = useAction(api.hianime.search);
+  const fetchRecentEpisodes = useAction(api.yumaApi.recentEpisodes);
 
   const [loading, setLoading] = useState(true);
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
   const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
+  const [recentEpisodesItems, setRecentEpisodesItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
   
@@ -121,11 +123,13 @@ export default function Landing() {
   const [airingPage, setAiringPage] = useState(1);
   const [moviePage, setMoviePage] = useState(1);
   const [tvShowPage, setTVShowPage] = useState(1);
+  const [recentEpisodesPage, setRecentEpisodesPage] = useState(1);
   
   const [popularHasMore, setPopularHasMore] = useState(false);
   const [airingHasMore, setAiringHasMore] = useState(false);
   const [movieHasMore, setMovieHasMore] = useState(false);
   const [tvShowHasMore, setTVShowHasMore] = useState(false);
+  const [recentEpisodesHasMore, setRecentEpisodesHasMore] = useState(false);
   
   const [loadingMore, setLoadingMore] = useState<string | null>(null);
 
@@ -139,8 +143,9 @@ export default function Landing() {
       fetchTopAiring({ page: 1 }),
       fetchMovies({ page: 1 }),
       fetchTVShows({ page: 1 }),
+      fetchRecentEpisodes({ page: 1 }),
     ])
-      .then(([popular, airing, movies, tvShows]) => {
+      .then(([popular, airing, movies, tvShows, recentEps]) => {
         if (!mounted) return;
         
         const popularData = popular as { results: AnimeItem[]; hasNextPage: boolean };
@@ -157,6 +162,24 @@ export default function Landing() {
         setAiringHasMore(airingData.hasNextPage || false);
         setMovieHasMore(moviesData.hasNextPage || false);
         setTVShowHasMore(tvShowsData.hasNextPage || false);
+
+        // Handle recent episodes (may be null if API fails)
+        if (recentEps && typeof recentEps === 'object' && 'results' in recentEps) {
+          const recentData = recentEps as { results: Array<any>; has_next_page: boolean };
+          const mappedRecent = (recentData.results || []).map((item: any) => ({
+            id: item.id,
+            dataId: item.id,
+            title: item.title,
+            image: item.image,
+            type: item.type,
+            language: {
+              sub: item.sub ? String(item.sub) : null,
+              dub: item.dub ? String(item.dub) : null,
+            },
+          }));
+          setRecentEpisodesItems(mappedRecent);
+          setRecentEpisodesHasMore(recentData.has_next_page || false);
+        }
 
         // Combine popular and airing for hero rotation
         const heroPool = [
@@ -179,7 +202,7 @@ export default function Landing() {
     return () => {
       mounted = false;
     };
-  }, [fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows]);
+  }, [fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows, fetchRecentEpisodes]);
 
   // Auto-rotate hero banner every 4 seconds
   useEffect(() => {
@@ -230,7 +253,7 @@ export default function Landing() {
   }, [query, searchAnime]);
 
   // Add function to load more items for a specific category
-  const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows') => {
+  const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows' | 'recentEpisodes') => {
     setLoadingMore(category);
     
     try {
@@ -269,6 +292,28 @@ export default function Landing() {
           setPage = setTVShowPage;
           setHasMore = setTVShowHasMore;
           break;
+        case 'recentEpisodes':
+          nextPage = recentEpisodesPage + 1;
+          const recentResult = await fetchRecentEpisodes({ page: nextPage });
+          if (recentResult && typeof recentResult === 'object' && 'results' in recentResult) {
+            const recentData = recentResult as { results: Array<any>; has_next_page: boolean };
+            const mappedRecent = (recentData.results || []).map((item: any) => ({
+              id: item.id,
+              dataId: item.id,
+              title: item.title,
+              image: item.image,
+              type: item.type,
+              language: {
+                sub: item.sub ? String(item.sub) : null,
+                dub: item.dub ? String(item.dub) : null,
+              },
+            }));
+            setRecentEpisodesItems((prev: AnimeItem[]) => [...prev, ...mappedRecent]);
+            setRecentEpisodesPage(nextPage);
+            setRecentEpisodesHasMore(recentData.has_next_page || false);
+          }
+          setLoadingMore(null);
+          return;
       }
       
       const result = await fetchFunction({ page: nextPage });
@@ -624,6 +669,19 @@ export default function Landing() {
                       title="My Watchlist"
                       items={watchlistItems}
                       onItemClick={openAnime}
+                    />
+                  )}
+
+                  {/* Recent Episodes - Only show if data loaded successfully */}
+                  {recentEpisodesItems.length > 0 && (
+                    <ContentRail
+                      title="Recent Episodes"
+                      items={recentEpisodesItems}
+                      onItemClick={openAnime}
+                      enableInfiniteScroll
+                      onLoadMore={() => loadMoreItems('recentEpisodes')}
+                      hasMore={recentEpisodesHasMore}
+                      isLoadingMore={loadingMore === 'recentEpisodes'}
                     />
                   )}
 

@@ -15,6 +15,7 @@ import type * as http from "../http.js";
 import type * as users from "../users.js";
 import type * as watchProgress from "../watchProgress.js";
 import type * as watchlist from "../watchlist.js";
+import type * as yumaApi from "../yumaApi.js";
 
 import type {
   ApiFromModules,
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   users: typeof users;
   watchProgress: typeof watchProgress;
   watchlist: typeof watchlist;
+  yumaApi: typeof yumaApi;
 }>;
 
 /**
