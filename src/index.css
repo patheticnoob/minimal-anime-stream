@@ -324,25 +324,118 @@
 .hero-banner {
   position: relative;
   width: 100%;
-  height: 65vh;
-  min-height: 500px;
-  border-radius: 0;
+  min-height: clamp(420px, 60vh, 620px);
+  margin-bottom: 2.5rem;
+  border-radius: 32px;
   overflow: hidden;
   background: #050814;
-  margin-bottom: 2rem;
+  isolation: isolate;
 }
 
-.hero-banner-content {
+.hero-banner-bg {
   position: absolute;
-  bottom: 0;
-  left: 0;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(103, 58, 183, 0.2), transparent 55%),
+    radial-gradient(circle at 80% 30%, rgba(79, 70, 229, 0.2), transparent 50%),
+    linear-gradient(135deg, #03050f 0%, #050814 55%, #080b1b 100%);
+  opacity: 0.9;
+}
+
+.hero-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(5, 8, 20, 0.95) 0%, rgba(5, 8, 20, 0.85) 35%, transparent 70%);
+}
+
+.hero-banner-inner {
+  position: relative;
+  z-index: 2;
   width: 100%;
-  z-index: 10;
-  padding: 40px 5%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  gap: clamp(1.5rem, 4vw, 5rem);
+  align-items: center;
+  padding: clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 5vw, 4rem);
+}
+
+.hero-banner-copy {
+  max-width: 560px;
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
+}
+
+.hero-banner-copy p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hero-banner-poster-wrapper {
+  display: flex;
   justify-content: flex-end;
-  align-items: flex-start;
+  width: 100%;
+}
+
+.hero-banner-poster {
+  position: relative;
+  width: min(320px, 40vw);
+  aspect-ratio: 2 / 3;
+  border-radius: 28px;
+  overflow: hidden;
+  padding: 6px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 55%),
+    #020409;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 35px 120px rgba(5, 8, 20, 0.85),
+    0 20px 40px rgba(5, 8, 20, 0.6);
+}
+
+.hero-banner-poster::after {
+  content: "";
+  position: absolute;
+  inset: 10%;
+  border-radius: 22px;
+  box-shadow: 0 25px 60px rgba(5, 8, 20, 0.6);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.hero-banner-poster-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  object-fit: cover;
+  transform: scale(1.04);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group:hover .hero-banner-poster-image {
+  transform: scale(1.08);
+}
+
+.group:hover .hero-banner-poster::after {
+  opacity: 0.15;
+}
+
+@media (max-width: 1024px) {
+  .hero-banner {
+    border-radius: 22px;
+  }
+
+  .hero-banner-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-banner-poster-wrapper {
+    justify-content: flex-start;
+  }
+
+  .hero-banner-poster {
+    margin: 0 auto;
+  }
 }
 
 /* ───────── Anime Card ───────── */
