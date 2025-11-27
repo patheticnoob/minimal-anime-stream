@@ -96,9 +96,9 @@ export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardPro
         </h3>
         
         <div className="flex gap-2 mt-1 text-[10px] font-medium text-[#8f9aa3]">
-          {anime.language?.sub && <span>SUB</span>}
+          {anime.language?.sub && <span>SUB {anime.language.sub}</span>}
           {anime.language?.sub && anime.language?.dub && <span className="text-gray-600">•</span>}
-          {anime.language?.dub && <span>DUB</span>}
+          {anime.language?.dub && <span>DUB {anime.language.dub}</span>}
         </div>
       </div>
     </div>
