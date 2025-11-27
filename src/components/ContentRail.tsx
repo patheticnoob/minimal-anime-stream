@@ -44,7 +44,7 @@ export function ContentRail({ title, items, onItemClick, onViewAll, variant = "p
         )}
       </div>
 
-      <div className="relative group">
+      <div className="relative">
         {/* Left Fade */}
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#050814] to-transparent z-10 pointer-events-none md:hidden" />
         
