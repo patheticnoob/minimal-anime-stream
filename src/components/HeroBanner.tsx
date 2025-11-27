@@ -23,22 +23,32 @@ interface HeroBannerProps {
 export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
   return (
     <div className="hero-banner group relative w-full h-[65vh] min-h-[500px] overflow-hidden">
-      {/* Background Image */}
-      {anime.image ? (
-        <img
-          src={anime.image}
-          alt={anime.title ?? "Hero"}
-          className="hero-banner-bg absolute inset-0 w-full h-full object-cover"
-        />
-      ) : (
-        <div className="hero-banner-bg absolute inset-0 bg-gradient-to-br from-blue-900 to-black" />
+      {/* Dark Background Base */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0e1a] via-[#050814] to-black" />
+
+      {/* Portrait Image - Right Side with Shadow */}
+      {anime.image && (
+        <div className="absolute right-0 top-0 bottom-0 w-[55%] md:w-[50%]">
+          <div className="relative h-full flex items-center justify-end pr-8 md:pr-16">
+            <div className="relative h-[85%] aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src={anime.image}
+                alt={anime.title ?? "Hero"}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              {/* Subtle inner shadow for depth */}
+              <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.4)]" />
+            </div>
+            {/* Soft glow behind poster */}
+            <div className="absolute inset-0 bg-gradient-radial from-purple-900/20 via-transparent to-transparent blur-3xl" />
+          </div>
+          {/* Left fade gradient */}
+          <div className="absolute left-0 top-0 bottom-0 w-48 bg-gradient-to-r from-[#050814] to-transparent" />
+        </div>
       )}
 
-      {/* Cinematic Overlay */}
-      <div className="hero-banner-overlay absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-[#050814]" />
-
-      {/* Content */}
-      <div className="hero-banner-content absolute bottom-0 left-0 w-full p-6 md:p-12 flex flex-col justify-end items-start z-10">
+      {/* Content - Left Side */}
+      <div className="hero-banner-content absolute bottom-0 left-0 w-full md:w-[55%] p-6 md:p-12 flex flex-col justify-end items-start z-10">
         {/* Meta Data */}
         <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-gray-300 mb-3">
           {anime.type && (
@@ -67,12 +77,12 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
         </div>
 
         {/* Title */}
-        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-none mb-6 drop-shadow-xl max-w-4xl">
+        <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-none mb-6 drop-shadow-xl max-w-xl">
           {anime.title ?? "Featured Anime"}
         </h1>
 
-        {/* Description - Hidden on mobile for cleaner look, visible on desktop */}
-        <p className="hidden md:block text-gray-300/90 text-lg line-clamp-2 leading-relaxed mb-8 max-w-2xl">
+        {/* Description */}
+        <p className="hidden md:block text-gray-300/90 text-lg line-clamp-2 leading-relaxed mb-8 max-w-xl">
           Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.
         </p>
 
