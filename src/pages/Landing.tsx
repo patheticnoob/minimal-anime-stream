@@ -11,7 +11,7 @@ import { TopBar } from "@/components/TopBar";
 import { AnimeCard } from "@/components/AnimeCard";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
-import { InfoModal } from "@/components/InfoModal";
+import { InfoModal, type BroadcastInfo } from "@/components/InfoModal";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
@@ -108,7 +108,7 @@ export default function Landing() {
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
-  const [broadcastInfo, setBroadcastInfo] = useState<string | null>(null);
+  const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
 
   // Watch progress and watchlist
@@ -368,8 +368,14 @@ export default function Landing() {
           if (broadcast.timezone) {
             summary = summary ? `${summary} (${broadcast.timezone})` : broadcast.timezone;
           }
-          if (summary) {
-            setBroadcastInfo(summary);
+          const info: BroadcastInfo = {
+            summary: summary || null,
+            day: broadcast.day ?? null,
+            time: broadcast.time ?? null,
+            timezone: broadcast.timezone ?? null,
+          };
+          if (info.summary || info.day || info.time || info.timezone) {
+            setBroadcastInfo(info);
           }
         })
         .catch(() => {

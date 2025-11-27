@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { DateTime } from "luxon";
 import { X, Play, Plus, Check, Clock3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,13 @@ type AnimeDetail = {
   };
 };
 
+export type BroadcastInfo = {
+  summary?: string | null;
+  day?: string | null;
+  time?: string | null;
+  timezone?: string | null;
+};
+
 interface InfoModalProps {
   anime: AnimeDetail | null;
   isOpen: boolean;
@@ -39,7 +47,7 @@ interface InfoModalProps {
   onPlayEpisode: (episode: Episode) => void;
   isInWatchlist?: boolean;
   onToggleWatchlist?: () => void;
-  broadcastInfo?: string | null;
+  broadcastInfo?: BroadcastInfo | null;
   broadcastLoading?: boolean;
 }
 
@@ -57,6 +65,48 @@ export function InfoModal({
 }: InfoModalProps) {
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
+
+  const broadcastDetails = useMemo(() => {
+    if (!broadcastInfo?.day || !broadcastInfo?.time || !broadcastInfo?.timezone) {
+      return null;
+    }
+    const normalizedDay = broadcastInfo.day.toLowerCase().replace(/s$/, "");
+    const dayMap: Record<string, number> = {
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+      sunday: 7,
+    };
+    const targetWeekday = dayMap[normalizedDay];
+    if (!targetWeekday) return null;
+    const [hourStr, minuteStr = "0"] = broadcastInfo.time.split(":");
+    const hour = Number(hourStr);
+    const minute = Number(minuteStr);
+    if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+    const zone = broadcastInfo.timezone || "UTC";
+    const nowInZone = DateTime.now().setZone(zone);
+    if (!nowInZone.isValid) return null;
+    let next = nowInZone
+      .startOf("day")
+      .plus({ days: (targetWeekday - nowInZone.weekday + 7) % 7 })
+      .set({ hour, minute, second: 0, millisecond: 0 });
+    if (next <= nowInZone) {
+      next = next.plus({ weeks: 1 });
+    }
+    const nextInIST = next.setZone("Asia/Kolkata");
+    if (!nextInIST.isValid) return null;
+    const nowInIST = DateTime.now().setZone("Asia/Kolkata");
+    const diff = nextInIST.diff(nowInIST, ["days", "hours"]).shiftTo("days", "hours");
+    const remainingDays = Math.max(0, Math.floor(diff.days ?? 0));
+    const remainingHours = Math.max(0, Math.floor(diff.hours ?? 0));
+    return {
+      istLabel: `${nextInIST.weekdayLong} at ${nextInIST.toFormat("hh:mm a")} IST`,
+      countdown: `${remainingDays} day${remainingDays === 1 ? "" : "s"} ${remainingHours} hour${remainingHours === 1 ? "" : "s"} remaining`,
+    };
+  }, [broadcastInfo]);
 
   // Reset episode range when anime changes
   useEffect(() => {
@@ -148,13 +198,25 @@ export function InfoModal({
               </div>
             </div>
             {(broadcastLoading || broadcastInfo) && (
-              <div className="mt-2 flex items-center gap-2 text-sm text-blue-300">
-                <Clock3 className="h-4 w-4" />
-                <span>
-                  {broadcastLoading
-                    ? "Fetching upcoming schedule..."
-                    : `Next broadcast: ${broadcastInfo}`}
-                </span>
+              <div className="mt-2 flex items-start gap-2 text-sm text-blue-300">
+                <Clock3 className="h-4 w-4 mt-0.5" />
+                {broadcastLoading ? (
+                  <span>Fetching upcoming schedule...</span>
+                ) : (
+                  <div className="space-y-1">
+                    <span className="block font-semibold text-white">
+                      Next broadcast: {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
+                    </span>
+                    {broadcastDetails?.countdown && (
+                      <span className="block text-xs text-blue-200">
+                        {broadcastDetails.countdown}
+                      </span>
+                    )}
+                    {!broadcastDetails?.istLabel && broadcastInfo?.summary && (
+                      <span className="block text-xs text-blue-200">{broadcastInfo.summary}</span>
+                    )}
+                  </div>
+                )}
               </div>
             )}
             <p className="detail-hero-description">
