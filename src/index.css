@@ -172,44 +172,36 @@
   scrollbar-width: none;
 }
 
-/* ───────── Expandable Sidebar (Hotstar-inspired) ───────── */
+/* ───────── Expandable Sidebar (Hotstar-inspired v2) ───────── */
 .sidebar {
   position: fixed;
   inset-block: 0;
   left: 0;
-  width: 72px;
-  background: #050712;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  width: 78px;
   z-index: 60;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
-  transition: 
-    width 240ms cubic-bezier(0.4, 0.0, 0.2, 1),
-    box-shadow 240ms ease,
-    background 240ms ease;
+  transition: width 260ms cubic-bezier(0.4, 0.0, 0.2, 1);
   overflow: visible;
   isolation: isolate;
 }
 
-/* Soft gradient glow when expanded */
+/* Glow / gradient behind the expanded sidebar */
 .sidebar::before {
   content: "";
   position: absolute;
-  inset: -24px 40px -24px -24px;
+  inset: 0;
   background:
-    radial-gradient(circle at top, rgba(124, 58, 237, 0.45), transparent 55%),
-    radial-gradient(circle at bottom, rgba(236, 72, 153, 0.3), transparent 60%),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.96));
+    radial-gradient(circle at top, rgba(129, 140, 248, 0.6), transparent 55%),
+    radial-gradient(circle at bottom, rgba(236, 72, 153, 0.5), transparent 60%),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.98));
+  filter: blur(22px);
   opacity: 0;
-  filter: blur(16px);
   pointer-events: none;
-  transition: opacity 240ms ease;
+  transition: opacity 260ms ease;
   z-index: -1;
 }
 
 .sidebar:hover {
-  width: 240px;
-  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.95);
-  background: radial-gradient(circle at top left, #020617 0%, #020617 50%);
+  width: 260px;
 }
 
 .sidebar:hover::before {
@@ -217,30 +209,43 @@
 }
 
 .sidebar-inner {
+  position: relative;
+  z-index: 1;
   height: 100%;
-  padding: 16px 12px;
+  padding: 24px 12px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.96);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
 }
 
 .sidebar-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 2px solid rgba(148, 163, 184, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at top, #22d3ee, #6366f1);
-  box-shadow: 0 0 22px rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.8);
   overflow: hidden;
-  margin: 0 auto 4px;
+  margin-bottom: 18px;
+  cursor: pointer;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
 }
 
 .nav-item {
@@ -252,16 +257,15 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 8px 10px;
-  margin: 2px 0;
+  padding: 9px 12px;
+  margin-inline: 2px;
   border-radius: 999px;
   cursor: pointer;
   overflow: hidden;
   isolation: isolate;
   transition:
     color 180ms ease,
-    transform 180ms ease,
-    background 180ms ease;
+    transform 180ms ease;
 }
 
 /* Gradient pill background */
@@ -270,7 +274,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, #ff3b8d, #7c3aed);
+  background: linear-gradient(160deg, #ff4b9a, #8b5cf6);
   opacity: 0;
   transform: scale(0.9);
   transition:
@@ -280,12 +284,11 @@
 }
 
 .nav-icon {
-  flex: 0 0 24px;
+  flex: 0 0 26px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 18px;
-  filter: drop-shadow(0 0 10px rgba(148, 163, 184, 0.35));
 }
 
 .nav-label {
