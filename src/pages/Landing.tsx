@@ -61,6 +61,12 @@ const normalizeEpisodeNumber = (value?: number | string | null) => {
   return 0;
 };
 
+const deriveDataIdFromSlug = (id?: string | null) => {
+  if (!id) return undefined;
+  const match = id.trim().match(/(\d+)(?:\/)?$/);
+  return match ? match[1] : id.replace(/^\/|\/$/g, "");
+};
+
 export default function Landing() {
   const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -168,7 +174,7 @@ export default function Landing() {
           const recentData = recentEps as { results: Array<any>; has_next_page: boolean };
           const mappedRecent = (recentData.results || []).map((item: any) => ({
             id: item.id,
-            dataId: item.id,
+            dataId: item.dataId ?? deriveDataIdFromSlug(item.id),
             title: item.title,
             image: item.image,
             type: item.type,
@@ -299,7 +305,7 @@ export default function Landing() {
             const recentData = recentResult as { results: Array<any>; has_next_page: boolean };
             const mappedRecent = (recentData.results || []).map((item: any) => ({
               id: item.id,
-              dataId: item.id,
+              dataId: item.dataId ?? deriveDataIdFromSlug(item.id),
               title: item.title,
               image: item.image,
               type: item.type,
