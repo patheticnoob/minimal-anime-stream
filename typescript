@@ -1,23 +1,40 @@
-// From Landing.tsx playEpisode function:
+// Original M3U8 URL
+const originalUrl = "https://megacloud.blog/stream/file.m3u8";
 
-// Original M3U8 URL from the source
-const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
-// Example: "https://megacloud.example.com/playlist.m3u8"
+// Proxied URL
+const proxiedUrl = `${convexSiteUrl}/proxy?url=${encodeURIComponent(originalUrl)}`;
 
-// Build Convex HTTP endpoint base
-const raw = import.meta.env.VITE_CONVEX_URL;
-let base = raw.replace("convex.cloud", "convex.site");
-base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
-// Result: "https://your-project.convex.site"
-
-// Proxy the M3U8 URL through Convex
-const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
-// Result: "https://your-project.convex.site/proxy?url=https%3A%2F%2Fmegacloud.example.com%2Fplaylist.m3u8"
-
-const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
-  ...t,
-  kind: t.kind || "subtitles",
-  file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+// Same for subtitles
+const proxiedTracks = tracks.map(track => ({
+  ...track,
+  file: `${convexSiteUrl}/proxy?url=${encodeURIComponent(track.file)}`
 }));
 
-setVideoSource(proxiedUrl);
+http.route({
+  path: "/proxy",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const url = new URL(request.url);
+    const targetUrl = url.searchParams.get("url");
+    
+    // Fetch the external resource server-side
+    const response = await fetch(targetUrl);
+    const content = await response.arrayBuffer();
+    
+    // Return with CORS headers allowing browser access
+    return new Response(content, {
+      headers: {
+        "Content-Type": response.headers.get("Content-Type") || "application/octet-stream",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Cache-Control": "public, max-age=3600"
+      }
+    });
+  })
+})
+
+// HLS.js loads the proxied M3U8
+hls.loadSource(proxiedUrl); // No CORS error!
+
+// Subtitle tracks use proxied URLs
+<track src={proxiedTrackUrl} /> // No CORS error!
