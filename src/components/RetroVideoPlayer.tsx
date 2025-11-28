@@ -56,6 +56,7 @@ export function RetroVideoPlayer({
   const [buffered, setBuffered] = useState(0);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showSkipOutro, setShowSkipOutro] = useState(false);
+  const [selectedSubtitle, setSelectedSubtitle] = useState("off");
 
   // Initialize HLS
   useEffect(() => {
@@ -127,6 +128,39 @@ export function RetroVideoPlayer({
       });
     }
   }, [source]);
+
+  useEffect(() => {
+    if (tracks && tracks.length > 0) {
+      setSelectedSubtitle(getTrackLabel(tracks[0], 0));
+    } else {
+      setSelectedSubtitle("off");
+    }
+  }, [tracks, source]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const syncTracks = () => {
+      const textTracks = video.textTracks;
+      for (let i = 0; i < textTracks.length; i += 1) {
+        const derivedLabel =
+          tracks && tracks[i]
+            ? getTrackLabel(tracks[i], i)
+            : textTracks[i].label || `Track ${i + 1}`;
+        textTracks[i].mode =
+          selectedSubtitle !== "off" && derivedLabel === selectedSubtitle
+            ? "showing"
+            : "disabled";
+      }
+    };
+
+    syncTracks();
+    video.addEventListener("loadeddata", syncTracks);
+    return () => {
+      video.removeEventListener("loadeddata", syncTracks);
+    };
+  }, [selectedSubtitle, tracks, source]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -298,6 +332,10 @@ export function RetroVideoPlayer({
     setIsMuted(newVolume === 0);
   };
 
+  const handleSubtitleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedSubtitle(event.target.value);
+  };
+
   const toggleMute = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -370,6 +408,16 @@ export function RetroVideoPlayer({
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  const getTrackLabel = (
+    track: { file: string; label: string; kind?: string },
+    index: number,
+  ) => {
+    const trimmed = track.label.trim();
+    if (trimmed.length > 0) return trimmed;
+    if (track.kind) return track.kind.toUpperCase();
+    return `Track ${index + 1}`;
+  };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -418,15 +466,18 @@ export function RetroVideoPlayer({
           crossOrigin="anonymous"
           playsInline
         >
-          {tracks?.map((track, idx) => (
-            <track
-              key={idx}
-              kind={track.kind || "subtitles"}
-              src={track.file}
-              label={track.label || "Unknown"}
-              srcLang={track.label?.slice(0, 2)?.toLowerCase() || "en"}
-            />
-          ))}
+          {tracks?.map((track, idx) => {
+            const label = getTrackLabel(track, idx);
+            return (
+              <track
+                key={`${label}-${idx}`}
+                kind={track.kind || "subtitles"}
+                src={track.file}
+                label={label}
+                srcLang={track.label?.slice(0, 2)?.toLowerCase() || "en"}
+              />
+            );
+          })}
         </video>
 
         {/* Loading Spinner */}
@@ -578,6 +629,27 @@ export function RetroVideoPlayer({
                 </button>
               </div>
             </div>
+
+            {tracks && tracks.length > 0 && (
+              <div className="flex items-center gap-2 px-4 pb-4 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
+                <span>Subs</span>
+                <select
+                  value={selectedSubtitle}
+                  onChange={handleSubtitleChange}
+                  className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
+                >
+                  <option value="off">Off</option>
+                  {tracks.map((track, idx) => {
+                    const label = getTrackLabel(track, idx);
+                    return (
+                      <option key={`${label}-${idx}`} value={label}>
+                        {label}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
           </div>
         </motion.div>
       </motion.div>

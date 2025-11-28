@@ -61,23 +61,17 @@
   letter-spacing: 0.1em;
   color: oklch(0.95 0.05 180);
   position: relative;
-  background-color: #040813;
+  background-color: #040615;
   background-image:
-    linear-gradient(120deg, rgba(255, 105, 180, 0.12) 0%, rgba(0, 214, 255, 0.08) 40%, transparent 72%),
-    radial-gradient(circle at 20% 20%, rgba(255, 105, 180, 0.18), transparent 55%),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(180deg, #03060f 0%, #07152e 45%, #0b2146 100%);
-  background-size:
-    100% 100%,
-    100% 100%,
-    100% 4px,
-    28px 28px,
-    28px 28px,
-    100% 100%;
+    radial-gradient(circle at 12% 22%, rgba(255, 105, 180, 0.28), transparent 55%),
+    radial-gradient(circle at 80% 8%, rgba(0, 255, 213, 0.22), transparent 45%),
+    radial-gradient(circle at 64% 80%, rgba(0, 132, 255, 0.18), transparent 50%),
+    linear-gradient(120deg, rgba(255, 105, 180, 0.16), rgba(5, 8, 18, 0) 45%),
+    linear-gradient(300deg, rgba(0, 229, 255, 0.16), rgba(5, 8, 18, 0) 50%),
+    linear-gradient(180deg, rgba(5, 9, 20, 0) 0%, rgba(3, 5, 12, 0.88) 60%, rgba(2, 4, 10, 1) 100%);
   background-attachment: fixed;
-  background-blend-mode: screen, screen, soft-light, normal, normal, normal;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 [data-theme="retro"] body::before,
@@ -89,14 +83,14 @@
 [data-theme="retro"] body::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
+    linear-gradient(rgba(136, 163, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(136, 163, 255, 0.08) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 213, 0.35));
   pointer-events: none;
   z-index: 0;
 }
@@ -105,15 +99,16 @@
 [data-theme="retro"] body::after {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.1) 50%);
-  background-size: 100% 4px;
+  inset: 0;
+  background-image:
+    linear-gradient(110deg, rgba(255, 105, 180, 0.08), rgba(0, 0, 0, 0) 40%),
+    linear-gradient(290deg, rgba(0, 229, 255, 0.08), rgba(0, 0, 0, 0) 45%),
+    linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 50%);
+  background-size: 100% 100%, 100% 100%, 100% 4px;
+  mix-blend-mode: screen;
+  opacity: 0.45;
   pointer-events: none;
-  z-index: 9999;
-  opacity: 0.5;
+  z-index: 0;
 }
 
 /* Typography */
