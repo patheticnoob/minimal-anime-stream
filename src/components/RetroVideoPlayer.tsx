@@ -60,7 +60,7 @@ export function RetroVideoPlayer({
   // Initialize HLS
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !source) return;
 
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
@@ -126,7 +126,35 @@ export function RetroVideoPlayer({
         video.play().catch(() => {});
       });
     }
-  }, [resumeFrom]);
+  }, [source]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (!resumeFrom || resumeFrom <= 0) return;
+    if (hasRestoredProgress.current) return;
+
+    const applyResume = () => {
+      if (hasRestoredProgress.current) return;
+      if (video.currentTime <= 1) {
+        video.currentTime = resumeFrom;
+      }
+      hasRestoredProgress.current = true;
+    };
+
+    if (video.readyState >= 1) {
+      applyResume();
+      return;
+    }
+
+    const handleLoadedMetadata = () => {
+      applyResume();
+      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+    };
+
+    video.addEventListener("loadedmetadata", handleLoadedMetadata);
+    return () => video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+  }, [resumeFrom, source]);
 
   // Update progress
   useEffect(() => {
