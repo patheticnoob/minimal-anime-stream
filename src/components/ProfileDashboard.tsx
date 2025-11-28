@@ -26,6 +26,8 @@ interface ProfileDashboardProps {
 const shimmerHighlight =
   "relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition before:duration-[1200ms]";
 
+const emptyIllustration = "/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png";
+
 export function ProfileDashboard({
   userName,
   userEmail,
@@ -89,12 +91,32 @@ export function ProfileDashboard({
     if (collection.length === 0) {
       return (
         <motion.section
-          className="rounded-2xl border border-white/5 bg-white/2 px-6 py-10 text-center text-gray-400 shadow-[0_15px_45px_rgba(0,0,0,0.35)]"
+          className="relative overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-br from-[#0f172a]/90 via-[#0b1324]/90 to-[#050a16] px-6 py-10 text-center shadow-[0_25px_80px_rgba(0,0,0,0.55)]"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <p className="text-lg font-semibold text-white/80">{title}</p>
-          <p className="mt-3 text-sm text-gray-400">{emptyText}</p>
+          <div className="absolute inset-0 opacity-10">
+            <div className="h-full w-full bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.8),_transparent_55%)] blur-2xl" />
+          </div>
+          <div className="relative flex flex-col items-center gap-4">
+            <img
+              src={emptyIllustration}
+              alt="Empty state"
+              className="h-24 w-24 rounded-2xl border border-white/10 bg-black/30 p-3 object-contain"
+            />
+            <p className="text-sm uppercase tracking-widest text-blue-200/80">{title}</p>
+            <p className="text-2xl font-semibold text-white">{emptyText}</p>
+            <p className="max-w-md text-sm text-gray-400">
+              Discover fresh episodes curated for you. Build your watchlist and keep an eye on upcoming drops.
+            </p>
+            <Button
+              size="lg"
+              className="rounded-full bg-gradient-to-r from-[#38bdf8] via-[#6366f1] to-[#ec4899] px-6 text-white shadow-[0_10px_35px_rgba(99,102,241,0.45)]"
+              onClick={() => (window.location.href = "/")}
+            >
+              Explore Anime
+            </Button>
+          </div>
         </motion.section>
       );
     }
@@ -162,7 +184,7 @@ export function ProfileDashboard({
                       </div>
                       <div className="mt-1 h-1.5 rounded-full bg-white/10">
                         <span
-                          className="block h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-400"
+                          className="block h-full rounded-full bg-gradient-to-r from-[#38bdf8] via-[#6366f1] to-[#ec4899] shadow-[0_0_12px_rgba(99,102,241,0.6)]"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -225,7 +247,7 @@ export function ProfileDashboard({
         {statCards.map((stat) => (
           <motion.div
             key={stat.label}
-            className="rounded-2xl border border-white/5 bg-white/3 px-5 py-6 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
+            className="rounded-2xl border border-white/5 bg-gradient-to-br from-white/8 via-white/2 to-transparent px-5 py-6 shadow-[0_20px_70px_rgba(0,0,0,0.45)]"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
           >

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Play, Plus, Info, Star, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 
 type AnimeItem = {
   title?: string;
@@ -22,12 +23,23 @@ interface HeroBannerProps {
 
 export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
   return (
-    <section className="hero-banner group">
+    <motion.section
+      className="hero-banner group"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
       <div className="hero-banner-bg" />
       <div className="hero-banner-overlay" />
+      <div className="hero-banner-glow" />
 
       <div className="hero-banner-inner">
-        <div className="hero-banner-copy">
+        <motion.div
+          className="hero-banner-copy"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+        >
           <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-gray-300">
             {anime.type && (
               <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">
@@ -94,20 +106,29 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               <Plus className="h-6 w-6" />
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {anime.image && (
-          <div className="hero-banner-poster-wrapper">
-            <div className="hero-banner-poster">
+          <motion.div
+            className="hero-banner-poster-wrapper"
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <motion.div
+              className="hero-banner-poster"
+              whileHover={{ scale: 1.03, rotate: -1 }}
+              transition={{ type: "spring", stiffness: 120, damping: 12 }}
+            >
+              <div className="hero-banner-poster-shine" />
               <img
                 src={anime.image}
                 alt={anime.title ?? "Hero"}
                 className="hero-banner-poster-image"
               />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </div>
-    </section>
+    </motion.section>
   );
 }

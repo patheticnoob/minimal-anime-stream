@@ -10,6 +10,38 @@
   isolation: isolate;
 }
 
+.hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: -20% -10% 0;
+  background: radial-gradient(circle at 30% 20%, rgba(96, 165, 250, 0.4), transparent 55%),
+    radial-gradient(circle at 80% 0%, rgba(147, 51, 234, 0.35), transparent 60%);
+  filter: blur(80px);
+  opacity: 0.8;
+  animation: auroraFloat 18s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.hero-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+    linear-gradient(315deg, rgba(255, 255, 255, 0.03) 20%, transparent 70%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.hero-banner-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 15% 50%, rgba(77, 124, 255, 0.15), transparent 35%),
+    radial-gradient(circle at 90% 20%, rgba(244, 114, 182, 0.2), transparent 45%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .hero-banner-bg {
   position: absolute;
   inset: 0;
@@ -70,6 +102,15 @@
     0 20px 40px rgba(5, 8, 20, 0.6);
 }
 
+.hero-banner-poster-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.15), transparent 60%);
+  mix-blend-mode: screen;
+  animation: shineSweep 6s ease-in-out infinite;
+}
+
 .hero-banner-poster::after {
   content: "";
   position: absolute;
@@ -96,6 +137,27 @@
 
 .group:hover .hero-banner-poster::after {
   opacity: 0.15;
+}
+
+@keyframes auroraFloat {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-3%, 4%, 0);
+  }
+}
+
+@keyframes shineSweep {
+  0% {
+    transform: translateX(-80%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(80%);
+  }
 }
 
 @media (max-width: 1024px) {

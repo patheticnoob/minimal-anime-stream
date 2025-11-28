@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Play } from "lucide-react";
+import { motion } from "framer-motion";
 
 type AnimeItem = {
   title?: string;
@@ -25,17 +26,21 @@ interface AnimeCardProps {
 }
 
 export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardProps) {
-  const progressPercentage = anime.currentTime && anime.duration 
-    ? (anime.currentTime / anime.duration) * 100 
+  const progressPercentage = anime.currentTime && anime.duration
+    ? (anime.currentTime / anime.duration) * 100
     : 0;
 
-  // Hotstar style: ~1.45:1 for landscape, standard 2:3 for portrait
   const aspectRatioClass = variant === "landscape" ? "aspect-[1.45/1]" : "aspect-[2/3]";
 
   return (
-    <div 
-      className="anime-card group relative flex flex-col gap-2" 
+    <motion.button
+      type="button"
+      aria-label={anime.title ?? "Open anime"}
+      className="anime-card group relative flex flex-col gap-2 text-left"
       onClick={onClick}
+      whileHover={{ y: -6, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 180, damping: 20 }}
     >
       <div className={`relative w-full ${aspectRatioClass} rounded-md overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}>
         {anime.image ? (
@@ -101,6 +106,6 @@ export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardPro
           {anime.language?.dub && <span>DUB {anime.language.dub}</span>}
         </div>
       </div>
-    </div>
+    </motion.button>
   );
 }
