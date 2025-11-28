@@ -74,6 +74,7 @@ const deriveDataIdFromSlug = (id?: string | null) => {
 export default function Landing() {
   const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { theme } = useTheme();
   
   const fetchTopAiring = useAction(api.hianime.topAiring);
   const fetchMostPopular = useAction(api.hianime.mostPopular);
@@ -827,7 +828,6 @@ export default function Landing() {
 
       {/* Video Player - Use RetroVideoPlayer for retro theme */}
       {videoSource && currentEpisodeData && (() => {
-        const { theme } = useTheme();
         const PlayerComponent = theme === "retro" ? RetroVideoPlayer : VideoPlayer;
         
         return (
