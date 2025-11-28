@@ -1,0 +1,340 @@
+@import url("https://fonts.googleapis.com/css2?family=DotGothic16&family=Space+Mono:wght@400;700&display=swap");
+
+[data-theme="retro"] {
+  --radius: 0.35rem;
+  --background: oklch(0.1 0.02 260);
+  --foreground: oklch(0.96 0.01 250);
+  --card: oklch(0.13 0.02 260);
+  --card-foreground: oklch(0.96 0.01 250);
+  --popover: oklch(0.11 0.02 260);
+  --popover-foreground: oklch(0.96 0.01 250);
+  --primary: oklch(0.74 0.07 150);
+  --primary-foreground: oklch(0.15 0.01 260);
+  --secondary: oklch(0.2 0.02 260);
+  --secondary-foreground: oklch(0.95 0.01 250);
+  --muted: oklch(0.18 0.01 260);
+  --muted-foreground: oklch(0.7 0.01 250);
+  --accent: oklch(0.68 0.08 210);
+  --accent-foreground: oklch(0.15 0.01 260);
+  --destructive: oklch(0.52 0.19 25);
+  --border: oklch(0.22 0.01 260);
+  --input: oklch(0.18 0.01 260);
+  --ring: oklch(0.74 0.07 150);
+  --chart-1: oklch(0.74 0.07 150);
+  --chart-2: oklch(0.68 0.08 210);
+  --chart-3: oklch(0.68 0.05 80);
+  --chart-4: oklch(0.6 0.05 40);
+  --chart-5: oklch(0.7 0.06 300);
+  --sidebar: oklch(0.09 0.01 260);
+  --sidebar-foreground: oklch(0.94 0.01 250);
+  --sidebar-primary: oklch(0.74 0.07 150);
+  --sidebar-primary-foreground: oklch(0.12 0.01 260);
+  --sidebar-accent: oklch(0.19 0.01 260);
+  --sidebar-accent-foreground: oklch(0.94 0.01 250);
+  --sidebar-border: oklch(0.2 0.01 260);
+  --sidebar-ring: oklch(0.68 0.08 210);
+  --font-heading: "DotGothic16", "Space Mono", "Inter", system-ui, sans-serif;
+  --font-body: "Space Mono", "DotGothic16", "Inter", system-ui, sans-serif;
+  --retro-grid-line: rgba(255, 255, 255, 0.05);
+  --retro-grid-bold: rgba(255, 255, 255, 0.08);
+  --retro-glow: rgba(115, 255, 196, 0.7);
+  --retro-panel: rgba(6, 11, 18, 0.92);
+}
+
+@keyframes retroScan {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 8px;
+  }
+}
+
+@keyframes retroPulse {
+  0% {
+    box-shadow: 0 0 12px rgba(74, 252, 141, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 26px rgba(91, 141, 255, 0.55);
+  }
+}
+
+@keyframes retroDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-3%, 5%, 0);
+  }
+}
+
+[data-theme="retro"] body {
+  font-family: var(--font-body);
+  letter-spacing: 0.04em;
+  background-color: #04070c;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(74, 252, 141, 0.16), transparent 45%),
+    radial-gradient(circle at 80% 5%, rgba(91, 141, 255, 0.18), transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      var(--retro-grid-line) 0px,
+      var(--retro-grid-line) 1px,
+      transparent 1px,
+      transparent 42px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--retro-grid-line) 0px,
+      var(--retro-grid-line) 1px,
+      transparent 1px,
+      transparent 42px
+    ),
+    linear-gradient(130deg, #020305 0%, #060b13 60%, #030307 100%);
+  color: #f2fff7;
+}
+
+[data-theme="retro"] body::before {
+  background: radial-gradient(circle at 15% 25%, rgba(74, 252, 141, 0.18), transparent 55%),
+    radial-gradient(circle at 90% 15%, rgba(91, 141, 255, 0.2), transparent 45%);
+  opacity: 0.8;
+  animation: retroDrift 22s ease-in-out infinite alternate;
+}
+
+[data-theme="retro"] body::after {
+  background-image: linear-gradient(0deg, rgba(4, 7, 14, 0.75), rgba(4, 7, 14, 0.8));
+  mix-blend-mode: lighten;
+  opacity: 0.45;
+}
+
+[data-theme="retro"] main::after {
+  background-image: linear-gradient(0deg, transparent 0%, rgba(4, 7, 14, 0.8) 45%);
+  opacity: 0.4;
+}
+
+[data-theme="retro"] h1,
+[data-theme="retro"] h2,
+[data-theme="retro"] h3,
+[data-theme="retro"] h4,
+[data-theme="retro"] h5,
+[data-theme="retro"] h6 {
+  font-family: var(--font-heading);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+[data-theme="retro"] p,
+[data-theme="retro"] span,
+[data-theme="retro"] button,
+[data-theme="retro"] input,
+[data-theme="retro"] label {
+  font-family: var(--font-body);
+}
+
+[data-theme="retro"] button {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+[data-theme="retro"] .hero-banner {
+  border-radius: 28px;
+  border: 1px solid rgba(115, 255, 196, 0.35);
+  background: linear-gradient(180deg, rgba(7, 12, 20, 0.96) 0%, rgba(3, 4, 8, 0.98) 100%);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+}
+
+[data-theme="retro"] .hero-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      var(--retro-grid-bold) 0px,
+      var(--retro-grid-bold) 1px,
+      transparent 1px,
+      transparent 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--retro-grid-line) 0px,
+      var(--retro-grid-line) 1px,
+      transparent 1px,
+      transparent 32px
+    );
+  opacity: 0.3;
+  mix-blend-mode: screen;
+}
+
+[data-theme="retro"] .hero-banner-copy h1 {
+  color: #f6fff7;
+  text-shadow: 0 0 16px var(--retro-glow);
+}
+
+[data-theme="retro"] .hero-banner-copy p {
+  color: rgba(242, 255, 247, 0.8);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-theme="retro"] .hero-banner button {
+  background: rgba(6, 11, 18, 0.8) !important;
+  border: 1px solid rgba(115, 255, 196, 0.5);
+  color: #f4fff8 !important;
+  box-shadow: 0 0 20px rgba(74, 252, 141, 0.15);
+  border-radius: 0.9rem;
+}
+
+[data-theme="retro"] .hero-banner button:first-of-type {
+  background: linear-gradient(90deg, #00ffa3 0%, #5b8dff 100%) !important;
+  color: #041015 !important;
+  box-shadow: 0 0 28px rgba(0, 255, 163, 0.45);
+}
+
+[data-theme="retro"] .hero-banner button:last-of-type {
+  width: 3.5rem;
+  aspect-ratio: 1/1;
+  border-radius: 1rem;
+}
+
+[data-theme="retro"] .hero-banner-art {
+  border-left: 1px solid rgba(115, 255, 196, 0.3);
+  background-color: rgba(6, 8, 12, 0.9);
+  position: relative;
+}
+
+[data-theme="retro"] .hero-banner-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 70% 50%, rgba(4, 8, 18, 0) 0%, rgba(4, 8, 18, 0.85) 85%),
+    linear-gradient(90deg, rgba(4, 8, 18, 0.95) 0%, rgba(4, 8, 18, 0.2) 60%, rgba(4, 8, 18, 0) 90%);
+  pointer-events: none;
+}
+
+[data-theme="retro"] .hero-banner-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px,
+    transparent 22px
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0.4;
+  animation: retroScan 1.8s linear infinite;
+}
+
+[data-theme="retro"] .hero-banner-copy .flex.flex-wrap {
+  gap: 0.75rem;
+}
+
+[data-theme="retro"] .hero-banner-copy .flex.flex-wrap span,
+[data-theme="retro"] .hero-banner-copy .flex.flex-wrap .badge {
+  border-radius: 0.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(6, 11, 18, 0.55);
+  padding: 2px 10px;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+}
+
+[data-theme="retro"] .anime-card {
+  border-radius: 18px;
+  border: 1px solid rgba(115, 255, 196, 0.35);
+  background: rgba(3, 5, 10, 0.85);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.65);
+  transition: transform 280ms ease, box-shadow 280ms ease;
+}
+
+[data-theme="retro"] .anime-card::before {
+  background: radial-gradient(circle at center, rgba(74, 252, 141, 0.14), transparent 65%);
+}
+
+[data-theme="retro"] .anime-card:hover {
+  box-shadow: 0 0 25px rgba(91, 141, 255, 0.4);
+  border-color: rgba(91, 141, 255, 0.6);
+}
+
+[data-theme="retro"] .anime-card-inner {
+  background: rgba(4, 7, 14, 0.95);
+}
+
+[data-theme="retro"] .anime-card-poster {
+  filter: saturate(0.85) contrast(1.1);
+}
+
+[data-theme="retro"] .anime-card .text-gray-100 {
+  color: #f0fff5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-theme="retro"] .anime-card .text-[#8f9aa3] {
+  color: rgba(226, 239, 230, 0.8);
+  letter-spacing: 0.06em;
+}
+
+[data-theme="retro"] .anime-card .bg-[#1977F3] {
+  background: linear-gradient(90deg, #5b8dff, #1ec8ff) !important;
+}
+
+[data-theme="retro"] .anime-card .bg-black\/60 {
+  background: rgba(6, 11, 18, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="retro"] .scrollbar-hide::-webkit-scrollbar {
+  height: 6px;
+}
+
+[data-theme="retro"] .scrollbar-hide::-webkit-scrollbar-thumb {
+  background: rgba(115, 255, 196, 0.5);
+  border-radius: 999px;
+}
+
+[data-theme="retro"] input,
+[data-theme="retro"] textarea {
+  background: rgba(6, 11, 18, 0.8);
+  border: 1px solid rgba(115, 255, 196, 0.35);
+  color: #f6fff6;
+  border-radius: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+[data-theme="retro"] .detail-sheet,
+[data-theme="retro"] .sidebar {
+  background: rgba(3, 5, 10, 0.92);
+  border: 1px solid rgba(115, 255, 196, 0.35);
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.75);
+}
+
+[data-theme="retro"] .sidebar .text-gray-400,
+[data-theme="retro"] .detail-sheet p {
+  color: rgba(226, 239, 230, 0.8);
+}
+
+[data-theme="retro"] .detail-episode {
+  border-color: rgba(115, 255, 196, 0.2);
+  background: rgba(5, 8, 13, 0.85);
+}
+
+[data-theme="retro"] .detail-episode:hover {
+  border-color: rgba(91, 141, 255, 0.6);
+  box-shadow: 0 0 18px rgba(91, 141, 255, 0.25);
+}
+
+[data-theme="retro"] .hero-banner,
+[data-theme="retro"] .anime-card,
+[data-theme="retro"] .detail-episode,
+[data-theme="retro"] .sidebar {
+  backdrop-filter: blur(6px);
+}

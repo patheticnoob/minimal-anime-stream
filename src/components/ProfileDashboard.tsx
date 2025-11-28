@@ -35,6 +35,11 @@ const shimmerHighlight =
 
 const emptyIllustration = "/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png";
 
+const themeOptions = [
+  { value: "classic", label: "Classic (Blue-Cyan)" },
+  { value: "retro", label: "Retro Home Screen" },
+] as const;
+
 export function ProfileDashboard({
   userName,
   userEmail,
@@ -51,6 +56,9 @@ export function ProfileDashboard({
     .map((segment) => segment[0]?.toUpperCase())
     .join("")
     .slice(0, 2) || "AF";
+
+  const activeThemeLabel =
+    themeOptions.find((option) => option.value === theme)?.label ?? theme;
 
   const totalSeconds = continueWatching.reduce(
     (acc, item) => acc + (item.currentTime ?? 0),
@@ -240,16 +248,21 @@ export function ProfileDashboard({
                   className="h-12 rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur"
                 >
                   <Palette className="mr-2 h-4 w-4" />
-                  Theme: {theme}
+                  Theme: {activeThemeLabel}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-black/95 border-white/10 text-white">
-                <DropdownMenuItem
-                  onClick={() => setTheme("classic")}
-                  className="cursor-pointer focus:bg-white/10"
-                >
-                  Classic (Blue-Cyan)
-                </DropdownMenuItem>
+                {themeOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => setTheme(option.value)}
+                    className={`cursor-pointer focus:bg-white/10 ${
+                      theme === option.value ? "text-blue-300" : ""
+                    }`}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
