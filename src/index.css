@@ -56,9 +56,9 @@
 body {
   position: relative;
   min-height: 100vh;
-  background: radial-gradient(circle at 20% 20%, rgba(103, 58, 183, 0.25), transparent 45%),
-    radial-gradient(circle at 80% 0%, rgba(79, 70, 229, 0.2), transparent 55%),
-    var(--background);
+  background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15), transparent 50%),
+    radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.12), transparent 55%),
+    linear-gradient(135deg, #050a14 0%, #0a0f1d 50%, #0d1425 100%);
 }
 
 body::before {
@@ -66,8 +66,8 @@ body::before {
   position: fixed;
   inset: -20% -10% auto;
   height: 140vh;
-  background: radial-gradient(circle at 10% 30%, rgba(96, 165, 250, 0.2), transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.25), transparent 45%);
+  background: radial-gradient(circle at 10% 30%, rgba(59, 130, 246, 0.15), transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.18), transparent 45%);
   filter: blur(60px);
   opacity: 0.8;
   animation: auroraShift 20s ease-in-out infinite alternate;
@@ -95,8 +95,8 @@ main::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(120deg, rgba(23, 37, 84, 0.4) 0%, transparent 60%),
-    linear-gradient(300deg, rgba(59, 7, 100, 0.35) 10%, transparent 65%);
+  background-image: linear-gradient(120deg, rgba(15, 23, 42, 0.4) 0%, transparent 60%),
+    linear-gradient(300deg, rgba(30, 58, 138, 0.25) 10%, transparent 65%);
   opacity: 0.25;
   pointer-events: none;
 }
