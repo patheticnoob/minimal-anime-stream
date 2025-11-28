@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Plus, Info, Star, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import type { CSSProperties } from "react";
 
 type AnimeItem = {
   title?: string;
@@ -21,13 +22,22 @@ interface HeroBannerProps {
   onMoreInfo: () => void;
 }
 
+type HeroBannerStyle = CSSProperties & {
+  "--hero-banner-image"?: string;
+};
+
 export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
+  const heroBackgroundStyle: HeroBannerStyle = anime.image
+    ? { "--hero-banner-image": `url(${anime.image})` }
+    : {};
+
   return (
     <motion.section
       className="hero-banner group"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
+      style={heroBackgroundStyle}
     >
       <div className="hero-banner-inner">
         <motion.div
