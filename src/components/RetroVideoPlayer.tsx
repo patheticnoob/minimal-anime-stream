@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 interface RetroVideoPlayerProps {
   source: string;
   title: string;
-  tracks?: Array<{ file: string; label: string; kind?: string }>;
+  tracks?: Array<{ file: string; label?: string; kind?: string }>;
   intro?: { start: number; end: number } | null;
   outro?: { start: number; end: number } | null;
   onClose: () => void;
@@ -409,10 +409,11 @@ export function RetroVideoPlayer({
   };
 
   const getTrackLabel = (
-    track: { file: string; label: string; kind?: string },
+    track: { file: string; label?: string; kind?: string },
     index: number,
   ) => {
-    const trimmed = track.label.trim();
+    const label = track.label || "";
+    const trimmed = label.trim();
     if (trimmed.length > 0) return trimmed;
     if (track.kind) return track.kind.toUpperCase();
     return `Track ${index + 1}`;
