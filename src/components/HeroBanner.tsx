@@ -113,22 +113,6 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             </Button>
           </div>
         </motion.div>
-
-        {anime.image && (
-          <motion.div
-            className="hero-banner-art"
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <img
-              src={anime.image}
-              alt={anime.title ?? "Featured artwork"}
-              className="hero-banner-art-image"
-              loading="eager"
-            />
-            <div className="hero-banner-art-overlay" />
-          </motion.div>
-        )}
       </div>
     </motion.section>
   );
