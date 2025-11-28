@@ -30,6 +30,7 @@ const schema = defineSchema(
       isAnonymous: v.optional(v.boolean()), // is the user anonymous. do not remove
 
       role: v.optional(roleValidator), // role of the user. do not remove
+      theme: v.optional(v.string()), // user's selected theme
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
     // Watch progress tracking

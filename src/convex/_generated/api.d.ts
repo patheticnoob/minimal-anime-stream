@@ -13,6 +13,7 @@ import type * as auth_emailOtp from "../auth/emailOtp.js";
 import type * as hianime from "../hianime.js";
 import type * as http from "../http.js";
 import type * as jikan from "../jikan.js";
+import type * as themes from "../themes.js";
 import type * as users from "../users.js";
 import type * as watchProgress from "../watchProgress.js";
 import type * as watchlist from "../watchlist.js";
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   hianime: typeof hianime;
   http: typeof http;
   jikan: typeof jikan;
+  themes: typeof themes;
   users: typeof users;
   watchProgress: typeof watchProgress;
   watchlist: typeof watchlist;

@@ -5,6 +5,7 @@
 
 /* Import component-specific styles */
 @import "./styles/theme.css";
+@import "./styles/themes/classic.css";
 @import "./styles/sidebar.css";
 @import "./styles/hero-banner.css";
 @import "./styles/anime-card.css";

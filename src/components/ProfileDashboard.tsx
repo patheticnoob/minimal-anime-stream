@@ -1,7 +1,14 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LogOut } from "lucide-react";
+import { LogOut, Palette } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useTheme } from "@/hooks/use-theme";
 
 type ProfileAnime = {
   title?: string;
@@ -36,6 +43,7 @@ export function ProfileDashboard({
   onSelectAnime,
   onLogout,
 }: ProfileDashboardProps) {
+  const { theme, setTheme } = useTheme();
   const displayName = userName?.trim() || userEmail || "Anime Fan";
   const initials = displayName
     .split(" ")
@@ -225,12 +233,25 @@ export function ProfileDashboard({
             </div>
           </div>
           <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              className="h-12 rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur"
-            >
-              Personalize Feed
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="secondary"
+                  className="h-12 rounded-2xl border border-white/10 bg-white/5 text-white backdrop-blur"
+                >
+                  <Palette className="mr-2 h-4 w-4" />
+                  Theme: {theme}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-black/95 border-white/10 text-white">
+                <DropdownMenuItem
+                  onClick={() => setTheme("classic")}
+                  className="cursor-pointer focus:bg-white/10"
+                >
+                  Classic (Blue-Cyan)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               variant="destructive"
               onClick={onLogout}
