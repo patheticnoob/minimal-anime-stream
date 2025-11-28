@@ -1,31 +1,23 @@
-import { InfoModal, type BroadcastInfo } from "@/components/InfoModal";
+// From Landing.tsx playEpisode function:
 
-type AnimeDetail = {
-  // ...
-};
+// Original M3U8 URL from the source
+const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
+// Example: "https://megacloud.example.com/playlist.m3u8"
 
-export type BroadcastInfo = {
-  summary?: string | null;
-  day?: string | null;
-  time?: string | null;
-  timezone?: string | null;
-};
+// Build Convex HTTP endpoint base
+const raw = import.meta.env.VITE_CONVEX_URL;
+let base = raw.replace("convex.cloud", "convex.site");
+base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+// Result: "https://your-project.convex.site"
 
-interface InfoModalProps {
+// Proxy the M3U8 URL through Convex
+const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
+// Result: "https://your-project.convex.site/proxy?url=https%3A%2F%2Fmegacloud.example.com%2Fplaylist.m3u8"
 
-}
+const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
+  ...t,
+  kind: t.kind || "subtitles",
+  file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+}));
 
-if (!broadcastInfo?.day || !broadcastInfo?.time || !broadcastInfo?.timezone) {
-  return null;
-}
-
-const normalizedDay = broadcastInfo.day.toLowerCase().replace(/s$/, "");
-
-return {
-  broadcast: {
-    day: anime.broadcast.day ?? null,
-    time: anime.broadcast.time ?? null,
-    timezone: anime.broadcast.timezone ?? null,
-    string: anime.broadcast.string ?? null,
-  },
-};
+setVideoSource(proxiedUrl);
