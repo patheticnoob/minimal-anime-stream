@@ -29,10 +29,6 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="hero-banner-bg" />
-      <div className="hero-banner-overlay" />
-      <div className="hero-banner-glow" />
-
       <div className="hero-banner-inner">
         <motion.div
           className="hero-banner-copy"
