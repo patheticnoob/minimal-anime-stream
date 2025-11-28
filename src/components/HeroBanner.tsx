@@ -110,22 +110,17 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
 
         {anime.image && (
           <motion.div
-            className="hero-banner-poster-wrapper"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            className="hero-banner-art"
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           >
-            <motion.div
-              className="hero-banner-poster"
-              whileHover={{ scale: 1.03, rotate: -1 }}
-              transition={{ type: "spring", stiffness: 120, damping: 12 }}
-            >
-              <div className="hero-banner-poster-shine" />
-              <img
-                src={anime.image}
-                alt={anime.title ?? "Hero"}
-                className="hero-banner-poster-image"
-              />
-            </motion.div>
+            <img
+              src={anime.image}
+              alt={anime.title ?? "Featured artwork"}
+              className="hero-banner-art-image"
+              loading="eager"
+            />
+            <div className="hero-banner-art-overlay" />
           </motion.div>
         )}
       </div>
