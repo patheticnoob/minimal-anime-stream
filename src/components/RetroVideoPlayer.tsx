@@ -202,7 +202,7 @@ export function RetroVideoPlayer({
       video.removeEventListener("waiting", handleWaiting);
       video.removeEventListener("canplay", handleCanPlay);
     };
-  }, [onProgressUpdate, intro, outro]);
+  }, [onProgressUpdate, intro, outro, source]);
 
   // Auto-hide controls
   useEffect(() => {

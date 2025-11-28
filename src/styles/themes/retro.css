@@ -208,7 +208,23 @@
 }
 
 [data-theme="retro"] .hero-banner-art {
-  display: none;
+  flex: 0 0 300px;
+  width: 300px;
+  height: 450px;
+  border: 3px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.5), 0 0 40px rgba(255, 105, 180, 0.3);
+  overflow: hidden;
+  position: relative;
+}
+
+[data-theme="retro"] .hero-banner-art img {
+  filter: saturate(1.2) contrast(1.1);
+}
+
+@media (max-width: 768px) {
+  [data-theme="retro"] .hero-banner-art {
+    display: none;
+  }
 }
 
 [data-theme="retro"] .hero-banner-copy .flex.flex-wrap span,

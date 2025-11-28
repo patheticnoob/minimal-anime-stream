@@ -111,14 +111,20 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
           </div>
         </motion.div>
 
-        <motion.div
-          className="hero-banner-art"
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.15, duration: 0.5 }}
-          aria-hidden="true"
-          style={heroArtStyle}
-        />
+        {anime.image && (
+          <motion.div
+            className="hero-banner-art"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+          >
+            <img 
+              src={anime.image} 
+              alt={anime.title || "Anime poster"} 
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+        )}
       </div>
     </motion.section>
   );
