@@ -105,13 +105,19 @@
 
   .hero-banner-inner {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
   }
 
   .hero-banner-poster-wrapper {
-    justify-content: flex-start;
+    justify-content: center;
+    order: -1;
   }
 
   .hero-banner-poster {
     margin: 0 auto;
+  }
+
+  .hero-banner-copy {
+    order: 1;
   }
 }
