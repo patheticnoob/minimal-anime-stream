@@ -22,14 +22,12 @@ interface HeroBannerProps {
   onMoreInfo: () => void;
 }
 
-type HeroBannerStyle = CSSProperties & {
-  "--hero-banner-image"?: string;
-};
+type HeroBannerStyle = CSSProperties;
 
 export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
-  const heroBackgroundStyle: HeroBannerStyle = anime.image
-    ? { "--hero-banner-image": `url(${anime.image})` }
-    : {};
+  const heroArtStyle: HeroBannerStyle | undefined = anime.image
+    ? { backgroundImage: `url(${anime.image})` }
+    : undefined;
 
   return (
     <motion.section
@@ -37,7 +35,6 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      style={heroBackgroundStyle}
     >
       <div className="hero-banner-inner">
         <motion.div
@@ -113,6 +110,15 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             </Button>
           </div>
         </motion.div>
+
+        <motion.div
+          className="hero-banner-art"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
+          aria-hidden="true"
+          style={heroArtStyle}
+        />
       </div>
     </motion.section>
   );
