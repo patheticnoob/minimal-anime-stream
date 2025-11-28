@@ -36,31 +36,29 @@
 .hero-banner::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background-image: radial-gradient(
-      circle at 80% 50%,
-      rgba(5, 7, 20, 0) 35%,
-      rgba(5, 7, 20, 0.45) 70%,
-      rgba(5, 7, 20, 0.9) 100%
-    ),
-    linear-gradient(
-      90deg,
-      rgba(5, 7, 20, 1) 0%,
-      rgba(5, 7, 20, 1) 40%,
-      rgba(5, 7, 20, 0.5) 60%,
-      rgba(5, 7, 20, 0) 80%
-    ),
-    var(--hero-banner-image, none);
-  background-size: 160% 160%, 100% 100%, cover;
-  background-position: right center, left center, right center;
-  background-repeat: no-repeat;
+  top: -6%;
+  right: -6%;
+  bottom: -6%;
+  left: 55%;
   pointer-events: none;
   z-index: 0;
+  background-image: radial-gradient(
+      circle at 0% 50%,
+      rgba(5, 7, 20, 1) 0%,
+      rgba(5, 7, 20, 0.9) 18%,
+      rgba(5, 7, 20, 0) 55%,
+      rgba(5, 7, 20, 0.6) 80%,
+      rgba(5, 7, 20, 1) 100%
+    ),
+    var(--hero-banner-image, none);
+  background-size: 170% 170%, cover;
+  background-position: left center, right center;
+  background-repeat: no-repeat;
 }
 
 .hero-banner-inner {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
