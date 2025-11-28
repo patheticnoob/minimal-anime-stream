@@ -60,7 +60,7 @@ export function RetroVideoPlayer({
   // Initialize HLS
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !source) return;
+    if (!video) return;
 
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
@@ -126,7 +126,7 @@ export function RetroVideoPlayer({
         video.play().catch(() => {});
       });
     }
-  }, [source, resumeFrom]);
+  }, [resumeFrom]);
 
   // Update progress
   useEffect(() => {
@@ -353,14 +353,6 @@ export function RetroVideoPlayer({
         onMouseMove={handleMouseMove}
         onMouseLeave={() => isPlaying && setShowControls(false)}
       >
-        {/* Retro Grid Background */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
-          backgroundImage: `
-            linear-gradient(rgba(255, 105, 180, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 105, 180, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '20px 20px'
-        }} />
 
         {/* Close Button */}
         <motion.div
