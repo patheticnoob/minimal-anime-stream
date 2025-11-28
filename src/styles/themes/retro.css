@@ -60,15 +60,25 @@
   font-family: var(--font-body);
   letter-spacing: 0.1em;
   background-color: oklch(0.12 0.02 240);
+  color: oklch(0.95 0.05 180);
+  position: relative;
+}
+
+/* Retro Grid Background - Applied to entire site */
+[data-theme="retro"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
-  color: oklch(0.95 0.05 180);
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Scanline Effect */
-[data-theme="retro"] body::before {
+/* Scanline Effect - Layered on top of grid */
+[data-theme="retro"] body::after {
   content: "";
   position: fixed;
   inset: 0;
@@ -77,14 +87,6 @@
   pointer-events: none;
   z-index: 9999;
   opacity: 0.5;
-}
-
-[data-theme="retro"] body::after {
-  content: none;
-}
-
-[data-theme="retro"] main::after {
-  content: none;
 }
 
 /* Typography */
@@ -113,10 +115,12 @@
   letter-spacing: 0.1em;
 }
 
-/* Retro Hero Banner - VHS Style */
+/* Retro Hero Banner - VHS Style with Fixed Height */
 [data-theme="retro"] .hero-banner {
   position: relative;
+  height: 500px;
   min-height: 500px;
+  max-height: 500px;
   border: 2px solid oklch(0.75 0.25 330);
   background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   overflow: hidden;
@@ -169,7 +173,7 @@
 }
 
 [data-theme="retro"] .hero-banner-copy h1 {
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: 700;
   color: oklch(0.75 0.25 330);
   text-shadow: 
@@ -178,17 +182,29 @@
     0 0 30px oklch(0.75 0.25 330);
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  line-height: 1.2;
+  line-height: 1.3;
   margin-bottom: 1.5rem;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
 }
 
 [data-theme="retro"] .hero-banner-copy p {
   color: oklch(0.65 0.22 180);
-  font-size: 1rem;
+  font-size: 0.9rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin-bottom: 2rem;
   text-shadow: 0 0 5px oklch(0.65 0.22 180);
+  line-height: 1.6;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  [data-theme="retro"] .hero-banner-copy h1 {
+    font-size: 3.5rem;
+  }
 }
 
 [data-theme="retro"] .hero-banner button {
