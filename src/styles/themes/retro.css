@@ -113,85 +113,102 @@
   letter-spacing: 0.1em;
 }
 
-/* Hero Banner */
+/* Retro Hero Banner - VHS Style */
 [data-theme="retro"] .hero-banner {
-  border-radius: 0.125rem;
+  position: relative;
+  min-height: 500px;
   border: 2px solid oklch(0.75 0.25 330);
-  background: oklch(0.15 0.03 240);
-  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   overflow: hidden;
+}
+
+[data-theme="retro"] .hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 105, 180, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 105, 180, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 1;
 }
 
 [data-theme="retro"] .hero-banner::after {
   content: "";
   position: absolute;
-  inset: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 105, 180, 0.1) 20%,
+    rgba(0, 255, 170, 0.1) 40%,
+    rgba(255, 215, 0, 0.1) 60%,
+    rgba(255, 105, 180, 0.2) 100%
+  );
   pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.5;
-  mix-blend-mode: screen;
+  z-index: 2;
+}
+
+[data-theme="retro"] .hero-banner-inner {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3rem;
+  min-height: 500px;
+}
+
+[data-theme="retro"] .hero-banner-copy {
+  flex: 1;
+  max-width: 600px;
 }
 
 [data-theme="retro"] .hero-banner-copy h1 {
+  font-size: 4rem;
+  font-weight: 700;
   color: oklch(0.75 0.25 330);
-  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+  text-shadow: 
+    0 0 10px oklch(0.75 0.25 330),
+    0 0 20px oklch(0.75 0.25 330),
+    0 0 30px oklch(0.75 0.25 330);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
 }
 
 [data-theme="retro"] .hero-banner-copy p {
-  color: oklch(0.95 0.05 180);
-  font-size: 0.95rem;
-  letter-spacing: 0.1em;
+  color: oklch(0.65 0.22 180);
+  font-size: 1rem;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 5px oklch(0.65 0.22 180);
 }
 
 [data-theme="retro"] .hero-banner button {
   background: oklch(0.75 0.25 330) !important;
-  border: 1px solid oklch(0.75 0.25 330);
+  border: 2px solid oklch(0.75 0.25 330);
   color: oklch(0.12 0.02 240) !important;
   box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
-  border-radius: 0.125rem;
-  transition: transform 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  transition: all 0.2s ease;
 }
 
 [data-theme="retro"] .hero-banner button:hover {
-  transform: scale(1.1);
-}
-
-[data-theme="retro"] .hero-banner button:first-of-type {
-  background: oklch(0.75 0.25 330) !important;
-  color: oklch(0.12 0.02 240) !important;
-  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.7), 0 0 30px rgba(255, 105, 180, 0.5);
 }
 
 [data-theme="retro"] .hero-banner-art {
-  border-left: 2px solid oklch(0.75 0.25 330);
-  background-color: oklch(0.15 0.03 240);
-  position: relative;
-}
-
-[data-theme="retro"] .hero-banner-art::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 70% 50%, rgba(18, 31, 61, 0) 0%, rgba(18, 31, 61, 0.85) 85%),
-    linear-gradient(90deg, rgba(18, 31, 61, 0.95) 0%, rgba(18, 31, 61, 0.2) 60%, rgba(18, 31, 61, 0) 90%);
-  pointer-events: none;
-}
-
-[data-theme="retro"] .hero-banner-art::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.1) 50%);
-  background-size: 100% 4px;
-  mix-blend-mode: soft-light;
-  opacity: 0.4;
-  animation: retroScan 1.8s linear infinite;
+  display: none;
 }
 
 [data-theme="retro"] .hero-banner-copy .flex.flex-wrap span,
@@ -289,14 +306,61 @@
 }
 
 [data-theme="retro"] .detail-episode {
-  border: 1px solid oklch(0.3 0.05 240);
-  background: oklch(0.2 0.03 240);
-  border-radius: 0.125rem;
+  border: 2px solid oklch(0.3 0.05 240);
+  background: oklch(0.15 0.03 240);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
 }
 
 [data-theme="retro"] .detail-episode:hover {
   border-color: oklch(0.75 0.25 330);
   box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+  transform: translateX(4px);
+}
+
+[data-theme="retro"] .detail-episode-title {
+  color: oklch(0.95 0.05 180);
+  font-family: 'Courier Prime', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.9rem;
+}
+
+[data-theme="retro"] .detail-episode-meta {
+  color: oklch(0.6 0.05 180);
+  font-family: 'Courier Prime', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+}
+
+/* Info Modal Retro Styling */
+[data-theme="retro"] .detail-sheet {
+  background: oklch(0.12 0.02 240);
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+}
+
+[data-theme="retro"] .detail-hero-title {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-family: 'Courier Prime', monospace;
+}
+
+[data-theme="retro"] .detail-hero-tag {
+  background: oklch(0.2 0.03 240);
+  border: 2px solid oklch(0.75 0.25 330);
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .detail-hero-actions button {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: 'Courier Prime', monospace;
 }
 
 /* Progress Bars */

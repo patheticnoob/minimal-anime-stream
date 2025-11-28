@@ -17,6 +17,8 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { SearchSection } from "@/components/SearchSection";
+import { useTheme } from "@/hooks/use-theme";
+import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 
 type AnimeItem = {
   title?: string;
@@ -823,62 +825,53 @@ export default function Landing() {
         broadcastLoading={isBroadcastLoading}
       />
 
-      {/* Video Player */}
-      {videoSource && currentEpisodeData && (
-        <VideoPlayer
-          source={videoSource}
-          title={videoTitle}
-          tracks={videoTracks}
-          intro={videoIntro}
-          outro={videoOutro}
-          info={{
-            title: currentAnimeInfo?.title ?? selected?.title ?? "",
-            image: (currentAnimeInfo?.image ?? selected?.image) ?? undefined,
-            type: currentAnimeInfo?.type ?? selected?.type,
-            language: currentAnimeInfo?.language ?? selected?.language,
-          }}
-          episodes={episodes.map(ep => ({
-            id: ep.id,
-            title: ep.title,
-            number: typeof ep.number === 'number' ? ep.number : undefined,
-          }))}
-          currentEpisode={currentEpisodeIndex !== null && episodes[currentEpisodeIndex] ? (typeof episodes[currentEpisodeIndex].number === 'number' ? episodes[currentEpisodeIndex].number : undefined) : undefined}
-          onSelectEpisode={(ep) => playEpisode(ep)}
-          onNext={() => {
-            if (currentEpisodeIndex === null) return;
-            const next = episodes[currentEpisodeIndex + 1];
-            if (next) playEpisode(next);
-          }}
-          nextTitle={
-            currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
-              ? `${selected?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
-              : undefined
-          }
-          resumeFrom={
-            animeProgress && 
-            currentEpisodeData &&
-            animeProgress.episodeId === currentEpisodeData.id && 
-            animeProgress.currentTime > 0 && 
-            animeProgress.duration > 0
-              ? animeProgress.currentTime
-              : 0
-          }
-          onProgressUpdate={handleProgressUpdate}
-          onClose={() => {
-            setVideoSource(null);
-            setVideoTitle("");
-            setVideoTracks([]);
-            setVideoIntro(null);
-            setVideoOutro(null);
-            setCurrentEpisodeData(null);
-            setCurrentAnimeInfo(null);
-            // Reopen the modal with the last selected anime
-            if (lastSelectedAnime) {
-              setSelected(lastSelectedAnime);
+      {/* Video Player - Use RetroVideoPlayer for retro theme */}
+      {videoSource && currentEpisodeData && (() => {
+        const { theme } = useTheme();
+        const PlayerComponent = theme === "retro" ? RetroVideoPlayer : VideoPlayer;
+        
+        return (
+          <PlayerComponent
+            source={videoSource}
+            title={videoTitle}
+            tracks={videoTracks}
+            intro={videoIntro}
+            outro={videoOutro}
+            resumeFrom={
+              animeProgress && 
+              currentEpisodeData &&
+              animeProgress.episodeId === currentEpisodeData.id && 
+              animeProgress.currentTime > 0 && 
+              animeProgress.duration > 0
+                ? animeProgress.currentTime
+                : 0
             }
-          }}
-        />
-      )}
+            onProgressUpdate={handleProgressUpdate}
+            onNext={() => {
+              if (currentEpisodeIndex === null) return;
+              const next = episodes[currentEpisodeIndex + 1];
+              if (next) playEpisode(next);
+            }}
+            nextTitle={
+              currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
+                ? `${selected?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
+                : undefined
+            }
+            onClose={() => {
+              setVideoSource(null);
+              setVideoTitle("");
+              setVideoTracks([]);
+              setVideoIntro(null);
+              setVideoOutro(null);
+              setCurrentEpisodeData(null);
+              setCurrentAnimeInfo(null);
+              if (lastSelectedAnime) {
+                setSelected(lastSelectedAnime);
+              }
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }
