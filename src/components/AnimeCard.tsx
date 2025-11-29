@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Play } from "lucide-react";
 import { motion } from "framer-motion";
+import { memo } from "react";
 
 type AnimeItem = {
   title?: string;
@@ -25,7 +26,7 @@ interface AnimeCardProps {
   variant?: "portrait" | "landscape";
 }
 
-export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardProps) {
+function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps) {
   const progressPercentage = anime.currentTime && anime.duration
     ? (anime.currentTime / anime.duration) * 100
     : 0;
@@ -121,3 +122,32 @@ export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardPro
     </motion.button>
   );
 }
+
+const areAnimeCardPropsEqual = (prev: AnimeCardProps, next: AnimeCardProps) => {
+  const prevAnime = prev.anime;
+  const nextAnime = next.anime;
+
+  if (prevAnime === nextAnime && prev.onClick === next.onClick && prev.variant === next.variant) {
+    return true;
+  }
+
+  if (!prevAnime || !nextAnime) {
+    return false;
+  }
+
+  const sameAnime =
+    prevAnime.id === nextAnime.id &&
+    prevAnime.dataId === nextAnime.dataId &&
+    prevAnime.title === nextAnime.title &&
+    prevAnime.image === nextAnime.image &&
+    prevAnime.type === nextAnime.type &&
+    prevAnime.episodeNumber === nextAnime.episodeNumber &&
+    prevAnime.currentTime === nextAnime.currentTime &&
+    prevAnime.duration === nextAnime.duration &&
+    prevAnime.language?.sub === nextAnime.language?.sub &&
+    prevAnime.language?.dub === nextAnime.language?.dub;
+
+  return sameAnime && prev.variant === next.variant && prev.onClick === next.onClick;
+};
+
+export const AnimeCard = memo(AnimeCardBase, areAnimeCardPropsEqual);

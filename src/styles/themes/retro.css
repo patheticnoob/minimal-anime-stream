@@ -196,6 +196,7 @@
   border-radius: 0.125rem;
   border: 2px solid oklch(0.75 0.25 330);
   box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  contain: paint;
   overflow: hidden;
   position: relative;
   transition: transform 0.35s ease, box-shadow 0.35s ease;
@@ -319,6 +320,7 @@
   padding: 0;
   overflow: visible;
   will-change: transform;
+  contain: paint;
 }
 
 [data-theme="retro"] .anime-card::before {
@@ -630,4 +632,24 @@
 
 [data-theme="retro"] .bg-accent {
   background: oklch(0.7 0.25 150);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="retro"] * {
+    animation: none !important;
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  [data-theme="retro"] .hero-banner,
+  [data-theme="retro"] .hero-banner-art,
+  [data-theme="retro"] .anime-card,
+  [data-theme="retro"] .detail-episode {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  [data-theme="retro"] body {
+    background-attachment: scroll !important;
+  }
 }

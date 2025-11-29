@@ -45,14 +45,15 @@ This document outlines performance optimizations implemented in the Minimal Anim
 - [x] Add will-change hints
 - [x] Reduce box-shadow layers
 - [x] Optimize transition properties
+- [x] Respect `prefers-reduced-motion` to disable heavy retro effects when requested
 
 ### Component Optimizations
-- [ ] Add React.memo to AnimeCard
-- [ ] Add React.memo to ContentRail
-- [ ] Add React.memo to HeroBanner
-- [ ] Implement useCallback for onClick handlers
-- [ ] Use useMemo for derived state
-- [ ] Break down large components (VideoPlayer, RetroVideoPlayer, Landing)
+- [x] Add React.memo to AnimeCard
+- [x] Add React.memo to ContentRail
+- [x] Add React.memo to HeroBanner
+- [x] Implement useCallback for onClick handlers
+- [x] Use useMemo for derived state
+- [x] Break down large components (VideoPlayer, RetroVideoPlayer, Landing)
 
 ### Asset Optimizations
 - [x] Lazy load images (loading="lazy")
@@ -161,3 +162,5 @@ This document outlines performance optimizations implemented in the Minimal Anim
 7. Stop recording and analyze
 
 ### Automated Testing
+
+Added memoization for frequently re-rendered UI (HeroBanner, AnimeCard) and stabilized ContentRail handlers via `useCallback`/`useMemo`, reducing unnecessary renders without affecting functionality. The retro theme now also honors reduced-motion preferences to prevent GPU spikes for sensitive users.

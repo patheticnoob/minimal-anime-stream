@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimeCard } from "./AnimeCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,15 +43,21 @@ export function ContentRail({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  const displayedItems = enableInfiniteScroll ? items : items.slice(0, displayCount);
-  const canShowMore = !enableInfiniteScroll && items.length > displayCount;
+  const displayedItems = useMemo(
+    () => (enableInfiniteScroll ? items : items.slice(0, displayCount)),
+    [enableInfiniteScroll, items, displayCount]
+  );
+  const canShowMore = useMemo(
+    () => !enableInfiniteScroll && items.length > displayCount,
+    [enableInfiniteScroll, items.length, displayCount]
+  );
 
-  const updateScrollState = () => {
+  const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     setCanScrollLeft(el.scrollLeft > 16);
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 16);
-  };
+  }, []);
 
   useEffect(() => {
     updateScrollState();
@@ -66,11 +72,11 @@ export function ContentRail({
       el.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScroll);
     };
-  }, [items.length, displayedItems.length]);
+  }, [displayedItems.length, items.length, updateScrollState]);
 
   if (!items || items.length === 0) return null;
 
-  const scrollRail = (direction: "left" | "right") => {
+  const scrollRail = useCallback((direction: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
     const scrollAmount = el.clientWidth * 0.85;
@@ -78,15 +84,15 @@ export function ContentRail({
       left: direction === "left" ? -scrollAmount : scrollAmount,
       behavior: "smooth",
     });
-  };
+  }, []);
 
-  const handleShowMore = () => {
+  const handleShowMore = useCallback(() => {
     if (enableInfiniteScroll && onLoadMore && hasMore) {
       onLoadMore();
     } else {
       setDisplayCount(prev => prev + 12);
     }
-  };
+  }, [enableInfiniteScroll, hasMore, onLoadMore]);
 
   return (
     <section className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

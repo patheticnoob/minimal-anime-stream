@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Plus, Info, Star, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { memo } from "react";
 import type { CSSProperties } from "react";
 
 type AnimeItem = {
@@ -24,7 +25,7 @@ interface HeroBannerProps {
 
 type HeroBannerStyle = CSSProperties;
 
-export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
+function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
   const heroArtStyle: HeroBannerStyle | undefined = anime.image
     ? { backgroundImage: `url(${anime.image})` }
     : undefined;
@@ -134,3 +135,21 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
     </motion.section>
   );
 }
+
+const areHeroBannerPropsEqual = (prev: HeroBannerProps, next: HeroBannerProps) => {
+  const prevAnime = prev.anime;
+  const nextAnime = next.anime;
+
+  const sameAnime =
+    prevAnime?.id === nextAnime?.id &&
+    prevAnime?.dataId === nextAnime?.dataId &&
+    prevAnime?.title === nextAnime?.title &&
+    prevAnime?.image === nextAnime?.image &&
+    prevAnime?.type === nextAnime?.type &&
+    prevAnime?.language?.sub === nextAnime?.language?.sub &&
+    prevAnime?.language?.dub === nextAnime?.language?.dub;
+
+  return sameAnime && prev.onPlay === next.onPlay && prev.onMoreInfo === next.onMoreInfo;
+};
+
+export const HeroBanner = memo(HeroBannerBase, areHeroBannerPropsEqual);
