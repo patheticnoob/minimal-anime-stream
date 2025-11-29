@@ -57,3 +57,14 @@
 .anime-card:active {
   transform: scale(0.98);
 }
+
+.anime-card-retro-overlay,
+.anime-card-retro-scanlines {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 300ms ease, transform 300ms ease;
+}

@@ -358,6 +358,37 @@
   border: 1px solid oklch(0.3 0.05 240);
 }
 
+[data-theme="retro"] .anime-card-retro-overlay {
+  opacity: 0.18;
+  background-image:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.15), transparent 55%),
+    linear-gradient(300deg, rgba(0, 255, 213, 0.12), transparent 60%);
+  mix-blend-mode: screen;
+  z-index: 2;
+}
+
+[data-theme="retro"] .anime-card-retro-scanlines {
+  opacity: 0.35;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.16) 0px,
+    rgba(255, 255, 255, 0.16) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode: screen;
+  z-index: 3;
+}
+
+[data-theme="retro"] .anime-card:hover .anime-card-retro-overlay {
+  opacity: 0.35;
+}
+
+[data-theme="retro"] .anime-card:hover .anime-card-retro-scanlines {
+  opacity: 0.6;
+  transform: scale(1.02);
+}
+
 /* Scrollbar */
 [data-theme="retro"] .scrollbar-hide::-webkit-scrollbar {
   height: 6px;

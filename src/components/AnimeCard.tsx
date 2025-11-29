@@ -42,7 +42,9 @@ export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardPro
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 180, damping: 20 }}
     >
-      <div className={`relative w-full ${aspectRatioClass} rounded-md overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}>
+      <div
+        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} rounded-md overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}
+      >
         {anime.image ? (
           <img
             src={anime.image}
@@ -55,9 +57,10 @@ export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardPro
             No Image
           </div>
         )}
-        
-        {/* Gradient Overlay on hover */}
+
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="anime-card-retro-overlay" aria-hidden="true" />
+        <div className="anime-card-retro-scanlines" aria-hidden="true" />
 
         {/* Episode number badge - Top Left */}
         {anime.episodeNumber && (
