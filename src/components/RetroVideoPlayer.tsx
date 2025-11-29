@@ -290,6 +290,37 @@ export function RetroVideoPlayer({
     };
   }, [isPlaying]);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const styleId = "subtitle-position-style-retro";
+    const translateValue = showControls ? "-120px" : "-60px";
+    const style = document.createElement("style");
+    style.id = styleId;
+    style.textContent = `
+      video[data-retro-player="true"]::-webkit-media-text-track-container {
+        transform: translateY(${translateValue}) !important;
+      }
+      video[data-retro-player="true"]::cue {
+        transform: translateY(${translateValue}) !important;
+      }
+    `;
+
+    const existingStyle = document.getElementById(styleId);
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+    document.head.appendChild(style);
+
+    return () => {
+      const styleToRemove = document.getElementById(styleId);
+      if (styleToRemove) {
+        styleToRemove.remove();
+      }
+    };
+  }, [showControls]);
+
   const handleMouseMove = () => {
     setShowControls(true);
     if (controlsTimeoutRef.current) {
@@ -466,6 +497,7 @@ export function RetroVideoPlayer({
           onClick={togglePlay}
           crossOrigin="anonymous"
           playsInline
+          data-retro-player="true"
         >
           {tracks?.map((track, idx) => {
             const label = getTrackLabel(track, idx);
@@ -632,23 +664,25 @@ export function RetroVideoPlayer({
             </div>
 
             {tracks && tracks.length > 0 && (
-              <div className="flex items-center gap-2 px-4 pb-4 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
-                <span>Subs</span>
-                <select
-                  value={selectedSubtitle}
-                  onChange={handleSubtitleChange}
-                  className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
-                >
-                  <option value="off">Off</option>
-                  {tracks.map((track, idx) => {
-                    const label = getTrackLabel(track, idx);
-                    return (
-                      <option key={`${label}-${idx}`} value={label}>
-                        {label}
-                      </option>
-                    );
-                  })}
-                </select>
+              <div className="flex justify-end px-4 pb-4">
+                <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
+                  <span>Subs</span>
+                  <select
+                    value={selectedSubtitle}
+                    onChange={handleSubtitleChange}
+                    className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
+                  >
+                    <option value="off">Off</option>
+                    {tracks.map((track, idx) => {
+                      const label = getTrackLabel(track, idx);
+                      return (
+                        <option key={`${label}-${idx}`} value={label}>
+                          {label}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
             )}
           </div>
