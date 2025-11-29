@@ -138,6 +138,19 @@
 }
 
 /* Retro Hero Banner - VHS Style */
+[data-theme="retro"] .hero-banner,
+[data-theme="retro"] .hero-banner-inner {
+  min-height: auto;
+  height: auto;
+  padding-top: clamp(2rem, 4vw, 3.5rem);
+  padding-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+[data-theme="retro"] .hero-banner-inner {
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+}
+
 [data-theme="retro"] .hero-banner {
   position: relative;
   border: 2px solid oklch(0.75 0.25 330);
@@ -176,13 +189,27 @@
   z-index: 2;
 }
 
-[data-theme="retro"] .hero-banner-inner {
+[data-theme="retro"] .hero-banner-art {
+  min-height: auto;
+  max-height: none;
+  height: 100%;
+  flex: 0 0 300px;
+  width: 300px;
+  height: 450px;
+  border: 3px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.5), 0 0 40px rgba(255, 105, 180, 0.3);
+  overflow: hidden;
   position: relative;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 3rem;
+}
+
+[data-theme="retro"] .hero-banner-art img {
+  filter: saturate(1.2) contrast(1.1);
+}
+
+@media (max-width: 768px) {
+  [data-theme="retro"] .hero-banner-art {
+    display: none;
+  }
 }
 
 [data-theme="retro"] .hero-banner-copy {
@@ -228,26 +255,6 @@
 [data-theme="retro"] .hero-banner button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(255, 105, 180, 0.7), 0 0 30px rgba(255, 105, 180, 0.5);
-}
-
-[data-theme="retro"] .hero-banner-art {
-  flex: 0 0 300px;
-  width: 300px;
-  height: 450px;
-  border: 3px solid oklch(0.75 0.25 330);
-  box-shadow: 0 0 20px rgba(255, 105, 180, 0.5), 0 0 40px rgba(255, 105, 180, 0.3);
-  overflow: hidden;
-  position: relative;
-}
-
-[data-theme="retro"] .hero-banner-art img {
-  filter: saturate(1.2) contrast(1.1);
-}
-
-@media (max-width: 768px) {
-  [data-theme="retro"] .hero-banner-art {
-    display: none;
-  }
 }
 
 [data-theme="retro"] .hero-banner-copy .flex.flex-wrap span,

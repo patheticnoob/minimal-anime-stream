@@ -73,11 +73,11 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             </div>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight leading-tight drop-shadow-xl">
+          <h1 className="text-[2.6rem] sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.25rem] font-bold text-white tracking-tight leading-tight drop-shadow-xl">
             {anime.title ?? "Featured Anime"}
           </h1>
 
-          <p className="text-gray-300/90 text-lg leading-relaxed">
+          <p className="text-gray-300/90 text-xl leading-relaxed">
             Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.
           </p>
 
