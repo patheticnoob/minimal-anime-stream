@@ -1,44 +1,44 @@
-# Video Player Documentation
+# Video Player Implementation Guide
 
 ## Overview
-A professional HLS video player component with clean UI, integrated with Convex backend proxy for secure streaming.
+This project features two video player implementations optimized for different themes:
+- **VideoPlayer.tsx**: Classic theme player with modern UI
+- **RetroVideoPlayer.tsx**: Retro-themed player with VHS aesthetic
 
-## Features
+## Key Features
 
-### Core Playback
-- ✅ **HLS Adaptive Streaming** - Automatically adjusts quality via HLS.js
-- ✅ **Playback Speed Control** - 0.5x, 0.75x, 1x, 1.25x, 1.5x, 2x speeds
-- ✅ **Subtitle Support** - Proxied through Convex for CORS safety
-- ✅ **Play/Pause Controls** - Center overlay and bottom bar
-- ✅ **Seek/Scrub** - Click progress bar to seek
-- ✅ **Volume Control** - Adjustable with mute toggle (hover to expand slider)
-- ✅ **Skip Forward/Backward** - 10-second skip buttons
-- ✅ **Fullscreen Mode** - Native fullscreen support
+### Both Players Support:
+- HLS streaming with hls.js
+- Subtitle management with dynamic positioning
+- Progress tracking and resume functionality
+- Keyboard shortcuts (Space/K: play/pause, F: fullscreen, M: mute, Arrow keys: seek/volume)
+- Skip intro/outro functionality
+- Buffering indicators
+- Fullscreen support
 
-### Advanced Features
-- ✅ **Keyboard Shortcuts** - Full keyboard navigation (see below)
-- ✅ **Auto-hide Controls** - Fade after 3 seconds of inactivity
-- ✅ **Buffer Progress** - Visual indicator of buffered content
-- ✅ **Test IDs** - All elements have data-testid for testing
+### VideoPlayer (Classic Theme)
+- Modern glass-morphism design
+- Dropdown subtitle selector
+- Settings menu for playback speed
+- Smooth gradient progress bar
+- Auto-hide controls (3s timeout)
 
-### UI/UX
-- ✅ **Clean Gradients** - Beautiful overlays and effects
-- ✅ **Smooth Animations** - Framer Motion powered
-- ✅ **Responsive Design** - Works on desktop, tablet, mobile
-- ✅ **Loading Spinner** - Shows during buffering
+### RetroVideoPlayer (Retro Theme)
+- Monospace "Courier Prime" font
+- Neon pink (#FF69B4) borders and glows
+- Inline subtitle dropdown (left of fullscreen button)
+- Simplified controls with retro styling
+- VHS-inspired visual effects
 
-## Keyboard Shortcuts
+## Subtitle Positioning
 
-| Key | Action |
-|-----|--------|
-| `Space` or `K` | Play/Pause |
-| `F` | Toggle Fullscreen |
-| `M` | Toggle Mute |
-| `→` | Skip forward 10 seconds |
-| `←` | Skip backward 10 seconds |
-| `↑` | Increase volume |
-| `↓` | Decrease volume |
+### Dynamic Subtitle Adjustment
+Both players dynamically adjust subtitle position based on control visibility:
 
-## Usage
+**When controls are visible:**
+- Subtitles move up by 120px to avoid overlap
 
-### Basic Usage
+**When controls are hidden:**
+- Subtitles move up by 60px for better readability
+
+Implementation uses CSS injection:

@@ -38,9 +38,9 @@ export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardPro
       aria-label={anime.title ?? "Open anime"}
       className="anime-card group relative flex flex-col gap-2 text-left"
       onClick={onClick}
-      whileHover={{ y: -6, scale: 1.02 }}
+      whileHover={{ y: -4, scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 180, damping: 20 }}
+      transition={{ type: "spring", stiffness: 200, damping: 22 }}
     >
       <div
         className={`anime-card-poster-frame relative w-full ${aspectRatioClass} rounded-md overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}
