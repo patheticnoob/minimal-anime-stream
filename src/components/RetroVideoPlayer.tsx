@@ -654,37 +654,34 @@ export function RetroVideoPlayer({
               </div>
 
               <div className="flex items-center gap-1">
-                <button 
-                  onClick={toggleFullscreen} 
+                {tracks && tracks.length > 0 && (
+                  <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
+                    <span>Subs</span>
+                    <select
+                      value={selectedSubtitle}
+                      onChange={handleSubtitleChange}
+                      className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
+                    >
+                      <option value="off">Off</option>
+                      {tracks.map((track, idx) => {
+                        const label = getTrackLabel(track, idx);
+                        return (
+                          <option key={`${label}-${idx}`} value={label}>
+                            {label}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                )}
+                <button
+                  onClick={toggleFullscreen}
                   className="text-[#FF69B4] hover:text-[#FF1493] p-2 transition-colors border-2 border-[#FF69B4] bg-black/50 hover:bg-black"
                 >
                   {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
                 </button>
               </div>
             </div>
-
-            {tracks && tracks.length > 0 && (
-              <div className="flex justify-end px-4 pb-4">
-                <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
-                  <span>Subs</span>
-                  <select
-                    value={selectedSubtitle}
-                    onChange={handleSubtitleChange}
-                    className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
-                  >
-                    <option value="off">Off</option>
-                    {tracks.map((track, idx) => {
-                      const label = getTrackLabel(track, idx);
-                      return (
-                        <option key={`${label}-${idx}`} value={label}>
-                          {label}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-              </div>
-            )}
           </div>
         </motion.div>
       </motion.div>
