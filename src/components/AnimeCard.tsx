@@ -62,6 +62,15 @@ export function AnimeCard({ anime, onClick, variant = "portrait" }: AnimeCardPro
         <div className="anime-card-retro-overlay" aria-hidden="true" />
         <div className="anime-card-retro-scanlines" aria-hidden="true" />
 
+        <div
+          className="anime-card-play-overlay absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          aria-hidden="true"
+        >
+          <div className="anime-card-play-button w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
+            <Play className="h-5 w-5 text-white fill-white ml-0.5" />
+          </div>
+        </div>
+
         {/* Episode number badge - Top Left */}
         {anime.episodeNumber && (
           <div className="absolute top-2 left-2">

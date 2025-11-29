@@ -68,3 +68,11 @@
   z-index: 1;
   transition: opacity 300ms ease, transform 300ms ease;
 }
+
+.anime-card-play-overlay {
+  pointer-events: none;
+}
+
+.anime-card-play-button {
+  pointer-events: auto;
+}

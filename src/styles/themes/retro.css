@@ -318,6 +318,8 @@
   background: oklch(0.15 0.03 240);
   box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 0;
+  overflow: visible;
 }
 
 [data-theme="retro"] .anime-card::before {
@@ -387,6 +389,36 @@
 [data-theme="retro"] .anime-card:hover .anime-card-retro-scanlines {
   opacity: 0.6;
   transform: scale(1.02);
+}
+
+[data-theme="retro"] .anime-card-poster-frame {
+  border-radius: 0.125rem;
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  overflow: hidden;
+}
+
+[data-theme="retro"] .anime-card-play-overlay {
+  background: rgba(4, 6, 21, 0.75);
+}
+
+[data-theme="retro"] .anime-card-play-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  border: 2px solid oklch(0.75 0.25 330);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.85));
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.6), 0 0 30px rgba(255, 105, 180, 0.4);
+  transition: transform 0.2s ease;
+}
+
+[data-theme="retro"] .anime-card-play-button svg {
+  color: oklch(0.75 0.25 330);
+  fill: currentColor;
+}
+
+[data-theme="retro"] .anime-card-play-button:hover {
+  transform: scale(1.05);
 }
 
 /* Scrollbar */
