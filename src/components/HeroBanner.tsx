@@ -113,16 +113,21 @@ export function HeroBanner({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
 
         {anime.image && (
           <motion.div
-            className="hero-banner-art"
+            className="hero-banner-art group"
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15, duration: 0.5 }}
           >
-            <img 
-              src={anime.image} 
-              alt={anime.title || "Anime poster"} 
+            <img
+              src={anime.image}
+              alt={anime.title || "Anime poster"}
               className="w-full h-full object-cover"
             />
+            <div className="hero-banner-art-overlay" aria-hidden="true">
+              <div className="hero-banner-art-play">
+                <Play className="h-6 w-6 fill-current" />
+              </div>
+            </div>
           </motion.div>
         )}
       </div>
