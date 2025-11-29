@@ -634,6 +634,129 @@
   background: oklch(0.7 0.25 150);
 }
 
+/* Retro Sidebar - Desktop */
+[data-theme="retro"] .sidebar {
+  background: #0a1628;
+  border-right: 2px solid oklch(0.3 0.05 240);
+}
+
+[data-theme="retro"] .sidebar-inner {
+  background: #0a1628;
+  border-right: 2px solid oklch(0.3 0.05 240);
+  box-shadow: none;
+}
+
+[data-theme="retro"] .sidebar-inner::before {
+  display: none;
+}
+
+[data-theme="retro"] .sidebar-logo {
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+  background: radial-gradient(circle at top, oklch(0.75 0.25 330), oklch(0.65 0.22 280));
+}
+
+[data-theme="retro"] .nav-item {
+  color: oklch(0.6 0.15 220);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.8rem;
+  border-radius: 0.125rem;
+}
+
+[data-theme="retro"] .nav-item::before {
+  background: linear-gradient(160deg, oklch(0.75 0.25 330), oklch(0.65 0.22 280));
+  border-radius: 0.125rem;
+}
+
+[data-theme="retro"] .nav-item:hover {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .nav-item--active {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .nav-item--active::before {
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+/* Retro Mobile Navigation */
+[data-theme="retro"] .mobile-top-nav {
+  background: #0a1628;
+  border-bottom: 2px solid oklch(0.3 0.05 240);
+  backdrop-filter: none;
+}
+
+[data-theme="retro"] .mobile-menu-button,
+[data-theme="retro"] .mobile-nav-icon-btn {
+  color: oklch(0.6 0.15 220);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+[data-theme="retro"] .mobile-menu-button:hover,
+[data-theme="retro"] .mobile-nav-icon-btn:hover {
+  color: oklch(0.75 0.25 330);
+  background: rgba(255, 105, 180, 0.1);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-nav-icon-btn.active {
+  color: oklch(0.75 0.25 330);
+  background: rgba(255, 105, 180, 0.15);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-side-panel {
+  background: #0a1628;
+  border-right: 2px solid oklch(0.3 0.05 240);
+}
+
+[data-theme="retro"] .mobile-side-panel-header {
+  border-bottom: 2px solid oklch(0.3 0.05 240);
+}
+
+[data-theme="retro"] .mobile-side-panel-logo {
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+[data-theme="retro"] .mobile-side-panel-close {
+  color: oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-side-panel-close:hover {
+  background: rgba(255, 105, 180, 0.1);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-side-panel-item {
+  color: oklch(0.6 0.15 220);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.85rem;
+  border-radius: 0.125rem;
+}
+
+[data-theme="retro"] .mobile-side-panel-item:hover {
+  background: rgba(255, 105, 180, 0.1);
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-side-panel-item.active {
+  background: rgba(255, 105, 180, 0.15);
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+  border: 1px solid oklch(0.75 0.25 330);
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-theme="retro"] * {
     animation: none !important;
