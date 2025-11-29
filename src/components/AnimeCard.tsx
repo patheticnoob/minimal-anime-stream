@@ -41,7 +41,13 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
       onClick={onClick}
       whileHover={{ y: -4, scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
-      transition={{ type: "spring", stiffness: 200, damping: 22 }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 200, 
+        damping: 22,
+        // Disable animations on mobile for performance
+        duration: window.innerWidth < 768 ? 0 : undefined
+      }}
     >
       <div
         className={`anime-card-poster-frame relative w-full ${aspectRatioClass} rounded-md overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}

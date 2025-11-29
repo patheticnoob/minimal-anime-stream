@@ -142,6 +142,7 @@ export function ContentRail({
         <div
           ref={scrollRef}
           className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-4 md:px-0"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {displayedItems.map((item, idx) => (
             <div

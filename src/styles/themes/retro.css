@@ -757,6 +757,63 @@
   border: 1px solid oklch(0.75 0.25 330);
 }
 
+/* Mobile Performance Optimizations */
+@media (max-width: 768px) {
+  /* Disable expensive effects on mobile */
+  [data-theme="retro"] body::before {
+    opacity: 0.2;
+    background-size: 80px 80px;
+  }
+
+  [data-theme="retro"] body::after {
+    opacity: 0.15;
+  }
+
+  /* Simplify anime card effects on mobile */
+  [data-theme="retro"] .anime-card {
+    box-shadow: 0 0 4px rgba(255, 105, 180, 0.3);
+    will-change: auto;
+  }
+
+  [data-theme="retro"] .anime-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 6px rgba(255, 105, 180, 0.4);
+  }
+
+  [data-theme="retro"] .anime-card-retro-overlay,
+  [data-theme="retro"] .anime-card-retro-scanlines {
+    display: none;
+  }
+
+  /* Simplify hero banner on mobile */
+  [data-theme="retro"] .hero-banner::before {
+    opacity: 0.3;
+    background-size: 60px 60px;
+  }
+
+  [data-theme="retro"] .hero-banner::after {
+    display: none;
+  }
+
+  /* Reduce text shadows on mobile */
+  [data-theme="retro"] h1,
+  [data-theme="retro"] h2,
+  [data-theme="retro"] h3 {
+    text-shadow: 0 0 5px currentColor;
+  }
+
+  /* Simplify sidebar effects on mobile */
+  [data-theme="retro"] .mobile-side-panel-logo {
+    box-shadow: 0 0 5px rgba(255, 105, 180, 0.3);
+  }
+
+  /* Disable backdrop filters on mobile (expensive) */
+  [data-theme="retro"] .mobile-top-nav {
+    backdrop-filter: none;
+    background: #0a1628;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-theme="retro"] * {
     animation: none !important;
