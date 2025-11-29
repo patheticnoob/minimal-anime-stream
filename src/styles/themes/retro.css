@@ -409,6 +409,75 @@
   font-family: 'Courier Prime', monospace;
 }
 
+/* Retro Tabs Styling */
+[data-theme="retro"] .detail-tabs {
+  border-bottom: 2px solid oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .detail-tab {
+  color: oklch(0.6 0.05 180);
+  font-family: 'Courier Prime', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+[data-theme="retro"] .detail-tab:hover {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .detail-tab.is-active {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .detail-tab.is-active::after {
+  background: oklch(0.75 0.25 330);
+  height: 3px;
+  box-shadow: 0 0 10px oklch(0.75 0.25 330);
+}
+
+/* Retro Button Styling in Info Modal */
+[data-theme="retro"] .btn-primary,
+[data-theme="retro"] .detail-hero-actions .btn-primary {
+  background: oklch(0.75 0.25 330) !important;
+  border: 2px solid oklch(0.75 0.25 330) !important;
+  color: oklch(0.12 0.02 240) !important;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-family: 'Courier Prime', monospace;
+}
+
+[data-theme="retro"] .btn-primary:hover,
+[data-theme="retro"] .detail-hero-actions .btn-primary:hover {
+  background: oklch(0.8 0.25 330) !important;
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.7), 0 0 30px rgba(255, 105, 180, 0.5);
+  transform: scale(1.02);
+}
+
+[data-theme="retro"] .btn-secondary,
+[data-theme="retro"] .detail-hero-actions .btn-secondary {
+  background: oklch(0.2 0.03 240) !important;
+  border: 2px solid oklch(0.75 0.25 330) !important;
+  color: oklch(0.75 0.25 330) !important;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-family: 'Courier Prime', monospace;
+}
+
+[data-theme="retro"] .btn-secondary:hover,
+[data-theme="retro"] .detail-hero-actions .btn-secondary:hover {
+  background: oklch(0.25 0.03 240) !important;
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+  transform: scale(1.02);
+}
+
 /* Progress Bars */
 [data-theme="retro"] .progress-bar {
   height: 6px;
