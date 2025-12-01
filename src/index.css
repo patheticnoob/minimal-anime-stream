@@ -141,3 +141,24 @@ main::after {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+html[data-theme="nothing"] body,
+body[data-theme="nothing"] {
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+  font-family: "Commit Mono", monospace;
+}
+
+html[data-theme="nothing"] body::before,
+html[data-theme="nothing"] body::after,
+html[data-theme="nothing"] main::after,
+body[data-theme="nothing"]::before,
+body[data-theme="nothing"]::after {
+  display: none;
+}
+
+html[data-theme="nothing"] main,
+body[data-theme="nothing"] main {
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+}

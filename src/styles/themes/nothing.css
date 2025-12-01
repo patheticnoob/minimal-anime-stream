@@ -405,3 +405,140 @@
     opacity: 0.05;
   }
 }
+
+[data-theme="nothing"] {
+  min-height: 100vh;
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] main,
+[data-theme="nothing"] .min-h-screen {
+  background: var(--nothing-bg) !important;
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .page-shell,
+[data-theme="nothing"] .content-rail,
+[data-theme="nothing"] .profile-card,
+[data-theme="nothing"] .detail-body {
+  background: var(--nothing-bg);
+}
+
+[data-theme="nothing"] .text-white,
+[data-theme="nothing"] .text-gray-100,
+[data-theme="nothing"] .text-gray-200 {
+  color: var(--nothing-fg) !important;
+}
+
+[data-theme="nothing"] .text-gray-400,
+[data-theme="nothing"] .text-gray-500,
+[data-theme="nothing"] .text-gray-600 {
+  color: var(--nothing-gray-4) !important;
+}
+
+[data-theme="nothing"] .text-blue-400,
+[data-theme="nothing"] .text-blue-500 {
+  color: var(--nothing-accent) !important;
+}
+
+[data-theme="nothing"] .bg-\[\#0B0F19\],
+[data-theme="nothing"] .bg-\[\#050814\],
+[data-theme="nothing"] .bg-black\/60,
+[data-theme="nothing"] .bg-white\/5,
+[data-theme="nothing"] .bg-white\/10,
+[data-theme="nothing"] .bg-blue-500\/10 {
+  background: var(--nothing-bg) !important;
+  color: var(--nothing-fg);
+  border-color: var(--nothing-border) !important;
+}
+
+[data-theme="nothing"] .border-white\/10,
+[data-theme="nothing"] .border-white\/20,
+[data-theme="nothing"] .border-white\/30 {
+  border-color: var(--nothing-border) !important;
+}
+
+[data-theme="nothing"] .detail-overlay {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+}
+
+[data-theme="nothing"] .detail-sheet {
+  background: var(--nothing-bg);
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  box-shadow: 18px 18px 0 rgba(0, 0, 0, 0.08);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-hero {
+  border-bottom: 2px solid var(--nothing-border);
+  background: var(--nothing-bg);
+}
+
+[data-theme="nothing"] .detail-hero-content {
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-hero-title {
+  color: var(--nothing-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+[data-theme="nothing"] .detail-hero-description {
+  color: var(--nothing-gray-4);
+}
+
+[data-theme="nothing"] .detail-hero-meta span {
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-dot {
+  background: var(--nothing-accent);
+}
+
+[data-theme="nothing"] .detail-language-badges .badge {
+  border-color: var(--nothing-border);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-tabs {
+  border-bottom: 2px solid var(--nothing-border);
+}
+
+[data-theme="nothing"] .detail-tab {
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  background: var(--nothing-bg);
+  color: var(--nothing-gray-4);
+}
+
+[data-theme="nothing"] .detail-tab.is-active {
+  background: var(--nothing-accent);
+  border-color: var(--nothing-accent);
+  color: #fff;
+}
+
+[data-theme="nothing"] .detail-episode {
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  background: var(--nothing-bg);
+}
+
+[data-theme="nothing"] .detail-episode:hover {
+  background: var(--nothing-gray-1);
+}
+
+[data-theme="nothing"] .detail-episode-thumb.placeholder {
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  background: var(--nothing-gray-1);
+}
+
+[data-theme="nothing"] .detail-placeholder {
+  border: 2px dashed var(--nothing-border);
+  border-radius: 0;
+  color: var(--nothing-gray-4);
+}
