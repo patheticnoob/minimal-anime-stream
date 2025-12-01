@@ -324,49 +324,218 @@
 }
 
 /* Modal - Nothing Style */
-[data-theme="nothing"] .modal,
-[data-theme="nothing"] .dialog {
+[data-theme="nothing"] .detail-overlay {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+[data-theme="nothing"].dark .detail-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="nothing"] .detail-sheet {
+  background: var(--nothing-bg);
+  border: 3px solid var(--nothing-border);
+  border-radius: 0;
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.15);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-drag-handle {
+  background: var(--nothing-border);
+  border-radius: 0;
+  width: 60px;
+  height: 3px;
+}
+
+[data-theme="nothing"] .detail-close {
   background: var(--nothing-bg);
   border: 2px solid var(--nothing-border);
   border-radius: 0;
-  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.1);
+  width: 40px;
+  height: 40px;
+  color: var(--nothing-fg);
 }
 
-/* Scrollbar - Nothing Style */
-[data-theme="nothing"] ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+[data-theme="nothing"] .detail-close:hover {
+  background: var(--nothing-accent);
+  border-color: var(--nothing-accent);
+  color: #FFFFFF;
+  transform: scale(1);
 }
 
-[data-theme="nothing"] ::-webkit-scrollbar-track {
+[data-theme="nothing"] .detail-hero {
+  border-bottom: 3px solid var(--nothing-border);
   background: var(--nothing-gray-1);
 }
 
-[data-theme="nothing"] ::-webkit-scrollbar-thumb {
-  background: var(--nothing-border);
+[data-theme="nothing"] .detail-hero-bg {
+  opacity: 0.3;
+  filter: grayscale(0.6) contrast(1.1);
+}
+
+[data-theme="nothing"] .detail-hero-scrim {
+  background: linear-gradient(to bottom, transparent 0%, var(--nothing-bg) 85%);
+}
+
+[data-theme="nothing"] .detail-hero-content {
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-hero-tag {
+  border: 2px solid var(--nothing-border);
   border-radius: 0;
-}
-
-[data-theme="nothing"] ::-webkit-scrollbar-thumb:hover {
-  background: var(--nothing-accent);
-}
-
-/* Typography Overrides */
-[data-theme="nothing"] h1,
-[data-theme="nothing"] h2,
-[data-theme="nothing"] h3,
-[data-theme="nothing"] h4,
-[data-theme="nothing"] h5,
-[data-theme="nothing"] h6 {
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.2em;
 }
 
-/* Disable retro effects */
-[data-theme="nothing"] .anime-card-retro-overlay,
-[data-theme="nothing"] .anime-card-retro-scanlines,
-[data-theme="nothing"] .hero-banner-art-overlay {
+[data-theme="nothing"] .detail-hero-title {
+  color: var(--nothing-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+[data-theme="nothing"] .detail-hero-description {
+  color: var(--nothing-gray-4);
+  font-size: 13px;
+}
+
+[data-theme="nothing"] .detail-hero-meta span {
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-dot {
+  background: var(--nothing-accent);
+  width: 4px;
+  height: 4px;
+}
+
+[data-theme="nothing"] .detail-language-badges .badge {
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  color: var(--nothing-fg);
+  background: var(--nothing-bg);
+}
+
+[data-theme="nothing"] .detail-body {
+  background: var(--nothing-bg);
+}
+
+[data-theme="nothing"] .detail-tabs {
+  border-bottom: 3px solid var(--nothing-border);
+  gap: 0;
+}
+
+[data-theme="nothing"] .detail-tab {
+  border: 2px solid var(--nothing-border);
+  border-bottom: none;
+  border-radius: 0;
+  background: var(--nothing-gray-1);
+  color: var(--nothing-gray-4);
+  margin-right: -2px;
+  padding: 14px 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+[data-theme="nothing"] .detail-tab:hover {
+  background: var(--nothing-gray-2);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-tab.is-active {
+  background: var(--nothing-bg);
+  border-color: var(--nothing-border);
+  color: var(--nothing-fg);
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="nothing"] .detail-tab.is-active::after {
   display: none;
+}
+
+[data-theme="nothing"] .detail-season-title {
+  color: var(--nothing-fg);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+}
+
+[data-theme="nothing"] .detail-episode {
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  background: var(--nothing-bg);
+}
+
+[data-theme="nothing"] .detail-episode:hover {
+  background: var(--nothing-gray-1);
+  border-color: var(--nothing-accent);
+  transform: translateX(0);
+}
+
+[data-theme="nothing"] .detail-episode-thumb {
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  background: var(--nothing-gray-1);
+}
+
+[data-theme="nothing"] .detail-episode-thumb .play-icon {
+  background: var(--nothing-accent);
+  border-radius: 0;
+  width: 28px;
+  height: 28px;
+}
+
+[data-theme="nothing"] .detail-episode:hover .play-icon {
+  background: var(--nothing-fg);
+  transform: scale(1);
+}
+
+[data-theme="nothing"] .detail-episode-title {
+  color: var(--nothing-fg);
+  font-weight: 600;
+}
+
+[data-theme="nothing"] .detail-episode-meta {
+  color: var(--nothing-gray-4);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+}
+
+[data-theme="nothing"] .detail-episode-description {
+  color: var(--nothing-gray-4);
+  font-size: 12px;
+}
+
+[data-theme="nothing"] .detail-placeholder {
+  border: 2px dashed var(--nothing-border);
+  border-radius: 0;
+  color: var(--nothing-gray-4);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding: 60px 20px;
+}
+
+/* Progress bar styling */
+[data-theme="nothing"] .detail-episode-thumb .absolute {
+  background: var(--nothing-gray-2);
+}
+
+[data-theme="nothing"] .detail-episode-thumb .bg-blue-500 {
+  background: var(--nothing-accent) !important;
+}
+
+/* Select dropdown for episode ranges */
+[data-theme="nothing"] .detail-season-header select,
+[data-theme="nothing"] .detail-season-header [role="combobox"] {
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+  font-weight: 600;
 }
 
 /* Clean, minimal animations */
