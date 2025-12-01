@@ -11,6 +11,7 @@ import "./index.css";
 import Landing from "./pages/Landing.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import WatchHistory from "./pages/WatchHistory.tsx";
+import { ThemedLanding, ThemedAuth, ThemedWatchHistory } from "@/shared/components/ThemeRouter";
 import "./types/global.d.ts";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
@@ -46,9 +47,9 @@ createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
           <RouteSyncer />
           <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/history" element={<WatchHistory />} />
-            <Route path="/auth" element={<AuthPage redirectAfterAuth="/" />} />
+            <Route path="/" element={<ThemedLanding />} />
+            <Route path="/history" element={<ThemedWatchHistory />} />
+            <Route path="/auth" element={<ThemedAuth redirectAfterAuth="/" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

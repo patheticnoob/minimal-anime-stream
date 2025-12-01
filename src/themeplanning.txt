@@ -1,37 +1,3 @@
-Retro Theme Implementation Plan
-===============================
+# Theme Architecture Planning
 
-Goal
-----
-Deliver a selectable “Retro Home Screen” theme inspired by CRT-era UI with:
-- Minimal grid background, soft glow edges, and scanline overlays.
-- Dotted matrix typography for titles plus mono body copy.
-- Retro-futuristic buttons, cards, and hero layout accents.
-- Theme persistence using the existing Convex-backed theme system.
-
-Work Breakdown
---------------
-1. Theme Foundation
-   - Define retro-focused CSS variables (palette, neon accents, radii).
-   - Import DotGothic16 + Space Mono to mimic matrix lettering.
-   - Create layered background (gradient + grid + scanlines) and global typography overrides.
-
-2. Visual Treatments
-   - Build neon panel styling for hero, sidebar, and modal shells.
-   - Add scanline/vignette overlays, glowing borders, and hover pulses.
-   - Normalize button/input styles to uppercase mono text with neon borders.
-
-3. Component Styling
-   - Hero: grid overlay, softened art edge, neon buttons, uppercase copy.
-   - Cards/Rails: holographic hover, wireframe borders, retro progress accents.
-   - Info modal + sidebar: translucent panels with glowing edges.
-
-4. Integration
-   - Import the retro stylesheet via `src/index.css`.
-   - Expose “Retro Home Screen” in the theme dropdown, persisting via existing mutations.
-   - Keep “classic” as the default to avoid regressions.
-
-5. QA & Polish
-   - Toggle between themes to ensure overrides are scoped and responsive.
-   - Verify readability, hover states, and that classic remains unchanged.
-   - Gather feedback for additional retro-specific micro-interactions if needed.
+## Structure
