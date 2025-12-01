@@ -10,6 +10,7 @@ import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
 import Landing from "./pages/Landing.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Watch from "./pages/Watch.tsx";
 import WatchHistory from "./pages/WatchHistory.tsx";
 import { ThemedLanding, ThemedAuth, ThemedWatchHistory } from "@/shared/components/ThemeRouter";
 import "./types/global.d.ts";
@@ -48,6 +49,7 @@ createRoot(document.getElementById("root")!).render(
           <RouteSyncer />
           <Routes>
             <Route path="/" element={<ThemedLanding />} />
+            <Route path="/watch/:animeId" element={<Watch />} />
             <Route path="/history" element={<ThemedWatchHistory />} />
             <Route path="/auth" element={<ThemedAuth redirectAfterAuth="/" />} />
             <Route path="*" element={<NotFound />} />

@@ -347,77 +347,16 @@ export default function Landing() {
   };
 
   const openAnime = async (anime: AnimeItem) => {
-    setSelected(anime);
-    setLastSelectedAnime(anime);
-    setBroadcastInfo(null);
-    setIsBroadcastLoading(false);
-    const shouldFetchBroadcast =
-      ["continueWatching", "watchlist", "recentEpisodes"].includes(
-        anime.sourceCategory ?? "",
-      );
-    if (shouldFetchBroadcast && anime.title) {
-      setIsBroadcastLoading(true);
-      fetchBroadcastInfo({ title: anime.title })
-        .then((result) => {
-          const status = result?.status ?? null;
-          if (status !== "airing" && status !== "upcoming") {
-            setBroadcastInfo(null);
-            return;
-          }
-
-          const broadcast = result?.broadcast;
-          if (!broadcast) return;
-
-          const summaryParts: string[] = [];
-          if (broadcast.string) {
-            summaryParts.push(broadcast.string);
-          } else {
-            if (broadcast.day) summaryParts.push(broadcast.day);
-            if (broadcast.time) summaryParts.push(broadcast.time);
-          }
-
-          let summary = summaryParts.join(" • ");
-          if (broadcast.timezone) {
-            summary = summary ? `${summary} (${broadcast.timezone})` : broadcast.timezone;
-          }
-
-          const info: BroadcastInfo = {
-            summary: summary || null,
-            day: broadcast.day ?? null,
-            time: broadcast.time ?? null,
-            timezone: broadcast.timezone ?? null,
-            status,
-          };
-
-          if (info.summary || info.day || info.time || info.timezone) {
-            setBroadcastInfo(info);
-          }
-        })
-        .catch(() => {
-          setBroadcastInfo(null);
-        })
-        .finally(() => setIsBroadcastLoading(false));
-    }
     if (!anime?.dataId) {
       toast("This title has no episodes available.");
       return;
     }
-    setEpisodes([]);
-    setEpisodesLoading(true);
-    try {
-      const eps = (await fetchEpisodes({ dataId: anime.dataId })) as Episode[];
-      const normalizedEpisodes = eps.map((ep) => ({
-        ...ep,
-        number: normalizeEpisodeNumber(ep.number),
-      }));
-      setEpisodes(normalizedEpisodes);
-      setCurrentEpisodeIndex(null);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to load episodes.";
-      toast.error(msg);
-    } finally {
-      setEpisodesLoading(false);
-    }
+
+    // Store anime data in localStorage for the Watch page
+    localStorage.setItem(`anime_${anime.dataId}`, JSON.stringify(anime));
+
+    // Navigate to Watch page
+    navigate(`/watch/${anime.dataId}`);
   };
 
   const handleToggleWatchlist = async () => {
