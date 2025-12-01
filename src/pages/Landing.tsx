@@ -346,18 +346,123 @@ export default function Landing() {
     }
   };
 
-  const openAnime = async (anime: AnimeItem) => {
+  const openAnime = (anime: AnimeItem) => {
     if (!anime?.dataId) {
       toast("This title has no episodes available.");
       return;
     }
 
-    // Store anime data in localStorage for the Watch page
-    localStorage.setItem(`anime_${anime.dataId}`, JSON.stringify(anime));
+    if (theme === "nothing") {
+      localStorage.setItem(`anime_${anime.dataId}`, JSON.stringify(anime));
+      navigate(`/watch/${anime.dataId}`);
+      return;
+    }
 
-    // Navigate to Watch page
-    navigate(`/watch/${anime.dataId}`);
+    setSelected(anime);
+    setLastSelectedAnime(anime);
   };
+
+  useEffect(() => {
+    if (!selected?.dataId) {
+      setEpisodes([]);
+      setEpisodesLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setEpisodesLoading(true);
+
+    fetchEpisodes({ dataId: selected.dataId })
+      .then((eps) => {
+        if (cancelled) return;
+        const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
+          ...ep,
+          number: normalizeEpisodeNumber(ep.number),
+        }));
+        setEpisodes(normalizedEpisodes);
+        setCurrentEpisodeIndex(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        const msg = err instanceof Error ? err.message : "Failed to load episodes.";
+        toast.error(msg);
+        setEpisodes([]);
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setEpisodesLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selected?.dataId, fetchEpisodes]);
+
+  useEffect(() => {
+    if (!selected?.title) {
+      setBroadcastInfo(null);
+      setIsBroadcastLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsBroadcastLoading(true);
+
+    fetchBroadcastInfo({ title: selected.title })
+      .then((result) => {
+        if (cancelled) return;
+
+        const status = result?.status ?? null;
+        if (status !== "airing" && status !== "upcoming") {
+          setBroadcastInfo(null);
+          return;
+        }
+
+        const broadcast = result?.broadcast;
+        if (!broadcast) {
+          setBroadcastInfo(null);
+          return;
+        }
+
+        const parts: string[] = [];
+        if (broadcast.string) {
+          parts.push(broadcast.string);
+        } else {
+          if (broadcast.day) parts.push(broadcast.day);
+          if (broadcast.time) parts.push(broadcast.time);
+        }
+
+        let summary = parts.join(" • ");
+        if (broadcast.timezone) {
+          summary = summary ? `${summary} (${broadcast.timezone})` : broadcast.timezone;
+        }
+
+        const info: BroadcastInfo = {
+          summary: summary || null,
+          day: broadcast.day ?? null,
+          time: broadcast.time ?? null,
+          timezone: broadcast.timezone ?? null,
+          status,
+        };
+
+        setBroadcastInfo(info.summary || info.day || info.time || info.timezone ? info : null);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setBroadcastInfo(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsBroadcastLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selected?.title, fetchBroadcastInfo]);
 
   const handleToggleWatchlist = async () => {
     if (!isAuthenticated) {
