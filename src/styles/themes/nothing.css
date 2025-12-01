@@ -137,6 +137,87 @@
   pointer-events: none;
 }
 
+[data-theme="nothing"] .hero-banner-pill {
+  border: 2px solid var(--nothing-border);
+  background: transparent;
+  color: var(--nothing-fg);
+  letter-spacing: 0.25em;
+}
+
+[data-theme="nothing"] .hero-banner-meta-row {
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .hero-banner-type-chip,
+[data-theme="nothing"] .hero-banner-language-chip,
+[data-theme="nothing"] .hero-banner-server-chip {
+  border: 2px solid var(--nothing-border);
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+  border-radius: 999px;
+}
+
+[data-theme="nothing"] .hero-banner-title {
+  color: var(--nothing-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+[data-theme="nothing"] .hero-banner-description {
+  color: var(--nothing-gray-4);
+  font-size: 0.95rem;
+}
+
+[data-theme="nothing"] .hero-banner-stat-card {
+  border: 2px solid var(--nothing-border);
+  background: var(--nothing-bg);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-theme="nothing"] .hero-banner-stat-label {
+  color: var(--nothing-gray-4);
+  letter-spacing: 0.3em;
+}
+
+[data-theme="nothing"] .hero-banner-stat-value {
+  color: var(--nothing-fg);
+  letter-spacing: 0.05em;
+}
+
+[data-theme="nothing"] .hero-banner-server-row {
+  border-top: 2px dashed var(--nothing-border);
+  padding-top: var(--nothing-space-sm);
+}
+
+[data-theme="nothing"] .hero-banner-primary-btn {
+  background: var(--nothing-accent);
+  border: 2px solid var(--nothing-accent);
+  border-radius: 0;
+  box-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+[data-theme="nothing"] .hero-banner-secondary-btn,
+[data-theme="nothing"] .hero-banner-icon-btn {
+  border: 2px solid var(--nothing-border);
+  border-radius: 0;
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .hero-banner-footnote {
+  color: var(--nothing-gray-4);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+[data-theme="nothing"] .hero-banner-footnote-dot {
+  background: var(--nothing-accent);
+  box-shadow: none;
+}
+
 [data-theme="nothing"] .hero-banner h1 {
   font-weight: 700;
   letter-spacing: -0.02em;

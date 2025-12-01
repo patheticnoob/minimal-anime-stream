@@ -30,6 +30,22 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
     ? { backgroundImage: `url(${anime.image})` }
     : undefined;
 
+  const availableLanguages = [
+    anime.language?.sub ? "Sub" : null,
+    anime.language?.dub ? "Dub" : null,
+  ].filter(Boolean) as string[];
+
+  const heroStatusLabel =
+    anime.type?.toLowerCase().includes("movie") ? "Premiere Spotlight" : "Now Streaming Weekly";
+
+  const stats = [
+    { label: "Format", value: anime.type ?? "Series" },
+    { label: "Audio", value: availableLanguages.length ? availableLanguages.join(" / ") : "Multi Audio" },
+    { label: "Rating", value: "4.8 / 5" },
+  ];
+
+  const preferredServers = ["HD-1", "HD-2", "HD-3"];
+
   return (
     <motion.section
       className="hero-banner group"
@@ -44,49 +60,62 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5 }}
         >
-          <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-gray-300">
-            {anime.type && (
-              <span className="px-2 py-0.5 rounded bg-white/10 border border-white/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">
-                {anime.type}
-              </span>
-            )}
-            <div className="flex gap-2">
-              {anime.language?.sub && (
-                <Badge variant="secondary" className="bg-[#1E88E5] text-white hover:bg-[#1E88E5]/90 border-0 h-5 text-[10px] px-1.5 rounded-sm">
-                  SUB
-                </Badge>
-              )}
-              {anime.language?.dub && (
-                <Badge variant="secondary" className="bg-[#1E88E5] text-white hover:bg-[#1E88E5]/90 border-0 h-5 text-[10px] px-1.5 rounded-sm">
-                  DUB
-                </Badge>
-              )}
+          <div className="hero-banner-pill">{heroStatusLabel}</div>
+
+          <div className="hero-banner-meta-row">
+            {anime.type && <span className="hero-banner-type-chip">{anime.type}</span>}
+
+            <div className="hero-banner-language-chip">
+              {availableLanguages.length ? availableLanguages.join(" • ") : "Global Audio"}
             </div>
-            <span className="w-1 h-1 bg-gray-500 rounded-full" />
-            <div className="flex items-center gap-1 text-yellow-500">
-              <Star className="h-3.5 w-3.5 fill-current" />
-              <span className="text-white">4.8</span>
+
+            <div className="hero-banner-meta-divider" />
+
+            <div className="hero-banner-meta-info">
+              <Star className="h-3.5 w-3.5 fill-current text-yellow-500" />
+              <span>4.8</span>
             </div>
-            <span className="w-1 h-1 bg-gray-500 rounded-full" />
-            <div className="flex items-center gap-1 text-gray-300">
+
+            <div className="hero-banner-meta-info">
               <Calendar className="h-3.5 w-3.5" />
               <span>2024</span>
             </div>
           </div>
 
-          <h1 className="text-[2.6rem] sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.25rem] font-bold text-white tracking-tight leading-tight drop-shadow-xl">
+          <h1 className="hero-banner-title">
             {anime.title ?? "Featured Anime"}
           </h1>
 
-          <p className="text-gray-300/90 text-xl leading-relaxed">
-            Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.
+          <p className="hero-banner-description">
+            Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio
+            options available. Join the adventure today.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+          <div className="hero-banner-stats-grid">
+            {stats.map((stat) => (
+              <div key={stat.label} className="hero-banner-stat-card">
+                <span className="hero-banner-stat-label">{stat.label}</span>
+                <span className="hero-banner-stat-value">{stat.value}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="hero-banner-server-row">
+            <span className="hero-banner-server-label">Servers</span>
+            <div className="hero-banner-server-chips">
+              {preferredServers.map((server) => (
+                <span key={server} className="hero-banner-server-chip">
+                  {server}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="hero-banner-actions">
             <Button
               size="lg"
               onClick={onPlay}
-              className="flex-1 md:flex-none h-12 px-8 bg-gradient-to-r from-[#673AB7] to-[#512DA8] hover:from-[#5E35B1] hover:to-[#4527A0] text-white font-bold text-base rounded-lg shadow-lg shadow-purple-900/20 transition-all hover:scale-105 active:scale-95"
+              className="hero-banner-primary-btn"
             >
               <Play className="mr-2 h-5 w-5 fill-white" />
               Watch Now
@@ -96,7 +125,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               size="lg"
               variant="outline"
               onClick={onMoreInfo}
-              className="flex-1 md:flex-none h-12 px-8 bg-transparent border-white/30 text-white hover:bg-white/10 hover:border-white/50 font-semibold text-base rounded-lg backdrop-blur-sm transition-all"
+              className="hero-banner-secondary-btn"
             >
               <Info className="mr-2 h-5 w-5" />
               More Info
@@ -105,10 +134,15 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             <Button
               size="lg"
               variant="secondary"
-              className="h-12 w-12 p-0 bg-white/10 text-white hover:bg-white/20 border border-white/10 backdrop-blur-sm rounded-lg transition-all hover:scale-105"
+              className="hero-banner-icon-btn"
             >
               <Plus className="h-6 w-6" />
             </Button>
+          </div>
+
+          <div className="hero-banner-footnote">
+            <span className="hero-banner-footnote-dot" />
+            Instant playback powered by adaptive HLS streams.
           </div>
         </motion.div>
 
