@@ -352,12 +352,14 @@ export default function Landing() {
       return;
     }
 
+    // Only navigate to Watch page for NothingOS theme
     if (theme === "nothing") {
       localStorage.setItem(`anime_${anime.dataId}`, JSON.stringify(anime));
       navigate(`/watch/${anime.dataId}`);
       return;
     }
 
+    // For other themes (Classic, Retro), open the InfoModal
     setSelected(anime);
     setLastSelectedAnime(anime);
   };
