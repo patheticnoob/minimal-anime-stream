@@ -12,7 +12,7 @@ export function useTheme() {
     }
   }, [currentTheme]);
 
-  const setTheme = async (theme: string) => {
+  const setTheme = async (theme: "classic" | "retro" | "nothing") => {
     document.documentElement.setAttribute("data-theme", theme);
     await setThemeMutation({ theme });
   };
