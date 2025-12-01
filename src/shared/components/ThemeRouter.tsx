@@ -1,6 +1,7 @@
 import { useTheme } from "@/hooks/use-theme";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
+import { useNavigate } from "react-router";
 
 const ClassicLanding = lazy(() => import("@/themes/classic/pages/Landing"));
 const RetroLanding = lazy(() => import("@/themes/retro/pages/Landing"));
@@ -66,18 +67,20 @@ export function ThemedWatchHistory() {
 
 export function ThemedWatch() {
   const { theme } = useTheme();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Redirect non-NothingOS themes back to landing
+    if (theme !== "nothing") {
+      navigate("/", { replace: true });
+    }
+  }, [theme, navigate]);
   
   return (
     <Suspense fallback={<FullscreenLoader label="Loading..." />}>
       {theme === "nothing" ? (
         <NothingWatch />
-      ) : (
-        // For other themes, we'll use the InfoModal approach (existing behavior)
-        // This component will redirect back to landing
-        <div className="min-h-screen flex items-center justify-center">
-          <p>Watch page is only available in NothingOS theme</p>
-        </div>
-      )}
+      ) : null}
     </Suspense>
   );
 }
