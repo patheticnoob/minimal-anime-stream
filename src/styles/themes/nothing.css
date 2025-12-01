@@ -711,3 +711,249 @@
   border-radius: 0;
   color: var(--nothing-gray-4);
 }
+
+[data-theme="nothing"] .nothing-player-shell {
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 36px;
+  padding: 16px;
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 60%);
+  backdrop-filter: blur(20px);
+}
+
+[data-theme="nothing"] .nothing-player-surface {
+  border-radius: 32px;
+  overflow: hidden;
+  background: #1a1d24;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="nothing"] .nothing-player-noise {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 180px 180px;
+  mix-blend-mode: screen;
+  opacity: 0.12;
+}
+
+[data-theme="nothing"] .nothing-brand-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  display: inline-block;
+}
+
+[data-theme="nothing"] .nothing-player-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 32px 32px 28px;
+  border-radius: 0 0 32px 32px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.8));
+}
+
+[data-theme="nothing"] .nothing-player-slider {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+[data-theme="nothing"] .nothing-player-slider input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+[data-theme="nothing"] .nothing-player-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+[data-theme="nothing"] .nothing-player-btn:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="nothing"] .nothing-player-btn-primary {
+  border-color: #ff4d4f;
+  background: #ff4d4f;
+  color: #000;
+}
+
+[data-theme="nothing"] .nothing-volume-slider {
+  width: 80px;
+  accent-color: #ff4d4f;
+}
+
+[data-theme="nothing"] .nothing-chip {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 6px 18px;
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  background: rgba(8, 12, 20, 0.6);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+[data-theme="nothing"] .nothing-chip-accent {
+  border-color: #ff4d4f;
+  background: #ff4d4f;
+  color: #000;
+}
+
+[data-theme="nothing"] .nothing-dropdown {
+  position: absolute;
+  right: 0;
+  top: 120%;
+  min-width: 180px;
+  background: rgba(5, 8, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 8px;
+  display: grid;
+  gap: 4px;
+  z-index: 30;
+}
+
+[data-theme="nothing"] .nothing-dropdown-item {
+  text-align: left;
+  font-size: 0.8rem;
+  padding: 8px 10px;
+  border-radius: 12px;
+  color: white;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+[data-theme="nothing"] .nothing-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="nothing"] .nothing-next-banner {
+  margin-top: 18px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+[data-theme="nothing"] .nothing-player-empty {
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 28px;
+  padding: 80px 24px;
+  background: rgba(5, 8, 20, 0.6);
+  text-align: center;
+  display: grid;
+  gap: 8px;
+}
+
+[data-theme="nothing"] .nothing-player-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 8px;
+}
+
+[data-theme="nothing"] .nothing-play-cta {
+  border-radius: 999px;
+  background: #ff4d4f;
+  color: #090b13;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  border: 2px solid #ff4d4f;
+  text-transform: uppercase;
+}
+
+[data-theme="nothing"] .nothing-play-cta:hover:not(:disabled) {
+  background: transparent;
+  color: #ff4d4f;
+}
+
+[data-theme="nothing"] .nothing-play-cta:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+[data-theme="nothing"] .nothing-play-dots {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #000 20%, transparent 22%) repeat;
+  background-size: 6px 6px;
+  margin-right: 10px;
+  display: inline-block;
+}
+
+[data-theme="nothing"] .nothing-episode-card {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 18px 16px;
+  background: rgba(5, 8, 20, 0.7);
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+[data-theme="nothing"] .nothing-episode-card:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateX(6px);
+}
+
+[data-theme="nothing"] .nothing-episode-card--active {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 30px rgba(255, 77, 79, 0.2);
+}
+
+[data-theme="nothing"] .nothing-episode-pill {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="nothing"] .nothing-episode-pill strong {
+  display: block;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  color: white;
+}
+
+[data-theme="nothing"] .nothing-episode-progress {
+  margin-top: 14px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+[data-theme="nothing"] .nothing-episode-progress div {
+  height: 100%;
+  background: #ff4d4f;
+  border-radius: 999px;
+}

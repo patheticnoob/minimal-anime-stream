@@ -3,11 +3,9 @@ import { useParams, useNavigate } from "react-router";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { ArrowLeft, Play, Plus, Check, Clock3 } from "lucide-react";
-import { VideoPlayer } from "@/components/VideoPlayer";
-import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
+import { ArrowLeft, Play, Plus, Check, Clock3, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useTheme } from "@/hooks/use-theme";
+import { NothingVideoPlayer } from "../components/NothingVideoPlayer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
@@ -61,7 +59,6 @@ export default function NothingWatch() {
   const { animeId } = useParams<{ animeId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { theme } = useTheme();
 
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
@@ -411,52 +408,42 @@ export default function NothingWatch() {
           {/* Left: Video Player */}
           <div className="space-y-6">
             {videoSource && currentEpisodeData ? (
-              (() => {
-                const PlayerComponent = theme === "retro" ? RetroVideoPlayer : VideoPlayer;
-                return (
-                  <PlayerComponent
-                    source={videoSource}
-                    title={videoTitle}
-                    tracks={videoTracks}
-                    intro={videoIntro}
-                    outro={videoOutro}
-                    resumeFrom={
-                      animeProgress &&
-                      currentEpisodeData &&
-                      animeProgress.episodeId === currentEpisodeData.id &&
-                      animeProgress.currentTime > 0 &&
-                      animeProgress.duration > 0
-                        ? animeProgress.currentTime
-                        : 0
-                    }
-                    onProgressUpdate={handleProgressUpdate}
-                    onNext={() => {
-                      if (currentEpisodeIndex === null) return;
-                      const next = episodes[currentEpisodeIndex + 1];
-                      if (next) playEpisode(next);
-                    }}
-                    nextTitle={
-                      currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
-                        ? `${anime?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
-                        : undefined
-                    }
-                    onClose={() => {
-                      setVideoSource(null);
-                      setVideoTitle("");
-                      setVideoTracks([]);
-                      setVideoIntro(null);
-                      setVideoOutro(null);
-                      setCurrentEpisodeData(null);
-                      setCurrentAnimeInfo(null);
-                    }}
-                  />
-                );
-              })()
+              <NothingVideoPlayer
+                source={videoSource}
+                title={anime?.title || "Now Playing"}
+                episodeLabel={`Episode ${currentEpisodeData.number ?? "?"}`}
+                tracks={videoTracks}
+                intro={videoIntro}
+                outro={videoOutro}
+                resumeFrom={
+                  animeProgress &&
+                  currentEpisodeData &&
+                  animeProgress.episodeId === currentEpisodeData.id &&
+                  animeProgress.currentTime > 0 &&
+                  animeProgress.duration > 0
+                    ? animeProgress.currentTime
+                    : 0
+                }
+                onProgressUpdate={handleProgressUpdate}
+                onNext={() => {
+                  if (currentEpisodeIndex === null) return;
+                  const next = episodes[currentEpisodeIndex + 1];
+                  if (next) playEpisode(next);
+                }}
+                nextTitle={
+                  currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
+                    ? `${anime?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
+                    : undefined
+                }
+              />
             ) : (
-              <div className="aspect-video bg-white/5 border border-white/10 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <Play className="h-16 w-16 mx-auto mb-4 text-gray-600" />
-                  <p className="text-gray-400">Select an episode to start watching</p>
+              <div className="nothing-player-shell">
+                <div className="nothing-player-empty">
+                  <div className="nothing-player-icon">
+                    <ImageIcon className="h-10 w-10" />
+                  </div>
+                  <p className="text-white/60 text-sm tracking-[0.3em] uppercase">Select an episode</p>
+                  <p className="text-white text-lg font-semibold">Choose an episode to start playback</p>
                 </div>
               </div>
             )}
@@ -495,6 +482,16 @@ export default function NothingWatch() {
                       </Badge>
                     )}
                   </div>
+                  {episodes.length > 0 && (
+                    <Button
+                      onClick={() => playEpisode(episodes[0])}
+                      className="nothing-play-cta mt-4 w-full md:w-auto"
+                      disabled={episodes.length === 0}
+                    >
+                      <span className="nothing-play-dots" />
+                      Play Episode {episodes[0].number ?? 1}
+                    </Button>
+                  )}
                   {shouldShowBroadcast && (
                     <div className="flex items-start gap-2 text-sm text-blue-300">
                       <Clock3 className="h-4 w-4 mt-0.5" />
@@ -525,35 +522,32 @@ export default function NothingWatch() {
             {episodes.length > 0 ? (
               <div className="space-y-2">
                 {episodes.map((ep) => {
-                  const progressPercentage = ep.currentTime && ep.duration
-                    ? (ep.currentTime / ep.duration) * 100
-                    : 0;
+                  const progressPercentage =
+                    ep.currentTime && ep.duration ? (ep.currentTime / ep.duration) * 100 : 0;
                   const isCurrentEpisode = currentEpisodeData?.id === ep.id;
 
                   return (
                     <button
                       key={ep.id}
                       onClick={() => playEpisode(ep)}
-                      className={`w-full text-left p-3 rounded-lg border transition-all ${
-                        isCurrentEpisode
-                          ? "bg-blue-500/20 border-blue-500"
-                          : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                      className={`nothing-episode-card ${
+                        isCurrentEpisode ? "nothing-episode-card--active" : ""
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-semibold">
-                          {ep.title || `Episode ${ep.number ?? "?"}`}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          EP {ep.number ?? "?"}
-                        </span>
+                      <div className="flex items-center gap-4">
+                        <div className="nothing-episode-pill">
+                          <span>EP</span>
+                          <strong>{ep.number ?? "?"}</strong>
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="font-semibold text-white">{ep.title || `Episode ${ep.number ?? "?"}`}</p>
+                          <p className="text-xs text-white/50">Episode {ep.number ?? "?"}</p>
+                        </div>
+                        <Play className="h-4 w-4 text-white/70" />
                       </div>
                       {progressPercentage > 0 && (
-                        <div className="mt-2 h-1 bg-gray-800 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-blue-500 transition-all"
-                            style={{ width: `${progressPercentage}%` }}
-                          />
+                        <div className="nothing-episode-progress">
+                          <div style={{ width: `${progressPercentage}%` }} />
                         </div>
                       )}
                     </button>
