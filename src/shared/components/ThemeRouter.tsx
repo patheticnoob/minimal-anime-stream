@@ -14,6 +14,8 @@ const ClassicWatchHistory = lazy(() => import("@/themes/classic/pages/WatchHisto
 const RetroWatchHistory = lazy(() => import("@/themes/retro/pages/WatchHistory"));
 const NothingWatchHistory = lazy(() => import("@/themes/nothing/pages/WatchHistory"));
 
+const NothingWatch = lazy(() => import("@/themes/nothing/pages/Watch"));
+
 export function ThemedLanding() {
   const { theme } = useTheme();
   
@@ -57,6 +59,24 @@ export function ThemedWatchHistory() {
         <NothingWatchHistory />
       ) : (
         <ClassicWatchHistory />
+      )}
+    </Suspense>
+  );
+}
+
+export function ThemedWatch() {
+  const { theme } = useTheme();
+  
+  return (
+    <Suspense fallback={<FullscreenLoader label="Loading..." />}>
+      {theme === "nothing" ? (
+        <NothingWatch />
+      ) : (
+        // For other themes, we'll use the InfoModal approach (existing behavior)
+        // This component will redirect back to landing
+        <div className="min-h-screen flex items-center justify-center">
+          <p>Watch page is only available in NothingOS theme</p>
+        </div>
       )}
     </Suspense>
   );
