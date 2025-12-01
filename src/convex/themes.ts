@@ -6,9 +6,13 @@ export const getUserTheme = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) return "classic";
     
+    if (!userId) {
+      return "classic";
+    }
+
     const user = await ctx.db.get(userId);
+
     return user?.theme || "classic";
   },
 });
@@ -17,9 +21,23 @@ export const setUserTheme = mutation({
   args: { theme: v.string() },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
     
-    await ctx.db.patch(userId, { theme: args.theme });
-    return { success: true };
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const user = await ctx.db.get(userId);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Validate theme
+    const validThemes = ["classic", "retro", "nothing"];
+    if (!validThemes.includes(args.theme)) {
+      throw new Error("Invalid theme");
+    }
+
+    await ctx.db.patch(user._id, { theme: args.theme });
   },
 });

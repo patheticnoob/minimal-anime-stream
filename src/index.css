@@ -1,18 +1,16 @@
 /* DO NOT CHANGE */
 @import "tailwindcss";
 @import "tw-animate-css";
-@custom-variant dark (&:is(.dark *));
-
-/* Import component-specific styles */
 @import "./styles/theme.css";
-@import "./styles/themes/classic.css";
-@import "./styles/themes/retro.css";
-@import "./styles/sidebar.css";
 @import "./styles/hero-banner.css";
 @import "./styles/anime-card.css";
 @import "./styles/info-modal.css";
+@import "./styles/sidebar.css";
 @import "./styles/mobile-nav.css";
 @import "./styles/loader.css";
+@import "./styles/themes/classic.css";
+@import "./styles/themes/retro.css";
+@import "./styles/themes/nothing.css";
 
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap");
 

@@ -1,0 +1,93 @@
+# NothingOS Theme Implementation Plan
+
+## Design Philosophy
+Based on the NothingOS design system from https://nothing-cn.vercel.app/
+
+### Core Design Principles
+1. **Minimalism** - Clean, purposeful design with no unnecessary elements
+2. **Monochrome** - Black and white color scheme with subtle grays
+3. **Typography** - Commit Mono font for technical feel, Ndot/Nothing Font for branding
+4. **Dot Matrix Aesthetic** - Signature dot patterns and grid-based layouts
+5. **High Contrast** - Strong black/white contrast for clarity
+6. **Geometric Shapes** - Clean lines, circles, and rectangular elements
+
+### Key Visual Elements
+- **Dot Matrix Patterns** - Signature Nothing aesthetic with dot grids
+- **Red Accents** - Minimal use of red (#FF0000) for CTAs and highlights
+- **Monospace Typography** - Technical, clean font (Commit Mono)
+- **Circular Elements** - Rounded buttons and icons
+- **Grid Layouts** - Structured, organized content presentation
+- **Minimal Shadows** - Flat design with subtle depth
+- **Border Emphasis** - Clean borders instead of shadows
+
+### Component Styling Guidelines
+
+#### Colors
+- Background: Pure white (#FFFFFF) / Pure black (#000000)
+- Foreground: Black (#000000) / White (#FFFFFF)
+- Accent: Red (#FF0000) for primary actions
+- Gray Scale: #F5F5F5, #E5E5E5, #CCCCCC for subtle elements
+
+#### Typography
+- Primary: Commit Mono (monospace)
+- Headings: Bold, uppercase, letter-spacing
+- Body: Regular weight, clean line-height
+- Code: Monospace with dot matrix background
+
+#### Spacing
+- Consistent 8px grid system
+- Generous whitespace
+- Clean margins and padding
+
+#### Buttons
+- Outlined style with 2px borders
+- Circular or rounded corners
+- Red fill for primary actions
+- Black outline for secondary
+- Hover: Inverted colors
+
+#### Cards
+- Thin black borders (1-2px)
+- No shadows
+- White background
+- Dot matrix pattern overlay (subtle)
+
+#### Navigation
+- Minimal sidebar with icons
+- Dot indicators for active state
+- Monochrome icons
+- Red accent for active items
+
+### Implementation Strategy
+
+1. **Create NothingOS Theme Files**
+   - `src/themes/nothing/pages/Landing.tsx`
+   - `src/themes/nothing/pages/Auth.tsx`
+   - `src/themes/nothing/pages/WatchHistory.tsx`
+   - `src/styles/themes/nothing.css`
+
+2. **Custom Components**
+   - NothingOS-styled buttons with dot patterns
+   - Minimal cards with clean borders
+   - Dot matrix backgrounds
+   - Monochrome icons and badges
+
+3. **Layout Adjustments**
+   - Sidebar: Minimal with dot indicators
+   - TopBar: Clean search with monochrome styling
+   - Content Rails: Grid-based with clean spacing
+   - Hero Banner: Large typography with dot patterns
+
+4. **Animations**
+   - Subtle fade-ins
+   - Dot pattern reveals
+   - Minimal motion (respecting Nothing's philosophy)
+
+5. **Mobile Optimization**
+   - Maintain minimalist aesthetic
+   - Touch-friendly targets
+   - Clean navigation
+
+### Technical Implementation
+
+#### CSS Variables (nothing.css)
