@@ -1,6 +1,11 @@
 import Landing from "@/pages/Landing";
 
-export default function ClassicLanding() {
-  // Classic theme uses the default Landing page with InfoModal
-  return <Landing />;
-}
+const ClassicLanding = () => {
+  return (
+    <div className="theme-classic">
+      <Landing />
+    </div>
+  );
+};
+
+export default ClassicLanding;
