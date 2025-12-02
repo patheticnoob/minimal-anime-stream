@@ -334,7 +334,7 @@ export function NothingVideoPlayer({
         </div>
 
         {(title || episodeLabel) && (
-          <div className="absolute bottom-24 left-6 text-white space-y-1 pointer-events-none">
+          <div className="absolute bottom-36 md:bottom-40 left-6 text-white space-y-1 pointer-events-none">
             <p className="uppercase text-sm tracking-[0.35em] text-white/60">Now Playing</p>
             <h3 className="text-2xl md:text-3xl font-bold">{title}</h3>
             {episodeLabel && <p className="text-sm text-white/70">{episodeLabel}</p>}
@@ -433,7 +433,7 @@ export function NothingVideoPlayer({
                 <Captions className="h-5 w-5" />
               </button>
               {showSubtitleMenu && (
-                <div className="nothing-dropdown">
+                <div className="nothing-dropdown absolute bottom-full right-0 mb-3">
                   <button onClick={() => changeSubtitle(-1)} className="nothing-dropdown-item">
                     {currentSubtitle === -1 ? "✓ " : ""}Off
                   </button>
