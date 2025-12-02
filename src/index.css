@@ -65,9 +65,7 @@ html[data-theme="classic"] body::before,
 html[data-theme="classic"] body::after,
 html[data-theme="classic"] main::after,
 body[data-theme="classic"]::before,
-body[data-theme="classic"]::after,
-html[data-theme="classic"] main,
-body[data-theme="classic"] main {
+body[data-theme="classic"]::after {
   display: none;
 }
 
