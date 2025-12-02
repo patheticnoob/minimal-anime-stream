@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Info, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import { memo } from "react";
+import { useTheme } from "@/hooks/use-theme";
 
 type AnimeItem = {
   title?: string;
@@ -22,6 +23,7 @@ interface HeroBannerProps {
 }
 
 function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
+  const { theme } = useTheme();
   const availableLanguages = [
     anime.language?.sub ? "Sub" : null,
     anime.language?.dub ? "Dub" : null,
@@ -31,7 +33,9 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
     ? "PREMIERE SPOTLIGHT" 
     : "NOW STREAMING WEEKLY";
 
-  return (
+  // Classic theme gets the modern white design
+  if (theme === "classic") {
+    return (
     <motion.section
       className="hero-banner-modern bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
@@ -157,6 +161,83 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               className="w-full h-full object-cover"
             />
           </motion.div>
+        )}
+      </div>
+    </motion.section>
+    );
+  }
+
+  // Default hero banner for retro and nothing themes
+  return (
+    <motion.section
+      className="hero-banner"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="hero-banner-inner">
+        <div className="hero-banner-copy">
+          <div className="hero-banner-pill">
+            {heroStatusLabel}
+          </div>
+
+          <h1 className="hero-banner-title">
+            {anime.title ?? "Featured Anime"}
+          </h1>
+
+          <p className="hero-banner-description">
+            Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio
+            options available. Join the adventure today.
+          </p>
+
+          <div className="hero-banner-meta-row">
+            {anime.type && (
+              <span className="hero-banner-type-chip">{anime.type}</span>
+            )}
+            {availableLanguages.length > 0 && (
+              <span className="hero-banner-language-chip">
+                {availableLanguages.join(" • ")}
+              </span>
+            )}
+          </div>
+
+          <div className="hero-banner-actions">
+            <Button
+              size="lg"
+              onClick={onPlay}
+              className="hero-banner-primary-btn"
+            >
+              <Play className="h-5 w-5 fill-white mr-2" />
+              WATCH NOW
+            </Button>
+
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={onMoreInfo}
+              className="hero-banner-secondary-btn"
+            >
+              <Info className="h-5 w-5 mr-2" />
+              MORE INFO
+            </Button>
+
+            <Button
+              size="lg"
+              variant="outline"
+              className="hero-banner-icon-btn"
+            >
+              <Plus className="h-6 w-6" />
+            </Button>
+          </div>
+        </div>
+
+        {anime.image && (
+          <div className="hero-banner-art">
+            <img
+              src={anime.image}
+              alt={anime.title || "Anime poster"}
+            />
+          </div>
         )}
       </div>
     </motion.section>
