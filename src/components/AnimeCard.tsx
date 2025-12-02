@@ -31,7 +31,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
     ? (anime.currentTime / anime.duration) * 100
     : 0;
 
-  const aspectRatioClass = variant === "landscape" ? "aspect-[1.45/1]" : "aspect-[2/3]";
+  const aspectRatioClass = variant === "landscape" ? "aspect-[1.45/1]" : "aspect-[3/4]";
 
   return (
     <motion.button
@@ -50,7 +50,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
       }}
     >
       <div
-        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} rounded-lg overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}
+        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} rounded overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}
       >
         {anime.image ? (
           <img
