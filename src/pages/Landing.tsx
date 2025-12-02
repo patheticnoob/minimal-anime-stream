@@ -716,6 +716,8 @@ export default function Landing() {
           }}
           onSearch={() => setActiveSection("search")}
           onProfile={() => setActiveSection("profile")}
+          searchQuery={query}
+          onSearchChange={setQuery}
         />
       ) : (
         <Sidebar
@@ -738,7 +740,7 @@ export default function Landing() {
         />
       )}
 
-      <main className={theme === "nothing" ? "pt-24 transition-all duration-300" : theme === "classic" ? "pt-16 transition-all duration-300" : "md:ml-20 transition-all duration-300"}>
+      <main className={theme === "nothing" ? "pt-24 transition-all duration-300" : theme === "classic" ? "pt-24 transition-all duration-300" : "md:ml-20 transition-all duration-300"}>
         <div className="px-6 md:px-10 pb-10 pt-8 max-w-[2000px] mx-auto">
           {activeSection === "search" ? (
             <div className="mt-8">
