@@ -50,7 +50,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
       }}
     >
       <div
-        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} rounded-md overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}
+        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} rounded-lg overflow-hidden bg-[#1a1f2e] shadow-lg shadow-black/40`}
       >
         {anime.image ? (
           <img
