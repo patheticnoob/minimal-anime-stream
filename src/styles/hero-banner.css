@@ -1,4 +1,43 @@
-/* ───────── Hero Banner ───────── */
+/* ───────── Modern Hero Banner ───────── */
+.hero-banner-modern {
+  position: relative;
+  width: 100%;
+  margin-bottom: 3rem;
+  padding: 0;
+}
+
+.hero-banner-modern h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1C1C1E;
+  line-height: 1;
+}
+
+.hero-banner-modern p {
+  line-height: 1.6;
+}
+
+.hero-banner-modern .font-display {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+}
+
+@media (max-width: 1024px) {
+  .hero-banner-modern {
+    margin-bottom: 2rem;
+  }
+
+  .hero-banner-modern h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-banner-modern h1 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+}
+
+/* ───────── Legacy Hero Banner (Keep for other themes) ───────── */
 .hero-banner {
   position: relative;
   width: 100%;

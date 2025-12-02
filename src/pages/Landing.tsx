@@ -700,6 +700,23 @@ export default function Landing() {
             setActiveSection("home");
           }}
         />
+      ) : theme === "classic" ? (
+        <TopBar
+          activeSection={activeSection}
+          onSectionChange={(section) => {
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") {
+              setQuery("");
+            }
+            setActiveSection(section);
+          }}
+          onSearch={() => setActiveSection("search")}
+          onProfile={() => setActiveSection("profile")}
+        />
       ) : (
         <Sidebar
           activeSection={activeSection}
@@ -721,7 +738,7 @@ export default function Landing() {
         />
       )}
 
-      <main className={theme === "nothing" ? "pt-24 transition-all duration-300" : "md:ml-20 transition-all duration-300"}>
+      <main className={theme === "nothing" ? "pt-24 transition-all duration-300" : theme === "classic" ? "pt-28 transition-all duration-300" : "md:ml-20 transition-all duration-300"}>
         <div className="px-6 md:px-10 pb-10 pt-8 max-w-[2000px] mx-auto">
           {activeSection === "search" ? (
             <div className="mt-8">
