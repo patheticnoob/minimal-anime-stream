@@ -2,15 +2,15 @@
 .hero-banner-modern {
   position: relative;
   width: 100%;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   padding: 0;
 }
 
 .hero-banner-modern h1 {
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  letter-spacing: -0.03em;
   color: #1C1C1E;
-  line-height: 1;
+  line-height: 0.95;
 }
 
 .hero-banner-modern p {
@@ -23,7 +23,7 @@
 
 @media (max-width: 1024px) {
   .hero-banner-modern {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
 
   .hero-banner-modern h1 {

@@ -147,7 +147,7 @@ export function ContentRail({
           {displayedItems.map((item, idx) => (
             <div
               key={item.id ?? item.dataId ?? idx}
-              className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[160px] md:w-[200px]" : "w-[110px] md:w-[140px]"}`}
+              className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"}`}
             >
               <AnimeCard
                 anime={item}
@@ -160,7 +160,7 @@ export function ContentRail({
           
           {/* Show More Button */}
           {(canShowMore || (hasMore && !isLoadingMore)) && (
-            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[160px] md:w-[200px]" : "w-[110px] md:w-[140px]"} flex items-center justify-center`}>
+            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"} flex items-center justify-center`}>
               <Button
                 variant="outline"
                 size="sm"
@@ -175,7 +175,7 @@ export function ContentRail({
           
           {/* Loading Indicator */}
           {isLoadingMore && (
-            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[160px] md:w-[200px]" : "w-[110px] md:w-[140px]"} flex items-center justify-center`}>
+            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"} flex items-center justify-center`}>
               <div className="h-full w-full bg-white/5 border border-white/10 rounded-md flex items-center justify-center">
                 <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full" />
               </div>
