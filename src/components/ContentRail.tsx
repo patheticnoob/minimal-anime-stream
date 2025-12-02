@@ -95,8 +95,8 @@ export function ContentRail({
   }, [enableInfiniteScroll, hasMore, onLoadMore]);
 
   return (
-    <section className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center justify-between mb-3 px-4 md:px-0">
+    <section className="content-rail mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="content-rail-header flex items-center justify-between mb-3 px-4 md:px-0">
         <h2 className="text-lg md:text-xl font-bold text-white tracking-wide uppercase">
           {title}
         </h2>
@@ -113,7 +113,7 @@ export function ContentRail({
         )}
       </div>
 
-      <div className="relative">
+      <div className="content-rail-track relative">
         {/* Left Fade - Reduced opacity for mobile */}
         <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#050814]/40 to-transparent z-10 pointer-events-none md:hidden" />
         
@@ -141,13 +141,13 @@ export function ContentRail({
 
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-4 md:px-0"
+          className="content-rail-scroll flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-4 md:px-0"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {displayedItems.map((item, idx) => (
             <div
               key={item.id ?? item.dataId ?? idx}
-              className={`flex-none snap-start ${variant === "landscape" ? "w-[220px] md:w-[260px]" : "w-[130px] md:w-[160px]"}`}
+              className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[220px] md:w-[260px]" : "w-[130px] md:w-[160px]"}`}
             >
               <AnimeCard
                 anime={item}
@@ -160,7 +160,7 @@ export function ContentRail({
           
           {/* Show More Button */}
           {(canShowMore || (hasMore && !isLoadingMore)) && (
-            <div className={`flex-none snap-start ${variant === "landscape" ? "w-[220px] md:w-[260px]" : "w-[130px] md:w-[160px]"} flex items-center justify-center`}>
+            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[220px] md:w-[260px]" : "w-[130px] md:w-[160px]"} flex items-center justify-center`}>
               <Button
                 variant="outline"
                 size="sm"
@@ -175,7 +175,7 @@ export function ContentRail({
           
           {/* Loading Indicator */}
           {isLoadingMore && (
-            <div className={`flex-none snap-start ${variant === "landscape" ? "w-[220px] md:w-[260px]" : "w-[130px] md:w-[160px]"} flex items-center justify-center`}>
+            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[220px] md:w-[260px]" : "w-[130px] md:w-[160px]"} flex items-center justify-center`}>
               <div className="h-full w-full bg-white/5 border border-white/10 rounded-md flex items-center justify-center">
                 <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full" />
               </div>
