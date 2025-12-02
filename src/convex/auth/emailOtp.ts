@@ -18,10 +18,17 @@ export const emailOtp = Email({
         console.log("📧 RESEND_FROM:", process.env.RESEND_FROM);
         console.log("🔐 RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
         
+        const fromEmail = process.env.RESEND_FROM?.includes('@') 
+          ? process.env.RESEND_FROM 
+          : `${process.env.RESEND_FROM || 'Anime'} <onboarding@resend.dev>`;
+        
+        console.log("📤 Sending from:", fromEmail);
+        console.log("📬 Sending to:", email);
+        
         await axios.post(
           "https://api.resend.com/emails",
           {
-            from: process.env.RESEND_FROM || "Anime <onboarding@resend.dev>",
+            from: fromEmail,
             to: email,
             subject: `Sign in to ${appName}`,
             html: `
