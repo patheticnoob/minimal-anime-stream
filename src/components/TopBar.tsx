@@ -27,24 +27,24 @@ export function TopBar({
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 pt-6">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
       <div className="container mx-auto px-6 md:px-10">
-        <div className="bg-white/80 backdrop-blur-lg rounded-full shadow-lg border border-gray-200 h-16 flex items-center justify-between px-8">
+        <div className="h-16 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="font-display text-lg tracking-widest uppercase font-bold">
+            <div className="font-display text-xl tracking-widest uppercase font-bold text-gray-900">
               Anime
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-12 font-display text-sm tracking-wider">
+          <nav className="hidden md:flex items-center gap-10 font-display text-sm tracking-wider">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => onSectionChange?.(item.id)}
                 className={cn(
-                  "relative transition-colors",
+                  "relative py-5 transition-colors font-medium",
                   activeSection === item.id
                     ? "text-gray-900"
                     : "text-gray-500 hover:text-gray-900"
@@ -52,24 +52,23 @@ export function TopBar({
               >
                 {item.label}
                 {activeSection === item.id && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-gray-900 rounded-full" />
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />
                 )}
               </button>
             ))}
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <button
               onClick={onSearch}
-              className="text-gray-500 hover:text-gray-900 transition-colors relative"
+              className="text-gray-500 hover:text-gray-900 transition-colors p-2"
             >
               <Search className="h-5 w-5" />
-              <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-[#FF3333] rounded-full" />
             </button>
             <button
               onClick={onProfile}
-              className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors flex items-center justify-center"
+              className="w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors flex items-center justify-center"
             >
               <User className="h-5 w-5 text-gray-700" />
             </button>
