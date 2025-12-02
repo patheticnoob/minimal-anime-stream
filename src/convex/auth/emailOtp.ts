@@ -14,10 +14,14 @@ export const emailOtp = Email({
     if (process.env.RESEND_API_KEY) {
       const appName = process.env.VLY_APP_NAME || "Minimal Anime Stream";
       try {
+        console.log("🔑 Attempting to send email via Resend...");
+        console.log("📧 RESEND_FROM:", process.env.RESEND_FROM);
+        console.log("🔐 RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
+        
         await axios.post(
           "https://api.resend.com/emails",
           {
-            from: process.env.RESEND_FROM || "onboarding@resend.dev",
+            from: process.env.RESEND_FROM || "Anime <onboarding@resend.dev>",
             to: email,
             subject: `Sign in to ${appName}`,
             html: `
@@ -38,9 +42,15 @@ export const emailOtp = Email({
             },
           }
         );
+        console.log("✅ Email sent successfully via Resend!");
         return;
       } catch (error) {
-        console.error("Failed to send via Resend, falling back to vly service:", error);
+        console.error("❌ Failed to send via Resend, falling back to vly service:");
+        console.error("Error details:", error);
+        if (axios.isAxiosError(error)) {
+          console.error("Response data:", error.response?.data);
+          console.error("Response status:", error.response?.status);
+        }
       }
     }
 
