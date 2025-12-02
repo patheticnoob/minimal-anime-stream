@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { ArrowLeft, Play, Plus, Check, Clock3, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Play, Plus, Check, Clock3, Image as ImageIcon, Film } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { NothingVideoPlayer } from "../components/NothingVideoPlayer";
 import { Badge } from "@/components/ui/badge";
@@ -373,29 +373,31 @@ export default function NothingWatch() {
         <div className="max-w-[2000px] mx-auto px-6 py-4 flex items-center gap-4">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
           >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="text-sm font-medium">Back</span>
+            <div className="p-2 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+              <ArrowLeft className="h-5 w-5" />
+            </div>
+            <span className="text-sm font-medium tracking-widest uppercase">Back</span>
           </button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold truncate">{anime?.title || "Loading..."}</h1>
+            <h1 className="text-xl font-bold truncate tracking-wide">{anime?.title || "Loading..."}</h1>
           </div>
           <Button
             onClick={handleToggleWatchlist}
             variant="outline"
             size="sm"
-            className="gap-2"
+            className="gap-2 border-white/20 hover:bg-white/10 hover:text-white"
           >
             {isInWatchlist ? (
               <>
-                <Check className="h-4 w-4" />
-                In Watchlist
+                <Check className="h-4 w-4 text-[#ff4d4f]" />
+                <span className="tracking-wider">IN WATCHLIST</span>
               </>
             ) : (
               <>
                 <Plus className="h-4 w-4" />
-                Watchlist
+                <span className="tracking-wider">ADD TO LIST</span>
               </>
             )}
           </Button>
@@ -403,10 +405,10 @@ export default function NothingWatch() {
       </header>
 
       {/* Main Content */}
-      <main className="pt-20 px-6 pb-10 max-w-[2000px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+      <main className="pt-24 px-6 pb-10 max-w-[2000px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
           {/* Left: Video Player */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             {videoSource && currentEpisodeData ? (
               <NothingVideoPlayer
                 source={videoSource}
@@ -437,78 +439,96 @@ export default function NothingWatch() {
                 }
               />
             ) : (
-              <div className="nothing-player-shell">
-                <div className="nothing-player-empty">
-                  <div className="nothing-player-icon">
-                    <ImageIcon className="h-10 w-10" />
+              <div className="nothing-player-shell aspect-video flex items-center justify-center bg-[#050814] rounded-[32px] border border-white/10 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('/assets/noise.png')] opacity-20 pointer-events-none"></div>
+                <div className="nothing-player-empty text-center z-10">
+                  <div className="nothing-player-icon mb-6 inline-flex p-6 rounded-full bg-white/5 border border-white/10">
+                    <ImageIcon className="h-12 w-12 text-white/40" />
                   </div>
-                  <p className="text-white/60 text-sm tracking-[0.3em] uppercase">Select an episode</p>
-                  <p className="text-white text-lg font-semibold">Choose an episode to start playback</p>
+                  <p className="text-[#ff4d4f] text-xs tracking-[0.4em] uppercase font-bold mb-2">Select Content</p>
+                  <p className="text-white text-2xl font-bold tracking-tight">Choose an episode to start</p>
                 </div>
               </div>
             )}
 
             {/* Anime Info */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <div className="flex gap-4">
+            <div className="bg-[#050814] border border-white/10 rounded-[24px] p-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+                <h1 className="text-9xl font-bold tracking-tighter text-white">NOTHING</h1>
+              </div>
+              
+              <div className="flex flex-col md:flex-row gap-8 relative z-10">
                 {anime?.image && (
-                  <img
-                    src={anime.image}
-                    alt={anime.title}
-                    className="w-32 h-48 object-cover rounded-lg"
-                  />
-                )}
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold mb-2">{anime?.title || "Unknown Title"}</h2>
-                  <div className="flex items-center gap-2 flex-wrap mb-4">
-                    {anime?.type && (
-                      <Badge variant="outline" className="text-xs">
-                        {anime.type}
-                      </Badge>
-                    )}
-                    {anime?.language?.sub && (
-                      <Badge variant="outline" className="text-xs">
-                        SUB
-                      </Badge>
-                    )}
-                    {anime?.language?.dub && (
-                      <Badge variant="outline" className="text-xs">
-                        DUB
-                      </Badge>
-                    )}
-                    {episodes.length > 0 && (
-                      <Badge variant="outline" className="text-xs">
-                        {episodes.length} Episodes
-                      </Badge>
-                    )}
+                  <div className="shrink-0">
+                    <img
+                      src={anime.image}
+                      alt={anime.title}
+                      className="w-40 h-60 object-cover rounded-2xl shadow-2xl border border-white/10"
+                    />
                   </div>
+                )}
+                <div className="flex-1 space-y-6">
+                  <div>
+                    <h2 className="text-4xl font-bold mb-3 tracking-tight leading-tight">{anime?.title || "Unknown Title"}</h2>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {anime?.type && (
+                        <span className="px-3 py-1 rounded-full border border-white/20 text-xs font-medium tracking-wider uppercase text-white/80">
+                          {anime.type}
+                        </span>
+                      )}
+                      {anime?.language?.sub && (
+                        <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-medium tracking-wider uppercase text-white">
+                          SUB
+                        </span>
+                      )}
+                      {anime?.language?.dub && (
+                        <span className="px-3 py-1 rounded-full bg-white/10 text-xs font-medium tracking-wider uppercase text-white">
+                          DUB
+                        </span>
+                      )}
+                      {episodes.length > 0 && (
+                        <span className="px-3 py-1 rounded-full border border-[#ff4d4f]/50 text-[#ff4d4f] text-xs font-medium tracking-wider uppercase">
+                          {episodes.length} Episodes
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
                   {episodes.length > 0 && (
                     <Button
                       onClick={() => playEpisode(episodes[0])}
-                      className="nothing-play-cta mt-4 w-full md:w-auto"
+                      className="nothing-play-cta h-14 px-8 rounded-full bg-white text-black hover:bg-gray-200 transition-all text-base font-bold tracking-wide"
                       disabled={episodes.length === 0}
                     >
-                      <span className="nothing-play-dots" />
-                      Play Episode {episodes[0].number ?? 1}
+                      <Play className="mr-2 h-5 w-5 fill-black" />
+                      START WATCHING
                     </Button>
                   )}
+
                   {shouldShowBroadcast && (
-                    <div className="flex items-start gap-2 text-sm text-blue-300">
-                      <Clock3 className="h-4 w-4 mt-0.5" />
-                      {isBroadcastLoading ? (
-                        <span>Fetching upcoming schedule...</span>
-                      ) : (
-                        <div className="space-y-1">
-                          <span className="block font-semibold text-white">
-                            Next broadcast: {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
-                          </span>
-                          {broadcastDetails?.countdown && (
-                            <span className="block text-xs text-blue-200">
-                              {broadcastDetails.countdown}
+                    <div className="flex items-start gap-4 p-4 rounded-xl bg-white/5 border border-white/10 max-w-md">
+                      <div className="p-2 rounded-full bg-[#ff4d4f]/10 text-[#ff4d4f]">
+                        <Clock3 className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        {isBroadcastLoading ? (
+                          <span className="text-sm text-white/60">Syncing broadcast data...</span>
+                        ) : (
+                          <div className="space-y-1">
+                            <span className="block text-xs font-bold tracking-[0.2em] text-white/40 uppercase">
+                              Next Broadcast
                             </span>
-                          )}
-                        </div>
-                      )}
+                            <span className="block font-medium text-white">
+                              {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
+                            </span>
+                            {broadcastDetails?.countdown && (
+                              <span className="block text-sm text-[#ff4d4f]">
+                                {broadcastDetails.countdown}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -517,10 +537,14 @@ export default function NothingWatch() {
           </div>
 
           {/* Right: Episode List */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-fit max-h-[calc(100vh-120px)] overflow-y-auto">
-            <h3 className="text-lg font-bold mb-4 uppercase tracking-wider">Episodes</h3>
+          <div className="bg-[#050814] border border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] overflow-y-auto flex flex-col">
+            <div className="flex items-center justify-between mb-6 sticky top-0 bg-[#050814] z-10 py-2">
+              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-white/60">Episodes</h3>
+              <span className="text-xs font-mono text-white/40">{episodes.length} TOTAL</span>
+            </div>
+            
             {episodes.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {episodes.map((ep) => {
                   const progressPercentage =
                     ep.currentTime && ep.duration ? (ep.currentTime / ep.duration) * 100 : 0;
@@ -530,24 +554,41 @@ export default function NothingWatch() {
                     <button
                       key={ep.id}
                       onClick={() => playEpisode(ep)}
-                      className={`nothing-episode-card ${
-                        isCurrentEpisode ? "nothing-episode-card--active" : ""
+                      className={`group relative w-full text-left p-4 rounded-xl border transition-all duration-300 ${
+                        isCurrentEpisode 
+                          ? "bg-white/10 border-[#ff4d4f] shadow-[0_0_20px_rgba(255,77,79,0.1)]" 
+                          : "bg-white/5 border-transparent hover:bg-white/10 hover:border-white/20"
                       }`}
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="nothing-episode-pill">
-                          <span>EP</span>
-                          <strong>{ep.number ?? "?"}</strong>
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-mono text-sm font-bold ${
+                          isCurrentEpisode ? "bg-[#ff4d4f] text-black" : "bg-black/40 text-white/60 group-hover:text-white"
+                        }`}>
+                          {ep.number ?? "#"}
                         </div>
-                        <div className="flex-1 text-left">
-                          <p className="font-semibold text-white">{ep.title || `Episode ${ep.number ?? "?"}`}</p>
-                          <p className="text-xs text-white/50">Episode {ep.number ?? "?"}</p>
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className={`font-medium truncate ${isCurrentEpisode ? "text-white" : "text-white/80 group-hover:text-white"}`}>
+                            {ep.title || `Episode ${ep.number ?? "?"}`}
+                          </p>
+                          <p className="text-xs text-white/40 font-mono mt-0.5">
+                            EP {ep.number ?? "?"}
+                          </p>
                         </div>
-                        <Play className="h-4 w-4 text-white/70" />
+
+                        {isCurrentEpisode ? (
+                          <div className="w-2 h-2 rounded-full bg-[#ff4d4f] animate-pulse" />
+                        ) : (
+                          <Play className="h-4 w-4 text-white/0 group-hover:text-white/60 transition-all transform translate-x-2 group-hover:translate-x-0" />
+                        )}
                       </div>
+
                       {progressPercentage > 0 && (
-                        <div className="nothing-episode-progress">
-                          <div style={{ width: `${progressPercentage}%` }} />
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/50 rounded-b-xl overflow-hidden">
+                          <div 
+                            className="h-full bg-[#ff4d4f]" 
+                            style={{ width: `${progressPercentage}%` }} 
+                          />
                         </div>
                       )}
                     </button>
@@ -555,7 +596,12 @@ export default function NothingWatch() {
                 })}
               </div>
             ) : (
-              <p className="text-center text-gray-400 py-8">No episodes available</p>
+              <div className="flex flex-col items-center justify-center py-12 text-white/40">
+                <div className="w-12 h-12 rounded-full border border-dashed border-white/20 flex items-center justify-center mb-4">
+                  <Film className="h-6 w-6" />
+                </div>
+                <p className="text-sm tracking-widest uppercase">No episodes found</p>
+              </div>
             )}
           </div>
         </div>

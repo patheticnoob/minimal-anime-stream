@@ -19,6 +19,7 @@ import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { SearchSection } from "@/components/SearchSection";
 import { useTheme } from "@/hooks/use-theme";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
+import { NothingNavBar } from "@/themes/nothing/components/NothingNavBar";
 
 type AnimeItem = {
   title?: string;
@@ -678,26 +679,49 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white font-sans selection:bg-blue-500/30">
-      <Sidebar
-        activeSection={activeSection}
-        onSectionChange={(section) => {
-          if (section === "history") {
-            navigate("/history");
-            return;
-          }
-          if (section === "profile" && !isAuthenticated) {
-            toast.error("Please sign in to view your profile");
-            navigate("/auth");
-            return;
-          }
-          if (section === "search") {
-            setQuery("");
-          }
-          setActiveSection(section);
-        }}
-      />
+      {theme === "nothing" ? (
+        <NothingNavBar
+          activeSection={activeSection}
+          onSectionChange={(section) => {
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") {
+              setQuery("");
+            }
+            setActiveSection(section);
+          }}
+          isAuthenticated={isAuthenticated}
+          onLogout={async () => {
+            await signOut();
+            toast.success("Logged out successfully");
+            setActiveSection("home");
+          }}
+        />
+      ) : (
+        <Sidebar
+          activeSection={activeSection}
+          onSectionChange={(section) => {
+            if (section === "history") {
+              navigate("/history");
+              return;
+            }
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") {
+              setQuery("");
+            }
+            setActiveSection(section);
+          }}
+        />
+      )}
 
-      <main className="md:ml-20 transition-all duration-300">
+      <main className={theme === "nothing" ? "pt-24 transition-all duration-300" : "md:ml-20 transition-all duration-300"}>
         <div className="px-6 md:px-10 pb-10 pt-8 max-w-[2000px] mx-auto">
           {activeSection === "search" ? (
             <div className="mt-8">
