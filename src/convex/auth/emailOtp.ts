@@ -40,8 +40,7 @@ export const emailOtp = Email({
         );
         return;
       } catch (error) {
-        console.error("Failed to send via Resend:", error);
-        throw new Error("Failed to send email via Resend. Check your API key.");
+        console.error("Failed to send via Resend, falling back to vly service:", error);
       }
     }
 
