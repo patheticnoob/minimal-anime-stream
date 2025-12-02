@@ -50,8 +50,6 @@ type AnimePlaybackInfo = {
   };
 };
 
-const AD_SCRIPT_SNIPPET = `(function(solth){var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];s.settings = solth || {};s.src = "//excitableminor.com/b.XJVVsed/GIlb0yYHW-ce/aeTmc9Hu/ZcUWlSkSPuTcYT3nMrTQQ/1pNdzEYPtlNyjRc_xyNZDsU/3RNfwg";s.async = true;s.referrerPolicy = 'no-referrer-when-downgrade';l.parentNode.insertBefore(s, l);})({});`;
-
 const normalizeEpisodeNumber = (value?: number | string | null) => {
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;
@@ -740,10 +738,6 @@ export default function Landing() {
                 />
               )}
 
-              {!isAuthenticated && activeSection === "home" && (
-                <script dangerouslySetInnerHTML={{ __html: AD_SCRIPT_SNIPPET }} />
-              )}
-
               {/* Section-specific content */}
               {sectionContent ? (
                 <div className="mt-8">
@@ -772,7 +766,6 @@ export default function Landing() {
                         items={continueWatchingItems}
                         onItemClick={openAnime}
                       />
-                      <script dangerouslySetInnerHTML={{ __html: AD_SCRIPT_SNIPPET }} />
                     </>
                   )}
 

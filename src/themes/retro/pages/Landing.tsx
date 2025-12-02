@@ -1,11 +1,10 @@
 import Landing from "@/pages/Landing";
 
-const RetroLanding = () => {
+export default function RetroLanding() {
+  // Retro theme uses the default Landing page with InfoModal
   return (
-    <div data-theme="retro" className="theme-retro">
+    <div data-theme="retro" className="theme-retro w-full min-h-screen">
       <Landing />
     </div>
   );
-};
-
-export default RetroLanding;
+}
