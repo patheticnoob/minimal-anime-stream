@@ -1,1 +1,1 @@
-npx convex dev --once && npx tsc -b --noEmit
+head -n 50 src/pages/Landing.tsx
