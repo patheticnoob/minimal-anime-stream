@@ -57,7 +57,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             </span>
           </div>
 
-          {/* Compact Meta Info - Top Right */}
+          {/* Compact Meta Info - Small inline tags */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
             {anime.type && (
               <span className="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
@@ -69,9 +69,9 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
                 {availableLanguages.join(" • ")}
               </span>
             )}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 border border-gray-900 text-gray-900 text-[10px] font-bold px-2.5 py-1 rounded">
               <span className="text-yellow-400 text-xs">★</span>
-              <span className="font-bold text-[10px] text-gray-900">4.8 / 5</span>
+              <span>4.8 / 5</span>
             </div>
           </div>
 
@@ -85,22 +85,6 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio
             options available. Join the adventure today.
           </p>
-
-          {/* Stats Grid - Smaller and more compact */}
-          <div className="grid grid-cols-3 gap-3 mb-6 pb-6 border-b border-dashed border-gray-300">
-            <div className="border-2 border-gray-900 rounded-lg p-2 text-center">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">Format</div>
-              <div className="text-sm font-black text-gray-900">{anime.type || "TV"}</div>
-            </div>
-            <div className="border-2 border-gray-900 rounded-lg p-2 text-center">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">Audio</div>
-              <div className="text-sm font-black text-gray-900">{availableLanguages.join(" / ") || "Sub / Dub"}</div>
-            </div>
-            <div className="border-2 border-gray-900 rounded-lg p-2 text-center">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">Rating</div>
-              <div className="text-sm font-black text-gray-900">4.8 / 5</div>
-            </div>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-3">
