@@ -57,21 +57,21 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             </span>
           </div>
 
-          {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-3 mb-4">
+          {/* Compact Meta Info - Top Right */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
             {anime.type && (
-              <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded uppercase">
+              <span className="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
                 {anime.type}
               </span>
             )}
             {availableLanguages.length > 0 && (
-              <span className="border-2 border-gray-900 text-gray-900 text-xs font-bold px-3 py-1 rounded uppercase">
+              <span className="border border-gray-900 text-gray-900 text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
                 {availableLanguages.join(" • ")}
               </span>
             )}
             <div className="flex items-center gap-1">
-              <span className="text-yellow-400 text-base">★</span>
-              <span className="font-bold text-sm text-gray-900">4.8 / 5</span>
+              <span className="text-yellow-400 text-xs">★</span>
+              <span className="font-bold text-[10px] text-gray-900">4.8 / 5</span>
             </div>
           </div>
 
@@ -86,33 +86,20 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             options available. Join the adventure today.
           </p>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4 mb-6 pb-6 border-b-2 border-dashed border-gray-300">
-            <div className="border-2 border-gray-900 rounded-lg p-3 text-center">
-              <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Format</div>
-              <div className="text-lg font-black text-gray-900">{anime.type || "TV"}</div>
+          {/* Stats Grid - Smaller and more compact */}
+          <div className="grid grid-cols-3 gap-3 mb-6 pb-6 border-b border-dashed border-gray-300">
+            <div className="border-2 border-gray-900 rounded-lg p-2 text-center">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">Format</div>
+              <div className="text-sm font-black text-gray-900">{anime.type || "TV"}</div>
             </div>
-            <div className="border-2 border-gray-900 rounded-lg p-3 text-center">
-              <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Audio</div>
-              <div className="text-lg font-black text-gray-900">{availableLanguages.join(" / ") || "Sub / Dub"}</div>
+            <div className="border-2 border-gray-900 rounded-lg p-2 text-center">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">Audio</div>
+              <div className="text-sm font-black text-gray-900">{availableLanguages.join(" / ") || "Sub / Dub"}</div>
             </div>
-            <div className="border-2 border-gray-900 rounded-lg p-3 text-center">
-              <div className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Rating</div>
-              <div className="text-lg font-black text-gray-900">4.8 / 5</div>
+            <div className="border-2 border-gray-900 rounded-lg p-2 text-center">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">Rating</div>
+              <div className="text-sm font-black text-gray-900">4.8 / 5</div>
             </div>
-          </div>
-
-          {/* Server Selection */}
-          <div className="flex items-center gap-2 mb-6">
-            <button className="border-2 border-gray-900 rounded-full px-4 py-1.5 text-xs font-bold uppercase hover:bg-gray-900 hover:text-white transition-colors">
-              HD-1
-            </button>
-            <button className="border-2 border-gray-900 rounded-full px-4 py-1.5 text-xs font-bold uppercase hover:bg-gray-900 hover:text-white transition-colors">
-              HD-2
-            </button>
-            <button className="border-2 border-gray-900 rounded-full px-4 py-1.5 text-xs font-bold uppercase hover:bg-gray-900 hover:text-white transition-colors">
-              HD-3
-            </button>
           </div>
 
           {/* Action Buttons */}
