@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { memo } from "react";
+import { useTheme } from "@/hooks/use-theme";
 
 type AnimeItem = {
   title?: string;
@@ -13,7 +14,6 @@ type AnimeItem = {
     sub?: string | null;
     dub?: string | null;
   };
-  // Progress tracking fields
   episodeNumber?: number;
   currentTime?: number;
   duration?: number;
@@ -27,11 +27,15 @@ interface AnimeCardProps {
 }
 
 function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps) {
+  const { theme } = useTheme();
   const progressPercentage = anime.currentTime && anime.duration
     ? (anime.currentTime / anime.duration) * 100
     : 0;
 
   const aspectRatioClass = variant === "landscape" ? "aspect-[1.45/1]" : "aspect-[2/3]";
+  
+  // NothingOS theme uses larger border radius
+  const borderRadiusClass = theme === "nothing" ? "rounded-[28px]" : "rounded-[4px]";
 
   return (
     <motion.button
@@ -45,13 +49,11 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
         type: "spring", 
         stiffness: 200, 
         damping: 22,
-        // Disable animations on mobile for performance
         duration: window.innerWidth < 768 ? 0 : undefined
       }}
     >
       <div
-        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} overflow-hidden bg-[#1a1f2e] shadow-lg`}
-        style={{ borderRadius: '4px' }}
+        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} overflow-hidden bg-[#1a1f2e] shadow-lg ${borderRadiusClass}`}
       >
         {anime.image ? (
           <img
@@ -74,15 +76,15 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
           className="anime-card-play-overlay absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           aria-hidden="true"
         >
-          <div className="anime-card-play-button w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
-            <Play className="h-5 w-5 text-white fill-white ml-0.5" />
+          <div className={`anime-card-play-button w-12 h-12 ${theme === "nothing" ? "rounded-full" : "rounded-full"} bg-white/20 backdrop-blur-md flex items-center justify-center border ${theme === "nothing" ? "border-white/40" : "border-white/30"}`}>
+            <Play className="h-6 w-6 text-white fill-white ml-0.5" />
           </div>
         </div>
 
         {/* Episode number badge - Top Left */}
         {anime.episodeNumber && (
           <div className="absolute top-2 left-2">
-            <Badge className="bg-[#1977F3] text-white border-0 text-[10px] font-bold px-1.5 py-0.5 rounded-sm shadow-sm">
+            <Badge className={`${theme === "nothing" ? "badge-accent" : "bg-[#1977F3]"} text-white border-0 text-[10px] font-bold px-2 py-1 ${theme === "nothing" ? "rounded-full" : "rounded-sm"} shadow-sm`}>
               EP {anime.episodeNumber}
             </Badge>
           </div>
@@ -91,7 +93,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
         {/* Type badge - Top Right */}
         {anime.type && (
           <div className="absolute top-2 right-2">
-            <Badge className="bg-black/60 backdrop-blur-md text-white border-0 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm">
+            <Badge className={`${theme === "nothing" ? "bg-white/90 text-[#0a0f1f] border border-black/10" : "bg-black/60 backdrop-blur-md text-white border-0"} text-[9px] font-bold uppercase tracking-wider px-2 py-1 ${theme === "nothing" ? "rounded-full" : "rounded-sm"}`}>
               {anime.type}
             </Badge>
           </div>
@@ -99,28 +101,21 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
 
         {/* Progress bar - Bottom */}
         {progressPercentage > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/30">
+          <div className={`absolute bottom-0 left-0 right-0 h-1 ${theme === "nothing" ? "bg-black/10" : "bg-white/30"}`}>
             <div 
-              className="h-full bg-white shadow-[0_0_4px_rgba(255,255,255,0.8)]"
+              className={`h-full ${theme === "nothing" ? "bg-[#ff3b3b]" : "bg-white"} shadow-[0_0_4px_rgba(255,255,255,0.8)]`}
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
         )}
-
-        {/* Play Icon Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-           <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
-              <Play className="h-5 w-5 text-white fill-white ml-0.5" />
-           </div>
-        </div>
       </div>
       
       <div className="px-0.5">
-        <h3 className="font-medium text-sm text-gray-100 line-clamp-1 group-hover:text-[#1977F3] transition-colors">
+        <h3 className={`font-medium text-sm ${theme === "nothing" ? "text-[#0a0f1f]" : "text-gray-100"} line-clamp-1 ${theme === "nothing" ? "group-hover:text-[#ff3b3b]" : "group-hover:text-[#1977F3]"} transition-colors`}>
           {anime.title ?? "Untitled"}
         </h3>
         
-        <div className="flex gap-2 mt-1 text-[10px] font-medium text-[#8f9aa3]">
+        <div className={`flex gap-2 mt-1 text-[10px] font-medium ${theme === "nothing" ? "text-[#8a90a6]" : "text-[#8f9aa3]"}`}>
           {anime.language?.sub && <span>SUB {anime.language.sub}</span>}
           {anime.language?.sub && anime.language?.dub && <span className="text-gray-600">•</span>}
           {anime.language?.dub && <span>DUB {anime.language.dub}</span>}

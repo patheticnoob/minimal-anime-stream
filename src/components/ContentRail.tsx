@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimeCard } from "./AnimeCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/hooks/use-theme";
 
 type AnimeItem = {
   title?: string;
@@ -38,6 +39,7 @@ export function ContentRail({
   hasMore = false,
   isLoadingMore = false
 }: ContentRailProps) {
+  const { theme } = useTheme();
   const [displayCount, setDisplayCount] = useState(12);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -96,8 +98,8 @@ export function ContentRail({
 
   return (
     <section className="content-rail mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="content-rail-header flex items-center justify-between mb-3 px-4 md:px-0">
-        <h2 className="text-lg md:text-xl font-bold text-white tracking-wide uppercase">
+      <div className="content-rail-header flex items-center justify-between mb-4 px-4 md:px-0">
+        <h2 className={`text-lg md:text-xl font-bold ${theme === "nothing" ? "text-[#0a0f1f]" : "text-white"} tracking-wide uppercase`}>
           {title}
         </h2>
         {onViewAll && (
@@ -105,7 +107,7 @@ export function ContentRail({
             variant="ghost"
             size="sm"
             onClick={onViewAll}
-            className="text-[#1977F3] hover:text-[#1977F3] hover:bg-blue-500/10 text-xs font-semibold"
+            className={`${theme === "nothing" ? "text-[#ff3b3b] hover:text-[#ff3b3b] hover:bg-[#ff3b3b]/10" : "text-[#1977F3] hover:text-[#1977F3] hover:bg-blue-500/10"} text-xs font-semibold`}
           >
             View All
             <ChevronRight className="ml-1 h-3 w-3" />
@@ -114,17 +116,15 @@ export function ContentRail({
       </div>
 
       <div className="content-rail-track relative">
-        {/* Left Fade - Reduced opacity for mobile */}
-        <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#050814]/40 to-transparent z-10 pointer-events-none md:hidden" />
-        
-        {/* Right Fade - Reduced opacity for mobile */}
-        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-r from-transparent to-[#050814]/40 z-10 pointer-events-none md:hidden" />
+        {/* Fade overlays - adjusted for theme */}
+        <div className={`absolute left-0 top-0 bottom-0 w-6 ${theme === "nothing" ? "bg-gradient-to-r from-[#f5f6fb]/40 to-transparent" : "bg-gradient-to-r from-[#050814]/40 to-transparent"} z-10 pointer-events-none md:hidden`} />
+        <div className={`absolute right-0 top-0 bottom-0 w-6 ${theme === "nothing" ? "bg-gradient-to-r from-transparent to-[#f5f6fb]/40" : "bg-gradient-to-r from-transparent to-[#050814]/40"} z-10 pointer-events-none md:hidden`} />
 
         {canScrollLeft && (
           <button
             aria-label="Scroll left"
             onClick={() => scrollRail("left")}
-            className="hidden md:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition"
+            className={`hidden md:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full ${theme === "nothing" ? "bg-white border-2 border-black/10 text-[#0a0f1f] hover:bg-[#f5f6fb]" : "bg-black/60 border border-white/10 text-white hover:bg-black/80"} transition`}
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -133,7 +133,7 @@ export function ContentRail({
           <button
             aria-label="Scroll right"
             onClick={() => scrollRail("right")}
-            className="hidden md:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-black/60 border border-white/10 text-white hover:bg-black/80 transition"
+            className={`hidden md:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full ${theme === "nothing" ? "bg-white border-2 border-black/10 text-[#0a0f1f] hover:bg-[#f5f6fb]" : "bg-black/60 border border-white/10 text-white hover:bg-black/80"} transition`}
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -165,7 +165,7 @@ export function ContentRail({
                 variant="outline"
                 size="sm"
                 onClick={handleShowMore}
-                className="h-full w-full bg-white/5 border-white/10 text-white hover:bg-white/10 flex flex-col gap-2"
+                className={`h-full w-full ${theme === "nothing" ? "bg-white/90 border-2 border-black/10 text-[#0a0f1f] hover:bg-[#f5f6fb]" : "bg-white/5 border-white/10 text-white hover:bg-white/10"} flex flex-col gap-2`}
               >
                 <ChevronRight className="h-6 w-6" />
                 <span className="text-xs">Load More</span>
@@ -176,8 +176,8 @@ export function ContentRail({
           {/* Loading Indicator */}
           {isLoadingMore && (
             <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"} flex items-center justify-center`}>
-              <div className="h-full w-full bg-white/5 border border-white/10 rounded-md flex items-center justify-center">
-                <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full" />
+              <div className={`h-full w-full ${theme === "nothing" ? "bg-white/90 border-2 border-black/10" : "bg-white/5 border border-white/10"} rounded-md flex items-center justify-center`}>
+                <div className={`animate-spin h-8 w-8 border-2 ${theme === "nothing" ? "border-[#ff3b3b] border-t-transparent" : "border-blue-500 border-t-transparent"} rounded-full`} />
               </div>
             </div>
           )}
