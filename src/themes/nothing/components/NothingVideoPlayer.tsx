@@ -308,10 +308,10 @@ export function NothingVideoPlayer({
 
   return (
     <div ref={containerRef} className="nothing-player-shell">
-      <div className="relative aspect-video nothing-player-surface">
+      <div className="relative aspect-video nothing-player-surface rounded-[24px] md:rounded-[32px] overflow-hidden">
         <video
           ref={videoRef}
-          className="h-full w-full object-cover rounded-[32px]"
+          className="h-full w-full object-cover"
           playsInline
           crossOrigin="anonymous"
           onClick={togglePlay}
@@ -372,8 +372,8 @@ export function NothingVideoPlayer({
           </div>
         )}
 
-        <div className="nothing-player-controls">
-          <div className="nothing-player-slider">
+        <div className="nothing-player-controls px-3 md:px-6">
+          <div className="nothing-player-slider mb-2">
             <div className="absolute inset-0 bg-white/10 rounded-full" />
             <div
               className="absolute inset-y-0 left-0 bg-[#ff4d4f] rounded-full"
@@ -390,15 +390,16 @@ export function NothingVideoPlayer({
               step={0.1}
               value={duration ? (currentTime / duration) * 100 : 0}
               onChange={(event) => seekTo(parseFloat(event.target.value))}
+              className="w-full"
             />
           </div>
 
-          <div className="flex items-center justify-between text-white/80 text-xs sm:text-sm">
+          <div className="flex items-center justify-between text-white/80 text-xs mb-2">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-white">
+          <div className="flex flex-wrap items-center gap-2 text-white">
             <button onClick={() => skip(-10)} className="nothing-player-btn" aria-label="Back 10 seconds">
               <RotateCcw className="h-5 w-5" />
             </button>
@@ -409,7 +410,7 @@ export function NothingVideoPlayer({
               <RotateCw className="h-5 w-5" />
             </button>
 
-            <div className="flex items-center gap-2 pl-2">
+            <div className="hidden sm:flex items-center gap-2 pl-2">
               <button onClick={toggleMute} className="nothing-player-btn" aria-label="Mute">
                 {isMuted || volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
               </button>
@@ -420,9 +421,13 @@ export function NothingVideoPlayer({
                 step={0.01}
                 value={isMuted ? 0 : volume}
                 onChange={(event) => changeVolume(parseFloat(event.target.value))}
-                className="nothing-volume-slider"
+                className="nothing-volume-slider w-20"
               />
             </div>
+
+            <button onClick={toggleMute} className="sm:hidden nothing-player-btn" aria-label="Mute">
+              {isMuted || volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+            </button>
 
             <div className="relative">
               <button
