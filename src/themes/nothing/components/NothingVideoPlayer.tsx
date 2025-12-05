@@ -43,6 +43,7 @@ export function NothingVideoPlayer({
   const hlsRef = useRef<any>(null);
   const lastSavedRef = useRef(0);
   const hasResumedRef = useRef(false);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(true);
@@ -52,6 +53,7 @@ export function NothingVideoPlayer({
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
   const [subtitles, setSubtitles] = useState<Array<{ index: number; label: string }>>([]);
   const [currentSubtitle, setCurrentSubtitle] = useState(-1);
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
@@ -74,6 +76,19 @@ export function NothingVideoPlayer({
     },
     [onProgressUpdate],
   );
+
+  // Auto-hide controls after 3 seconds of inactivity
+  const resetControlsTimeout = useCallback(() => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    if (isPlaying && isFullscreen) {
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+    }
+  }, [isPlaying, isFullscreen]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -151,11 +166,16 @@ export function NothingVideoPlayer({
     const handlePlay = () => {
       setIsPlaying(true);
       setIsBuffering(false);
+      resetControlsTimeout();
     };
 
     const handlePause = () => {
       setIsPlaying(false);
       reportProgress(video);
+      setShowControls(true);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
     };
 
     const handleWaiting = () => setIsBuffering(true);
@@ -197,6 +217,7 @@ export function NothingVideoPlayer({
       setIsPlaying(false);
       setShowOutroCta(false);
       reportProgress(video);
+      setShowControls(true);
     };
 
     const syncTracks = () => {
@@ -233,15 +254,29 @@ export function NothingVideoPlayer({
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("ended", handleEnded);
     };
-  }, [intro, outro, onProgressUpdate, reportProgress, resumeFrom, currentSubtitle]);
+  }, [intro, outro, onProgressUpdate, reportProgress, resumeFrom, currentSubtitle, resetControlsTimeout]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
+      const isNowFullscreen = Boolean(document.fullscreenElement);
+      setIsFullscreen(isNowFullscreen);
+      if (!isNowFullscreen) {
+        setShowControls(true);
+        if (controlsTimeoutRef.current) {
+          clearTimeout(controlsTimeoutRef.current);
+        }
+      } else {
+        resetControlsTimeout();
+      }
     };
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    };
+  }, [resetControlsTimeout]);
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -258,12 +293,14 @@ export function NothingVideoPlayer({
     if (!video) return;
     const target = Math.min(Math.max(video.currentTime + seconds, 0), duration || video.duration || 0);
     video.currentTime = target;
+    resetControlsTimeout();
   };
 
   const seekTo = (percentage: number) => {
     const video = videoRef.current;
     if (!video || !Number.isFinite(duration) || duration <= 0) return;
     video.currentTime = (percentage / 100) * duration;
+    resetControlsTimeout();
   };
 
   const changeVolume = (nextVolume: number) => {
@@ -272,6 +309,7 @@ export function NothingVideoPlayer({
     video.volume = nextVolume;
     setVolume(nextVolume);
     setIsMuted(nextVolume === 0);
+    resetControlsTimeout();
   };
 
   const toggleMute = () => {
@@ -284,6 +322,7 @@ export function NothingVideoPlayer({
       video.volume = 0;
       setIsMuted(true);
     }
+    resetControlsTimeout();
   };
 
   const toggleFullscreen = () => {
@@ -304,17 +343,26 @@ export function NothingVideoPlayer({
       track.mode = idx === index ? "showing" : "hidden";
     });
     setShowSubtitleMenu(false);
+    resetControlsTimeout();
+  };
+
+  const handleContainerInteraction = () => {
+    resetControlsTimeout();
   };
 
   return (
     <div ref={containerRef} className="nothing-player-shell">
-      <div className="relative aspect-video nothing-player-surface rounded-[24px] md:rounded-[32px] overflow-hidden">
+      <div 
+        className="relative aspect-video nothing-player-surface rounded-[24px] md:rounded-[32px] overflow-hidden"
+        onMouseMove={handleContainerInteraction}
+        onTouchStart={handleContainerInteraction}
+        onClick={togglePlay}
+      >
         <video
           ref={videoRef}
           className="h-full w-full object-cover"
           playsInline
           crossOrigin="anonymous"
-          onClick={togglePlay}
         >
           {tracks.map((track, idx) => (
             <track
@@ -328,12 +376,16 @@ export function NothingVideoPlayer({
 
         <div className="absolute inset-0 pointer-events-none nothing-player-noise" />
 
-        <div className="absolute top-5 left-6 flex items-center gap-3 text-white/80 font-semibold tracking-[0.2em] text-xs">
-          <span className="nothing-brand-dot" />
-          Nothing Anime
-        </div>
+        {/* Brand label - hide in fullscreen */}
+        {!isFullscreen && (
+          <div className="absolute top-5 left-6 flex items-center gap-3 text-white/80 font-semibold tracking-[0.2em] text-xs">
+            <span className="nothing-brand-dot" />
+            Nothing Anime
+          </div>
+        )}
 
-        {(title || episodeLabel) && (
+        {/* Title and episode - hide in fullscreen or show only when controls visible */}
+        {(title || episodeLabel) && (!isFullscreen || showControls) && (
           <div className="absolute bottom-36 md:bottom-40 left-6 text-white space-y-1 pointer-events-none">
             <p className="uppercase text-sm tracking-[0.35em] text-white/60">Now Playing</p>
             <h3 className="text-2xl md:text-3xl font-bold">{title}</h3>
@@ -347,32 +399,51 @@ export function NothingVideoPlayer({
           </div>
         )}
 
-        {showIntroCta && intro && (
+        {/* Skip buttons - show when controls visible */}
+        {showIntroCta && intro && showControls && (
           <button
-            onClick={() => seekTo((intro.end / (duration || intro.end)) * 100)}
+            onClick={(e) => {
+              e.stopPropagation();
+              seekTo((intro.end / (duration || intro.end)) * 100);
+            }}
             className="nothing-chip absolute top-5 right-5"
           >
             Skip Intro
           </button>
         )}
 
-        {showOutroCta && outro && (
+        {showOutroCta && outro && showControls && (
           <div className="absolute top-5 right-5 flex gap-3">
             <button
-              onClick={() => seekTo((outro.end / (duration || outro.end)) * 100)}
+              onClick={(e) => {
+                e.stopPropagation();
+                seekTo((outro.end / (duration || outro.end)) * 100);
+              }}
               className="nothing-chip"
             >
               Skip Outro
             </button>
-            {onNext && nextTitle && (
-              <button onClick={onNext} className="nothing-chip nothing-chip-accent">
+            {onNext && nextTitle && !isFullscreen && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNext();
+                }} 
+                className="nothing-chip nothing-chip-accent"
+              >
                 Next • {nextTitle}
               </button>
             )}
           </div>
         )}
 
-        <div className="nothing-player-controls px-3 md:px-6">
+        {/* Controls - show/hide based on state */}
+        <div 
+          className={`nothing-player-controls px-3 md:px-6 transition-opacity duration-300 ${
+            showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="nothing-player-slider mb-2">
             <div className="absolute inset-0 bg-white/10 rounded-full" />
             <div
@@ -463,7 +534,8 @@ export function NothingVideoPlayer({
         </div>
       </div>
 
-      {nextTitle && onNext && (
+      {/* Next episode banner - hide in fullscreen */}
+      {nextTitle && onNext && !isFullscreen && (
         <div className="nothing-next-banner">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">Up Next</p>
