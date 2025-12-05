@@ -353,7 +353,8 @@ export function NothingVideoPlayer({
   return (
     <div ref={containerRef} className="nothing-player-shell">
       <div 
-        className="relative aspect-video nothing-player-surface rounded-[24px] md:rounded-[32px] overflow-hidden"
+        className="relative aspect-video nothing-player-surface overflow-hidden"
+        style={{ borderRadius: 'clamp(24px, 4vw, 32px)' }}
         onMouseMove={handleContainerInteraction}
         onTouchStart={handleContainerInteraction}
         onClick={togglePlay}
