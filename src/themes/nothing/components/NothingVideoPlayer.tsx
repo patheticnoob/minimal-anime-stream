@@ -350,6 +350,11 @@ export function NothingVideoPlayer({
     resetControlsTimeout();
   };
 
+  const handleVideoClick = () => {
+    resetControlsTimeout();
+    togglePlay();
+  };
+
   return (
     <div ref={containerRef} className="nothing-player-shell">
       <div 
@@ -357,7 +362,7 @@ export function NothingVideoPlayer({
         style={{ borderRadius: 'clamp(24px, 4vw, 32px)' }}
         onMouseMove={handleContainerInteraction}
         onTouchStart={handleContainerInteraction}
-        onClick={togglePlay}
+        onClick={handleVideoClick}
       >
         <video
           ref={videoRef}
