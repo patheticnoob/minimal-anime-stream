@@ -45,6 +45,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
   const hlsRef = useRef<any>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
   const hasRestoredProgress = useRef(false);
+  const wakeLockRef = useRef<any>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -63,6 +64,42 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
   const [buffered, setBuffered] = useState(0);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showSkipOutro, setShowSkipOutro] = useState(false);
+
+  // Wake Lock API - Keep screen awake during fullscreen playback
+  useEffect(() => {
+    const requestWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator && isFullscreen && isPlaying) {
+          wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+          console.log('Wake Lock activated');
+        }
+      } catch (err) {
+        console.log('Wake Lock error:', err);
+      }
+    };
+
+    const releaseWakeLock = async () => {
+      if (wakeLockRef.current) {
+        try {
+          await wakeLockRef.current.release();
+          wakeLockRef.current = null;
+          console.log('Wake Lock released');
+        } catch (err) {
+          console.log('Wake Lock release error:', err);
+        }
+      }
+    };
+
+    if (isFullscreen && isPlaying) {
+      requestWakeLock();
+    } else {
+      releaseWakeLock();
+    }
+
+    return () => {
+      releaseWakeLock();
+    };
+  }, [isFullscreen, isPlaying]);
 
   // Initialize HLS and resume from saved position
   useEffect(() => {
@@ -320,6 +357,49 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
   }, [showControls]);
 
   const handleMouseMove = () => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    if (isPlaying) {
+      controlsTimeoutRef.current = window.setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+    }
+  };
+
+  // Enhanced video click handler for fullscreen mobile behavior
+  const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
+    if (!isFullscreen) {
+      // Normal behavior when not in fullscreen
+      togglePlay();
+      return;
+    }
+
+    // In fullscreen: check if click is in center area
+    const video = e.currentTarget;
+    const rect = video.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+    
+    // Define center area as 40% of width and height
+    const centerWidth = rect.width * 0.4;
+    const centerHeight = rect.height * 0.4;
+    const centerLeft = (rect.width - centerWidth) / 2;
+    const centerTop = (rect.height - centerHeight) / 2;
+    
+    const isInCenter = 
+      clickX >= centerLeft && 
+      clickX <= centerLeft + centerWidth &&
+      clickY >= centerTop && 
+      clickY <= centerTop + centerHeight;
+
+    if (isInCenter) {
+      // Center click: toggle play/pause
+      togglePlay();
+    }
+    
+    // Always show controls on any click in fullscreen
     setShowControls(true);
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
@@ -596,7 +676,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
         <video
           ref={videoRef}
           className="w-full h-full object-contain cursor-pointer"
-          onClick={togglePlay}
+          onClick={handleVideoClick}
           crossOrigin="anonymous"
           playsInline
           data-testid="video-element"
