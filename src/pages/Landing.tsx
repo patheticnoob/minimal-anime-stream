@@ -20,55 +20,8 @@ import { SearchSection } from "@/components/SearchSection";
 import { useTheme } from "@/hooks/use-theme";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { NothingNavBar } from "@/themes/nothing/components/NothingNavBar";
-
-type AnimeItem = {
-  title?: string;
-  image?: string;
-  type?: string;
-  id?: string;
-  dataId?: string;
-  language?: {
-    sub?: string | null;
-    dub?: string | null;
-  };
-  sourceCategory?: "continueWatching" | "watchlist" | "recentEpisodes";
-};
-
-type Episode = {
-  id: string;
-  title?: string;
-  number?: number | string | null;
-};
-
-type AnimePlaybackInfo = {
-  animeId: string;
-  title: string;
-  image?: string | null;
-  type?: string;
-  language?: {
-    sub?: string | null;
-    dub?: string | null;
-  };
-};
-
-const normalizeEpisodeNumber = (value?: number | string | null) => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-  if (typeof value === "string") {
-    const parsed = Number(value);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-  return 0;
-};
-
-const deriveDataIdFromSlug = (id?: string | null) => {
-  if (!id) return undefined;
-  const match = id.trim().match(/(\d+)(?:\/)?$/);
-  return match ? match[1] : id.replace(/^\/|\/$/g, "");
-};
+import { AnimeItem, Episode, AnimePlaybackInfo } from "@/types/landing";
+import { normalizeEpisodeNumber, deriveDataIdFromSlug } from "@/lib/landing-utils";
 
 export default function Landing() {
   const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
@@ -148,6 +101,7 @@ export default function Landing() {
 
   // Load all content on mount
   useEffect(() => {
+    console.log("Landing page loaded - refreshed");
     let mounted = true;
     setLoading(true);
 
