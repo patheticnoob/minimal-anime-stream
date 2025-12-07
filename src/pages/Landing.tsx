@@ -22,6 +22,8 @@ import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { NothingNavBar } from "@/themes/nothing/components/NothingNavBar";
 import { AnimeItem, Episode, AnimePlaybackInfo } from "@/types/landing";
 import { normalizeEpisodeNumber, deriveDataIdFromSlug } from "@/lib/landing-utils";
+import { SectionContentGrid } from "@/components/SectionContentGrid";
+import { HomeContentRails } from "@/components/HomeContentRails";
 
 export default function Landing() {
   const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
@@ -718,94 +720,33 @@ export default function Landing() {
 
               {/* Section-specific content */}
               {sectionContent ? (
-                <div className="mt-8">
-                  <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
-                    {activeSection === "tv" ? "TV Shows" : activeSection === "recent" ? "Recently Added" : activeSection}
-                  </h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                    {sectionContent.map((item, idx) => (
-                      <AnimeCard 
-                        key={item.id ?? idx} 
-                        anime={item} 
-                        onClick={() => openAnime(item)} 
-                        index={idx}
-                      />
-                    ))}
-                  </div>
-                </div>
+                <SectionContentGrid
+                  title={activeSection === "tv" ? "TV Shows" : activeSection === "recent" ? "Recently Added" : activeSection}
+                  items={sectionContent}
+                  onItemClick={openAnime}
+                />
               ) : (
                 /* Home view with content rails */
-                <div className="space-y-8">
-                  {/* Continue Watching */}
-                  {isAuthenticated && continueWatchingItems.length > 0 && (
-                    <>
-                      <ContentRail
-                        title="Continue Watching"
-                        items={continueWatchingItems}
-                        onItemClick={openAnime}
-                      />
-                    </>
-                  )}
-
-                  {/* My Watchlist */}
-                  {isAuthenticated && watchlistItems.length > 0 && (
-                    <ContentRail
-                      title="My Watchlist"
-                      items={watchlistItems}
-                      onItemClick={openAnime}
-                    />
-                  )}
-
-                  {/* Recent Episodes - Only show if data loaded successfully */}
-                  {recentEpisodesItems.length > 0 && (
-                    <ContentRail
-                      title="Recent Episodes"
-                      items={recentEpisodesItems}
-                      onItemClick={openAnime}
-                      enableInfiniteScroll
-                      onLoadMore={() => loadMoreItems('recentEpisodes')}
-                      hasMore={recentEpisodesHasMore}
-                      isLoadingMore={loadingMore === 'recentEpisodes'}
-                    />
-                  )}
-
-                  <ContentRail
-                    title="Trending Now"
-                    items={popularItems}
-                    onItemClick={openAnime}
-                    enableInfiniteScroll
-                    onLoadMore={() => loadMoreItems('popular')}
-                    hasMore={popularHasMore}
-                    isLoadingMore={loadingMore === 'popular'}
-                  />
-                  <ContentRail
-                    title="Top Airing"
-                    items={airingItems}
-                    onItemClick={openAnime}
-                    enableInfiniteScroll
-                    onLoadMore={() => loadMoreItems('airing')}
-                    hasMore={airingHasMore}
-                    isLoadingMore={loadingMore === 'airing'}
-                  />
-                  <ContentRail
-                    title="Popular Movies"
-                    items={movieItems}
-                    onItemClick={openAnime}
-                    enableInfiniteScroll
-                    onLoadMore={() => loadMoreItems('movies')}
-                    hasMore={movieHasMore}
-                    isLoadingMore={loadingMore === 'movies'}
-                  />
-                  <ContentRail
-                    title="TV Series"
-                    items={tvShowItems}
-                    onItemClick={openAnime}
-                    enableInfiniteScroll
-                    onLoadMore={() => loadMoreItems('tvShows')}
-                    hasMore={tvShowHasMore}
-                    isLoadingMore={loadingMore === 'tvShows'}
-                  />
-                </div>
+                <HomeContentRails
+                  isAuthenticated={isAuthenticated}
+                  continueWatchingItems={continueWatchingItems}
+                  watchlistItems={watchlistItems}
+                  recentEpisodesItems={recentEpisodesItems}
+                  popularItems={popularItems}
+                  airingItems={airingItems}
+                  movieItems={movieItems}
+                  tvShowItems={tvShowItems}
+                  onItemClick={openAnime}
+                  onLoadMore={loadMoreItems}
+                  hasMore={{
+                    popular: popularHasMore,
+                    airing: airingHasMore,
+                    movies: movieHasMore,
+                    tvShows: tvShowHasMore,
+                    recentEpisodes: recentEpisodesHasMore,
+                  }}
+                  loadingMore={loadingMore}
+                />
               )}
             </>
           )}
@@ -818,7 +759,6 @@ export default function Landing() {
         isOpen={!!selected}
         onClose={() => setSelected(null)}
         episodes={episodes.map(ep => {
-          // Enrich episodes with progress data
           const normalizedEp = {
             id: ep.id,
             title: ep.title,
@@ -843,7 +783,7 @@ export default function Landing() {
         broadcastLoading={isBroadcastLoading}
       />
 
-      {/* Video Player - Use RetroVideoPlayer for retro theme */}
+      {/* Video Player */}
       {videoSource && currentEpisodeData && (() => {
         const PlayerComponent = theme === "retro" ? RetroVideoPlayer : VideoPlayer;
         
