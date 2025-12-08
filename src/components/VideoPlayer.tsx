@@ -905,13 +905,19 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                         height: `${(thumbnailPreview as any).height}px`,
                       }}
                     >
-                      <div
+                      <img
+                        src={thumbnailPreview.url}
+                        alt="Video preview"
+                        crossOrigin="anonymous"
                         style={{
-                          width: `${(thumbnailPreview as any).width}px`,
-                          height: `${(thumbnailPreview as any).height}px`,
-                          backgroundImage: `url(${thumbnailPreview.url})`,
-                          backgroundPosition: `-${(thumbnailPreview as any).spriteX}px -${(thumbnailPreview as any).spriteY}px`,
-                          backgroundRepeat: 'no-repeat',
+                          width: 'auto',
+                          height: 'auto',
+                          objectFit: 'none',
+                          objectPosition: `-${(thumbnailPreview as any).spriteX}px -${(thumbnailPreview as any).spriteY}px`,
+                        }}
+                        onError={(e) => {
+                          console.error('Thumbnail failed to load:', thumbnailPreview.url);
+                          e.currentTarget.style.display = 'none';
                         }}
                       />
                     </div>
