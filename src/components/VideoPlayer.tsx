@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { parseVTTThumbnails, findThumbnailForTime, type ThumbnailCue } from "@/lib/vttParser";
 
 interface VideoPlayerProps {
   source: string;
@@ -65,6 +66,8 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showSkipOutro, setShowSkipOutro] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number } | null>(null);
+  const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
+  const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
 
   // Wake Lock API - Keep screen awake during fullscreen playback
   useEffect(() => {
@@ -101,6 +104,29 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
       releaseWakeLock();
     };
   }, [isFullscreen, isPlaying]);
+
+  // Load and parse thumbnail VTT file
+  useEffect(() => {
+    const thumbnailTrack = tracks?.find(t => t.kind === "thumbnails");
+    if (!thumbnailTrack) {
+      setThumbnailCues([]);
+      setThumbnailSprite(null);
+      return;
+    }
+
+    parseVTTThumbnails(thumbnailTrack.file)
+      .then((cues) => {
+        setThumbnailCues(cues);
+        // Preload the first sprite image
+        if (cues.length > 0 && cues[0].url) {
+          setThumbnailSprite(cues[0].url);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load thumbnail cues:', err);
+        setThumbnailCues([]);
+      });
+  }, [tracks]);
 
   // Initialize HLS and resume from saved position
   useEffect(() => {
@@ -438,19 +464,28 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
     const video = videoRef.current;
     if (!video || !Number.isFinite(duration) || duration <= 0) return;
     
-    // Find thumbnail track
-    const thumbnailTrack = tracks?.find(t => t.kind === "thumbnails");
-    if (!thumbnailTrack) return;
+    if (thumbnailCues.length === 0) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const pos = (e.clientX - rect.left) / rect.width;
     const hoverTime = pos * duration;
     
-    // Show thumbnail preview (simplified - actual VTT parsing would be more complex)
-    setThumbnailPreview({
-      url: thumbnailTrack.file,
-      x: e.clientX - rect.left,
-    });
+    // Find the thumbnail for this time
+    const thumbnail = findThumbnailForTime(thumbnailCues, hoverTime);
+    
+    if (thumbnail) {
+      setThumbnailPreview({
+        url: thumbnail.url,
+        x: e.clientX - rect.left,
+        y: thumbnail.y || 0,
+        width: thumbnail.width || 160,
+        height: thumbnail.height || 90,
+        spriteX: thumbnail.x || 0,
+        spriteY: thumbnail.y || 0,
+      } as any);
+    } else {
+      setThumbnailPreview(null);
+    }
   };
 
   const handleProgressLeave = () => {
@@ -832,27 +867,50 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
           <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
             {/* Progress Bar */}
             <div
-              className="relative h-1.5 bg-white/20 cursor-pointer mb-4 rounded-full overflow-hidden hover:h-2 transition-all"
+              className="relative h-1.5 bg-white/20 cursor-pointer mb-4 rounded-full overflow-visible hover:h-2 transition-all group"
               onClick={handleSeek}
               onMouseMove={handleProgressHover}
               onMouseLeave={handleProgressLeave}
               data-testid="video-progress-bar"
             >
               {/* Thumbnail Preview */}
-              {thumbnailPreview && (
+              {thumbnailPreview && (thumbnailPreview as any).width && (
                 <div
-                  className="absolute bottom-full mb-2 pointer-events-none"
-                  style={{ left: `${thumbnailPreview.x}px`, transform: "translateX(-50%)" }}
+                  className="absolute bottom-full mb-3 pointer-events-none z-50"
+                  style={{ 
+                    left: `${thumbnailPreview.x}px`, 
+                    transform: "translateX(-50%)",
+                  }}
                 >
-                  <div className="bg-black/90 rounded-md p-1 text-xs text-white">
-                    Preview available
+                  <div className="relative">
+                    <div 
+                      className="bg-black rounded-md overflow-hidden shadow-2xl border-2 border-white/20"
+                      style={{
+                        width: `${(thumbnailPreview as any).width}px`,
+                        height: `${(thumbnailPreview as any).height}px`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${(thumbnailPreview as any).width}px`,
+                          height: `${(thumbnailPreview as any).height}px`,
+                          backgroundImage: `url(${thumbnailPreview.url})`,
+                          backgroundPosition: `-${(thumbnailPreview as any).spriteX}px -${(thumbnailPreview as any).spriteY}px`,
+                          backgroundRepeat: 'no-repeat',
+                        }}
+                      />
+                    </div>
+                    {/* Arrow pointing down */}
+                    <div 
+                      className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white/20"
+                    />
                   </div>
                 </div>
               )}
               <div className="absolute top-0 left-0 h-full bg-white/30 pointer-events-none" style={{ width: `${buffered}%` }} />
               <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-sky-500 to-blue-600 pointer-events-none transition-all" style={{ width: `${(currentTime / duration) * 100}%` }} />
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-lg opacity-0 hover:opacity-100 pointer-events-none transition-opacity"
+                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
                 style={{ left: `${(currentTime / duration) * 100}%`, transform: "translate(-50%, -50%)" }}
               />
             </div>
