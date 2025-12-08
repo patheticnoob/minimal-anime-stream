@@ -544,9 +544,10 @@ export default function Landing() {
       const sources = await fetchSources({ serverId: preferredServer.id });
       const sourcesData = sources as { 
         sources: Array<{ file: string; type: string }>;
-        tracks?: Array<{ file: string; label: string; kind?: string }>;
+        tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
         intro?: { start: number; end: number };
         outro?: { start: number; end: number };
+        headers?: Record<string, string>;
       };
       
       if (sourcesData.sources && sourcesData.sources.length > 0) {
@@ -568,11 +569,12 @@ export default function Landing() {
         // Proxy the m3u8 URL through Convex HTTP endpoint
         const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
 
-        // Proxy subtitle tracks as well (CORS-safe) and ensure kind defaults to "subtitles"
+        // Proxy all tracks (subtitles and thumbnails) through Convex endpoint
         const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
           ...t,
           kind: t.kind || "subtitles",
           file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+          default: t.default || false,
         }));
 
         setVideoSource(proxiedUrl);

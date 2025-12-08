@@ -16,6 +16,7 @@ declare module "hianime" {
     id: string; // episode id for servers
     title?: string;
     number?: number;
+    href?: string; // Direct watch URL path
   };
 
   export type EpisodeServers = {
@@ -25,7 +26,10 @@ declare module "hianime" {
 
   export type EpisodeSources = {
     sources: Array<{ file: string; type: string }>;
-    tracks?: Array<{ file: string; label: string; kind?: string }>;
+    tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
+    headers?: Record<string, string>;
+    intro?: { start: number; end: number };
+    outro?: { start: number; end: number };
   };
 
   export class Hianime {

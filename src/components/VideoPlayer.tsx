@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 interface VideoPlayerProps {
   source: string;
   title: string;
-  tracks?: Array<{ file: string; label: string; kind?: string }>;
+  tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
   intro?: { start: number; end: number } | null;
   outro?: { start: number; end: number } | null;
   onClose: () => void;
@@ -64,6 +64,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
   const [buffered, setBuffered] = useState(0);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showSkipOutro, setShowSkipOutro] = useState(false);
+  const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number } | null>(null);
 
   // Wake Lock API - Keep screen awake during fullscreen playback
   useEffect(() => {
@@ -433,6 +434,29 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
     }
   };
 
+  const handleProgressHover = (e: React.MouseEvent<HTMLDivElement>) => {
+    const video = videoRef.current;
+    if (!video || !Number.isFinite(duration) || duration <= 0) return;
+    
+    // Find thumbnail track
+    const thumbnailTrack = tracks?.find(t => t.kind === "thumbnails");
+    if (!thumbnailTrack) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    const hoverTime = pos * duration;
+    
+    // Show thumbnail preview (simplified - actual VTT parsing would be more complex)
+    setThumbnailPreview({
+      url: thumbnailTrack.file,
+      x: e.clientX - rect.left,
+    });
+  };
+
+  const handleProgressLeave = () => {
+    setThumbnailPreview(null);
+  };
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     const video = videoRef.current;
@@ -529,7 +553,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
     setShowSubtitles(false);
   };
 
-  // Load subtitle tracks and enable English by default
+  // Load subtitle tracks and enable default track from API or fallback to English
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -537,33 +561,61 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
     const updateSubtitles = () => {
       const tracksList: Array<{ index: number; label: string; language: string }> = [];
       for (let i = 0; i < video.textTracks.length; i++) {
+        const track = video.textTracks[i];
+        // Skip thumbnail tracks from subtitle list
+        if (track.kind === "metadata") continue;
+        
         tracksList.push({
           index: i,
-          label: video.textTracks[i].label || video.textTracks[i].language || `Track ${i + 1}`,
-          language: video.textTracks[i].language || "",
+          label: track.label || track.language || `Track ${i + 1}`,
+          language: track.language || "",
         });
       }
       setSubtitles(tracksList);
 
-      // Auto-enable English subtitles by default
-      let englishTrackIndex = -1;
-      for (let i = 0; i < video.textTracks.length; i++) {
-        const track = video.textTracks[i];
-        const label = (track.label || "").toLowerCase();
-        const lang = (track.language || "").toLowerCase();
-        
-        // Check if track is English
-        if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
-          englishTrackIndex = i;
-          break;
+      // Auto-enable default subtitle track from API
+      let defaultTrackIndex = -1;
+      
+      // First, check if any track was marked as default by the API
+      if (tracks && tracks.length > 0) {
+        const defaultTrack = tracks.find(t => t.default === true && t.kind !== "thumbnails");
+        if (defaultTrack) {
+          // Find the corresponding video text track
+          for (let i = 0; i < video.textTracks.length; i++) {
+            const track = video.textTracks[i];
+            if (track.kind === "metadata") continue;
+            const trackLabel = (track.label || "").toLowerCase();
+            const apiLabel = (defaultTrack.label || "").toLowerCase();
+            if (trackLabel === apiLabel) {
+              defaultTrackIndex = i;
+              console.log("✅ Default subtitle track enabled from API:", defaultTrack.label);
+              break;
+            }
+          }
+        }
+      }
+      
+      // Fallback: Auto-enable English subtitles if no default was found
+      if (defaultTrackIndex === -1) {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          const track = video.textTracks[i];
+          if (track.kind === "metadata") continue;
+          const label = (track.label || "").toLowerCase();
+          const lang = (track.language || "").toLowerCase();
+          
+          // Check if track is English
+          if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
+            defaultTrackIndex = i;
+            console.log("✅ English subtitles enabled as fallback");
+            break;
+          }
         }
       }
 
-      // Enable English track if found
-      if (englishTrackIndex >= 0) {
-        video.textTracks[englishTrackIndex].mode = "showing";
-        setCurrentSubtitle(englishTrackIndex);
-        console.log("✅ English subtitles enabled by default");
+      // Enable the selected default track
+      if (defaultTrackIndex >= 0) {
+        video.textTracks[defaultTrackIndex].mode = "showing";
+        setCurrentSubtitle(defaultTrackIndex);
       }
     };
 
@@ -571,7 +623,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
     return () => {
       video.removeEventListener("loadedmetadata", updateSubtitles);
     };
-  }, []);
+  }, [tracks]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -684,10 +736,11 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
           {tracks?.map((track, idx) => (
             <track
               key={idx}
-              kind={track.kind || "subtitles"}
+              kind={track.kind === "thumbnails" ? "metadata" : (track.kind || "subtitles")}
               src={track.file}
               label={track.label || "Unknown"}
               srcLang={track.label?.slice(0, 2)?.toLowerCase() || "en"}
+              default={track.default || false}
             />
           ))}
         </video>
@@ -781,8 +834,21 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
             <div
               className="relative h-1.5 bg-white/20 cursor-pointer mb-4 rounded-full overflow-hidden hover:h-2 transition-all"
               onClick={handleSeek}
+              onMouseMove={handleProgressHover}
+              onMouseLeave={handleProgressLeave}
               data-testid="video-progress-bar"
             >
+              {/* Thumbnail Preview */}
+              {thumbnailPreview && (
+                <div
+                  className="absolute bottom-full mb-2 pointer-events-none"
+                  style={{ left: `${thumbnailPreview.x}px`, transform: "translateX(-50%)" }}
+                >
+                  <div className="bg-black/90 rounded-md p-1 text-xs text-white">
+                    Preview available
+                  </div>
+                </div>
+              )}
               <div className="absolute top-0 left-0 h-full bg-white/30 pointer-events-none" style={{ width: `${buffered}%` }} />
               <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-sky-500 to-blue-600 pointer-events-none transition-all" style={{ width: `${(currentTime / duration) * 100}%` }} />
               <div
