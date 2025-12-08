@@ -400,6 +400,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   }, [showControls]);
 
   const handleMouseMove = () => {
+    if (isDragging) return;
     setShowControls(true);
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
@@ -937,7 +938,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                 >
                   <div className="relative">
                     <div 
-                      className="bg-black rounded-md overflow-hidden shadow-2xl border-2 border-white/20"
+                      className="relative bg-black rounded-md overflow-hidden shadow-2xl border-2 border-white/20"
                       style={{
                         width: `${(thumbnailPreview as any).width}px`,
                         height: `${(thumbnailPreview as any).height}px`,
@@ -947,7 +948,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                         src={thumbnailPreview.url}
                         alt="Video preview"
                         crossOrigin="anonymous"
-                        className="absolute top-0 left-0"
+                        className="absolute top-0 left-0 max-w-none"
                         style={{
                           width: 'auto',
                           height: 'auto',
