@@ -1,8 +1,2 @@
-// In VideoPlayer.tsx, the HLS setup has:
-xhrSetup: (xhr: XMLHttpRequest) => {
-  if (!source.includes("/proxy?url=")) {
-    try {
-      xhr.setRequestHeader("Referer", "https://megacloud.blog/");
-    } catch {}
-  }
-}
+onMouseMove={handleProgressHover}
+onMouseLeave={handleProgressLeave}
