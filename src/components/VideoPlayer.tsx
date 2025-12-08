@@ -558,7 +558,10 @@ export function VideoPlayer({
                 onSetPlaybackRate={handleSetPlaybackRate}
                 onSetSubtitle={handleSetSubtitle}
                 onSetAudio={() => {}}
-                onShowEpisodes={() => {}}
+                onShowEpisodes={() => {
+                  // Episodes functionality would be handled by parent component
+                  // For now, this is a placeholder that can be extended
+                }}
                 formatTime={formatTime}
               />
             </div>
