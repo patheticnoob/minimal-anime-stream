@@ -514,6 +514,10 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     setIsDragging(true);
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
     handleProgressHover(e);
   };
 
@@ -528,6 +532,13 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
       handleSeek(e);
       setIsDragging(false);
       setThumbnailPreview(null);
+      
+      // Restart auto-hide timer after drag ends
+      if (isPlaying) {
+        controlsTimeoutRef.current = window.setTimeout(() => {
+          setShowControls(false);
+        }, 3000);
+      }
     }
   };
 
@@ -936,15 +947,19 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                         src={thumbnailPreview.url}
                         alt="Video preview"
                         crossOrigin="anonymous"
+                        className="absolute top-0 left-0"
                         style={{
                           width: 'auto',
                           height: 'auto',
-                          objectFit: 'none',
-                          objectPosition: `-${(thumbnailPreview as any).spriteX}px -${(thumbnailPreview as any).spriteY}px`,
+                          marginLeft: `-${(thumbnailPreview as any).spriteX}px`,
+                          marginTop: `-${(thumbnailPreview as any).spriteY}px`,
                         }}
                         onError={(e) => {
                           console.error('Thumbnail failed to load:', thumbnailPreview.url);
                           e.currentTarget.style.display = 'none';
+                        }}
+                        onLoad={() => {
+                          console.log('✅ Thumbnail loaded successfully:', thumbnailPreview.url);
                         }}
                       />
                     </div>
