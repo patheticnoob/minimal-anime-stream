@@ -69,6 +69,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number } | null>(null);
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Wake Lock API - Keep screen awake during fullscreen playback
   useEffect(() => {
@@ -464,25 +465,27 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     }
   }, [isPlaying]);
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     const video = videoRef.current;
     if (!video || !Number.isFinite(duration) || duration <= 0) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    const pos = (e.clientX - rect.left) / rect.width;
+    const clientX = 'touches' in e ? e.touches[0]?.clientX || e.changedTouches[0]?.clientX : e.clientX;
+    const pos = (clientX - rect.left) / rect.width;
     const newTime = pos * duration;
     if (Number.isFinite(newTime)) {
       video.currentTime = newTime;
     }
   };
 
-  const handleProgressHover = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleProgressHover = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     const video = videoRef.current;
     if (!video || !Number.isFinite(duration) || duration <= 0) return;
     
     if (thumbnailCues.length === 0) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
-    const pos = (e.clientX - rect.left) / rect.width;
+    const clientX = 'touches' in e ? e.touches[0]?.clientX : e.clientX;
+    const pos = (clientX - rect.left) / rect.width;
     const hoverTime = pos * duration;
     
     // Find the thumbnail for this time
@@ -491,7 +494,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     if (thumbnail) {
       setThumbnailPreview({
         url: thumbnail.url,
-        x: e.clientX - rect.left,
+        x: clientX - rect.left,
         y: thumbnail.y || 0,
         width: thumbnail.width || 160,
         height: thumbnail.height || 90,
@@ -504,7 +507,28 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   };
 
   const handleProgressLeave = () => {
-    setThumbnailPreview(null);
+    if (!isDragging) {
+      setThumbnailPreview(null);
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    handleProgressHover(e);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    e.preventDefault(); // Prevent scrolling while dragging
+    handleProgressHover(e);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (isDragging) {
+      handleSeek(e);
+      setIsDragging(false);
+      setThumbnailPreview(null);
+    }
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -882,13 +906,16 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
             {/* Progress Bar */}
             <div
-              className="relative h-1.5 bg-white/20 cursor-pointer mb-4 rounded-full overflow-visible hover:h-2 transition-all group"
+              className="relative h-1.5 bg-white/20 cursor-pointer mb-4 rounded-full overflow-visible hover:h-2 transition-all group touch-none"
               onClick={handleSeek}
               onMouseMove={handleProgressHover}
               onMouseLeave={handleProgressLeave}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
               data-testid="video-progress-bar"
             >
-              {/* Thumbnail Preview */}
+              {/* Thumbnail Preview - Show on hover (desktop) or drag (mobile) */}
               {thumbnailPreview && (thumbnailPreview as any).width && (
                 <div
                   className="absolute bottom-full mb-3 pointer-events-none z-50"
