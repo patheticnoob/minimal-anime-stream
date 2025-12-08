@@ -44,6 +44,19 @@ export async function parseVTTThumbnails(vttUrl: string): Promise<ThumbnailCue[]
     const response = await fetch(vttUrl);
     const text = await response.text();
     
+    let originalVttUrl = vttUrl;
+    let proxyBase: string | null = null;
+    try {
+      const parsedVttUrl = new URL(vttUrl);
+      const targetUrl = parsedVttUrl.searchParams.get("url");
+      if (targetUrl) {
+        originalVttUrl = targetUrl;
+        proxyBase = `${parsedVttUrl.origin}${parsedVttUrl.pathname}`;
+      }
+    } catch {
+      // Non-proxied VTT URLs won't include a `url` search param
+    }
+    
     const cues: ThumbnailCue[] = [];
     const lines = text.split('\n');
     
@@ -73,12 +86,23 @@ export async function parseVTTThumbnails(vttUrl: string): Promise<ThumbnailCue[]
           const match = imageLine.match(/^(.+?)(?:#xywh=(\d+),(\d+),(\d+),(\d+))?$/);
           
           if (match) {
-            const [, url, x, y, width, height] = match;
+            const [, rawUrl, x, y, width, height] = match;
+            let resolvedUrl = rawUrl.trim();
+            
+            try {
+              resolvedUrl = new URL(resolvedUrl, originalVttUrl).toString();
+            } catch {
+              // Leave the URL as-is if it can't be resolved relative to the VTT file
+            }
+            
+            if (proxyBase) {
+              resolvedUrl = `${proxyBase}?url=${encodeURIComponent(resolvedUrl)}`;
+            }
             
             cues.push({
               startTime,
               endTime,
-              url: url.trim(),
+              url: resolvedUrl,
               x: x ? parseInt(x, 10) : undefined,
               y: y ? parseInt(y, 10) : undefined,
               width: width ? parseInt(width, 10) : undefined,
