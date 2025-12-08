@@ -23,6 +23,7 @@ interface VideoPlayerProps {
   tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
   intro?: { start: number; end: number } | null;
   outro?: { start: number; end: number } | null;
+  headers?: Record<string, string> | null;
   onClose: () => void;
   onNext?: () => void;
   nextTitle?: string;
@@ -40,7 +41,7 @@ interface VideoPlayerProps {
   resumeFrom?: number;
 }
 
-export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onNext, nextTitle }: VideoPlayerProps) {
+export function VideoPlayer({ source, title, tracks, intro, outro, headers, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onNext, nextTitle }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -149,8 +150,22 @@ export function VideoPlayer({ source, title, tracks, intro, outro, onClose, onPr
             xhrSetup: (xhr: XMLHttpRequest) => {
               if (!source.includes("/proxy?url=")) {
                 try {
-                  xhr.setRequestHeader("Referer", "https://megacloud.blog/");
-                } catch {}
+                  // Use dynamic headers from API response if available
+                  if (headers) {
+                    Object.entries(headers).forEach(([key, value]) => {
+                      try {
+                        xhr.setRequestHeader(key, value);
+                      } catch (err) {
+                        console.warn(`Failed to set header ${key}:`, err);
+                      }
+                    });
+                  } else {
+                    // Fallback to hardcoded Referer if no headers provided
+                    xhr.setRequestHeader("Referer", "https://megacloud.blog/");
+                  }
+                } catch (err) {
+                  console.warn("Failed to set request headers:", err);
+                }
               }
             },
           });

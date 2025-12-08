@@ -107,6 +107,7 @@ export default function Landing() {
   const [videoTracks, setVideoTracks] = useState<Array<{ file: string; label: string; kind?: string }>>([]);
   const [videoIntro, setVideoIntro] = useState<{ start: number; end: number } | null>(null);
   const [videoOutro, setVideoOutro] = useState<{ start: number; end: number } | null>(null);
+  const [videoHeaders, setVideoHeaders] = useState<Record<string, string> | null>(null);
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState<number | null>(null);
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
@@ -525,6 +526,7 @@ export default function Landing() {
     setVideoSource(null);
     setVideoIntro(null);
     setVideoOutro(null);
+    setVideoHeaders(null);
 
     toast("Loading video...");
     
@@ -551,6 +553,8 @@ export default function Landing() {
       };
       
       if (sourcesData.sources && sourcesData.sources.length > 0) {
+        // Capture headers from API response
+        setVideoHeaders(sourcesData.headers || null);
         const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
         const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
 
@@ -902,6 +906,7 @@ export default function Landing() {
             tracks={videoTracks}
             intro={videoIntro}
             outro={videoOutro}
+            headers={videoHeaders}
             resumeFrom={
               animeProgress && 
               currentEpisodeData &&
@@ -928,6 +933,7 @@ export default function Landing() {
               setVideoTracks([]);
               setVideoIntro(null);
               setVideoOutro(null);
+              setVideoHeaders(null);
               setCurrentEpisodeData(null);
               setCurrentAnimeInfo(null);
               if (lastSelectedAnime) {
