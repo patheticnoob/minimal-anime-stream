@@ -1,0 +1,10 @@
+{
+  "sources": [{ "file": "https://example.com/video.m3u8", "type": "hls" }],
+  "headers": {
+    "Referer": "https://megacloud.blog/",
+    "Origin": "https://megacloud.blog"
+  },
+  "tracks": [...],
+  "intro": {...},
+  "outro": {...}
+}

@@ -1,8 +1,8 @@
-// The VTT file looks like this:
-WEBVTT
-
-00:00:00.000 --> 00:00:05.000
-https://example.com/thumbnails.jpg#xywh=0,0,160,90
-
-00:00:05.000 --> 00:00:10.000
-https://example.com/thumbnails.jpg#xywh=160,0,160,90
+// In VideoPlayer.tsx, the HLS setup has:
+xhrSetup: (xhr: XMLHttpRequest) => {
+  if (!source.includes("/proxy?url=")) {
+    try {
+      xhr.setRequestHeader("Referer", "https://megacloud.blog/");
+    } catch {}
+  }
+}
