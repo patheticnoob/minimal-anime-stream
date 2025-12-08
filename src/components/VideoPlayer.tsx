@@ -948,12 +948,11 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                         src={thumbnailPreview.url}
                         alt="Video preview"
                         crossOrigin="anonymous"
-                        className="absolute top-0 left-0 max-w-none"
                         style={{
-                          width: 'auto',
-                          height: 'auto',
-                          marginLeft: `-${(thumbnailPreview as any).spriteX}px`,
-                          marginTop: `-${(thumbnailPreview as any).spriteY}px`,
+                          width: `${(thumbnailPreview as any).width}px`,
+                          height: `${(thumbnailPreview as any).height}px`,
+                          objectFit: 'none',
+                          objectPosition: `-${(thumbnailPreview as any).spriteX}px -${(thumbnailPreview as any).spriteY}px`,
                         }}
                         onError={(e) => {
                           console.error('Thumbnail failed to load:', thumbnailPreview.url);
