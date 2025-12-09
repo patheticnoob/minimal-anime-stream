@@ -1,55 +1,26 @@
-import { motion } from "framer-motion";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { Loader2, Play, Plus, Check } from "lucide-react";
 import { HeroBanner } from "@/components/HeroBanner";
-import { ContentRail } from "@/components/ContentRail";
 import { Sidebar } from "@/components/Sidebar";
-import { TopBar } from "@/components/TopBar";
 import { AnimeCard } from "@/components/AnimeCard";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router";
 import { InfoModal } from "@/components/InfoModal";
 import { type BroadcastInfo } from "@/types/broadcast";
-import { VideoPlayer } from "@/components/VideoPlayer";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { SearchSection } from "@/components/SearchSection";
 import { useTheme } from "@/hooks/use-theme";
-import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { NothingNavBar } from "@/themes/nothing/components/NothingNavBar";
+import { HomeSections } from "@/components/landing/HomeSections";
+import { fetchYumaRecentEpisodes } from "@/lib/external-api";
+import { AnimeItem, Episode, AnimePlaybackInfo } from "@/shared/types";
 
-type AnimeItem = {
-  title?: string;
-  image?: string;
-  type?: string;
-  id?: string;
-  dataId?: string;
-  language?: {
-    sub?: string | null;
-    dub?: string | null;
-  };
-  sourceCategory?: "continueWatching" | "watchlist" | "recentEpisodes";
-};
-
-type Episode = {
-  id: string;
-  title?: string;
-  number?: number | string | null;
-};
-
-type AnimePlaybackInfo = {
-  animeId: string;
-  title: string;
-  image?: string | null;
-  type?: string;
-  language?: {
-    sub?: string | null;
-    dub?: string | null;
-  };
-};
+// Lazy load players
+const VideoPlayer = lazy(() => import("@/components/VideoPlayer").then(m => ({ default: m.VideoPlayer })));
+const RetroVideoPlayer = lazy(() => import("@/components/RetroVideoPlayer").then(m => ({ default: m.RetroVideoPlayer })));
 
 const normalizeEpisodeNumber = (value?: number | string | null) => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -62,12 +33,6 @@ const normalizeEpisodeNumber = (value?: number | string | null) => {
     }
   }
   return 0;
-};
-
-const deriveDataIdFromSlug = (id?: string | null) => {
-  if (!id) return undefined;
-  const match = id.trim().match(/(\d+)(?:\/)?$/);
-  return match ? match[1] : id.replace(/^\/|\/$/g, "");
 };
 
 export default function Landing() {
@@ -83,7 +48,6 @@ export default function Landing() {
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
   const searchAnime = useAction(api.hianime.search);
-  const fetchRecentEpisodes = useAction(api.yumaApi.recentEpisodes);
   const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
   const [loading, setLoading] = useState(true);
@@ -132,7 +96,7 @@ export default function Landing() {
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
 
-  // Add pagination state for each section
+  // Pagination state
   const [popularPage, setPopularPage] = useState(1);
   const [airingPage, setAiringPage] = useState(1);
   const [moviePage, setMoviePage] = useState(1);
@@ -157,7 +121,7 @@ export default function Landing() {
       fetchTopAiring({ page: 1 }),
       fetchMovies({ page: 1 }),
       fetchTVShows({ page: 1 }),
-      fetchRecentEpisodes({ page: 1 }),
+      fetchYumaRecentEpisodes(1),
     ])
       .then(([popular, airing, movies, tvShows, recentEps]) => {
         if (!mounted) return;
@@ -171,30 +135,13 @@ export default function Landing() {
         setAiringItems(airingData.results || []);
         setMovieItems(moviesData.results || []);
         setTVShowItems(tvShowsData.results || []);
+        setRecentEpisodesItems(recentEps.results || []);
         
         setPopularHasMore(popularData.hasNextPage || false);
         setAiringHasMore(airingData.hasNextPage || false);
         setMovieHasMore(moviesData.hasNextPage || false);
         setTVShowHasMore(tvShowsData.hasNextPage || false);
-
-        // Handle recent episodes (may be null if API fails)
-        if (recentEps && typeof recentEps === 'object' && 'results' in recentEps) {
-          const recentData = recentEps as { results: Array<any>; has_next_page: boolean };
-          const mappedRecent = (recentData.results || []).map((item: any) => ({
-            id: item.id,
-            dataId: item.dataId ?? deriveDataIdFromSlug(item.id),
-            title: item.title,
-            image: item.image,
-            type: item.type,
-            language: {
-              sub: item.sub ? String(item.sub) : null,
-              dub: item.dub ? String(item.dub) : null,
-            },
-            sourceCategory: "recentEpisodes" as const,
-          }));
-          setRecentEpisodesItems(mappedRecent);
-          setRecentEpisodesHasMore(recentData.has_next_page || false);
-        }
+        setRecentEpisodesHasMore(recentEps.hasNextPage || false);
 
         // Combine popular and airing for hero rotation
         const heroPool = [
@@ -217,9 +164,9 @@ export default function Landing() {
     return () => {
       mounted = false;
     };
-  }, [fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows, fetchRecentEpisodes]);
+  }, [fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows]);
 
-  // Auto-rotate hero banner every 4 seconds
+  // Auto-rotate hero banner
   useEffect(() => {
     if (!heroAnime || popularItems.length === 0 || airingItems.length === 0) return;
 
@@ -236,12 +183,12 @@ export default function Landing() {
         setHeroAnime(heroPool[nextIndex]);
         return nextIndex;
       });
-    }, 4000); // Rotate every 4 seconds
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [heroAnime, popularItems, airingItems]);
 
-  // Search handler with debounce
+  // Search handler
   useEffect(() => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -262,12 +209,11 @@ export default function Landing() {
       } finally {
         setIsSearching(false);
       }
-    }, 500); // 500ms debounce
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [query, searchAnime]);
 
-  // Add function to load more items for a specific category
   const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows' | 'recentEpisodes') => {
     setLoadingMore(category);
     
@@ -309,35 +255,22 @@ export default function Landing() {
           break;
         case 'recentEpisodes':
           nextPage = recentEpisodesPage + 1;
-          const recentResult = await fetchRecentEpisodes({ page: nextPage });
-          if (recentResult && typeof recentResult === 'object' && 'results' in recentResult) {
-            const recentData = recentResult as { results: Array<any>; has_next_page: boolean };
-            const mappedRecent = (recentData.results || []).map((item: any) => ({
-              id: item.id,
-              dataId: item.dataId ?? deriveDataIdFromSlug(item.id),
-              title: item.title,
-              image: item.image,
-              type: item.type,
-              language: {
-                sub: item.sub ? String(item.sub) : null,
-                dub: item.dub ? String(item.dub) : null,
-              },
-              sourceCategory: "recentEpisodes" as const,
-            }));
-            setRecentEpisodesItems((prev: AnimeItem[]) => [...prev, ...mappedRecent]);
-            setRecentEpisodesPage(nextPage);
-            setRecentEpisodesHasMore(recentData.has_next_page || false);
-          }
+          const recentResult = await fetchYumaRecentEpisodes(nextPage);
+          setRecentEpisodesItems((prev) => [...prev, ...recentResult.results]);
+          setRecentEpisodesPage(nextPage);
+          setRecentEpisodesHasMore(recentResult.hasNextPage);
           setLoadingMore(null);
           return;
       }
       
-      const result = await fetchFunction({ page: nextPage });
-      const data = result as { results: AnimeItem[]; hasNextPage: boolean };
-      
-      setItems((prev: AnimeItem[]) => [...prev, ...(data.results || [])]);
-      setPage(nextPage);
-      setHasMore(data.hasNextPage || false);
+      if (fetchFunction) {
+        const result = await fetchFunction({ page: nextPage });
+        const data = result as { results: AnimeItem[]; hasNextPage: boolean };
+        
+        setItems((prev: AnimeItem[]) => [...prev, ...(data.results || [])]);
+        setPage(nextPage);
+        setHasMore(data.hasNextPage || false);
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load more items";
       toast.error(msg);
@@ -352,14 +285,12 @@ export default function Landing() {
       return;
     }
 
-    // Only navigate to Watch page for NothingOS theme
     if (theme === "nothing") {
       localStorage.setItem(`anime_${anime.dataId}`, JSON.stringify(anime));
       navigate(`/watch/${anime.dataId}`);
       return;
     }
 
-    // For other themes (Classic, Retro), open the InfoModal
     setSelected(anime);
     setLastSelectedAnime(anime);
   };
@@ -518,11 +449,8 @@ export default function Landing() {
       language: selected.language,
     };
     setCurrentAnimeInfo(animeInfo);
-
-    // Store episode data FIRST (before any async operations)
     setCurrentEpisodeData(normalizedEpisode);
 
-    // Reset video state to prevent old data from carrying over
     setVideoSource(null);
     setVideoIntro(null);
     setVideoOutro(null);
@@ -534,7 +462,6 @@ export default function Landing() {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
       
-      // Try to get HD-2 sub server first
       const subServers = serverData.sub || [];
       const preferredServer = subServers.find(s => s.name === "HD-2") || subServers[0];
       
@@ -553,12 +480,10 @@ export default function Landing() {
       };
       
       if (sourcesData.sources && sourcesData.sources.length > 0) {
-        // Capture headers from API response
         setVideoHeaders(sourcesData.headers || null);
         const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
         const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
 
-        // Build Convex HTTP endpoint base (.site), robust for various env formats
         const raw = import.meta.env.VITE_CONVEX_URL as string;
         let base = raw;
         try {
@@ -570,10 +495,8 @@ export default function Landing() {
         }
         base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
 
-        // Proxy the m3u8 URL through Convex HTTP endpoint
         const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
 
-        // Proxy all tracks (subtitles and thumbnails) through Convex endpoint
         const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
           ...t,
           kind: t.kind || "subtitles",
@@ -602,9 +525,7 @@ export default function Landing() {
 
   const handleProgressUpdate = useCallback(async (currentTime: number, duration: number) => {
     if (!isAuthenticated) return;
-
     if (!currentEpisodeData || !currentAnimeInfo) return;
-
     if (!duration || duration <= 0) return;
 
     const episodeNumberForProgress = normalizeEpisodeNumber(currentEpisodeData.number);
@@ -624,34 +545,19 @@ export default function Landing() {
     }
   }, [isAuthenticated, currentEpisodeData, currentAnimeInfo, saveProgress]);
 
-  // Filter content based on active section
   const getSectionContent = () => {
     switch (activeSection) {
-      case "tv":
-        return tvShowItems;
-      case "movies":
-        return movieItems;
-      case "popular":
-        return popularItems;
-      case "recent":
-        return airingItems;
-      default:
-        return null;
+      case "tv": return tvShowItems;
+      case "movies": return movieItems;
+      case "popular": return popularItems;
+      case "recent": return airingItems;
+      default: return null;
     }
   };
 
   const sectionContent = getSectionContent();
 
-  const handleProfileCTA = () => {
-    if (!isAuthenticated) {
-      toast.error("Please sign in to view your profile");
-      navigate("/auth");
-      return;
-    }
-    setActiveSection("profile");
-  };
-
-  // Convert continue watching to AnimeItem format with progress
+  // Convert continue watching to AnimeItem format
   const continueWatchingItems: AnimeItem[] = (continueWatching || []).map((item) => ({
     title: item.animeTitle,
     image: item.animeImage || undefined,
@@ -694,9 +600,7 @@ export default function Landing() {
               navigate("/auth");
               return;
             }
-            if (section === "search") {
-              setQuery("");
-            }
+            if (section === "search") setQuery("");
             setActiveSection(section);
           }}
           isAuthenticated={isAuthenticated}
@@ -719,9 +623,7 @@ export default function Landing() {
               navigate("/auth");
               return;
             }
-            if (section === "search") {
-              setQuery("");
-            }
+            if (section === "search") setQuery("");
             setActiveSection(section);
           }}
         />
@@ -759,7 +661,6 @@ export default function Landing() {
             />
           ) : (
             <>
-              {/* Hero Banner */}
               {activeSection === "home" && heroAnime && (
                 <HeroBanner
                   anime={heroAnime}
@@ -768,7 +669,6 @@ export default function Landing() {
                 />
               )}
 
-              {/* Section-specific content */}
               {sectionContent ? (
                 <div className="mt-8">
                   <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
@@ -786,91 +686,37 @@ export default function Landing() {
                   </div>
                 </div>
               ) : (
-                /* Home view with content rails */
-                <div className="space-y-8">
-                  {/* Continue Watching */}
-                  {isAuthenticated && continueWatchingItems.length > 0 && (
-                    <>
-                      <ContentRail
-                        title="Continue Watching"
-                        items={continueWatchingItems}
-                        onItemClick={openAnime}
-                      />
-                    </>
-                  )}
-
-                  {/* My Watchlist */}
-                  {isAuthenticated && watchlistItems.length > 0 && (
-                    <ContentRail
-                      title="My Watchlist"
-                      items={watchlistItems}
-                      onItemClick={openAnime}
-                    />
-                  )}
-
-                  {/* Recent Episodes - Only show if data loaded successfully */}
-                  {recentEpisodesItems.length > 0 && (
-                    <ContentRail
-                      title="Recent Episodes"
-                      items={recentEpisodesItems}
-                      onItemClick={openAnime}
-                      enableInfiniteScroll
-                      onLoadMore={() => loadMoreItems('recentEpisodes')}
-                      hasMore={recentEpisodesHasMore}
-                      isLoadingMore={loadingMore === 'recentEpisodes'}
-                    />
-                  )}
-
-                  <ContentRail
-                    title="Trending Now"
-                    items={popularItems}
-                    onItemClick={openAnime}
-                    enableInfiniteScroll
-                    onLoadMore={() => loadMoreItems('popular')}
-                    hasMore={popularHasMore}
-                    isLoadingMore={loadingMore === 'popular'}
-                  />
-                  <ContentRail
-                    title="Top Airing"
-                    items={airingItems}
-                    onItemClick={openAnime}
-                    enableInfiniteScroll
-                    onLoadMore={() => loadMoreItems('airing')}
-                    hasMore={airingHasMore}
-                    isLoadingMore={loadingMore === 'airing'}
-                  />
-                  <ContentRail
-                    title="Popular Movies"
-                    items={movieItems}
-                    onItemClick={openAnime}
-                    enableInfiniteScroll
-                    onLoadMore={() => loadMoreItems('movies')}
-                    hasMore={movieHasMore}
-                    isLoadingMore={loadingMore === 'movies'}
-                  />
-                  <ContentRail
-                    title="TV Series"
-                    items={tvShowItems}
-                    onItemClick={openAnime}
-                    enableInfiniteScroll
-                    onLoadMore={() => loadMoreItems('tvShows')}
-                    hasMore={tvShowHasMore}
-                    isLoadingMore={loadingMore === 'tvShows'}
-                  />
-                </div>
+                <HomeSections
+                  isAuthenticated={isAuthenticated}
+                  continueWatchingItems={continueWatchingItems}
+                  watchlistItems={watchlistItems}
+                  recentEpisodesItems={recentEpisodesItems}
+                  popularItems={popularItems}
+                  airingItems={airingItems}
+                  movieItems={movieItems}
+                  tvShowItems={tvShowItems}
+                  onOpenAnime={openAnime}
+                  onLoadMore={loadMoreItems}
+                  loadingMore={loadingMore}
+                  hasMore={{
+                    popular: popularHasMore,
+                    airing: airingHasMore,
+                    movies: movieHasMore,
+                    tvShows: tvShowHasMore,
+                    recentEpisodes: recentEpisodesHasMore,
+                  }}
+                />
               )}
             </>
           )}
         </div>
       </main>
 
-      {/* Info Modal */}
       <InfoModal
         anime={selected}
         isOpen={!!selected}
         onClose={() => setSelected(null)}
         episodes={episodes.map(ep => {
-          // Enrich episodes with progress data
           const normalizedEp = {
             id: ep.id,
             title: ep.title,
@@ -886,63 +732,97 @@ export default function Landing() {
           return normalizedEp;
         })}
         episodesLoading={episodesLoading}
-        onPlayEpisode={(ep) => {
-          playEpisode(ep);
-        }}
+        onPlayEpisode={(ep) => playEpisode(ep)}
         isInWatchlist={isInWatchlist}
         onToggleWatchlist={handleToggleWatchlist}
         broadcastInfo={broadcastInfo}
         broadcastLoading={isBroadcastLoading}
       />
 
-      {/* Video Player - Use RetroVideoPlayer for retro theme */}
-      {videoSource && currentEpisodeData && (() => {
-        const PlayerComponent = theme === "retro" ? RetroVideoPlayer : VideoPlayer;
-        
-        return (
-          <PlayerComponent
-            source={videoSource}
-            title={videoTitle}
-            tracks={videoTracks}
-            intro={videoIntro}
-            outro={videoOutro}
-            headers={videoHeaders}
-            resumeFrom={
-              animeProgress && 
-              currentEpisodeData &&
-              animeProgress.episodeId === currentEpisodeData.id && 
-              animeProgress.currentTime > 0 && 
-              animeProgress.duration > 0
-                ? animeProgress.currentTime
-                : 0
-            }
-            onProgressUpdate={handleProgressUpdate}
-            onNext={() => {
-              if (currentEpisodeIndex === null) return;
-              const next = episodes[currentEpisodeIndex + 1];
-              if (next) playEpisode(next);
-            }}
-            nextTitle={
-              currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
-                ? `${selected?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
-                : undefined
-            }
-            onClose={() => {
-              setVideoSource(null);
-              setVideoTitle("");
-              setVideoTracks([]);
-              setVideoIntro(null);
-              setVideoOutro(null);
-              setVideoHeaders(null);
-              setCurrentEpisodeData(null);
-              setCurrentAnimeInfo(null);
-              if (lastSelectedAnime) {
-                setSelected(lastSelectedAnime);
+      {videoSource && currentEpisodeData && (
+        <Suspense fallback={<FullscreenLoader label="Loading Player..." />}>
+          {theme === "retro" ? (
+            <RetroVideoPlayer
+              source={videoSource}
+              title={videoTitle}
+              tracks={videoTracks}
+              intro={videoIntro}
+              outro={videoOutro}
+              onClose={() => {
+                setVideoSource(null);
+                setVideoTitle("");
+                setVideoTracks([]);
+                setVideoIntro(null);
+                setVideoOutro(null);
+                setVideoHeaders(null);
+                setCurrentEpisodeData(null);
+                setCurrentAnimeInfo(null);
+                if (lastSelectedAnime) setSelected(lastSelectedAnime);
+              }}
+              onProgressUpdate={handleProgressUpdate}
+              resumeFrom={
+                animeProgress && 
+                currentEpisodeData &&
+                animeProgress.episodeId === currentEpisodeData.id && 
+                animeProgress.currentTime > 0 && 
+                animeProgress.duration > 0
+                  ? animeProgress.currentTime
+                  : 0
               }
-            }}
-          />
-        );
-      })()}
+              onNext={() => {
+                if (currentEpisodeIndex === null) return;
+                const next = episodes[currentEpisodeIndex + 1];
+                if (next) playEpisode(next);
+              }}
+              nextTitle={
+                currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
+                  ? `${selected?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
+                  : undefined
+              }
+            />
+          ) : (
+            <VideoPlayer
+              source={videoSource}
+              title={videoTitle}
+              tracks={videoTracks}
+              intro={videoIntro}
+              outro={videoOutro}
+              headers={videoHeaders || undefined}
+              onClose={() => {
+                setVideoSource(null);
+                setVideoTitle("");
+                setVideoTracks([]);
+                setVideoIntro(null);
+                setVideoOutro(null);
+                setVideoHeaders(null);
+                setCurrentEpisodeData(null);
+                setCurrentAnimeInfo(null);
+                if (lastSelectedAnime) setSelected(lastSelectedAnime);
+              }}
+              onProgressUpdate={handleProgressUpdate}
+              resumeFrom={
+                animeProgress && 
+                currentEpisodeData &&
+                animeProgress.episodeId === currentEpisodeData.id && 
+                animeProgress.currentTime > 0 && 
+                animeProgress.duration > 0
+                  ? animeProgress.currentTime
+                  : 0
+              }
+              onNext={() => {
+                if (currentEpisodeIndex === null) return;
+                const next = episodes[currentEpisodeIndex + 1];
+                if (next) playEpisode(next);
+              }}
+              nextTitle={
+                currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
+                  ? `${selected?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
+                  : undefined
+              }
+            />
+          )}
+        </Suspense>
+      )}
     </div>
   );
 }
