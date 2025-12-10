@@ -371,12 +371,9 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     }
   };
 
-  const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
-    if (!isFullscreen) {
-      togglePlay();
-      return;
-    }
+  const lastTapRef = useRef<{ time: number; x: number; side: 'left' | 'right' | 'center' | null }>({ time: 0, x: 0, side: null });
 
+  const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
     const video = e.currentTarget;
     const rect = video.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
@@ -393,19 +390,65 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       clickY >= centerTop && 
       clickY <= centerTop + centerHeight;
 
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapRef.current.time;
+    const isDoubleTap = timeSinceLastTap < 300;
+
+    let side: 'left' | 'right' | 'center' | null = null;
     if (isInCenter) {
+      side = 'center';
+    } else if (clickX < centerLeft) {
+      side = 'left';
+    } else if (clickX > centerLeft + centerWidth) {
+      side = 'right';
+    }
+
+    if (isDoubleTap && lastTapRef.current.side === side && side !== 'center') {
+      // Double tap on left or right - seek without showing controls
+      if (side === 'left') {
+        skip(-10);
+      } else if (side === 'right') {
+        skip(10);
+      }
+      lastTapRef.current = { time: 0, x: 0, side: null }; // Reset to prevent triple tap
+      return;
+    }
+
+    // Single tap behavior
+    if (isInCenter) {
+      // Center tap - toggle play and toggle controls
       togglePlay();
-    }
-    
-    setShowControls(true);
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    if (isPlaying) {
-      controlsTimeoutRef.current = window.setTimeout(() => {
+      if (showControls) {
         setShowControls(false);
-      }, 3000);
+        if (controlsTimeoutRef.current) {
+          clearTimeout(controlsTimeoutRef.current);
+        }
+      } else {
+        setShowControls(true);
+        if (isPlaying) {
+          controlsTimeoutRef.current = window.setTimeout(() => {
+            setShowControls(false);
+          }, 3000);
+        }
+      }
+    } else {
+      // Side tap - toggle controls visibility
+      if (showControls) {
+        setShowControls(false);
+        if (controlsTimeoutRef.current) {
+          clearTimeout(controlsTimeoutRef.current);
+        }
+      } else {
+        setShowControls(true);
+        if (isPlaying) {
+          controlsTimeoutRef.current = window.setTimeout(() => {
+            setShowControls(false);
+          }, 3000);
+        }
+      }
     }
+
+    lastTapRef.current = { time: now, x: clickX, side };
   };
 
   const togglePlay = useCallback(() => {
