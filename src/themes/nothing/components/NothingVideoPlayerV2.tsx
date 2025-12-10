@@ -779,7 +779,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : -20 }}
         >
-          <h2 className="text-white text-sm font-medium bg-black/80 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-white/10">
+          <h2 className="text-white text-xs font-bold tracking-[0.2em] uppercase bg-black/90 backdrop-blur-md px-5 py-2.5 rounded-2xl shadow-2xl border border-white/20">
             {title}
           </h2>
         </motion.div>
@@ -820,7 +820,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
             >
               <Button
                 onClick={skipIntro}
-                className="bg-white hover:bg-white/90 text-black font-bold px-6 py-3 rounded-xl shadow-2xl border-2 border-black/10"
+                className="bg-white hover:bg-white/90 text-black font-bold px-8 py-3 rounded-full shadow-2xl border-2 border-black/10 tracking-wider text-sm uppercase"
               >
                 Skip Intro
               </Button>
@@ -838,14 +838,14 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
             >
               <Button
                 onClick={skipOutro}
-                className="bg-white hover:bg-white/90 text-black font-bold px-6 py-3 rounded-xl shadow-2xl border-2 border-black/10"
+                className="bg-white hover:bg-white/90 text-black font-bold px-8 py-3 rounded-full shadow-2xl border-2 border-black/10 tracking-wider text-sm uppercase"
               >
                 Skip Outro
               </Button>
               {onNext && nextTitle && (
                 <Button
                   onClick={onNext}
-                  className="bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white font-bold px-6 py-3 rounded-xl shadow-2xl"
+                  className="bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white font-bold px-8 py-3 rounded-full shadow-2xl tracking-wider text-sm uppercase"
                 >
                   Next Episode
                 </Button>
@@ -863,11 +863,11 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
               exit={{ opacity: 0 }}
             >
               <div
-                className="w-20 h-20 bg-white/15 backdrop-blur-lg rounded-full flex items-center justify-center cursor-pointer border-2 border-white/30 hover:bg-white/25 hover:scale-110 transition-all pointer-events-auto"
+                className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center cursor-pointer border-3 border-white/40 hover:bg-white/30 hover:scale-110 transition-all pointer-events-auto shadow-2xl"
                 onClick={togglePlay}
                 data-testid="video-center-button"
               >
-                <Play className="h-10 w-10 text-white fill-white ml-1" />
+                <Play className="h-12 w-12 text-white fill-white ml-1.5" />
               </div>
             </motion.div>
           )}
@@ -970,7 +970,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                   />
                 </div>
 
-                <div className="text-white text-sm font-bold ml-2 select-none bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-sm" data-testid="time-display">
+                <div className="text-white text-xs font-mono font-bold ml-2 select-none bg-black/60 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10" data-testid="time-display">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </div>
               </div>
@@ -989,8 +989,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                   </button>
 
                   {showSubtitles && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-2xl p-2 min-w-[200px] shadow-2xl border-2 border-white/20" data-testid="subtitles-menu">
-                      <div className="text-white/70 text-xs font-bold uppercase tracking-widest px-4 py-3 border-b border-white/10">Subtitles</div>
+                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-3xl p-3 min-w-[220px] shadow-2xl border-2 border-white/30" data-testid="subtitles-menu">
+                      <div className="text-white/60 text-[10px] font-bold uppercase tracking-[0.3em] px-4 py-3 border-b border-white/20">Subtitles</div>
                       <button
                         onClick={() => changeSubtitle(-1)}
                         className={`block w-full text-left px-4 py-3 text-white text-sm font-medium hover:bg-white/10 transition-colors rounded-lg ${currentSubtitle === -1 ? "bg-[#ff4d4f] text-white" : ""}`}
@@ -1025,8 +1025,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                   </button>
 
                   {showSettings && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-2xl p-2 min-w-[200px] shadow-2xl border-2 border-white/20" data-testid="settings-menu">
-                      <div className="text-white/70 text-xs font-bold uppercase tracking-widest px-4 py-3 border-b border-white/10">Playback Speed</div>
+                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-3xl p-3 min-w-[220px] shadow-2xl border-2 border-white/30" data-testid="settings-menu">
+                      <div className="text-white/60 text-[10px] font-bold uppercase tracking-[0.3em] px-4 py-3 border-b border-white/20">Playback Speed</div>
                       {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
                         <button
                           key={rate}
