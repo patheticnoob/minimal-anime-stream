@@ -1,132 +1,59 @@
-// ... keep existing code
-import { NothingPlayerControls } from "./NothingPlayerControls";
-import { NothingPlayerOverlay } from "./NothingPlayerOverlay";
-import { NothingGestureOverlay } from "./NothingGestureOverlay";
-import { usePlayerGestures } from "./NothingPlayerGestures";
+<div className="absolute inset-0 pointer-events-none z-40 overflow-hidden rounded-[32px]">
+</div>
 
-interface NothingVideoPlayerV2Props {
-  source: string;
-  title: string;
-  tracks: Track[];
-  intro: string;
-  outro: string;
-  headers: string[];
-  onClose: () => void;
-  onProgressUpdate: (progress: number) => void;
-  resumeFrom: number;
-  info: VideoInfo;
-  episodes: Episode[];
-  currentEpisode: Episode;
-  onNext: () => void;
-  nextTitle: string;
-}
+useEffect(() => {
+  const video = videoRef.current;
+  if (!video) return;
 
-export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, headers, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onNext, nextTitle }: NothingVideoPlayerV2Props) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const hlsRef = useRef<any>(null);
-  const controlsTimeoutRef = useRef<number | null>(null);
-  const hasRestoredProgress = useRef(false);
-  const wakeLockRef = useRef<any>(null);
+  const style = document.createElement('style');
+  style.id = 'subtitle-position-style';
+  
+  const commonCueStyles = `
+    video::cue {
+      background-color: rgba(0, 0, 0, 0.6) !important;
+      color: white !important;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8) !important;
+      font-family: sans-serif !important;
+      font-weight: 500 !important;
+    }
+  `;
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [brightness, setBrightness] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const updateControlsVisibility = useCallback(
-    (nextVisible: boolean | ((prevVisible: boolean) => boolean)) => {
-      setShowControls((prevVisible) => {
-        const resolvedVisible =
-          typeof nextVisible === "function"
-            ? nextVisible(prevVisible)
-            : nextVisible;
-
-        if (controlsTimeoutRef.current) {
-          clearTimeout(controlsTimeoutRef.current);
-          controlsTimeoutRef.current = null;
-        }
-
-        if (resolvedVisible) {
-          controlsTimeoutRef.current = window.setTimeout(() => {
-            setShowControls(false);
-            controlsTimeoutRef.current = null;
-          }, 4000);
-        }
-
-        return resolvedVisible;
-      });
-    },
-    [],
-  );
-
-  // Wake Lock API - Keep screen awake during fullscreen playback
-  useEffect(() => {
-    // ... keep existing code
-    return () => {
-      releaseWakeLock();
-    };
-  }, [isFullscreen, isPlaying]);
-
-  // Load and parse thumbnail VTT file
-  useEffect(() => {
-    const resetControlsTimeout = () => {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
+  if (showControls) {
+    style.textContent = `
+      video::-webkit-media-text-track-container {
+        transform: translateY(-120px) !important;
       }
-
-      if (isPlaying && showControls) {
-        controlsTimeoutRef.current = window.setTimeout(() => {
-          setShowControls(false);
-        }, 4000);
+      video::cue {
+        transform: translateY(-120px) !important;
       }
-    };
-
-    resetControlsTimeout();
-
-    return () => {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
+      ${commonCueStyles}
+    `;
+  } else {
+    style.textContent = `
+      video::-webkit-media-text-track-container {
+        transform: translateY(-60px) !important;
       }
-    };
-  }, [isPlaying, showControls]);
+      video::cue {
+        transform: translateY(-60px) !important;
+      }
+      ${commonCueStyles}
+    `;
+  }
+});
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const normalize = (value?: string | null) => (value || "").trim().toLowerCase();
-// ... keep existing code
-  return (
-    <AnimatePresence>
-      <motion.div
-        ref={containerRef}
-        className="relative w-full aspect-video bg-black rounded-[32px] overflow-hidden group select-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={() => isPlaying && setShowControls(false)}
-        data-testid="video-player-container"
-        {...gestureHandlers}
-      >
-        <NothingGestureOverlay {...overlayProps} />
-
-        <NothingPlayerOverlay
-// ... keep existing code
-        <video
-          ref={videoRef}
-          className="w-full h-full object-contain cursor-pointer"
-          crossOrigin="anonymous"
-          playsInline
-          style={{ filter: `brightness(${brightness})` }}
-          data-testid="video-element"
-        >
-          {tracks?.map((track, idx) => (
-// ... keep existing code
-
-</edits_to_apply>
+return (
+  <AnimatePresence>
+    <motion.div
+      ref={containerRef}
+      className="relative w-full aspect-video bg-black rounded-[32px] overflow-hidden group select-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onMouseMove={handleMouseMove}
+      data-testid="video-player-container"
+      {...gestureHandlers}
+    >
+      <NothingGestureOverlay {...overlayProps} />
+    </motion.div>
+  </AnimatePresence>
+);

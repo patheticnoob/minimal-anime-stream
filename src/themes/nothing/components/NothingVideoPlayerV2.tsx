@@ -76,7 +76,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           controlsTimeoutRef.current = window.setTimeout(() => {
             setShowControls(false);
             controlsTimeoutRef.current = null;
-          }, 4000);
+          }, 3000);
         }
 
         return resolvedVisible;
@@ -344,7 +344,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         if (showControls) {
           controlsTimeoutRef.current = window.setTimeout(() => {
             setShowControls(false);
-          }, 4000);
+          }, 3000);
         }
       }
     };
@@ -365,6 +365,16 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const style = document.createElement('style');
     style.id = 'subtitle-position-style';
     
+    const commonCueStyles = `
+      video::cue {
+        background-color: rgba(0, 0, 0, 0.6) !important;
+        color: white !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8) !important;
+        font-family: sans-serif !important;
+        font-weight: 500 !important;
+      }
+    `;
+
     if (showControls) {
       style.textContent = `
         video::-webkit-media-text-track-container {
@@ -373,6 +383,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         video::cue {
           transform: translateY(-120px) !important;
         }
+        ${commonCueStyles}
       `;
     } else {
       style.textContent = `
@@ -382,6 +393,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         video::cue {
           transform: translateY(-60px) !important;
         }
+        ${commonCueStyles}
       `;
     }
 
@@ -680,7 +692,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onMouseMove={handleMouseMove}
-        onMouseLeave={() => isPlaying && setShowControls(false)}
         data-testid="video-player-container"
         {...gestureHandlers}
       >

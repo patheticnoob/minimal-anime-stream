@@ -130,8 +130,8 @@ export function usePlayerGestures({
 
     // Check for Double Tap
     const isDoubleTap = lastTapRef.current && 
-      (now - lastTapRef.current.time < 300) &&
-      Math.abs(touchEnd.clientX - lastTapRef.current.x) < 50; // Ensure taps are close
+      (now - lastTapRef.current.time < 400) &&
+      Math.abs(touchEnd.clientX - lastTapRef.current.x) < 80; // Ensure taps are close
 
     if (isDoubleTap && zone !== 'center') {
       // Handle Double Tap (Seek)
@@ -181,7 +181,7 @@ export function usePlayerGestures({
         singleTapTimerRef.current = window.setTimeout(() => {
           toggleControls();
           singleTapTimerRef.current = null;
-        }, 300);
+        }, 400);
       }
       
       lastTapRef.current = { time: now, x: touchEnd.clientX };
