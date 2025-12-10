@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { parseVTTThumbnails, type ThumbnailCue } from "@/lib/vttParser";
 import { NothingPlayerControls } from "./NothingPlayerControls";
 import { NothingPlayerOverlay } from "./NothingPlayerOverlay";
+import { NothingGestureOverlay } from "./NothingGestureOverlay";
+import { usePlayerGestures } from "./NothingPlayerGestures";
 
 interface NothingVideoPlayerV2Props {
   source: string;
@@ -28,7 +30,7 @@ interface NothingVideoPlayerV2Props {
   resumeFrom?: number;
 }
 
-export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, headers, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onNext, nextTitle }: NothingVideoPlayerV2Props) {
+export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, headers, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onSelectEpisode, onNext, nextTitle }: NothingVideoPlayerV2Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -41,6 +43,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
+  const [brightness, setBrightness] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -69,17 +72,17 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           controlsTimeoutRef.current = null;
         }
 
-        if (resolvedVisible && isPlaying) {
+        if (resolvedVisible) {
           controlsTimeoutRef.current = window.setTimeout(() => {
             setShowControls(false);
             controlsTimeoutRef.current = null;
-          }, 3000);
+          }, 4000);
         }
 
         return resolvedVisible;
       });
     },
-    [isPlaying],
+    [],
   );
 
   // Wake Lock API - Keep screen awake during fullscreen playback
@@ -337,10 +340,12 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       }
 
       if (isPlaying) {
-        setShowControls(true);
-        controlsTimeoutRef.current = window.setTimeout(() => {
-          setShowControls(false);
-        }, 3000);
+        // Don't force show controls on play, just reset timeout if they are visible
+        if (showControls) {
+          controlsTimeoutRef.current = window.setTimeout(() => {
+            setShowControls(false);
+          }, 4000);
+        }
       }
     };
 
@@ -351,7 +356,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         clearTimeout(controlsTimeoutRef.current);
       }
     };
-  }, [isPlaying]);
+  }, [isPlaying, showControls]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -397,81 +402,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const handleMouseMove = () => {
     if (isDragging) return;
     updateControlsVisibility(true);
-  };
-
-  const lastTapRef = useRef<{ time: number; x: number; side: 'left' | 'right' | 'center' | null }>({ time: 0, x: 0, side: null });
-
-  const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
-    const video = e.currentTarget;
-    const rect = video.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-    
-    const centerWidth = rect.width * 0.4;
-    const centerHeight = rect.height * 0.4;
-    const centerLeft = (rect.width - centerWidth) / 2;
-    const centerTop = (rect.height - centerHeight) / 2;
-    
-    const isInCenter = 
-      clickX >= centerLeft && 
-      clickX <= centerLeft + centerWidth &&
-      clickY >= centerTop && 
-      clickY <= centerTop + centerHeight;
-
-    const now = Date.now();
-    const timeSinceLastTap = now - lastTapRef.current.time;
-    const isDoubleTap = timeSinceLastTap < 300;
-
-    let side: 'left' | 'right' | 'center' | null = null;
-    if (isInCenter) {
-      side = 'center';
-    } else if (clickX < centerLeft) {
-      side = 'left';
-    } else if (clickX > centerLeft + centerWidth) {
-      side = 'right';
-    }
-
-    // Center Tap Logic
-    if (side === "center") {
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-        clickTimeoutRef.current = null;
-      }
-
-      updateControlsVisibility((prev) => !prev);
-      lastTapRef.current = { time: now, x: clickX, side };
-      return;
-    }
-
-    // Side Tap Logic
-    if (isDoubleTap && lastTapRef.current.side === side) {
-      // Double Tap detected - Cancel single tap action
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-        clickTimeoutRef.current = null;
-      }
-
-      if (side === 'left') {
-        skip(-10);
-      } else if (side === 'right') {
-        skip(10);
-      }
-      
-      // Reset to prevent triple tap
-      lastTapRef.current = { time: 0, x: 0, side: null };
-    } else {
-      // Single Tap detected (Potential)
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-      }
-
-      lastTapRef.current = { time: now, x: clickX, side };
-
-      clickTimeoutRef.current = window.setTimeout(() => {
-        updateControlsVisibility((prev) => !prev);
-        clickTimeoutRef.current = null;
-      }, 300);
-    }
   };
 
   const togglePlay = useCallback(() => {
@@ -679,6 +609,21 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     };
   }, [tracks]);
 
+  // Gesture Hook
+  const { gestureHandlers, overlayProps } = usePlayerGestures({
+    videoRef,
+    isPlaying,
+    togglePlay,
+    seek: handleSeek,
+    duration,
+    currentTime,
+    volume,
+    setVolume: handleVolumeChange,
+    brightness,
+    setBrightness,
+    toggleControls: (force) => updateControlsVisibility(force !== undefined ? force : (prev) => !prev),
+  });
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
@@ -730,14 +675,17 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     <AnimatePresence>
       <motion.div
         ref={containerRef}
-        className="relative w-full aspect-video bg-black rounded-[32px] overflow-hidden"
+        className="relative w-full aspect-video bg-black rounded-[32px] overflow-hidden group select-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onMouseMove={handleMouseMove}
         onMouseLeave={() => isPlaying && setShowControls(false)}
         data-testid="video-player-container"
+        {...gestureHandlers}
       >
+        <NothingGestureOverlay {...overlayProps} />
+
         <NothingPlayerOverlay
           title={title}
           showControls={showControls}
@@ -755,9 +703,9 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         <video
           ref={videoRef}
           className="w-full h-full object-contain cursor-pointer"
-          onClick={handleVideoClick}
           crossOrigin="anonymous"
           playsInline
+          style={{ filter: `brightness(${brightness})` }}
           data-testid="video-element"
         >
           {tracks?.map((track, idx) => (
