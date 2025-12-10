@@ -56,6 +56,32 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
+  const updateControlsVisibility = useCallback(
+    (nextVisible: boolean | ((prevVisible: boolean) => boolean)) => {
+      setShowControls((prevVisible) => {
+        const resolvedVisible =
+          typeof nextVisible === "function"
+            ? nextVisible(prevVisible)
+            : nextVisible;
+
+        if (controlsTimeoutRef.current) {
+          clearTimeout(controlsTimeoutRef.current);
+          controlsTimeoutRef.current = null;
+        }
+
+        if (resolvedVisible && isPlaying) {
+          controlsTimeoutRef.current = window.setTimeout(() => {
+            setShowControls(false);
+            controlsTimeoutRef.current = null;
+          }, 3000);
+        }
+
+        return resolvedVisible;
+      });
+    },
+    [isPlaying],
+  );
+
   // Wake Lock API - Keep screen awake during fullscreen playback
   useEffect(() => {
     const requestWakeLock = async () => {
@@ -370,15 +396,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
   const handleMouseMove = () => {
     if (isDragging) return;
-    setShowControls(true);
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    if (isPlaying) {
-      controlsTimeoutRef.current = window.setTimeout(() => {
-        setShowControls(false);
-      }, 3000);
-    }
+    updateControlsVisibility(true);
   };
 
   const lastTapRef = useRef<{ time: number; x: number; side: 'left' | 'right' | 'center' | null }>({ time: 0, x: 0, side: null });
@@ -414,23 +432,13 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     }
 
     // Center Tap Logic
-    if (side === 'center') {
-      // Clear any pending side tap timeout
+    if (side === "center") {
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
         clickTimeoutRef.current = null;
       }
 
-      if (isPlaying) {
-        video.pause();
-        setShowControls(true);
-        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-      } else {
-        video.play();
-        setShowControls(false);
-        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-      }
-      
+      updateControlsVisibility((prev) => !prev);
       lastTapRef.current = { time: now, x: clickX, side };
       return;
     }
@@ -460,17 +468,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       lastTapRef.current = { time: now, x: clickX, side };
 
       clickTimeoutRef.current = window.setTimeout(() => {
-        if (showControls) {
-          setShowControls(false);
-          if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-        } else {
-          setShowControls(true);
-          if (isPlaying) {
-            controlsTimeoutRef.current = window.setTimeout(() => {
-              setShowControls(false);
-            }, 3000);
-          }
-        }
+        updateControlsVisibility((prev) => !prev);
         clickTimeoutRef.current = null;
       }, 300);
     }
