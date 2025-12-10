@@ -1,21 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Maximize,
-  Minimize,
-  Settings,
-  SkipForward,
-  SkipBack,
-  Loader2,
-  Subtitles,
-  X,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { parseVTTThumbnails, findThumbnailForTime, type ThumbnailCue } from "@/lib/vttParser";
+import { AnimatePresence, motion } from "framer-motion";
+import { parseVTTThumbnails, type ThumbnailCue } from "@/lib/vttParser";
+import { NothingPlayerControls } from "./NothingPlayerControls";
+import { NothingPlayerOverlay } from "./NothingPlayerOverlay";
 
 interface NothingVideoPlayerV2Props {
   source: string;
@@ -52,7 +39,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [resumeTime, setResumeTime] = useState<number | null>(null);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -66,9 +52,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [buffered, setBuffered] = useState(0);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showSkipOutro, setShowSkipOutro] = useState(false);
-  const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number } | null>(null);
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
-  const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   // Wake Lock API - Keep screen awake during fullscreen playback
@@ -112,16 +96,12 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const thumbnailTrack = tracks?.find(t => t.kind === "thumbnails");
     if (!thumbnailTrack) {
       setThumbnailCues([]);
-      setThumbnailSprite(null);
       return;
     }
 
     parseVTTThumbnails(thumbnailTrack.file)
       .then((cues) => {
         setThumbnailCues(cues);
-        if (cues.length > 0 && cues[0].url) {
-          setThumbnailSprite(cues[0].url);
-        }
       })
       .catch((err) => {
         console.error('Failed to load thumbnail cues:', err);
@@ -314,8 +294,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     };
   }, [onProgressUpdate]);
 
-  // ... keep existing code for auto-hide controls, subtitle positioning, mouse move handler, video click handler
-
   useEffect(() => {
     const resetControlsTimeout = () => {
       if (controlsTimeoutRef.current) {
@@ -441,83 +419,15 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     }
   }, [isPlaying]);
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+  const handleSeek = (newTime: number) => {
     const video = videoRef.current;
-    if (!video || !Number.isFinite(duration) || duration <= 0) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0]?.clientX || e.changedTouches[0]?.clientX : e.clientX;
-    const pos = (clientX - rect.left) / rect.width;
-    const newTime = pos * duration;
+    if (!video) return;
     if (Number.isFinite(newTime)) {
       video.currentTime = newTime;
     }
   };
 
-  const handleProgressHover = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-    const video = videoRef.current;
-    if (!video || !Number.isFinite(duration) || duration <= 0) return;
-    
-    if (thumbnailCues.length === 0) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0]?.clientX : e.clientX;
-    const pos = (clientX - rect.left) / rect.width;
-    const hoverTime = pos * duration;
-    
-    const thumbnail = findThumbnailForTime(thumbnailCues, hoverTime);
-    
-    if (thumbnail) {
-      setThumbnailPreview({
-        url: thumbnail.url,
-        x: clientX - rect.left,
-        y: thumbnail.y || 0,
-        width: thumbnail.width || 160,
-        height: thumbnail.height || 90,
-        spriteX: thumbnail.x || 0,
-        spriteY: thumbnail.y || 0,
-      } as any);
-    } else {
-      setThumbnailPreview(null);
-    }
-  };
-
-  const handleProgressLeave = () => {
-    if (!isDragging) {
-      setThumbnailPreview(null);
-    }
-  };
-
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    setIsDragging(true);
-    setShowControls(true);
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    handleProgressHover(e);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    handleProgressHover(e);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (isDragging) {
-      handleSeek(e);
-      setIsDragging(false);
-      setThumbnailPreview(null);
-      
-      if (isPlaying) {
-        controlsTimeoutRef.current = window.setTimeout(() => {
-          setShowControls(false);
-        }, 3000);
-      }
-    }
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
+  const handleVolumeChange = (newVolume: number) => {
     const video = videoRef.current;
     if (!video) return;
     video.volume = newVolume;
@@ -750,18 +660,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     };
   }, [togglePlay, toggleFullscreen, volume]);
 
-  const formatTime = (time: number) => {
-    if (isNaN(time)) return "0:00";
-    const hours = Math.floor(time / 3600);
-    const minutes = Math.floor((time % 3600) / 60);
-    const seconds = Math.floor(time % 60);
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    }
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
-
   return (
     <AnimatePresence>
       <motion.div
@@ -774,15 +672,19 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         onMouseLeave={() => isPlaying && setShowControls(false)}
         data-testid="video-player-container"
       >
-        <motion.div
-          className="absolute top-4 left-4 z-[90]"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : -20 }}
-        >
-          <h2 className="text-white text-xs font-bold tracking-[0.2em] uppercase bg-black/90 backdrop-blur-md px-5 py-2.5 rounded-2xl shadow-2xl border border-white/20">
-            {title}
-          </h2>
-        </motion.div>
+        <NothingPlayerOverlay
+          title={title}
+          showControls={showControls}
+          isPlaying={isPlaying}
+          isLoading={isLoading}
+          showSkipIntro={showSkipIntro}
+          showSkipOutro={showSkipOutro}
+          onSkipIntro={skipIntro}
+          onSkipOutro={skipOutro}
+          onNext={onNext}
+          nextTitle={nextTitle}
+          onTogglePlay={togglePlay}
+        />
 
         <video
           ref={videoRef}
@@ -804,250 +706,35 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           ))}
         </video>
 
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center z-20" data-testid="video-loading">
-            <Loader2 className="h-16 w-16 animate-spin text-white" />
-          </div>
-        )}
-
-        <AnimatePresence>
-          {showSkipIntro && (
-            <motion.div
-              className="absolute bottom-24 right-8 z-20"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-            >
-              <Button
-                onClick={skipIntro}
-                className="bg-white hover:bg-white/90 text-black font-bold px-8 py-3 rounded-full shadow-2xl border-2 border-black/10 tracking-wider text-sm uppercase"
-              >
-                Skip Intro
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {showSkipOutro && (
-            <motion.div
-              className="absolute bottom-24 right-8 z-20 flex gap-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-            >
-              <Button
-                onClick={skipOutro}
-                className="bg-white hover:bg-white/90 text-black font-bold px-8 py-3 rounded-full shadow-2xl border-2 border-black/10 tracking-wider text-sm uppercase"
-              >
-                Skip Outro
-              </Button>
-              {onNext && nextTitle && (
-                <Button
-                  onClick={onNext}
-                  className="bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white font-bold px-8 py-3 rounded-full shadow-2xl tracking-wider text-sm uppercase"
-                >
-                  Next Episode
-                </Button>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {showControls && !isPlaying && (
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center z-15 pointer-events-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <div
-                className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center cursor-pointer border-3 border-white/40 hover:bg-white/30 hover:scale-110 transition-all pointer-events-auto shadow-2xl"
-                onClick={togglePlay}
-                data-testid="video-center-button"
-              >
-                <Play className="h-12 w-12 text-white fill-white ml-1.5" />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <motion.div
-          className={`absolute inset-0 z-10 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-          data-testid="video-controls"
-        >
-          <div className="absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-black/90 via-black/50 to-transparent pointer-events-none" />
-          <div className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none" />
-
-          <div className="absolute bottom-0 left-0 right-0 px-3 md:px-5 pb-3 md:pb-5">
-            <div
-              className="relative h-1.5 bg-white/20 cursor-pointer mb-4 rounded-full overflow-visible hover:h-2 transition-all group touch-none"
-              onClick={handleSeek}
-              onMouseMove={handleProgressHover}
-              onMouseLeave={handleProgressLeave}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              data-testid="video-progress-bar"
-            >
-              {thumbnailPreview && (thumbnailPreview as any).width && (
-                <div
-                  className="absolute bottom-full mb-3 pointer-events-none z-50"
-                  style={{ 
-                    left: `${thumbnailPreview.x}px`, 
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <div className="relative">
-                    <div 
-                      className="relative bg-black rounded-md overflow-hidden shadow-2xl border-2 border-white/20"
-                      style={{
-                        width: `${(thumbnailPreview as any).width}px`,
-                        height: `${(thumbnailPreview as any).height}px`,
-                      }}
-                    >
-                      <img
-                        src={thumbnailPreview.url}
-                        alt="Video preview"
-                        crossOrigin="anonymous"
-                        style={{
-                          width: `${(thumbnailPreview as any).width}px`,
-                          height: `${(thumbnailPreview as any).height}px`,
-                          objectFit: 'none',
-                          objectPosition: `-${(thumbnailPreview as any).spriteX}px -${(thumbnailPreview as any).spriteY}px`,
-                        }}
-                        onError={(e) => {
-                          console.error('Thumbnail failed to load:', thumbnailPreview.url);
-                          e.currentTarget.style.display = 'none';
-                        }}
-                        onLoad={() => {
-                          console.log('✅ Thumbnail loaded successfully:', thumbnailPreview.url);
-                        }}
-                      />
-                    </div>
-                    <div 
-                      className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white/20"
-                    />
-                  </div>
-                </div>
-              )}
-              <div className="absolute top-0 left-0 h-full bg-white/20 pointer-events-none rounded-full" style={{ width: `${buffered}%` }} />
-              <div className="absolute top-0 left-0 h-full bg-[#ff4d4f] pointer-events-none transition-all rounded-full" style={{ width: `${(currentTime / duration) * 100}%` }} />
-              <div
-                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity border-2 border-[#ff4d4f]"
-                style={{ left: `${(currentTime / duration) * 100}%`, transform: "translate(-50%, -50%)" }}
-              />
-            </div>
-
-            <div className="flex items-center justify-between gap-2 md:gap-3">
-              <div className="flex items-center gap-1.5 md:gap-2">
-                <button onClick={togglePlay} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="play-pause-button">
-                  {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
-                </button>
-
-                <button onClick={() => skip(-10)} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="skip-back-button">
-                  <SkipBack size={22} />
-                </button>
-
-                <button onClick={() => skip(10)} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="skip-forward-button">
-                  <SkipForward size={22} />
-                </button>
-
-                <div className="flex items-center gap-2 relative group">
-                  <button onClick={toggleMute} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="mute-button">
-                    {isMuted || volume === 0 ? <VolumeX size={22} /> : <Volume2 size={22} />}
-                  </button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="w-0 opacity-0 group-hover:w-20 group-hover:opacity-100 transition-all h-1.5 bg-white/30 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg"
-                    data-testid="volume-slider"
-                  />
-                </div>
-
-                <div className="text-white text-xs font-mono font-bold ml-2 select-none bg-black/60 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10" data-testid="time-display">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 md:gap-2">
-                <div className="relative">
-                  <button
-                    onClick={() => {
-                      setShowSubtitles(!showSubtitles);
-                      setShowSettings(false);
-                    }}
-                    className={`text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 ${currentSubtitle >= 0 ? "bg-[#ff4d4f] text-white" : "bg-white/10"}`}
-                    data-testid="subtitles-button"
-                  >
-                    <Subtitles size={22} />
-                  </button>
-
-                  {showSubtitles && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-3xl p-3 min-w-[220px] shadow-2xl border-2 border-white/30" data-testid="subtitles-menu">
-                      <div className="text-white/60 text-[10px] font-bold uppercase tracking-[0.3em] px-4 py-3 border-b border-white/20">Subtitles</div>
-                      <button
-                        onClick={() => changeSubtitle(-1)}
-                        className={`block w-full text-left px-4 py-3 text-white text-sm font-medium hover:bg-white/10 transition-colors rounded-lg ${currentSubtitle === -1 ? "bg-[#ff4d4f] text-white" : ""}`}
-                        data-testid="subtitle-off"
-                      >
-                        Off {currentSubtitle === -1 && "✓"}
-                      </button>
-                      {subtitles.map((subtitle) => (
-                        <button
-                          key={subtitle.index}
-                          onClick={() => changeSubtitle(subtitle.index)}
-                          className={`block w-full text-left px-4 py-3 text-white text-sm font-medium hover:bg-white/10 transition-colors rounded-lg ${currentSubtitle === subtitle.index ? "bg-[#ff4d4f] text-white" : ""}`}
-                          data-testid={`subtitle-${subtitle.language}`}
-                        >
-                          {subtitle.label} {currentSubtitle === subtitle.index && "✓"}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="relative">
-                  <button
-                    onClick={() => {
-                      setShowSettings(!showSettings);
-                      setShowSubtitles(false);
-                    }}
-                    className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10"
-                    data-testid="settings-button"
-                  >
-                    <Settings size={22} />
-                  </button>
-
-                  {showSettings && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-3xl p-3 min-w-[220px] shadow-2xl border-2 border-white/30" data-testid="settings-menu">
-                      <div className="text-white/60 text-[10px] font-bold uppercase tracking-[0.3em] px-4 py-3 border-b border-white/20">Playback Speed</div>
-                      {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
-                        <button
-                          key={rate}
-                          onClick={() => changePlaybackRate(rate)}
-                          className={`block w-full text-left px-4 py-3 text-white text-sm font-medium hover:bg-white/10 transition-colors rounded-lg ${playbackRate === rate ? "bg-[#ff4d4f] text-white" : ""}`}
-                          data-testid={`playback-rate-${rate}`}
-                        >
-                          {rate}x {playbackRate === rate && "✓"}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <button onClick={toggleFullscreen} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="fullscreen-button">
-                  {isFullscreen ? <Minimize size={22} /> : <Maximize size={22} />}
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        <NothingPlayerControls
+          showControls={showControls}
+          isPlaying={isPlaying}
+          onTogglePlay={togglePlay}
+          currentTime={currentTime}
+          duration={duration}
+          buffered={buffered}
+          onSeek={handleSeek}
+          volume={volume}
+          isMuted={isMuted}
+          onVolumeChange={handleVolumeChange}
+          onToggleMute={toggleMute}
+          isFullscreen={isFullscreen}
+          onToggleFullscreen={toggleFullscreen}
+          onSkip={skip}
+          showSubtitles={showSubtitles}
+          setShowSubtitles={setShowSubtitles}
+          showSettings={showSettings}
+          setShowSettings={setShowSettings}
+          subtitles={subtitles}
+          currentSubtitle={currentSubtitle}
+          onChangeSubtitle={changeSubtitle}
+          playbackRate={playbackRate}
+          onChangePlaybackRate={changePlaybackRate}
+          thumbnailCues={thumbnailCues}
+          isDragging={isDragging}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={() => setIsDragging(false)}
+        />
       </motion.div>
     </AnimatePresence>
   );
