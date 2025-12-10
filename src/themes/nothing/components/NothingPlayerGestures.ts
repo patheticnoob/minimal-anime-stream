@@ -178,20 +178,21 @@ export function usePlayerGestures({
     } else {
       // Handle Single Tap (Potential)
       if (zone === 'center') {
-        // Center Tap: Play/Pause + Toggle UI
+        // Center Tap: Play/Pause + Show Controls (with auto-hide)
         togglePlay();
-        toggleControls(controlsVisibleRef.current ? false : true);
+        toggleControls(true); // Always show controls on center tap
         setCenterAction({ type: isPlaying ? 'pause' : 'play' });
         setTimeout(() => setCenterAction(null), 600);
       } else {
-        // Side Tap: Toggle UI
+        // Side Tap: Toggle UI with proper auto-hide
         // Delay to allow for double tap detection
         if (singleTapTimerRef.current) {
           clearTimeout(singleTapTimerRef.current);
         }
         
         singleTapTimerRef.current = window.setTimeout(() => {
-          toggleControls(controlsVisibleRef.current ? false : true);
+          // Toggle: if visible, hide; if hidden, show with auto-hide
+          toggleControls(!controlsVisibleRef.current);
           singleTapTimerRef.current = null;
         }, SINGLE_TAP_DELAY);
       }
