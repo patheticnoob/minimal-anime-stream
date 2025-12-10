@@ -137,7 +137,7 @@ export function NothingPlayerControls({
     }
   };
 
-  const buttonClass = "text-white !text-white hover:bg-white/20 p-3 rounded-full transition-all hover:scale-105 bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/10 flex items-center justify-center w-12 h-12 shadow-lg";
+  const buttonClass = "text-white !text-white hover:bg-white/20 p-3 rounded-full transition-all hover:scale-105 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center w-12 h-12 shadow-lg group/btn";
   const activeButtonClass = "bg-[#ff4d4f] !bg-[#ff4d4f] text-white !text-white hover:bg-[#ff4d4f]/90 border-[#ff4d4f] shadow-[#ff4d4f]/20";
 
   return (
@@ -240,7 +240,7 @@ export function NothingPlayerControls({
               </div>
             </div>
 
-            <div className="hidden md:flex flex-col justify-center ml-2 px-4 py-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 min-w-[100px]" data-testid="time-display">
+            <div className="hidden md:flex flex-col justify-center ml-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 min-w-[100px]" data-testid="time-display">
               <span className="text-[#ff4d4f] text-xs font-mono font-bold leading-none mb-1">{formatTime(currentTime)}</span>
               <span className="text-white/60 text-[10px] font-mono font-medium leading-none">{formatTime(duration)}</span>
             </div>
