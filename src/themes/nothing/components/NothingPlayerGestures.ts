@@ -191,13 +191,8 @@ export function usePlayerGestures({
         }
         
         singleTapTimerRef.current = window.setTimeout(() => {
-          // If controls are hidden, show them with auto-hide
-          // If controls are visible, hide them immediately
-          if (!controlsVisibleRef.current) {
-            toggleControls(true); // Show with auto-hide timer
-          } else {
-            toggleControls(false); // Hide immediately
-          }
+          // Always show controls and reset the auto-hide timer
+          toggleControls(true);
           singleTapTimerRef.current = null;
         }, SINGLE_TAP_DELAY);
       }

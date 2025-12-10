@@ -331,8 +331,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       controlsTimeoutRef.current = null;
     }
 
-    // Only set auto-hide timeout if controls are visible AND video is playing
-    if (showControls && isPlaying) {
+    // Always auto-hide after inactivity whenever controls are visible
+    if (showControls) {
       controlsTimeoutRef.current = window.setTimeout(() => {
         setShowControls(false);
         controlsTimeoutRef.current = null;
@@ -345,7 +345,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         controlsTimeoutRef.current = null;
       }
     };
-  }, [isPlaying, showControls]);
+  }, [showControls, isPlaying]);
 
   useEffect(() => {
     const video = videoRef.current;
