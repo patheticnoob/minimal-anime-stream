@@ -184,15 +184,20 @@ export function usePlayerGestures({
         setCenterAction({ type: isPlaying ? 'pause' : 'play' });
         setTimeout(() => setCenterAction(null), 600);
       } else {
-        // Side Tap: Toggle UI with proper auto-hide
+        // Side Tap: Show controls with auto-hide (or hide if already visible)
         // Delay to allow for double tap detection
         if (singleTapTimerRef.current) {
           clearTimeout(singleTapTimerRef.current);
         }
         
         singleTapTimerRef.current = window.setTimeout(() => {
-          // Toggle: if visible, hide; if hidden, show with auto-hide
-          toggleControls(!controlsVisibleRef.current);
+          // If controls are hidden, show them with auto-hide
+          // If controls are visible, hide them immediately
+          if (!controlsVisibleRef.current) {
+            toggleControls(true); // Show with auto-hide timer
+          } else {
+            toggleControls(false); // Hide immediately
+          }
           singleTapTimerRef.current = null;
         }, SINGLE_TAP_DELAY);
       }
