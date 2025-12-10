@@ -77,6 +77,7 @@ export function NothingPlayerControls({
   const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number; width: number; height: number; spriteX: number; spriteY: number } | null>(null);
 
   const handleSeekClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Stop propagation to prevent gesture toggling
     if (!Number.isFinite(duration) || duration <= 0) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0]?.clientX || e.changedTouches[0]?.clientX : e.clientX;
@@ -119,17 +120,20 @@ export function NothingPlayerControls({
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Stop propagation
     onDragStart();
     handleProgressHover(e);
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Stop propagation
     if (!isDragging) return;
     e.preventDefault();
     handleProgressHover(e);
   };
 
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Stop propagation
     if (isDragging) {
       handleSeekClick(e);
       onDragEnd();
@@ -137,7 +141,7 @@ export function NothingPlayerControls({
     }
   };
 
-  const buttonClass = "text-[#0a0a0a] hover:text-black p-3 rounded-full transition-all hover:scale-105 bg-white/70 hover:bg-white/90 backdrop-blur-xl border border-white/80 flex items-center justify-center w-12 h-12 shadow-[0_15px_45px_rgba(0,0,0,0.35)] group/btn";
+  const buttonClass = "text-[#0a0a0a] hover:text-black p-2 md:p-3 rounded-full transition-all hover:scale-105 bg-white/70 hover:bg-white/90 backdrop-blur-xl border border-white/80 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 shadow-[0_15px_45px_rgba(0,0,0,0.35)] group/btn";
   const activeButtonClass = "bg-[#ff4d4f] text-white hover:bg-[#ff4d4f]/90 border-[#ff4d4f] shadow-[0_20px_45px_rgba(255,77,79,0.45)]";
 
   return (
@@ -148,10 +152,15 @@ export function NothingPlayerControls({
       <div className="absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-black/90 via-black/50 to-transparent pointer-events-none" />
       <div className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none" />
 
-      <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 md:px-8 md:pb-8">
+      <div 
+        className="absolute bottom-0 left-0 right-0 px-4 pb-4 md:px-8 md:pb-8"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+      >
         {/* Progress Bar */}
         <div
-          className="relative h-1.5 bg-white/20 cursor-pointer mb-6 rounded-full overflow-visible hover:h-2 transition-all group touch-none"
+          className="relative h-1.5 bg-white/20 cursor-pointer mb-4 md:mb-6 rounded-full overflow-visible hover:h-2 transition-all group touch-none"
           onClick={handleSeekClick}
           onMouseMove={handleProgressHover}
           onMouseLeave={handleProgressLeave}
@@ -208,17 +217,17 @@ export function NothingPlayerControls({
           />
         </div>
 
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-3">
             <button onClick={onTogglePlay} className={buttonClass} data-testid="play-pause-button">
               {isPlaying ? <Pause size={20} className="text-[#0a0a0a]" /> : <Play size={20} className="ml-0.5 text-[#0a0a0a]" />}
             </button>
 
-            <button onClick={() => onSkip(-10)} className={buttonClass} data-testid="skip-back-button">
+            <button onClick={() => onSkip(-10)} className={`${buttonClass} hidden sm:flex`} data-testid="skip-back-button">
               <SkipBack size={18} className="text-[#0a0a0a]" />
             </button>
 
-            <button onClick={() => onSkip(10)} className={buttonClass} data-testid="skip-forward-button">
+            <button onClick={() => onSkip(10)} className={`${buttonClass} hidden sm:flex`} data-testid="skip-forward-button">
               <SkipForward size={18} className="text-[#0a0a0a]" />
             </button>
 
@@ -226,7 +235,7 @@ export function NothingPlayerControls({
               <button onClick={onToggleMute} className={buttonClass} data-testid="mute-button">
                 {isMuted || volume === 0 ? <VolumeX size={20} className="text-[#0a0a0a]" /> : <Volume2 size={20} className="text-[#0a0a0a]" />}
               </button>
-              <div className="w-0 overflow-hidden group-hover:w-24 transition-all duration-300 ease-out">
+              <div className="w-0 overflow-hidden group-hover:w-24 transition-all duration-300 ease-out hidden md:block">
                 <input
                   type="range"
                   min="0"
@@ -246,7 +255,7 @@ export function NothingPlayerControls({
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <div className="relative">
               <button
                 onClick={() => {

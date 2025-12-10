@@ -36,6 +36,7 @@ export function usePlayerGestures({
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const lastTapRef = useRef<{ time: number; x: number } | null>(null);
   const doubleTapTimerRef = useRef<number | null>(null);
+  const singleTapTimerRef = useRef<number | null>(null); // New ref for single tap delay
   const seekAccumulatorRef = useRef<number>(0);
   const isSwipingRef = useRef(false);
   const swipeDirectionRef = useRef<'vertical' | 'horizontal' | null>(null);
@@ -134,6 +135,13 @@ export function usePlayerGestures({
 
     if (isDoubleTap && zone !== 'center') {
       // Handle Double Tap (Seek)
+      
+      // Cancel any pending single tap action
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+        singleTapTimerRef.current = null;
+      }
+
       if (doubleTapTimerRef.current) {
         clearTimeout(doubleTapTimerRef.current);
       }
@@ -165,9 +173,15 @@ export function usePlayerGestures({
         setTimeout(() => setCenterAction(null), 600);
       } else {
         // Side Tap: Toggle UI
-        if (!doubleTapTimerRef.current) {
-             toggleControls();
+        // Delay to allow for double tap detection
+        if (singleTapTimerRef.current) {
+          clearTimeout(singleTapTimerRef.current);
         }
+        
+        singleTapTimerRef.current = window.setTimeout(() => {
+          toggleControls();
+          singleTapTimerRef.current = null;
+        }, 300);
       }
       
       lastTapRef.current = { time: now, x: touchEnd.clientX };
