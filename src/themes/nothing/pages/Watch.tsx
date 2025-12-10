@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { ArrowLeft, Play, Plus, Check, Clock3, Image as ImageIcon, Film } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { NothingVideoPlayer } from "../components/NothingVideoPlayer";
+import { NothingVideoPlayerV2 } from "../components/NothingVideoPlayerV2";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
@@ -67,6 +67,7 @@ export default function NothingWatch() {
 
   const [anime, setAnime] = useState<AnimeDetail | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [episodesWithProgress, setEpisodesWithProgress] = useState<Episode[]>([]);
   const [episodesLoading, setEpisodesLoading] = useState(true);
   const [videoSource, setVideoSource] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>("");
@@ -172,6 +173,26 @@ export default function NothingWatch() {
       }
     }
   }, [animeId, fetchEpisodes, fetchBroadcastInfo, navigate]);
+
+  // Merge episodes with progress data
+  useEffect(() => {
+    if (!animeProgress || episodes.length === 0) {
+      setEpisodesWithProgress(episodes);
+      return;
+    }
+
+    const merged = episodes.map((ep) => {
+      if (ep.id === animeProgress.episodeId) {
+        return {
+          ...ep,
+          currentTime: animeProgress.currentTime,
+          duration: animeProgress.duration,
+        };
+      }
+      return ep;
+    });
+    setEpisodesWithProgress(merged);
+  }, [episodes, animeProgress]);
 
   const handleToggleWatchlist = async () => {
     if (!isAuthenticated) {
@@ -410,13 +431,13 @@ export default function NothingWatch() {
           {/* Left: Video Player */}
           <div className="space-y-8">
             {videoSource && currentEpisodeData ? (
-              <NothingVideoPlayer
+              <NothingVideoPlayerV2
                 source={videoSource}
-                title={anime?.title || "Now Playing"}
-                episodeLabel={`Episode ${currentEpisodeData.number ?? "?"}`}
+                title={videoTitle}
                 tracks={videoTracks}
                 intro={videoIntro}
                 outro={videoOutro}
+                onClose={() => setVideoSource(null)}
                 resumeFrom={
                   animeProgress &&
                   currentEpisodeData &&
@@ -543,9 +564,9 @@ export default function NothingWatch() {
               <span className="text-xs font-mono text-black/30">{episodes.length} TOTAL</span>
             </div>
             
-            {episodes.length > 0 ? (
+            {episodesWithProgress.length > 0 ? (
               <div className="space-y-3">
-                {episodes.map((ep) => {
+                {episodesWithProgress.map((ep) => {
                   const progressPercentage =
                     ep.currentTime && ep.duration ? (ep.currentTime / ep.duration) * 100 : 0;
                   const isCurrentEpisode = currentEpisodeData?.id === ep.id;
