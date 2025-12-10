@@ -265,7 +265,7 @@ export function NothingPlayerControls({
                   <div className="max-h-[300px] overflow-y-auto py-2 custom-scrollbar">
                     <button
                       onClick={() => onChangeSubtitle(-1)}
-                      className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${currentSubtitle === -1 ? "text-[#ff4d4f]" : "text-white hover:bg-white/10"}`}
+                      className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${currentSubtitle === -1 ? "text-[#ff4d4f] bg-white/5" : "text-white/90 hover:bg-white/10 hover:text-white"}`}
                       data-testid="subtitle-off"
                     >
                       <span>Off</span>
@@ -275,7 +275,7 @@ export function NothingPlayerControls({
                       <button
                         key={subtitle.index}
                         onClick={() => onChangeSubtitle(subtitle.index)}
-                        className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${currentSubtitle === subtitle.index ? "text-[#ff4d4f]" : "text-white hover:bg-white/10"}`}
+                        className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${currentSubtitle === subtitle.index ? "text-[#ff4d4f] bg-white/5" : "text-white/90 hover:bg-white/10 hover:text-white"}`}
                         data-testid={`subtitle-${subtitle.language}`}
                       >
                         <span className="truncate pr-4">{subtitle.label}</span>
@@ -307,7 +307,7 @@ export function NothingPlayerControls({
                       <button
                         key={rate}
                         onClick={() => onChangePlaybackRate(rate)}
-                        className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${playbackRate === rate ? "text-[#ff4d4f]" : "text-white hover:bg-white/10"}`}
+                        className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-between ${playbackRate === rate ? "text-[#ff4d4f] bg-white/5" : "text-white/90 hover:bg-white/10 hover:text-white"}`}
                         data-testid={`playback-rate-${rate}`}
                       >
                         <span>{rate}x</span>
