@@ -33,6 +33,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
+  const clickTimeoutRef = useRef<number | null>(null);
   const hasRestoredProgress = useRef(false);
   const wakeLockRef = useRef<any>(null);
 
@@ -90,6 +91,15 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       releaseWakeLock();
     };
   }, [isFullscreen, isPlaying]);
+
+  // Cleanup click timeout
+  useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Load and parse thumbnail VTT file
   useEffect(() => {
@@ -403,52 +413,67 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       side = 'right';
     }
 
-    if (isDoubleTap && lastTapRef.current.side === side && side !== 'center') {
-      // Double tap on left or right - seek without showing controls
+    // Center Tap Logic
+    if (side === 'center') {
+      // Clear any pending side tap timeout
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
+
+      if (isPlaying) {
+        video.pause();
+        setShowControls(true);
+        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      } else {
+        video.play();
+        setShowControls(false);
+        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      }
+      
+      lastTapRef.current = { time: now, x: clickX, side };
+      return;
+    }
+
+    // Side Tap Logic
+    if (isDoubleTap && lastTapRef.current.side === side) {
+      // Double Tap detected - Cancel single tap action
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
+
       if (side === 'left') {
         skip(-10);
       } else if (side === 'right') {
         skip(10);
       }
-      lastTapRef.current = { time: 0, x: 0, side: null }; // Reset to prevent triple tap
-      return;
-    }
-
-    // Single tap behavior
-    if (isInCenter) {
-      // Center tap - toggle play and toggle controls
-      togglePlay();
-      if (showControls) {
-        setShowControls(false);
-        if (controlsTimeoutRef.current) {
-          clearTimeout(controlsTimeoutRef.current);
-        }
-      } else {
-        setShowControls(true);
-        if (isPlaying) {
-          controlsTimeoutRef.current = window.setTimeout(() => {
-            setShowControls(false);
-          }, 3000);
-        }
-      }
+      
+      // Reset to prevent triple tap
+      lastTapRef.current = { time: 0, x: 0, side: null };
     } else {
-      // Side tap - toggle controls visibility
-      if (showControls) {
-        setShowControls(false);
-        if (controlsTimeoutRef.current) {
-          clearTimeout(controlsTimeoutRef.current);
-        }
-      } else {
-        setShowControls(true);
-        if (isPlaying) {
-          controlsTimeoutRef.current = window.setTimeout(() => {
-            setShowControls(false);
-          }, 3000);
-        }
+      // Single Tap detected (Potential)
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
       }
-    }
 
-    lastTapRef.current = { time: now, x: clickX, side };
+      lastTapRef.current = { time: now, x: clickX, side };
+
+      clickTimeoutRef.current = window.setTimeout(() => {
+        if (showControls) {
+          setShowControls(false);
+          if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+        } else {
+          setShowControls(true);
+          if (isPlaying) {
+            controlsTimeoutRef.current = window.setTimeout(() => {
+              setShowControls(false);
+            }, 3000);
+          }
+        }
+        clickTimeoutRef.current = null;
+      }, 300);
+    }
   };
 
   const togglePlay = useCallback(() => {
