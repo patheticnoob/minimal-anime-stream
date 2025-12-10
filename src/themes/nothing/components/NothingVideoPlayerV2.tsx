@@ -337,27 +337,24 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   }, [onProgressUpdate]);
 
   useEffect(() => {
-    const resetControlsTimeout = () => {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
-      }
+    // Clear any existing timeout
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+      controlsTimeoutRef.current = null;
+    }
 
-      if (isPlaying) {
-        // Don't force show controls on play, just reset timeout if they are visible
-        if (showControls) {
-          controlsTimeoutRef.current = window.setTimeout(() => {
-            setShowControls(false);
-            controlsTimeoutRef.current = null;
-          }, CONTROL_VISIBILITY_DURATION);
-        }
-      }
-    };
-
-    resetControlsTimeout();
+    // Only set auto-hide timeout if controls are visible AND video is playing
+    if (showControls && isPlaying) {
+      controlsTimeoutRef.current = window.setTimeout(() => {
+        setShowControls(false);
+        controlsTimeoutRef.current = null;
+      }, CONTROL_VISIBILITY_DURATION);
+    }
 
     return () => {
       if (controlsTimeoutRef.current) {
         clearTimeout(controlsTimeoutRef.current);
+        controlsTimeoutRef.current = null;
       }
     };
   }, [isPlaying, showControls]);
