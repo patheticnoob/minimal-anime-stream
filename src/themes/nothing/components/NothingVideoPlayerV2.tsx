@@ -59,7 +59,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
-  const CONTROL_VISIBILITY_DURATION = 4000;
+  const CONTROL_VISIBILITY_DURATION = 3000;
 
   const updateControlsVisibility = useCallback(
     (nextVisible: boolean | ((prevVisible: boolean) => boolean)) => {
