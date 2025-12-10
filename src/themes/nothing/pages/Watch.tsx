@@ -429,7 +429,7 @@ export default function NothingWatch() {
       <main className="pt-28 md:pt-24 px-4 md:px-6 pb-10 max-w-[2000px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
           {/* Left: Video Player */}
-          <div className="space-y-8">
+          <div className="space-y-8 mt-8 md:mt-0">
             {videoSource && currentEpisodeData ? (
               <NothingVideoPlayerV2
                 source={videoSource}
@@ -605,11 +605,11 @@ export default function NothingWatch() {
                       </div>
 
                       {progressPercentage > 0 && (
-                        <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
-                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-transparent">
-                            <div 
-                              className="h-full bg-[#ff4d4f] rounded-full" 
-                              style={{ width: `${progressPercentage}%` }} 
+                        <div className="absolute inset-x-5 bottom-3 pointer-events-none">
+                          <div className="h-1 rounded-full bg-[#ff4d4f]/15 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-[#ff4d4f] transition-all"
+                              style={{ width: `${Math.min(progressPercentage, 100)}%` }}
                             />
                           </div>
                         </div>

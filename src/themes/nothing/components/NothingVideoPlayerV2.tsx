@@ -616,31 +616,42 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const video = videoRef.current;
     if (!video) return;
 
+    const normalize = (value?: string | null) => (value || "").trim().toLowerCase();
+
     const updateSubtitles = () => {
       const tracksList: Array<{ index: number; label: string; language: string }> = [];
+
       for (let i = 0; i < video.textTracks.length; i++) {
         const track = video.textTracks[i];
         if (track.kind === "metadata") continue;
-        
+
+        const label = track.label || track.language || `Track ${i + 1}`;
         tracksList.push({
           index: i,
-          label: track.label || track.language || `Track ${i + 1}`,
+          label,
           language: track.language || "",
         });
+
+        track.mode = "hidden";
       }
+
       setSubtitles(tracksList);
 
       let defaultTrackIndex = -1;
-      
+
       if (tracks && tracks.length > 0) {
-        const defaultTrack = tracks.find(t => t.default === true && t.kind !== "thumbnails");
+        const defaultTrack = tracks.find((t) => t.default === true && t.kind !== "thumbnails");
         if (defaultTrack) {
           for (let i = 0; i < video.textTracks.length; i++) {
             const track = video.textTracks[i];
             if (track.kind === "metadata") continue;
-            const trackLabel = (track.label || "").toLowerCase();
-            const apiLabel = (defaultTrack.label || "").toLowerCase();
-            if (trackLabel === apiLabel) {
+
+            const trackLabel = normalize(track.label);
+            const apiLabel = normalize(defaultTrack.label);
+            const trackLang = normalize(track.language);
+            const apiLang = normalize((defaultTrack as any).language);
+
+            if (trackLabel === apiLabel || (apiLang && trackLang && trackLang === apiLang)) {
               defaultTrackIndex = i;
               console.log("✅ Default subtitle track enabled from API:", defaultTrack.label);
               break;
@@ -648,14 +659,15 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           }
         }
       }
-      
+
       if (defaultTrackIndex === -1) {
         for (let i = 0; i < video.textTracks.length; i++) {
           const track = video.textTracks[i];
           if (track.kind === "metadata") continue;
-          const label = (track.label || "").toLowerCase();
-          const lang = (track.language || "").toLowerCase();
-          
+
+          const label = normalize(track.label);
+          const lang = normalize(track.language);
+
           if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
             defaultTrackIndex = i;
             console.log("✅ English subtitles enabled as fallback");
@@ -664,15 +676,30 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         }
       }
 
+      if (defaultTrackIndex === -1 && tracksList.length > 0) {
+        defaultTrackIndex = tracksList[0].index;
+      }
+
       if (defaultTrackIndex >= 0) {
         video.textTracks[defaultTrackIndex].mode = "showing";
         setCurrentSubtitle(defaultTrackIndex);
+      } else {
+        setCurrentSubtitle(-1);
       }
     };
 
+    const handleTrackChange = () => {
+      requestAnimationFrame(updateSubtitles);
+    };
+
     video.addEventListener("loadedmetadata", updateSubtitles);
+    video.textTracks.addEventListener?.("addtrack", handleTrackChange);
+    video.textTracks.addEventListener?.("removetrack", handleTrackChange);
+
     return () => {
       video.removeEventListener("loadedmetadata", updateSubtitles);
+      video.textTracks.removeEventListener?.("addtrack", handleTrackChange);
+      video.textTracks.removeEventListener?.("removetrack", handleTrackChange);
     };
   }, [tracks]);
 
