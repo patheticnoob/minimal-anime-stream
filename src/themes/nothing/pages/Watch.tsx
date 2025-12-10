@@ -426,7 +426,7 @@ export default function NothingWatch() {
       </header>
 
       {/* Main Content */}
-      <main className="pt-24 px-6 pb-10 max-w-[2000px] mx-auto">
+      <main className="pt-28 md:pt-24 px-4 md:px-6 pb-10 max-w-[2000px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
           {/* Left: Video Player */}
           <div className="space-y-8">
@@ -605,11 +605,13 @@ export default function NothingWatch() {
                       </div>
 
                       {progressPercentage > 0 && (
-                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/5 rounded-b-xl overflow-hidden">
-                          <div 
-                            className="h-full bg-[#ff4d4f]" 
-                            style={{ width: `${progressPercentage}%` }} 
-                          />
+                        <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
+                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-transparent">
+                            <div 
+                              className="h-full bg-[#ff4d4f] rounded-full" 
+                              style={{ width: `${progressPercentage}%` }} 
+                            />
+                          </div>
                         </div>
                       )}
                     </button>

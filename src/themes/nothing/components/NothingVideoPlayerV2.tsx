@@ -853,7 +853,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           <div className="absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-black/90 via-black/50 to-transparent pointer-events-none" />
           <div className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none" />
 
-          <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
+          <div className="absolute bottom-0 left-0 right-0 px-3 md:px-5 pb-3 md:pb-5">
             <div
               className="relative h-1.5 bg-white/20 cursor-pointer mb-4 rounded-full overflow-visible hover:h-2 transition-all group touch-none"
               onClick={handleSeek}
@@ -913,8 +913,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
               />
             </div>
 
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2 md:gap-3">
+              <div className="flex items-center gap-1.5 md:gap-2">
                 <button onClick={togglePlay} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="play-pause-button">
                   {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
                 </button>
@@ -948,7 +948,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 md:gap-2">
                 <div className="relative">
                   <button
                     onClick={() => {
