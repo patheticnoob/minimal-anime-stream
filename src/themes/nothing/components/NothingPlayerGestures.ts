@@ -1,4 +1,4 @@
-import { useState, useRef, type TouchEvent, type RefObject } from "react";
+import { useState, useRef, useEffect, type TouchEvent, type RefObject } from "react";
 
 interface UsePlayerGesturesProps {
   videoRef: RefObject<HTMLVideoElement | null>;
@@ -12,7 +12,12 @@ interface UsePlayerGesturesProps {
   brightness: number;
   setBrightness: (val: number) => void;
   toggleControls: (force?: boolean) => void;
+  areControlsVisible: boolean;
 }
+
+const DOUBLE_TAP_WINDOW = 450;
+const DOUBLE_TAP_DISTANCE = 100;
+const SINGLE_TAP_DELAY = 500;
 
 export function usePlayerGestures({
   videoRef,
@@ -26,6 +31,7 @@ export function usePlayerGestures({
   brightness,
   setBrightness,
   toggleControls,
+  areControlsVisible,
 }: UsePlayerGesturesProps) {
   // State for visual feedback
   const [doubleTapAction, setDoubleTapAction] = useState<{ side: 'left' | 'right'; seconds: number } | null>(null);
@@ -41,6 +47,11 @@ export function usePlayerGestures({
   const isSwipingRef = useRef(false);
   const swipeDirectionRef = useRef<'vertical' | 'horizontal' | null>(null);
   const initialValueRef = useRef<number>(0); // Stores initial volume/brightness on swipe start
+  const controlsVisibleRef = useRef(areControlsVisible);
+
+  useEffect(() => {
+    controlsVisibleRef.current = areControlsVisible;
+  }, [areControlsVisible]);
 
   const handleTouchStart = (e: TouchEvent) => {
     const touch = e.touches[0];
@@ -129,9 +140,9 @@ export function usePlayerGestures({
     else if (x > (width * 2) / 3) zone = 'right';
 
     // Check for Double Tap
-    const isDoubleTap = lastTapRef.current && 
-      (now - lastTapRef.current.time < 400) &&
-      Math.abs(touchEnd.clientX - lastTapRef.current.x) < 80; // Ensure taps are close
+    const isDoubleTap = lastTapRef.current &&
+      now - lastTapRef.current.time < DOUBLE_TAP_WINDOW &&
+      Math.abs(touchEnd.clientX - lastTapRef.current.x) < DOUBLE_TAP_DISTANCE;
 
     if (isDoubleTap && zone !== 'center') {
       // Handle Double Tap (Seek)
@@ -168,7 +179,7 @@ export function usePlayerGestures({
       if (zone === 'center') {
         // Center Tap: Play/Pause + Toggle UI
         togglePlay();
-        toggleControls();
+        toggleControls(controlsVisibleRef.current ? false : true);
         setCenterAction({ type: isPlaying ? 'pause' : 'play' });
         setTimeout(() => setCenterAction(null), 600);
       } else {
@@ -179,9 +190,9 @@ export function usePlayerGestures({
         }
         
         singleTapTimerRef.current = window.setTimeout(() => {
-          toggleControls();
+          toggleControls(controlsVisibleRef.current ? false : true);
           singleTapTimerRef.current = null;
-        }, 400);
+        }, SINGLE_TAP_DELAY);
       }
       
       lastTapRef.current = { time: now, x: touchEnd.clientX };

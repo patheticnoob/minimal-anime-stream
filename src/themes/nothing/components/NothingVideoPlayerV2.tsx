@@ -9,7 +9,7 @@ import { usePlayerGestures } from "./NothingPlayerGestures";
 interface NothingVideoPlayerV2Props {
   source: string;
   title: string;
-  tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
+  tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean; language?: string }>;
   intro?: { start: number; end: number } | null;
   outro?: { start: number; end: number } | null;
   headers?: Record<string, string> | null;
@@ -59,6 +59,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
+  const CONTROL_VISIBILITY_DURATION = 3000;
+
   const updateControlsVisibility = useCallback(
     (nextVisible: boolean | ((prevVisible: boolean) => boolean)) => {
       setShowControls((prevVisible) => {
@@ -76,7 +78,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           controlsTimeoutRef.current = window.setTimeout(() => {
             setShowControls(false);
             controlsTimeoutRef.current = null;
-          }, 3000);
+          }, CONTROL_VISIBILITY_DURATION);
         }
 
         return resolvedVisible;
@@ -344,7 +346,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         if (showControls) {
           controlsTimeoutRef.current = window.setTimeout(() => {
             setShowControls(false);
-          }, 3000);
+            controlsTimeoutRef.current = null;
+          }, CONTROL_VISIBILITY_DURATION);
         }
       }
     };
@@ -549,8 +552,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           label,
           language: track.language || "",
         });
-
-        track.mode = "hidden";
       }
 
       setSubtitles(tracksList);
@@ -598,12 +599,13 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         defaultTrackIndex = tracksList[0].index;
       }
 
-      if (defaultTrackIndex >= 0) {
-        video.textTracks[defaultTrackIndex].mode = "showing";
-        setCurrentSubtitle(defaultTrackIndex);
-      } else {
-        setCurrentSubtitle(-1);
+      for (let i = 0; i < video.textTracks.length; i++) {
+        const track = video.textTracks[i];
+        if (track.kind === "metadata") continue;
+        track.mode = i === defaultTrackIndex ? "showing" : "hidden";
       }
+
+      setCurrentSubtitle(defaultTrackIndex >= 0 ? defaultTrackIndex : -1);
     };
 
     const handleTrackChange = () => {
@@ -611,13 +613,17 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     };
 
     video.addEventListener("loadedmetadata", updateSubtitles);
+    video.addEventListener("loadeddata", updateSubtitles);
     video.textTracks.addEventListener?.("addtrack", handleTrackChange);
     video.textTracks.addEventListener?.("removetrack", handleTrackChange);
+    video.textTracks.addEventListener?.("change", handleTrackChange);
 
     return () => {
       video.removeEventListener("loadedmetadata", updateSubtitles);
+      video.removeEventListener("loadeddata", updateSubtitles);
       video.textTracks.removeEventListener?.("addtrack", handleTrackChange);
       video.textTracks.removeEventListener?.("removetrack", handleTrackChange);
+      video.textTracks.removeEventListener?.("change", handleTrackChange);
     };
   }, [tracks]);
 
@@ -633,7 +639,9 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     setVolume: handleVolumeChange,
     brightness,
     setBrightness,
-    toggleControls: (force) => updateControlsVisibility(force !== undefined ? force : (prev) => !prev),
+    toggleControls: (force) =>
+      updateControlsVisibility(force !== undefined ? force : (prev) => !prev),
+    areControlsVisible: showControls,
   });
 
   useEffect(() => {
@@ -725,8 +733,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
               kind={track.kind === "thumbnails" ? "metadata" : (track.kind || "subtitles")}
               src={track.file}
               label={track.label || "Unknown"}
-              srcLang={track.label?.slice(0, 2)?.toLowerCase() || "en"}
-              default={track.default || false}
+              srcLang={track.language?.toLowerCase() || track.label?.slice(0, 2)?.toLowerCase() || "en"}
+              default={track.default ?? (track.kind !== "thumbnails" && idx === 0)}
             />
           ))}
         </video>
