@@ -15,7 +15,7 @@ interface UsePlayerGesturesProps {
   areControlsVisible: boolean;
 }
 
-const DOUBLE_TAP_WINDOW = 450;
+const DOUBLE_TAP_WINDOW = 300;
 const DOUBLE_TAP_DISTANCE = 100;
 const SINGLE_TAP_DELAY = 300;
 

@@ -59,7 +59,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
-  const CONTROL_VISIBILITY_DURATION = 3000;
+  const CONTROL_VISIBILITY_DURATION = 4000;
 
   const updateControlsVisibility = useCallback(
     (nextVisible: boolean | ((prevVisible: boolean) => boolean)) => {
@@ -188,6 +188,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
             },
           });
 
+          hls.subtitleDisplay = true;
           hls.loadSource(source);
           hls.attachMedia(video);
 
@@ -368,33 +369,42 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const style = document.createElement('style');
     style.id = 'subtitle-position-style';
     
+    // Enhanced subtitle styles for better visibility
     const commonCueStyles = `
       video::cue {
-        background-color: rgba(0, 0, 0, 0.6) !important;
+        background-color: rgba(0, 0, 0, 0.75) !important;
         color: white !important;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.8) !important;
-        font-family: sans-serif !important;
-        font-weight: 500 !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.9) !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 1.1em !important;
+        line-height: 1.4 !important;
+        padding: 4px 8px !important;
+        border-radius: 4px !important;
       }
     `;
 
     if (showControls) {
       style.textContent = `
         video::-webkit-media-text-track-container {
-          transform: translateY(-120px) !important;
+          transform: translateY(-100px) !important;
+          transition: transform 0.3s ease-out !important;
         }
         video::cue {
-          transform: translateY(-120px) !important;
+          transform: translateY(-100px) !important;
+          transition: transform 0.3s ease-out !important;
         }
         ${commonCueStyles}
       `;
     } else {
       style.textContent = `
         video::-webkit-media-text-track-container {
-          transform: translateY(-60px) !important;
+          transform: translateY(-40px) !important;
+          transition: transform 0.3s ease-out !important;
         }
         video::cue {
-          transform: translateY(-60px) !important;
+          transform: translateY(-40px) !important;
+          transition: transform 0.3s ease-out !important;
         }
         ${commonCueStyles}
       `;
@@ -579,37 +589,23 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         }
       }
 
-      if (defaultTrackIndex === -1) {
-        for (let i = 0; i < video.textTracks.length; i++) {
-          const track = video.textTracks[i];
-          if (track.kind === "metadata") continue;
-
-          const label = normalize(track.label);
-          const lang = normalize(track.language);
-
-          if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
-            defaultTrackIndex = i;
-            console.log("✅ English subtitles enabled as fallback");
-            break;
-          }
-        }
-      }
-
       if (defaultTrackIndex === -1 && tracksList.length > 0) {
         defaultTrackIndex = tracksList[0].index;
         console.log("✅ First available subtitle track enabled as fallback");
       }
 
-      // Force enable the default track
-      for (let i = 0; i < video.textTracks.length; i++) {
-        const track = video.textTracks[i];
-        if (track.kind === "metadata") continue;
-        
-        if (i === defaultTrackIndex) {
-          track.mode = "showing";
-          console.log(`✅ Subtitle track ${i} (${track.label}) set to SHOWING`);
-        } else {
-          track.mode = "hidden";
+      // Force enable the default track and ensure others are hidden
+      if (video.textTracks && video.textTracks.length > 0) {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          const track = video.textTracks[i];
+          if (track.kind === "metadata") continue;
+          
+          if (i === defaultTrackIndex) {
+            track.mode = "showing";
+            console.log(`✅ Subtitle track ${i} (${track.label}) set to SHOWING`);
+          } else {
+            track.mode = "hidden";
+          }
         }
       }
 
@@ -619,9 +615,13 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       setTimeout(() => {
         if (defaultTrackIndex >= 0 && video.textTracks[defaultTrackIndex]) {
           video.textTracks[defaultTrackIndex].mode = "showing";
-          console.log(`🔄 Re-confirmed subtitle track ${defaultTrackIndex} is showing`);
+          // Also try setting it to hidden then showing to force refresh
+          // video.textTracks[defaultTrackIndex].mode = "hidden";
+          // setTimeout(() => {
+          //   video.textTracks[defaultTrackIndex].mode = "showing";
+          // }, 50);
         }
-      }, 100);
+      }, 500);
     };
 
     const handleTrackChange = () => {
