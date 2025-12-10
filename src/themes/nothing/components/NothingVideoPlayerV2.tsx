@@ -69,18 +69,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
             ? nextVisible(prevVisible)
             : nextVisible;
 
-        if (controlsTimeoutRef.current) {
-          clearTimeout(controlsTimeoutRef.current);
-          controlsTimeoutRef.current = null;
-        }
-
-        if (resolvedVisible) {
-          controlsTimeoutRef.current = window.setTimeout(() => {
-            setShowControls(false);
-            controlsTimeoutRef.current = null;
-          }, CONTROL_VISIBILITY_DURATION);
-        }
-
         return resolvedVisible;
       });
     },
