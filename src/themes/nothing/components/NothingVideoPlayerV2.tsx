@@ -739,7 +739,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     <AnimatePresence>
       <motion.div
         ref={containerRef}
-        className="fixed inset-0 z-[80] bg-black"
+        className="relative w-full aspect-video bg-black rounded-[32px] overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -748,27 +748,11 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         data-testid="video-player-container"
       >
         <motion.div
-          className="absolute top-4 right-4 z-[100]"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : -20 }}
-        >
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={onClose}
-            className="bg-black/50 hover:bg-black/70 text-white"
-            data-testid="close-button"
-          >
-            <X className="h-6 w-6" />
-          </Button>
-        </motion.div>
-
-        <motion.div
           className="absolute top-4 left-4 z-[90]"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : -20 }}
         >
-          <h2 className="text-white text-lg font-semibold bg-black/50 px-4 py-2 rounded">
+          <h2 className="text-white text-sm font-medium bg-black/80 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-white/10">
             {title}
           </h2>
         </motion.div>
@@ -809,7 +793,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
             >
               <Button
                 onClick={skipIntro}
-                className="bg-white/90 hover:bg-white text-black font-semibold px-6 py-2 rounded-md shadow-lg"
+                className="bg-white hover:bg-white/90 text-black font-bold px-6 py-3 rounded-xl shadow-2xl border-2 border-black/10"
               >
                 Skip Intro
               </Button>
@@ -827,14 +811,14 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
             >
               <Button
                 onClick={skipOutro}
-                className="bg-white/90 hover:bg-white text-black font-semibold px-6 py-2 rounded-md shadow-lg"
+                className="bg-white hover:bg-white/90 text-black font-bold px-6 py-3 rounded-xl shadow-2xl border-2 border-black/10"
               >
                 Skip Outro
               </Button>
               {onNext && nextTitle && (
                 <Button
                   onClick={onNext}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md shadow-lg"
+                  className="bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white font-bold px-6 py-3 rounded-xl shadow-2xl"
                 >
                   Next Episode
                 </Button>
@@ -866,8 +850,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           className={`absolute inset-0 z-10 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           data-testid="video-controls"
         >
-          <div className="absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-black/70 to-transparent pointer-events-none" />
-          <div className="absolute bottom-0 left-0 right-0 h-[180px] bg-gradient-to-t from-black/90 to-transparent pointer-events-none" />
+          <div className="absolute top-0 left-0 right-0 h-[150px] bg-gradient-to-b from-black/90 via-black/50 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-[200px] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none" />
 
           <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
             <div
@@ -921,30 +905,30 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                   </div>
                 </div>
               )}
-              <div className="absolute top-0 left-0 h-full bg-white/30 pointer-events-none" style={{ width: `${buffered}%` }} />
-              <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-sky-500 to-blue-600 pointer-events-none transition-all" style={{ width: `${(currentTime / duration) * 100}%` }} />
+              <div className="absolute top-0 left-0 h-full bg-white/20 pointer-events-none rounded-full" style={{ width: `${buffered}%` }} />
+              <div className="absolute top-0 left-0 h-full bg-[#ff4d4f] pointer-events-none transition-all rounded-full" style={{ width: `${(currentTime / duration) * 100}%` }} />
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity border-2 border-[#ff4d4f]"
                 style={{ left: `${(currentTime / duration) * 100}%`, transform: "translate(-50%, -50%)" }}
               />
             </div>
 
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <button onClick={togglePlay} className="text-white hover:bg-white/15 p-2 rounded transition-all hover:scale-110" data-testid="play-pause-button">
-                  {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+                <button onClick={togglePlay} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="play-pause-button">
+                  {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
                 </button>
 
-                <button onClick={() => skip(-10)} className="text-white hover:bg-white/15 p-2 rounded transition-all hover:scale-110" data-testid="skip-back-button">
+                <button onClick={() => skip(-10)} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="skip-back-button">
                   <SkipBack size={22} />
                 </button>
 
-                <button onClick={() => skip(10)} className="text-white hover:bg-white/15 p-2 rounded transition-all hover:scale-110" data-testid="skip-forward-button">
+                <button onClick={() => skip(10)} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="skip-forward-button">
                   <SkipForward size={22} />
                 </button>
 
                 <div className="flex items-center gap-2 relative group">
-                  <button onClick={toggleMute} className="text-white hover:bg-white/15 p-2 rounded transition-all hover:scale-110" data-testid="mute-button">
+                  <button onClick={toggleMute} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="mute-button">
                     {isMuted || volume === 0 ? <VolumeX size={22} /> : <Volume2 size={22} />}
                   </button>
                   <input
@@ -954,35 +938,35 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                     step="0.01"
                     value={isMuted ? 0 : volume}
                     onChange={handleVolumeChange}
-                    className="w-0 opacity-0 group-hover:w-20 group-hover:opacity-100 transition-all h-1 bg-white/30 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md"
+                    className="w-0 opacity-0 group-hover:w-20 group-hover:opacity-100 transition-all h-1.5 bg-white/30 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg"
                     data-testid="volume-slider"
                   />
                 </div>
 
-                <div className="text-white text-sm font-medium ml-2 select-none" data-testid="time-display">
+                <div className="text-white text-sm font-bold ml-2 select-none bg-black/40 px-3 py-1.5 rounded-lg backdrop-blur-sm" data-testid="time-display">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </div>
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <div className="relative">
                   <button
                     onClick={() => {
                       setShowSubtitles(!showSubtitles);
                       setShowSettings(false);
                     }}
-                    className={`text-white hover:bg-white/15 p-2 rounded transition-all hover:scale-110 ${currentSubtitle >= 0 ? "bg-blue-600/30 text-blue-400" : ""}`}
+                    className={`text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 ${currentSubtitle >= 0 ? "bg-[#ff4d4f] text-white" : "bg-white/10"}`}
                     data-testid="subtitles-button"
                   >
                     <Subtitles size={22} />
                   </button>
 
                   {showSubtitles && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-lg p-3 min-w-[200px] shadow-2xl border border-white/10" data-testid="subtitles-menu">
-                      <div className="text-white/60 text-xs font-semibold uppercase tracking-wide px-4 py-2">Subtitles</div>
+                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-2xl p-2 min-w-[200px] shadow-2xl border-2 border-white/20" data-testid="subtitles-menu">
+                      <div className="text-white/70 text-xs font-bold uppercase tracking-widest px-4 py-3 border-b border-white/10">Subtitles</div>
                       <button
                         onClick={() => changeSubtitle(-1)}
-                        className={`block w-full text-left px-4 py-2.5 text-white text-sm hover:bg-white/10 transition-colors ${currentSubtitle === -1 ? "bg-blue-600/20 text-blue-400" : ""}`}
+                        className={`block w-full text-left px-4 py-3 text-white text-sm font-medium hover:bg-white/10 transition-colors rounded-lg ${currentSubtitle === -1 ? "bg-[#ff4d4f] text-white" : ""}`}
                         data-testid="subtitle-off"
                       >
                         Off {currentSubtitle === -1 && "✓"}
@@ -991,7 +975,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                         <button
                           key={subtitle.index}
                           onClick={() => changeSubtitle(subtitle.index)}
-                          className={`block w-full text-left px-4 py-2.5 text-white text-sm hover:bg-white/10 transition-colors ${currentSubtitle === subtitle.index ? "bg-blue-600/20 text-blue-400" : ""}`}
+                          className={`block w-full text-left px-4 py-3 text-white text-sm font-medium hover:bg-white/10 transition-colors rounded-lg ${currentSubtitle === subtitle.index ? "bg-[#ff4d4f] text-white" : ""}`}
                           data-testid={`subtitle-${subtitle.language}`}
                         >
                           {subtitle.label} {currentSubtitle === subtitle.index && "✓"}
@@ -1007,20 +991,20 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                       setShowSettings(!showSettings);
                       setShowSubtitles(false);
                     }}
-                    className="text-white hover:bg-white/15 p-2 rounded transition-all hover:scale-110"
+                    className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10"
                     data-testid="settings-button"
                   >
                     <Settings size={22} />
                   </button>
 
                   {showSettings && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-lg p-3 min-w-[200px] shadow-2xl border border-white/10" data-testid="settings-menu">
-                      <div className="text-white/60 text-xs font-semibold uppercase tracking-wide px-4 py-2">Playback Speed</div>
+                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-2xl p-2 min-w-[200px] shadow-2xl border-2 border-white/20" data-testid="settings-menu">
+                      <div className="text-white/70 text-xs font-bold uppercase tracking-widest px-4 py-3 border-b border-white/10">Playback Speed</div>
                       {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
                         <button
                           key={rate}
                           onClick={() => changePlaybackRate(rate)}
-                          className={`block w-full text-left px-4 py-2.5 text-white text-sm hover:bg-white/10 transition-colors ${playbackRate === rate ? "bg-blue-600/20 text-blue-400" : ""}`}
+                          className={`block w-full text-left px-4 py-3 text-white text-sm font-medium hover:bg-white/10 transition-colors rounded-lg ${playbackRate === rate ? "bg-[#ff4d4f] text-white" : ""}`}
                           data-testid={`playback-rate-${rate}`}
                         >
                           {rate}x {playbackRate === rate && "✓"}
@@ -1030,7 +1014,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
                   )}
                 </div>
 
-                <button onClick={toggleFullscreen} className="text-white hover:bg-white/15 p-2 rounded transition-all hover:scale-110" data-testid="fullscreen-button">
+                <button onClick={toggleFullscreen} className="text-white hover:bg-white/20 p-2.5 rounded-xl transition-all hover:scale-110 bg-white/10" data-testid="fullscreen-button">
                   {isFullscreen ? <Minimize size={22} /> : <Maximize size={22} />}
                 </button>
               </div>
