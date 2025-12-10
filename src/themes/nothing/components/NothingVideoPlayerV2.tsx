@@ -597,15 +597,31 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
       if (defaultTrackIndex === -1 && tracksList.length > 0) {
         defaultTrackIndex = tracksList[0].index;
+        console.log("✅ First available subtitle track enabled as fallback");
       }
 
+      // Force enable the default track
       for (let i = 0; i < video.textTracks.length; i++) {
         const track = video.textTracks[i];
         if (track.kind === "metadata") continue;
-        track.mode = i === defaultTrackIndex ? "showing" : "hidden";
+        
+        if (i === defaultTrackIndex) {
+          track.mode = "showing";
+          console.log(`✅ Subtitle track ${i} (${track.label}) set to SHOWING`);
+        } else {
+          track.mode = "hidden";
+        }
       }
 
       setCurrentSubtitle(defaultTrackIndex >= 0 ? defaultTrackIndex : -1);
+      
+      // Double-check after a short delay to ensure subtitles are visible
+      setTimeout(() => {
+        if (defaultTrackIndex >= 0 && video.textTracks[defaultTrackIndex]) {
+          video.textTracks[defaultTrackIndex].mode = "showing";
+          console.log(`🔄 Re-confirmed subtitle track ${defaultTrackIndex} is showing`);
+        }
+      }, 100);
     };
 
     const handleTrackChange = () => {

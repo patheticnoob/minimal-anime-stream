@@ -17,7 +17,7 @@ interface UsePlayerGesturesProps {
 
 const DOUBLE_TAP_WINDOW = 450;
 const DOUBLE_TAP_DISTANCE = 100;
-const SINGLE_TAP_DELAY = 500;
+const SINGLE_TAP_DELAY = 300;
 
 export function usePlayerGestures({
   videoRef,
@@ -145,7 +145,7 @@ export function usePlayerGestures({
       Math.abs(touchEnd.clientX - lastTapRef.current.x) < DOUBLE_TAP_DISTANCE;
 
     if (isDoubleTap && zone !== 'center') {
-      // Handle Double Tap (Seek)
+      // Handle Double Tap (Seek) - DO NOT TOGGLE CONTROLS
       
       // Cancel any pending single tap action
       if (singleTapTimerRef.current) {
@@ -174,6 +174,7 @@ export function usePlayerGestures({
       }, 600); // Wait for more taps
 
       lastTapRef.current = null; // Reset tap tracking
+      // DO NOT call toggleControls here - double tap should not affect controls
     } else {
       // Handle Single Tap (Potential)
       if (zone === 'center') {
