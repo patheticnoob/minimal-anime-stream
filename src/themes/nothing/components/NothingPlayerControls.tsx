@@ -137,8 +137,8 @@ export function NothingPlayerControls({
     }
   };
 
-  const buttonClass = "text-white !text-white hover:bg-white/20 p-3 rounded-full transition-all hover:scale-105 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center w-12 h-12 shadow-lg group/btn";
-  const activeButtonClass = "bg-[#ff4d4f] !bg-[#ff4d4f] text-white !text-white hover:bg-[#ff4d4f]/90 border-[#ff4d4f] shadow-[#ff4d4f]/20";
+  const buttonClass = "text-[#0a0a0a] hover:text-black p-3 rounded-full transition-all hover:scale-105 bg-white/70 hover:bg-white/90 backdrop-blur-xl border border-white/80 flex items-center justify-center w-12 h-12 shadow-[0_15px_45px_rgba(0,0,0,0.35)] group/btn";
+  const activeButtonClass = "bg-[#ff4d4f] text-white hover:bg-[#ff4d4f]/90 border-[#ff4d4f] shadow-[0_20px_45px_rgba(255,77,79,0.45)]";
 
   return (
     <motion.div
@@ -211,20 +211,20 @@ export function NothingPlayerControls({
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button onClick={onTogglePlay} className={buttonClass} data-testid="play-pause-button">
-              {isPlaying ? <Pause size={20} className="fill-white text-white" /> : <Play size={20} className="ml-0.5 fill-white text-white" />}
+              {isPlaying ? <Pause size={20} className="text-[#0a0a0a]" /> : <Play size={20} className="ml-0.5 text-[#0a0a0a]" />}
             </button>
 
             <button onClick={() => onSkip(-10)} className={buttonClass} data-testid="skip-back-button">
-              <SkipBack size={18} className="text-white" />
+              <SkipBack size={18} className="text-[#0a0a0a]" />
             </button>
 
             <button onClick={() => onSkip(10)} className={buttonClass} data-testid="skip-forward-button">
-              <SkipForward size={18} className="text-white" />
+              <SkipForward size={18} className="text-[#0a0a0a]" />
             </button>
 
             <div className="flex items-center gap-3 relative group ml-2">
               <button onClick={onToggleMute} className={buttonClass} data-testid="mute-button">
-                {isMuted || volume === 0 ? <VolumeX size={20} className="text-white" /> : <Volume2 size={20} className="text-white" />}
+                {isMuted || volume === 0 ? <VolumeX size={20} className="text-[#0a0a0a]" /> : <Volume2 size={20} className="text-[#0a0a0a]" />}
               </button>
               <div className="w-0 overflow-hidden group-hover:w-24 transition-all duration-300 ease-out">
                 <input
@@ -240,9 +240,9 @@ export function NothingPlayerControls({
               </div>
             </div>
 
-            <div className="hidden md:flex flex-col justify-center ml-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 min-w-[100px]" data-testid="time-display">
+            <div className="hidden md:flex flex-col justify-center ml-2 px-4 py-2 rounded-xl bg-white/80 text-[#0a0a0a] backdrop-blur-xl border border-white min-w-[100px] shadow-[0_12px_35px_rgba(0,0,0,0.35)]" data-testid="time-display">
               <span className="text-[#ff4d4f] text-xs font-mono font-bold leading-none mb-1">{formatTime(currentTime)}</span>
-              <span className="text-white/60 text-[10px] font-mono font-medium leading-none">{formatTime(duration)}</span>
+              <span className="text-black/60 text-[10px] font-mono font-medium leading-none">{formatTime(duration)}</span>
             </div>
           </div>
 
@@ -256,7 +256,7 @@ export function NothingPlayerControls({
                 className={`${buttonClass} ${currentSubtitle >= 0 ? activeButtonClass : ""}`}
                 data-testid="subtitles-button"
               >
-                <Subtitles size={20} className={currentSubtitle >= 0 ? "text-white" : "text-white"} />
+                <Subtitles size={20} className={currentSubtitle >= 0 ? "text-white" : "text-[#0a0a0a]"} />
               </button>
 
               {showSubtitles && (
@@ -296,7 +296,7 @@ export function NothingPlayerControls({
                 className={buttonClass}
                 data-testid="settings-button"
               >
-                <Settings size={20} className="text-white" />
+                <Settings size={20} className="text-[#0a0a0a]" />
               </button>
 
               {showSettings && (
@@ -320,7 +320,7 @@ export function NothingPlayerControls({
             </div>
 
             <button onClick={onToggleFullscreen} className={buttonClass} data-testid="fullscreen-button">
-              {isFullscreen ? <Minimize size={20} className="text-white" /> : <Maximize size={20} className="text-white" />}
+              {isFullscreen ? <Minimize size={20} className="text-[#0a0a0a]" /> : <Maximize size={20} className="text-[#0a0a0a]" />}
             </button>
           </div>
         </div>
