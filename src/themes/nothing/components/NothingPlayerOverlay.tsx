@@ -36,7 +36,7 @@ export function NothingPlayerOverlay({
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: showControls ? 1 : 0, y: showControls ? 0 : -20 }}
       >
-        <h2 className="text-white text-xs md:text-sm font-bold tracking-[0.15em] uppercase bg-black/80 backdrop-blur-md px-6 py-3 rounded-full shadow-2xl border border-white/10 inline-block">
+        <h2 className="text-white !text-white text-xs md:text-sm font-bold tracking-[0.15em] uppercase bg-black/80 backdrop-blur-md px-6 py-3 rounded-full shadow-2xl border border-white/10 inline-block">
           {title}
         </h2>
       </motion.div>
