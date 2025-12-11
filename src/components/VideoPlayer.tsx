@@ -13,6 +13,7 @@ import {
   Loader2,
   Subtitles,
   X,
+  Cast,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { parseVTTThumbnails, findThumbnailForTime, type ThumbnailCue } from "@/lib/vttParser";
@@ -48,6 +49,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const controlsTimeoutRef = useRef<number | null>(null);
   const hasRestoredProgress = useRef(false);
   const wakeLockRef = useRef<any>(null);
+  const castSessionRef = useRef<any>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -70,6 +72,113 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isCasting, setIsCasting] = useState(false);
+  const [castAvailable, setCastAvailable] = useState(false);
+
+  // Initialize Google Cast
+  useEffect(() => {
+    const initializeCast = () => {
+      if (typeof window !== 'undefined' && (window as any).chrome?.cast) {
+        const cast = (window as any).chrome.cast;
+        const sessionRequest = new cast.SessionRequest(cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
+        const apiConfig = new cast.ApiConfig(
+          sessionRequest,
+          (session: any) => {
+            console.log('Cast session started');
+            castSessionRef.current = session;
+            setIsCasting(true);
+            loadMediaToCast(session);
+          },
+          (availability: string) => {
+            setCastAvailable(availability === 'available');
+          }
+        );
+        cast.initialize(apiConfig, () => {
+          console.log('Cast initialized');
+        }, (error: any) => {
+          console.error('Cast initialization error:', error);
+        });
+      }
+    };
+
+    if ((window as any).__onGCastApiAvailable) {
+      initializeCast();
+    } else {
+      (window as any).__onGCastApiAvailable = (isAvailable: boolean) => {
+        if (isAvailable) {
+          initializeCast();
+        }
+      };
+    }
+  }, []);
+
+  const loadMediaToCast = (session: any) => {
+    if (!session || !source) return;
+
+    const cast = (window as any).chrome.cast;
+    const mediaInfo = new cast.media.MediaInfo(source, 'application/x-mpegurl');
+    mediaInfo.metadata = new cast.media.GenericMediaMetadata();
+    mediaInfo.metadata.title = title;
+    
+    // Add subtitle tracks
+    if (tracks && tracks.length > 0) {
+      mediaInfo.tracks = tracks
+        .filter(t => t.kind !== 'thumbnails')
+        .map((track, idx) => {
+          const castTrack = new cast.media.Track(idx, cast.media.TrackType.TEXT);
+          castTrack.trackContentId = track.file;
+          castTrack.trackContentType = 'text/vtt';
+          castTrack.subtype = cast.media.TextTrackType.SUBTITLES;
+          castTrack.name = track.label;
+          castTrack.language = track.label?.slice(0, 2)?.toLowerCase() || 'en';
+          return castTrack;
+        });
+    }
+
+    const request = new cast.media.LoadRequest(mediaInfo);
+    request.currentTime = currentTime || 0;
+    request.autoplay = true;
+
+    session.loadMedia(request).then(
+      () => {
+        console.log('Media loaded to Cast');
+        if (videoRef.current) {
+          videoRef.current.pause();
+        }
+      },
+      (error: any) => {
+        console.error('Error loading media:', error);
+      }
+    );
+  };
+
+  const handleCastClick = () => {
+    if (isCasting && castSessionRef.current) {
+      castSessionRef.current.stop(() => {
+        setIsCasting(false);
+        castSessionRef.current = null;
+        if (videoRef.current) {
+          videoRef.current.play();
+        }
+      }, (error: any) => {
+        console.error('Error stopping cast:', error);
+      });
+    } else {
+      const cast = (window as any).chrome?.cast;
+      if (cast) {
+        cast.requestSession(
+          (session: any) => {
+            castSessionRef.current = session;
+            setIsCasting(true);
+            loadMediaToCast(session);
+          },
+          (error: any) => {
+            console.error('Error requesting cast session:', error);
+          }
+        );
+      }
+    }
+  };
 
   // Wake Lock API - Keep screen awake during fullscreen playback
   useEffect(() => {
@@ -119,7 +228,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     parseVTTThumbnails(thumbnailTrack.file)
       .then((cues) => {
         setThumbnailCues(cues);
-        // Preload the first sprite image
         if (cues.length > 0 && cues[0].url) {
           setThumbnailSprite(cues[0].url);
         }
@@ -135,7 +243,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     const video = videoRef.current;
     if (!video || !source) return;
 
-    // Reset the restored progress flag when source changes
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
 
@@ -144,16 +251,15 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         if (Hls.isSupported()) {
           const hls = new Hls({
             enableWorker: true,
-            lowLatencyMode: true, // Enable low latency for faster start
+            lowLatencyMode: true,
             backBufferLength: 60,
             maxBufferLength: 30,
             maxMaxBufferLength: 60,
-            startFragPrefetch: true, // Prefetch the first fragment
-            capLevelToPlayerSize: true, // Limit quality to player size to save bandwidth
+            startFragPrefetch: true,
+            capLevelToPlayerSize: true,
             xhrSetup: (xhr: XMLHttpRequest) => {
               if (!source.includes("/proxy?url=")) {
                 try {
-                  // Use dynamic headers from API response if available
                   if (headers) {
                     Object.entries(headers).forEach(([key, value]) => {
                       try {
@@ -163,7 +269,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                       }
                     });
                   } else {
-                    // Fallback to hardcoded Referer if no headers provided
                     xhr.setRequestHeader("Referer", "https://megacloud.blog/");
                   }
                 } catch (err) {
@@ -178,7 +283,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             setIsLoading(false);
-            // Resume from saved position
             if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
               console.log("📍 Resuming playback from:", resumeFrom, "seconds");
               video.currentTime = resumeFrom;
@@ -186,7 +290,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
             } else {
               console.log("▶️ Starting from beginning");
             }
-            // Autoplay
             video.play().catch((err) => {
               console.log("Autoplay prevented:", err);
             });
@@ -208,7 +311,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           video.src = source;
           video.addEventListener("loadedmetadata", () => {
             setIsLoading(false);
-            // Resume from saved position
             if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
               console.log("📍 Resuming playback from:", resumeFrom, "seconds");
               video.currentTime = resumeFrom;
@@ -216,7 +318,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
             } else {
               console.log("▶️ Starting from beginning");
             }
-            // Autoplay
             video.play().catch((err) => {
               console.log("Autoplay prevented:", err);
             });
@@ -226,13 +327,11 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     } else {
       video.src = source;
       video.addEventListener("loadedmetadata", () => {
-        // Resume from saved position
         if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
           video.currentTime = resumeFrom;
           hasRestoredProgress.current = true;
           console.log("Resuming from:", resumeFrom);
         }
-        // Autoplay
         video.play().catch((err) => {
           console.log("Autoplay prevented:", err);
         });
@@ -258,20 +357,17 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         setBuffered((bufferedEnd / video.duration) * 100);
       }
 
-      // Save progress every 10 seconds
       if (onProgressUpdate && video.currentTime - lastSavedTime >= 10) {
         onProgressUpdate(video.currentTime, video.duration);
         lastSavedTime = video.currentTime;
       }
 
-      // Show/hide skip intro button
       if (intro && video.currentTime >= intro.start && video.currentTime < intro.end) {
         setShowSkipIntro(true);
       } else {
         setShowSkipIntro(false);
       }
 
-      // Show/hide skip outro button
       if (outro && video.currentTime >= outro.start && video.currentTime < outro.end) {
         setShowSkipOutro(true);
       } else {
@@ -281,7 +377,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
 
     const handlePlay = () => {
       setIsPlaying(true);
-      // Save progress when playback starts
       if (onProgressUpdate && video.duration) {
         onProgressUpdate(video.currentTime, video.duration);
       }
@@ -289,14 +384,12 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
 
     const handlePause = () => {
       setIsPlaying(false);
-      // Save progress on pause
       if (onProgressUpdate && video.duration) {
         onProgressUpdate(video.currentTime, video.duration);
       }
     };
 
     const handleSeeked = () => {
-      // Save progress after seeking
       if (onProgressUpdate && video.duration) {
         onProgressUpdate(video.currentTime, video.duration);
       }
@@ -307,7 +400,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
 
     const handleLoadedMetadata = () => {
       updateProgress();
-      // Save initial progress when metadata loads (this ensures we have duration)
       if (onProgressUpdate && video.duration && video.duration > 0) {
         console.log("📊 Saving initial progress with duration:", video.duration);
         onProgressUpdate(video.currentTime, video.duration);
@@ -331,7 +423,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
       video.removeEventListener("canplay", handleCanPlay);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
-  }, [onProgressUpdate]);
+  }, [onProgressUpdate, intro, outro]);
 
   // Auto-hide controls
   useEffect(() => {
@@ -365,9 +457,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     const style = document.createElement('style');
     style.id = 'subtitle-position-style';
     
-    // Adjusted values to be less aggressive and ensure visibility
     if (showControls) {
-      // Move subtitles up when controls are visible
       style.textContent = `
         video::-webkit-media-text-track-container {
           transform: translateY(-80px) !important;
@@ -378,7 +468,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         }
       `;
     } else {
-      // Standard position
       style.textContent = `
         video::-webkit-media-text-track-container {
           transform: translateY(-20px) !important;
@@ -420,18 +509,15 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   // Enhanced video click handler for fullscreen mobile behavior
   const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
     if (!isFullscreen) {
-      // Normal behavior when not in fullscreen
       togglePlay();
       return;
     }
 
-    // In fullscreen: check if click is in center area
     const video = e.currentTarget;
     const rect = video.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
     
-    // Define center area as 40% of width and height
     const centerWidth = rect.width * 0.4;
     const centerHeight = rect.height * 0.4;
     const centerLeft = (rect.width - centerWidth) / 2;
@@ -444,11 +530,9 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
       clickY <= centerTop + centerHeight;
 
     if (isInCenter) {
-      // Center click: toggle play/pause
       togglePlay();
     }
     
-    // Always show controls on any click in fullscreen
     setShowControls(true);
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
@@ -494,7 +578,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     const pos = (clientX - rect.left) / rect.width;
     const hoverTime = pos * duration;
     
-    // Find the thumbnail for this time
     const thumbnail = findThumbnailForTime(thumbnailCues, hoverTime);
     
     if (thumbnail) {
@@ -529,7 +612,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging) return;
-    e.preventDefault(); // Prevent scrolling while dragging
+    e.preventDefault();
     handleProgressHover(e);
   };
 
@@ -539,7 +622,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
       setIsDragging(false);
       setThumbnailPreview(null);
       
-      // Restart auto-hide timer after drag ends
       if (isPlaying) {
         controlsTimeoutRef.current = window.setTimeout(() => {
           setShowControls(false);
@@ -644,16 +726,14 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     setShowSubtitles(false);
   };
 
-  // Load subtitle tracks and enable default track from API or fallback to English
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const updateSubtitles = () => {
-      const tracksList: Array<{ index: number; label: string; language: string }> = [];
+      const tracksList: Array<{ index: number; label: string; language: string }> = []
       for (let i = 0; i < video.textTracks.length; i++) {
         const track = video.textTracks[i];
-        // Skip thumbnail tracks from subtitle list
         if (track.kind === "metadata") continue;
         
         tracksList.push({
@@ -664,14 +744,11 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
       }
       setSubtitles(tracksList);
 
-      // Auto-enable default subtitle track from API
       let defaultTrackIndex = -1;
       
-      // First, check if any track was marked as default by the API
       if (tracks && tracks.length > 0) {
         const defaultTrack = tracks.find(t => t.default === true && t.kind !== "thumbnails");
         if (defaultTrack) {
-          // Find the corresponding video text track
           for (let i = 0; i < video.textTracks.length; i++) {
             const track = video.textTracks[i];
             if (track.kind === "metadata") continue;
@@ -686,7 +763,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         }
       }
       
-      // Fallback: Auto-enable English subtitles if no default was found
       if (defaultTrackIndex === -1) {
         for (let i = 0; i < video.textTracks.length; i++) {
           const track = video.textTracks[i];
@@ -694,7 +770,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           const label = (track.label || "").toLowerCase();
           const lang = (track.language || "").toLowerCase();
           
-          // Check if track is English
           if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
             defaultTrackIndex = i;
             console.log("✅ English subtitles enabled as fallback");
@@ -703,7 +778,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         }
       }
 
-      // Enable the selected default track
       if (defaultTrackIndex >= 0) {
         video.textTracks[defaultTrackIndex].mode = "showing";
         setCurrentSubtitle(defaultTrackIndex);
@@ -968,7 +1042,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                         }}
                       />
                     </div>
-                    {/* Arrow pointing down */}
                     <div 
                       className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white/20"
                     />
@@ -1020,6 +1093,17 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
               </div>
 
               <div className="flex items-center gap-1">
+                {castAvailable && (
+                  <button
+                    onClick={handleCastClick}
+                    className={`text-white hover:bg-white/15 p-2 rounded transition-all hover:scale-110 ${isCasting ? "bg-blue-600/30 text-blue-400" : ""}`}
+                    data-testid="cast-button"
+                    title="Cast to TV"
+                  >
+                    <Cast size={22} />
+                  </button>
+                )}
+
                 <div className="relative">
                   <button
                     onClick={() => {
