@@ -18,6 +18,12 @@ export function useAnimeLists() {
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
   
+  // Individual loading states for progressive loading
+  const [popularLoading, setPopularLoading] = useState(true);
+  const [airingLoading, setAiringLoading] = useState(true);
+  const [moviesLoading, setMoviesLoading] = useState(true);
+  const [tvShowsLoading, setTVShowsLoading] = useState(true);
+  
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<AnimeItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -35,51 +41,82 @@ export function useAnimeLists() {
   
   const [loadingMore, setLoadingMore] = useState<string | null>(null);
 
-  // Load all content on mount
+  // Load content progressively - each section loads independently
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
 
-    Promise.all([
-      fetchMostPopular({ page: 1 }),
-      fetchTopAiring({ page: 1 }),
-      fetchMovies({ page: 1 }),
-      fetchTVShows({ page: 1 }),
-    ])
-      .then(([popular, airing, movies, tvShows]) => {
+    // Load popular first (for hero banner)
+    fetchMostPopular({ page: 1 })
+      .then((popular) => {
         if (!mounted) return;
-        
         const popularData = popular as { results: AnimeItem[]; hasNextPage: boolean };
-        const airingData = airing as { results: AnimeItem[]; hasNextPage: boolean };
-        const moviesData = movies as { results: AnimeItem[]; hasNextPage: boolean };
-        const tvShowsData = tvShows as { results: AnimeItem[]; hasNextPage: boolean };
-
         setPopularItems(popularData.results || []);
-        setAiringItems(airingData.results || []);
-        setMovieItems(moviesData.results || []);
-        setTVShowItems(tvShowsData.results || []);
-        
         setPopularHasMore(popularData.hasNextPage || false);
-        setAiringHasMore(airingData.hasNextPage || false);
-        setMovieHasMore(moviesData.hasNextPage || false);
-        setTVShowHasMore(tvShowsData.hasNextPage || false);
-
-        // Combine popular and airing for hero rotation
-        const heroPool = [
-          ...(popularData.results || []).slice(0, 5),
-          ...(airingData.results || []).slice(0, 5),
-        ];
         
-        if (heroPool.length > 0) {
-          const randomIndex = Math.floor(Math.random() * heroPool.length);
-          setHeroAnime(heroPool[randomIndex]);
+        // Set hero from popular
+        if (popularData.results && popularData.results.length > 0) {
+          const randomIndex = Math.floor(Math.random() * Math.min(5, popularData.results.length));
+          setHeroAnime(popularData.results[randomIndex]);
         }
+        
+        setPopularLoading(false);
+        setLoading(false); // Allow page to render after popular loads
       })
       .catch((err) => {
-        const msg = err instanceof Error ? err.message : "Failed to load content";
+        if (!mounted) return;
+        const msg = err instanceof Error ? err.message : "Failed to load popular content";
         toast.error(msg);
+        setPopularLoading(false);
+        setLoading(false);
+      });
+
+    // Load airing independently
+    fetchTopAiring({ page: 1 })
+      .then((airing) => {
+        if (!mounted) return;
+        const airingData = airing as { results: AnimeItem[]; hasNextPage: boolean };
+        setAiringItems(airingData.results || []);
+        setAiringHasMore(airingData.hasNextPage || false);
+        setAiringLoading(false);
       })
-      .finally(() => mounted && setLoading(false));
+      .catch((err) => {
+        if (!mounted) return;
+        const msg = err instanceof Error ? err.message : "Failed to load airing content";
+        toast.error(msg);
+        setAiringLoading(false);
+      });
+
+    // Load movies independently
+    fetchMovies({ page: 1 })
+      .then((movies) => {
+        if (!mounted) return;
+        const moviesData = movies as { results: AnimeItem[]; hasNextPage: boolean };
+        setMovieItems(moviesData.results || []);
+        setMovieHasMore(moviesData.hasNextPage || false);
+        setMoviesLoading(false);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        const msg = err instanceof Error ? err.message : "Failed to load movies";
+        toast.error(msg);
+        setMoviesLoading(false);
+      });
+
+    // Load TV shows independently
+    fetchTVShows({ page: 1 })
+      .then((tvShows) => {
+        if (!mounted) return;
+        const tvShowsData = tvShows as { results: AnimeItem[]; hasNextPage: boolean };
+        setTVShowItems(tvShowsData.results || []);
+        setTVShowHasMore(tvShowsData.hasNextPage || false);
+        setTVShowsLoading(false);
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        const msg = err instanceof Error ? err.message : "Failed to load TV shows";
+        toast.error(msg);
+        setTVShowsLoading(false);
+      });
 
     return () => {
       mounted = false;
@@ -88,13 +125,9 @@ export function useAnimeLists() {
 
   // Auto-rotate hero banner
   useEffect(() => {
-    if (!heroAnime || popularItems.length === 0 || airingItems.length === 0) return;
+    if (!heroAnime || popularItems.length === 0) return;
 
-    const heroPool = [
-      ...popularItems.slice(0, 5),
-      ...airingItems.slice(0, 5),
-    ];
-
+    const heroPool = popularItems.slice(0, 5);
     if (heroPool.length === 0) return;
 
     const interval = setInterval(() => {
@@ -106,7 +139,7 @@ export function useAnimeLists() {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [heroAnime, popularItems, airingItems]);
+  }, [heroAnime, popularItems]);
 
   // Search handler
   useEffect(() => {
@@ -198,6 +231,10 @@ export function useAnimeLists() {
     movieItems,
     tvShowItems,
     heroAnime,
+    popularLoading,
+    airingLoading,
+    moviesLoading,
+    tvShowsLoading,
     query,
     setQuery,
     searchResults,

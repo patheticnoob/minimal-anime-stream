@@ -23,6 +23,9 @@ import { usePlayerLogic } from "@/hooks/use-player-logic";
 const VideoPlayer = lazy(() => import("@/components/VideoPlayer").then(m => ({ default: m.VideoPlayer })));
 const RetroVideoPlayer = lazy(() => import("@/components/RetroVideoPlayer").then(m => ({ default: m.RetroVideoPlayer })));
 
+// Track if this is the first load
+const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
+
 export default function Landing() {
   const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -33,6 +36,7 @@ export default function Landing() {
   const [activeSection, setActiveSection] = useState("home");
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
+  const [showInitialLoader, setShowInitialLoader] = useState(!hasLoadedBefore);
 
   // Use custom hooks for data and player logic
   const {
@@ -42,6 +46,10 @@ export default function Landing() {
     movieItems,
     tvShowItems,
     heroAnime,
+    popularLoading,
+    airingLoading,
+    moviesLoading,
+    tvShowsLoading,
     query,
     setQuery,
     searchResults,
@@ -82,6 +90,14 @@ export default function Landing() {
     api.watchlist.isInWatchlist,
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
+
+  // Hide initial loader after first content loads
+  useEffect(() => {
+    if (!loading && !hasLoadedBefore) {
+      sessionStorage.setItem('hasLoadedBefore', 'true');
+      setShowInitialLoader(false);
+    }
+  }, [loading]);
 
   const openAnime = (anime: AnimeItem) => {
     if (!anime?.dataId) {
@@ -228,7 +244,8 @@ export default function Landing() {
     sourceCategory: "watchlist" as const,
   }));
 
-  if (loading || authLoading) {
+  // Show initial loader only on first visit
+  if (showInitialLoader && (loading || authLoading)) {
     return (
       <FullscreenLoader
         label="Loading anime..."
@@ -342,6 +359,10 @@ export default function Landing() {
                   airingItems={airingItems}
                   movieItems={movieItems}
                   tvShowItems={tvShowItems}
+                  popularLoading={popularLoading}
+                  airingLoading={airingLoading}
+                  moviesLoading={moviesLoading}
+                  tvShowsLoading={tvShowsLoading}
                   onOpenAnime={openAnime}
                   onLoadMore={loadMoreItems}
                   loadingMore={loadingMore}
