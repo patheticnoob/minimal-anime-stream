@@ -3,6 +3,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { AnimeItem, Episode, AnimePlaybackInfo } from "@/shared/types";
+import { animeCache } from "@/lib/anime-cache";
 
 const normalizeEpisodeNumber = (value?: number | string | null) => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -37,16 +38,69 @@ export function usePlayerLogic(isAuthenticated: boolean) {
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
 
-  // Get progress for selected anime
   const animeProgress = useQuery(
     api.watchProgress.getProgress,
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
 
+  // Prefetch episode sources for faster playback
+  const prefetchEpisodeSources = useCallback(async (episodeId: string) => {
+    const cacheKey = `sources_${episodeId}`;
+    if (animeCache.has(cacheKey)) return;
+
+    try {
+      // Always use HD-2 server
+      const servers = await fetchServers({ episodeId });
+      const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
+      
+      const subServers = serverData.sub || [];
+      const hd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
+      
+      if (hd2Server) {
+        const sources = await fetchSources({ serverId: hd2Server.id });
+        animeCache.set(cacheKey, sources, 5); // Cache for 5 minutes
+      }
+    } catch (err) {
+      console.warn('Prefetch failed for episode:', episodeId, err);
+    }
+  }, [fetchServers, fetchSources]);
+
   useEffect(() => {
     if (!selected?.dataId) {
       setEpisodes([]);
       setEpisodesLoading(false);
+      return;
+    }
+
+    // Check cache first
+    const cacheKey = `episodes_${selected.dataId}`;
+    const cachedEpisodes = animeCache.get<Episode[]>(cacheKey);
+    
+    if (cachedEpisodes) {
+      const normalizedEpisodes = cachedEpisodes.map((ep) => ({
+        ...ep,
+        number: normalizeEpisodeNumber(ep.number),
+      }));
+      setEpisodes(normalizedEpisodes);
+      setEpisodesLoading(false);
+      
+      // Prefetch first episode or last watched episode
+      if (normalizedEpisodes.length > 0) {
+        const targetEpisode = animeProgress?.episodeId 
+          ? normalizedEpisodes.find(ep => ep.id === animeProgress.episodeId)
+          : normalizedEpisodes[0];
+        
+        if (targetEpisode) {
+          prefetchEpisodeSources(targetEpisode.id);
+          
+          // Also prefetch next episode
+          const targetIndex = normalizedEpisodes.findIndex(ep => ep.id === targetEpisode.id);
+          if (targetIndex !== -1 && normalizedEpisodes[targetIndex + 1]) {
+            prefetchEpisodeSources(normalizedEpisodes[targetIndex + 1].id);
+          }
+        }
+      }
+      
       return;
     }
 
@@ -62,6 +116,26 @@ export function usePlayerLogic(isAuthenticated: boolean) {
         }));
         setEpisodes(normalizedEpisodes);
         setCurrentEpisodeIndex(null);
+        
+        // Cache episodes
+        animeCache.set(cacheKey, eps, 10);
+        
+        // Prefetch first episode or last watched episode
+        if (normalizedEpisodes.length > 0) {
+          const targetEpisode = animeProgress?.episodeId 
+            ? normalizedEpisodes.find(ep => ep.id === animeProgress.episodeId)
+            : normalizedEpisodes[0];
+          
+          if (targetEpisode) {
+            prefetchEpisodeSources(targetEpisode.id);
+            
+            // Also prefetch next episode
+            const targetIndex = normalizedEpisodes.findIndex(ep => ep.id === targetEpisode.id);
+            if (targetIndex !== -1 && normalizedEpisodes[targetIndex + 1]) {
+              prefetchEpisodeSources(normalizedEpisodes[targetIndex + 1].id);
+            }
+          }
+        }
       })
       .catch((err) => {
         if (cancelled) return;
@@ -78,7 +152,7 @@ export function usePlayerLogic(isAuthenticated: boolean) {
     return () => {
       cancelled = true;
     };
-  }, [selected?.dataId, fetchEpisodes]);
+  }, [selected?.dataId, fetchEpisodes, animeProgress?.episodeId, prefetchEpisodeSources]);
 
   const playEpisode = async (episode: Episode) => {
     if (!isAuthenticated) {
@@ -109,21 +183,72 @@ export function usePlayerLogic(isAuthenticated: boolean) {
     setVideoOutro(null);
     setVideoHeaders(null);
 
-    toast("Loading video...");
+    // Check cache first
+    const cacheKey = `sources_${episode.id}`;
+    const cachedSources = animeCache.get<any>(cacheKey);
+    
+    if (cachedSources) {
+      // Use cached sources immediately
+      const sourcesData = cachedSources;
+      
+      if (sourcesData.sources && sourcesData.sources.length > 0) {
+        setVideoHeaders(sourcesData.headers || null);
+        const m3u8Source = sourcesData.sources.find((s: any) => s.file.includes(".m3u8"));
+        const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
+
+        const raw = import.meta.env.VITE_CONVEX_URL as string;
+        let base = raw;
+        try {
+          const u = new URL(raw);
+          const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
+          base = `${u.protocol}//${hostname}`;
+        } catch {
+          base = raw.replace("convex.cloud", "convex.site");
+        }
+        base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+
+        const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
+
+        const proxiedTracks = (sourcesData.tracks || []).map((t: any) => ({
+          ...t,
+          kind: t.kind || "subtitles",
+          file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+          default: t.default || false,
+        }));
+
+        setVideoSource(proxiedUrl);
+        setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
+        setVideoTracks(proxiedTracks);
+        setVideoIntro(sourcesData.intro || null);
+        setVideoOutro(sourcesData.outro || null);
+
+        const idx = episodes.findIndex((e) => e.id === episode.id);
+        if (idx !== -1) setCurrentEpisodeIndex(idx);
+
+        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+        
+        // Prefetch next episode
+        if (idx !== -1 && episodes[idx + 1]) {
+          prefetchEpisodeSources(episodes[idx + 1].id);
+        }
+        
+        return;
+      }
+    }
     
     try {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
       
       const subServers = serverData.sub || [];
-      const preferredServer = subServers.find(s => s.name === "HD-2") || subServers[0];
+      const hd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
       
-      if (!preferredServer) {
+      if (!hd2Server) {
         toast.error("No streaming servers available");
         return;
       }
 
-      const sources = await fetchSources({ serverId: preferredServer.id });
+      const sources = await fetchSources({ serverId: hd2Server.id });
       const sourcesData = sources as { 
         sources: Array<{ file: string; type: string }>;
         tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
@@ -131,6 +256,9 @@ export function usePlayerLogic(isAuthenticated: boolean) {
         outro?: { start: number; end: number };
         headers?: Record<string, string>;
       };
+      
+      // Cache the sources
+      animeCache.set(cacheKey, sourcesData, 5);
       
       if (sourcesData.sources && sourcesData.sources.length > 0) {
         setVideoHeaders(sourcesData.headers || null);
@@ -167,6 +295,11 @@ export function usePlayerLogic(isAuthenticated: boolean) {
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
         toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+        
+        // Prefetch next episode
+        if (idx !== -1 && episodes[idx + 1]) {
+          prefetchEpisodeSources(episodes[idx + 1].id);
+        }
       } else {
         toast.error("No video sources available");
       }

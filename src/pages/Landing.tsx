@@ -18,6 +18,7 @@ import { HomeSections } from "@/components/landing/HomeSections";
 import { AnimeItem } from "@/shared/types";
 import { useAnimeLists } from "@/hooks/use-anime-lists";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
+import { animeCache } from "@/lib/anime-cache";
 
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
@@ -105,7 +106,9 @@ export default function Landing() {
     }
 
     if (theme === "nothing") {
+      // Pass anime data through route state AND localStorage
       localStorage.setItem(`anime_${anime.dataId}`, JSON.stringify(anime));
+      
       navigate(`/watch/${anime.dataId}`);
       return;
     }
@@ -114,8 +117,9 @@ export default function Landing() {
     setLastSelectedAnime(anime);
   };
 
+  // Lazy load broadcast info after episodes are ready
   useEffect(() => {
-    if (!selected?.title) {
+    if (!selected?.title || episodesLoading) {
       setBroadcastInfo(null);
       setIsBroadcastLoading(false);
       return;
@@ -124,60 +128,64 @@ export default function Landing() {
     let cancelled = false;
     setIsBroadcastLoading(true);
 
-    fetchBroadcastInfo({ title: selected.title })
-      .then((result) => {
-        if (cancelled) return;
+    // Delay broadcast fetch to prioritize episode loading
+    const timeoutId = setTimeout(() => {
+      fetchBroadcastInfo({ title: selected.title! })
+        .then((result) => {
+          if (cancelled) return;
 
-        const status = result?.status ?? null;
-        if (status !== "airing" && status !== "upcoming") {
-          setBroadcastInfo(null);
-          return;
-        }
+          const status = result?.status ?? null;
+          if (status !== "airing" && status !== "upcoming") {
+            setBroadcastInfo(null);
+            return;
+          }
 
-        const broadcast = result?.broadcast;
-        if (!broadcast) {
-          setBroadcastInfo(null);
-          return;
-        }
+          const broadcast = result?.broadcast;
+          if (!broadcast) {
+            setBroadcastInfo(null);
+            return;
+          }
 
-        const parts: string[] = [];
-        if (broadcast.string) {
-          parts.push(broadcast.string);
-        } else {
-          if (broadcast.day) parts.push(broadcast.day);
-          if (broadcast.time) parts.push(broadcast.time);
-        }
+          const parts: string[] = [];
+          if (broadcast.string) {
+            parts.push(broadcast.string);
+          } else {
+            if (broadcast.day) parts.push(broadcast.day);
+            if (broadcast.time) parts.push(broadcast.time);
+          }
 
-        let summary = parts.join(" • ");
-        if (broadcast.timezone) {
-          summary = summary ? `${summary} (${broadcast.timezone})` : broadcast.timezone;
-        }
+          let summary = parts.join(" • ");
+          if (broadcast.timezone) {
+            summary = summary ? `${summary} (${broadcast.timezone})` : broadcast.timezone;
+          }
 
-        const info: BroadcastInfo = {
-          summary: summary || null,
-          day: broadcast.day ?? null,
-          time: broadcast.time ?? null,
-          timezone: broadcast.timezone ?? null,
-          status,
-        };
+          const info: BroadcastInfo = {
+            summary: summary || null,
+            day: broadcast.day ?? null,
+            time: broadcast.time ?? null,
+            timezone: broadcast.timezone ?? null,
+            status,
+          };
 
-        setBroadcastInfo(info.summary || info.day || info.time || info.timezone ? info : null);
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setBroadcastInfo(null);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsBroadcastLoading(false);
-        }
-      });
+          setBroadcastInfo(info.summary || info.day || info.time || info.timezone ? info : null);
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setBroadcastInfo(null);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setIsBroadcastLoading(false);
+          }
+        });
+    }, 500); // Delay by 500ms
 
     return () => {
       cancelled = true;
+      clearTimeout(timeoutId);
     };
-  }, [selected?.title, fetchBroadcastInfo]);
+  }, [selected?.title, episodesLoading, fetchBroadcastInfo]);
 
   const handleToggleWatchlist = async () => {
     if (!isAuthenticated) {
