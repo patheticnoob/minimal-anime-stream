@@ -1,13 +1,11 @@
 {
-  "results": [
+  "episodes": [
     {
-      "id": "one-piece-episode-1000",
-      "title": "One Piece",
-      "image": "https://...",
-      "type": "TV",
-      "sub": 1000,
-      "dub": 950
+      "id": "super-dragon-ball-heroes-9688$episode$10218",  // ← Episode ID format
+      "number": 1,
+      "title": "Bulma and Son Goku",
+      "is_subbed": true,
+      "is_dubbed": true
     }
-  ],
-  "hasNextPage": true
+  ]
 }

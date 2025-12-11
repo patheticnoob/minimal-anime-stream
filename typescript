@@ -1,15 +1,1 @@
-export async function fetchYumaRecentEpisodes(page: number = 1)
-{
-  let animeId = item.id;
-  if (typeof animeId === 'string' && animeId.includes('-episode-')) {
-    animeId = animeId.replace(/-episode-\d+$/, '');
-  }
-}
-
-const openAnime = (anime: AnimeItem) => {
-  if (!anime?.dataId) {
-    toast("This title has no episodes available.");
-    return;
-  }
-  // Uses anime.dataId to fetch episodes
-}
+fetchYumaRecentEpisodes(1)
