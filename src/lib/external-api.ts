@@ -4,28 +4,16 @@ export async function fetchYumaRecentEpisodes(page: number = 1): Promise<{ resul
   try {
     const response = await fetch(`https://yumaapi.vercel.app/recent-episodes?page=${page}`);
     if (!response.ok) {
-      // Silently fail or return empty
       return { results: [], hasNextPage: false };
     }
     const data = await response.json();
     
     const results = (data.results || []).map((item: any) => {
-      // Extract anime ID from new episode ID format (e.g. "dragon-ball-509$episode$10218" -> "dragon-ball-509")
-      let animeId = item.id;
-      if (typeof animeId === 'string') {
-        // Handle new format with $episode$ separator
-        if (animeId.includes('$episode$')) {
-          animeId = animeId.split('$episode$')[0];
-        }
-        // Fallback: handle old format with -episode- separator
-        else if (animeId.includes('-episode-')) {
-          animeId = animeId.replace(/-episode-\d+$/, '');
-        }
-      }
-
+      // The 'id' field from recent-episodes is already the correct anime ID
+      // No parsing needed - use it directly as dataId
       return {
         id: item.id,
-        dataId: animeId, // Use extracted ID for fetching anime details
+        dataId: item.id, // Use the ID directly without any parsing
         title: item.title,
         image: item.image,
         type: item.type,
