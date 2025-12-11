@@ -348,6 +348,14 @@ export default function NothingWatch() {
     setVideoIntro(null);
     setVideoOutro(null);
 
+    // Auto-scroll to video player after a short delay to allow rendering
+    setTimeout(() => {
+      const playerContainer = document.getElementById('video-player-container');
+      if (playerContainer) {
+        playerContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+
     // Check cache first
     const cacheKey = `sources_${episode.id}`;
     const cachedSources = animeCache.get<any>(cacheKey);
@@ -619,50 +627,8 @@ export default function NothingWatch() {
       {/* Main Content */}
       <main className="pt-28 md:pt-24 px-4 md:px-6 pb-10 max-w-[2000px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
-          {/* Left: Video Player */}
+          {/* Left: Anime Info and Video Player */}
           <div className="space-y-8 mt-8 md:mt-0">
-            {videoSource && currentEpisodeData ? (
-              <NothingVideoPlayerV2
-                source={videoSource}
-                title={videoTitle}
-                tracks={videoTracks}
-                intro={videoIntro}
-                outro={videoOutro}
-                onClose={() => setVideoSource(null)}
-                resumeFrom={
-                  animeProgress &&
-                  currentEpisodeData &&
-                  animeProgress.episodeId === currentEpisodeData.id &&
-                  animeProgress.currentTime > 0 &&
-                  animeProgress.duration > 0
-                    ? animeProgress.currentTime
-                    : 0
-                }
-                onProgressUpdate={handleProgressUpdate}
-                onNext={() => {
-                  if (currentEpisodeIndex === null) return;
-                  const next = episodes[currentEpisodeIndex + 1];
-                  if (next) playEpisode(next);
-                }}
-                nextTitle={
-                  currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
-                    ? `${anime?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
-                    : undefined
-                }
-              />
-            ) : (
-              <div className="nothing-player-shell aspect-video flex items-center justify-center bg-white rounded-[32px] border border-black/5 relative overflow-hidden shadow-sm">
-                <div className="absolute inset-0 bg-[url('/assets/noise.png')] opacity-5 pointer-events-none"></div>
-                <div className="nothing-player-empty text-center z-10">
-                  <div className="nothing-player-icon mb-6 inline-flex p-6 rounded-full bg-black/5 border border-black/5">
-                    <ImageIcon className="h-12 w-12 text-black/20" />
-                  </div>
-                  <p className="text-[#ff4d4f] text-xs tracking-[0.4em] uppercase font-bold mb-2">Select Content</p>
-                  <p className="text-[#050814] text-2xl font-bold tracking-tight">Choose an episode to start</p>
-                </div>
-              </div>
-            )}
-
             {/* Anime Info */}
             <div className="bg-white border border-black/5 rounded-[24px] p-8 relative overflow-hidden shadow-sm">
               <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
@@ -746,6 +712,40 @@ export default function NothingWatch() {
                 </div>
               </div>
             </div>
+
+            {/* Video Player - Only shown when episode is playing */}
+            {videoSource && currentEpisodeData && (
+              <div id="video-player-container">
+                <NothingVideoPlayerV2
+                  source={videoSource}
+                  title={videoTitle}
+                  tracks={videoTracks}
+                  intro={videoIntro}
+                  outro={videoOutro}
+                  onClose={() => setVideoSource(null)}
+                  resumeFrom={
+                    animeProgress &&
+                    currentEpisodeData &&
+                    animeProgress.episodeId === currentEpisodeData.id &&
+                    animeProgress.currentTime > 0 &&
+                    animeProgress.duration > 0
+                      ? animeProgress.currentTime
+                      : 0
+                  }
+                  onProgressUpdate={handleProgressUpdate}
+                  onNext={() => {
+                    if (currentEpisodeIndex === null) return;
+                    const next = episodes[currentEpisodeIndex + 1];
+                    if (next) playEpisode(next);
+                  }}
+                  nextTitle={
+                    currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
+                      ? `${anime?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
+                      : undefined
+                  }
+                />
+              </div>
+            )}
           </div>
 
           {/* Right: Episode List */}
