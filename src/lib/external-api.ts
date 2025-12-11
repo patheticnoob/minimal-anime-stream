@@ -9,8 +9,8 @@ export async function fetchYumaRecentEpisodes(page: number = 1): Promise<{ resul
     const data = await response.json();
     
     const results = (data.results || []).map((item: any) => {
-      // The 'id' field from recent-episodes is already the correct anime ID
-      // No parsing needed - use it directly as dataId
+      // The 'id' field from recent-episodes is the correct anime ID
+      // Use it directly as dataId for fetching episodes via hianime
       return {
         id: item.id,
         dataId: item.id, // Use the ID directly without any parsing
