@@ -1,104 +1,15 @@
-import { ThemedLanding, ThemedAuth, ThemedWatchHistory, ThemedWatch } from "@/shared/components/ThemeRouter";
-import "./types/global.d.ts";
+export async function fetchYumaRecentEpisodes(page: number = 1)
+{
+  let animeId = item.id;
+  if (typeof animeId === 'string' && animeId.includes('-episode-')) {
+    animeId = animeId.replace(/-episode-\d+$/, '');
+  }
+}
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-
-const DOUBLE_TAP_WINDOW = 300;
-const DOUBLE_TAP_DISTANCE = 100;
-const SINGLE_TAP_DELAY = 300;
-
-const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
-const [isDragging, setIsDragging] = useState(false);
-
-const CONTROL_VISIBILITY_DURATION = 4000;
-
-const updateControlsVisibility = useCallback(
-  (isPlaying: boolean, isMuted: boolean, isFullscreen: boolean) => {
-    const controls = document.querySelector(".video-controls");
-    if (!controls) return;
-
-    const isControlVisible = controls.classList.contains("visible");
-    const isControlHidden = controls.classList.contains("hidden");
-
-    if (isControlVisible && !isPlaying) {
-      controls.classList.add("hidden");
-      controls.classList.remove("visible");
-    } else if (isControlHidden && isPlaying) {
-      controls.classList.add("visible");
-      controls.classList.remove("hidden");
-    }
-  },
-  []
-);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const style = document.createElement('style');
-    style.id = 'subtitle-position-style';
-    
-    // Enhanced subtitle styles for better visibility
-    const commonCueStyles = `
-      video::cue {
-        background-color: rgba(0, 0, 0, 0.75) !important;
-        color: white !important;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.9) !important;
-        font-family: system-ui, -apple-system, sans-serif !important;
-        font-weight: 600 !important;
-        font-size: 1.1em !important;
-        line-height: 1.4 !important;
-        padding: 4px 8px !important;
-        border-radius: 4px !important;
-      }
-    `;
-
-    if (showControls) {
-      style.textContent = `
-        video::-webkit-media-text-track-container {
-          transform: translateY(-100px) !important;
-          transition: transform 0.3s ease-out !important;
-        }
-        video::cue {
-          transform: translateY(-100px) !important;
-          transition: transform 0.3s ease-out !important;
-        }
-        ${commonCueStyles}
-      `;
-    } else {
-      style.textContent = `
-        video::-webkit-media-text-track-container {
-          transform: translateY(-40px) !important;
-          transition: transform 0.3s ease-out !important;
-        }
-        video::cue {
-          transform: translateY(-40px) !important;
-          transition: transform 0.3s ease-out !important;
-        }
-        ${commonCueStyles}
-      `;
-    }
-
-    const existingStyle = document.getElementById('subtitle-position-style');
-    if (existingStyle) {
-      existingStyle.remove();
-    }
-    document.head.appendChild(style);
-
-    return () => {
-      if (style.parentNode) {
-        style.parentNode.removeChild(style);
-      }
-    };
-  }, [showControls]);
-
-      <motion.div
-        ref={containerRef}
-        className="relative w-full aspect-video bg-black rounded-[32px] overflow-hidden group select-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onMouseMove={handleMouseMove}
-        data-testid="video-player-container"
-        {...gestureHandlers}
-      >
+const openAnime = (anime: AnimeItem) => {
+  if (!anime?.dataId) {
+    toast("This title has no episodes available.");
+    return;
+  }
+  // Uses anime.dataId to fetch episodes
+}

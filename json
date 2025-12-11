@@ -1,3 +1,13 @@
 {
-  "plan": "1. Verify the fix for the type error in NothingPlayerGestures.ts.\n2. Ensure NothingVideoPlayerV2.tsx compiles correctly.\n3. If successful, the gesture controls (single tap, double tap, swipe) should be fully functional."
+  "results": [
+    {
+      "id": "one-piece-episode-1000",
+      "title": "One Piece",
+      "image": "https://...",
+      "type": "TV",
+      "sub": 1000,
+      "dub": 950
+    }
+  ],
+  "hasNextPage": true
 }
