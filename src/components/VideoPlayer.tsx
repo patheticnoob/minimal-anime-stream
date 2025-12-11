@@ -50,7 +50,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const controlsTimeoutRef = useRef<number | null>(null);
   const hasRestoredProgress = useRef(false);
   const wakeLockRef = useRef<any>(null);
-
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
