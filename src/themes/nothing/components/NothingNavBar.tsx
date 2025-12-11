@@ -40,7 +40,7 @@ export function NothingNavBar({
 
             <span className="hidden sm:block h-8 w-px bg-black/10" />
 
-            <div className="flex-1 flex items-center gap-2 sm:gap-4 overflow-x-auto">
+            <div className="flex-1 flex items-center gap-2 sm:gap-4 overflow-x-auto scrollbar-hide">
               {navItems.map((item) => (
                 <button
                   key={item.id}

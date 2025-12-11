@@ -112,7 +112,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
       </div>
       
       <div className="px-0.5">
-        <h3 className={`font-medium text-sm ${theme === "nothing" ? "text-[#0a0f1f]" : "text-gray-100"} line-clamp-1 ${theme === "nothing" ? "group-hover:text-[#ff3b3b]" : "group-hover:text-[#1977F3]"} transition-colors`}>
+        <h3 className={`font-medium text-sm ${theme === "nothing" ? "text-[#0a0f1f]" : "text-gray-100"} line-clamp-2 ${theme === "nothing" ? "group-hover:text-[#ff3b3b]" : "group-hover:text-[#1977F3]"} transition-colors leading-tight min-h-[2.5rem]`}>
           {anime.title ?? "Untitled"}
         </h3>
         
