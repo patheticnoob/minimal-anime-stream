@@ -18,6 +18,7 @@ import { HomeSections } from "@/components/landing/HomeSections";
 import { AnimeItem } from "@/shared/types";
 import { useAnimeLists } from "@/hooks/use-anime-lists";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
+
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 

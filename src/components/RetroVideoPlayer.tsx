@@ -138,7 +138,7 @@ export function RetroVideoPlayer({
         video.play().catch(() => {});
       });
     }
-  }, [source]);
+  }, [source, resumeFrom]);
 
   useEffect(() => {
     if (tracks && tracks.length > 0) {
@@ -472,8 +472,6 @@ export function RetroVideoPlayer({
         onMouseMove={handleMouseMove}
         onMouseLeave={() => isPlaying && setShowControls(false)}
       >
-
-        {/* Close Button */}
         <motion.div
           className="absolute top-4 right-4 z-[100]"
           initial={{ opacity: 0, y: -20 }}
@@ -489,7 +487,6 @@ export function RetroVideoPlayer({
           </Button>
         </motion.div>
 
-        {/* Title */}
         <motion.div
           className="absolute top-4 left-4 z-[90]"
           initial={{ opacity: 0, y: -20 }}
@@ -524,7 +521,6 @@ export function RetroVideoPlayer({
           })}
         </video>
 
-        {/* Loading Spinner */}
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center z-20">
             <Loader2 className="h-16 w-16 animate-spin text-[#FF69B4]" style={{
@@ -533,7 +529,6 @@ export function RetroVideoPlayer({
           </div>
         )}
 
-        {/* Skip Buttons */}
         <AnimatePresence>
           {showSkipIntro && (
             <motion.div
@@ -578,7 +573,6 @@ export function RetroVideoPlayer({
           )}
         </AnimatePresence>
 
-        {/* Center Play/Pause */}
         <AnimatePresence>
           {showControls && !isPlaying && (
             <motion.div
@@ -600,12 +594,10 @@ export function RetroVideoPlayer({
           )}
         </AnimatePresence>
 
-        {/* Controls Overlay */}
         <motion.div
           className={`absolute inset-0 z-10 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <div className="absolute bottom-0 left-0 right-0 bg-black/90 border-t-2 border-[#FF69B4]">
-            {/* Progress Bar */}
             <div
               className="relative h-2 bg-[#1a1a2e] cursor-pointer border-b-2 border-[#FF69B4]/30"
               onClick={handleSeek}
@@ -617,7 +609,6 @@ export function RetroVideoPlayer({
               }} />
             </div>
 
-            {/* Control Buttons */}
             <div className="flex items-center justify-between gap-3 px-4 py-3">
               <div className="flex items-center gap-2">
                 <button 
