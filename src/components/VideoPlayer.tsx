@@ -1024,25 +1024,29 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                   </button>
 
                   {showSubtitles && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-lg p-3 min-w-[200px] shadow-2xl border border-white/10" data-testid="subtitles-menu">
-                      <div className="text-white/60 text-xs font-semibold uppercase tracking-wide px-4 py-2">Subtitles</div>
-                      <button
-                        onClick={() => changeSubtitle(-1)}
-                        className={`block w-full text-left px-4 py-2.5 text-white text-sm hover:bg-white/10 transition-colors ${currentSubtitle === -1 ? "bg-blue-600/20 text-blue-400" : ""}`}
-                        data-testid="subtitle-off"
-                      >
-                        Off {currentSubtitle === -1 && "✓"}
-                      </button>
-                      {subtitles.map((subtitle) => (
+                    <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-xl rounded-xl p-2 min-w-[220px] max-w-[280px] shadow-2xl border border-white/10" data-testid="subtitles-menu">
+                      <div className="text-white/50 text-[10px] font-bold uppercase tracking-widest px-3 py-2 border-b border-white/5">Subtitles</div>
+                      <div className="max-h-[280px] overflow-y-auto py-1">
                         <button
-                          key={subtitle.index}
-                          onClick={() => changeSubtitle(subtitle.index)}
-                          className={`block w-full text-left px-4 py-2.5 text-white text-sm hover:bg-white/10 transition-colors ${currentSubtitle === subtitle.index ? "bg-blue-600/20 text-blue-400" : ""}`}
-                          data-testid={`subtitle-${subtitle.language}`}
+                          onClick={() => changeSubtitle(-1)}
+                          className={`flex items-center justify-between w-full text-left px-3 py-2.5 text-white text-sm rounded-lg hover:bg-white/10 transition-all ${currentSubtitle === -1 ? "bg-blue-600/30 text-blue-400 font-semibold" : ""}`}
+                          data-testid="subtitle-off"
                         >
-                          {subtitle.label} {currentSubtitle === subtitle.index && "✓"}
+                          <span>Off</span>
+                          {currentSubtitle === -1 && <span className="text-blue-400 text-lg">✓</span>}
                         </button>
-                      ))}
+                        {subtitles.map((subtitle) => (
+                          <button
+                            key={subtitle.index}
+                            onClick={() => changeSubtitle(subtitle.index)}
+                            className={`flex items-center justify-between w-full text-left px-3 py-2.5 text-white text-sm rounded-lg hover:bg-white/10 transition-all ${currentSubtitle === subtitle.index ? "bg-blue-600/30 text-blue-400 font-semibold" : ""}`}
+                            data-testid={`subtitle-${subtitle.language}`}
+                          >
+                            <span className="truncate">{subtitle.label}</span>
+                            {currentSubtitle === subtitle.index && <span className="text-blue-400 text-lg ml-2">✓</span>}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>

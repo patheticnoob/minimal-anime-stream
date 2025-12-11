@@ -515,20 +515,27 @@ export function NothingVideoPlayer({
                 <Captions className="h-5 w-5" />
               </button>
               {showSubtitleMenu && (
-                <div className="nothing-dropdown absolute bottom-full right-0 mb-3">
-                  <button onClick={() => changeSubtitle(-1)} className="nothing-dropdown-item">
-                    {currentSubtitle === -1 ? "✓ " : ""}Off
-                  </button>
-                  {subtitles.map((track) => (
-                    <button
-                      key={track.index}
-                      onClick={() => changeSubtitle(track.index)}
-                      className="nothing-dropdown-item"
+                <div className="absolute bottom-full right-0 mb-3 bg-white/95 backdrop-blur-xl rounded-2xl p-2 min-w-[220px] max-w-[280px] shadow-2xl border border-black/10">
+                  <div className="text-black/40 text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-2 border-b border-black/5">Subtitles</div>
+                  <div className="max-h-[280px] overflow-y-auto py-1">
+                    <button 
+                      onClick={() => changeSubtitle(-1)} 
+                      className={`flex items-center justify-between w-full text-left px-3 py-2.5 text-sm rounded-xl hover:bg-black/5 transition-all ${currentSubtitle === -1 ? "bg-[#ff4d4f]/10 text-[#ff4d4f] font-semibold" : "text-[#050814]"}`}
                     >
-                      {currentSubtitle === track.index ? "✓ " : ""}
-                      {track.label}
+                      <span>Off</span>
+                      {currentSubtitle === -1 && <span className="text-[#ff4d4f] text-lg">✓</span>}
                     </button>
-                  ))}
+                    {subtitles.map((track) => (
+                      <button
+                        key={track.index}
+                        onClick={() => changeSubtitle(track.index)}
+                        className={`flex items-center justify-between w-full text-left px-3 py-2.5 text-sm rounded-xl hover:bg-black/5 transition-all ${currentSubtitle === track.index ? "bg-[#ff4d4f]/10 text-[#ff4d4f] font-semibold" : "text-[#050814]"}`}
+                      >
+                        <span className="truncate">{track.label}</span>
+                        {currentSubtitle === track.index && <span className="text-[#ff4d4f] text-lg ml-2">✓</span>}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
