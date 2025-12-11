@@ -1,1 +1,1 @@
-curl "https://yumaapi.vercel.app/info/awkward-senpai-19918"
+npx convex dev --once && npx tsc -b --noEmit
