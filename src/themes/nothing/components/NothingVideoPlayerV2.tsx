@@ -418,12 +418,17 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const video = videoRef.current;
     if (!video) return;
 
-    if (isPlaying) {
-      video.pause();
+    if (video.paused) {
+      video.play().catch((err) => {
+        // Ignore abort errors which happen when pausing quickly after playing
+        if (err.name !== "AbortError") {
+          console.error("Play error:", err);
+        }
+      });
     } else {
-      video.play();
+      video.pause();
     }
-  }, [isPlaying]);
+  }, []);
 
   const handleSeek = (newTime: number) => {
     const video = videoRef.current;
