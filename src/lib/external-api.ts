@@ -10,11 +10,17 @@ export async function fetchYumaRecentEpisodes(page: number = 1): Promise<{ resul
     const data = await response.json();
     
     const results = (data.results || []).map((item: any) => {
-      // Attempt to extract anime ID from episode ID (e.g. "one-piece-episode-100" -> "one-piece")
-      // This fixes the issue where clicking a recent episode failed to load the anime details
+      // Extract anime ID from new episode ID format (e.g. "dragon-ball-509$episode$10218" -> "dragon-ball-509")
       let animeId = item.id;
-      if (typeof animeId === 'string' && animeId.includes('-episode-')) {
-        animeId = animeId.replace(/-episode-\d+$/, '');
+      if (typeof animeId === 'string') {
+        // Handle new format with $episode$ separator
+        if (animeId.includes('$episode$')) {
+          animeId = animeId.split('$episode$')[0];
+        }
+        // Fallback: handle old format with -episode- separator
+        else if (animeId.includes('-episode-')) {
+          animeId = animeId.replace(/-episode-\d+$/, '');
+        }
       }
 
       return {
