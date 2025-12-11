@@ -427,6 +427,14 @@ export default function NothingWatch() {
 
       {/* Main Content */}
       <main className="pt-28 md:pt-24 px-4 md:px-6 pb-10 max-w-[2000px] mx-auto">
+        {episodesLoading && (
+          <div className="flex items-center justify-center py-20">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 border-4 border-[#ff4d4f]/20 border-t-[#ff4d4f] rounded-full animate-spin" />
+              <p className="text-sm text-black/40 tracking-wider uppercase">Loading episodes...</p>
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
           {/* Left: Video Player */}
           <div className="space-y-8 mt-8 md:mt-0">
