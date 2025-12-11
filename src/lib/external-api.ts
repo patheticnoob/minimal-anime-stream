@@ -9,18 +9,27 @@ export async function fetchYumaRecentEpisodes(page: number = 1): Promise<{ resul
     }
     const data = await response.json();
     
-    const results = (data.results || []).map((item: any) => ({
-      id: item.id,
-      dataId: item.id, // Yuma IDs usually match the slug needed
-      title: item.title,
-      image: item.image,
-      type: item.type,
-      language: {
-        sub: item.sub ? String(item.sub) : null,
-        dub: item.dub ? String(item.dub) : null,
-      },
-      sourceCategory: "recentEpisodes" as const,
-    }));
+    const results = (data.results || []).map((item: any) => {
+      // Attempt to extract anime ID from episode ID (e.g. "one-piece-episode-100" -> "one-piece")
+      // This fixes the issue where clicking a recent episode failed to load the anime details
+      let animeId = item.id;
+      if (typeof animeId === 'string' && animeId.includes('-episode-')) {
+        animeId = animeId.replace(/-episode-\d+$/, '');
+      }
+
+      return {
+        id: item.id,
+        dataId: animeId, // Use extracted ID for fetching anime details
+        title: item.title,
+        image: item.image,
+        type: item.type,
+        language: {
+          sub: item.sub ? String(item.sub) : null,
+          dub: item.dub ? String(item.dub) : null,
+        },
+        sourceCategory: "recentEpisodes" as const,
+      };
+    });
 
     return {
       results,

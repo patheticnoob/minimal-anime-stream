@@ -61,6 +61,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps)
             alt={anime.title ?? "Anime"}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-600 bg-gray-900">

@@ -144,10 +144,12 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         if (Hls.isSupported()) {
           const hls = new Hls({
             enableWorker: true,
-            lowLatencyMode: false,
+            lowLatencyMode: true, // Enable low latency for faster start
             backBufferLength: 60,
             maxBufferLength: 30,
             maxMaxBufferLength: 60,
+            startFragPrefetch: true, // Prefetch the first fragment
+            capLevelToPlayerSize: true, // Limit quality to player size to save bandwidth
             xhrSetup: (xhr: XMLHttpRequest) => {
               if (!source.includes("/proxy?url=")) {
                 try {
@@ -363,24 +365,27 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     const style = document.createElement('style');
     style.id = 'subtitle-position-style';
     
+    // Adjusted values to be less aggressive and ensure visibility
     if (showControls) {
       // Move subtitles up when controls are visible
       style.textContent = `
         video::-webkit-media-text-track-container {
-          transform: translateY(-120px) !important;
+          transform: translateY(-80px) !important;
         }
         video::cue {
-          transform: translateY(-120px) !important;
+          transform: translateY(-80px) !important;
+          background-color: rgba(0, 0, 0, 0.7) !important;
         }
       `;
     } else {
-      // Add bottom padding when controls are hidden
+      // Standard position
       style.textContent = `
         video::-webkit-media-text-track-container {
-          transform: translateY(-60px) !important;
+          transform: translateY(-20px) !important;
         }
         video::cue {
-          transform: translateY(-60px) !important;
+          transform: translateY(-20px) !important;
+          background-color: rgba(0, 0, 0, 0.5) !important;
         }
       `;
     }
