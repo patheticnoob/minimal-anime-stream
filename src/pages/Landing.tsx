@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -18,10 +18,8 @@ import { HomeSections } from "@/components/landing/HomeSections";
 import { AnimeItem } from "@/shared/types";
 import { useAnimeLists } from "@/hooks/use-anime-lists";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
-
-// Lazy load players
-const VideoPlayer = lazy(() => import("@/components/VideoPlayer").then(m => ({ default: m.VideoPlayer })));
-const RetroVideoPlayer = lazy(() => import("@/components/RetroVideoPlayer").then(m => ({ default: m.RetroVideoPlayer })));
+import { VideoPlayer } from "@/components/VideoPlayer";
+import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 
 // Track if this is the first load
 const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
@@ -402,7 +400,7 @@ export default function Landing() {
       />
 
       {videoSource && currentEpisodeData && (
-        <Suspense fallback={<FullscreenLoader label="Loading Player..." />}>
+        <>
           {theme === "retro" ? (
             <RetroVideoPlayer
               source={videoSource}
@@ -447,7 +445,7 @@ export default function Landing() {
               nextTitle={nextEpisodeTitle}
             />
           )}
-        </Suspense>
+        </>
       )}
     </div>
   );
