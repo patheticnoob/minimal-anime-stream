@@ -106,9 +106,10 @@ export default function Landing() {
     }
 
     if (theme === "nothing") {
-      // Pass anime data through route state AND localStorage
+      // Pass anime data through localStorage
       localStorage.setItem(`anime_${anime.dataId}`, JSON.stringify(anime));
       
+      // Navigate immediately - Watch page will use cached data or fetch
       navigate(`/watch/${anime.dataId}`);
       return;
     }

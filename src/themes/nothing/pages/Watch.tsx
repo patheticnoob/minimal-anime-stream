@@ -112,7 +112,7 @@ export default function NothingWatch() {
       }
     }
 
-    // Check cache first
+    // Check cache first - this eliminates redundant fetching
     const cacheKey = `episodes_${animeId}`;
     const cachedEpisodes = animeCache.get<Episode[]>(cacheKey);
     
@@ -124,13 +124,13 @@ export default function NothingWatch() {
       setEpisodes(normalizedEpisodes);
       setEpisodesLoading(false);
       
-      // Prefetch first or last watched episode
+      // Prefetch first or last watched episode immediately
       if (normalizedEpisodes.length > 0 && storedAnime) {
         const animeData = JSON.parse(storedAnime);
         prefetchEpisodeSources(normalizedEpisodes, animeData);
       }
       
-      // Lazy load broadcast info after episodes are ready
+      // Lazy load broadcast info after episodes are ready (non-critical)
       if (storedAnime) {
         const animeData = JSON.parse(storedAnime);
         if (animeData.title) {
@@ -140,9 +140,10 @@ export default function NothingWatch() {
         }
       }
       
-      return;
+      return; // Exit early - no need to fetch
     }
 
+    // Only fetch if not in cache
     setEpisodesLoading(true);
     fetchEpisodes({ dataId: animeId })
       .then((eps) => {
@@ -152,7 +153,7 @@ export default function NothingWatch() {
         }));
         setEpisodes(normalizedEpisodes);
         
-        // Cache episodes
+        // Cache episodes for 10 minutes
         animeCache.set(cacheKey, eps, 10);
         
         // Prefetch first or last watched episode
@@ -167,7 +168,7 @@ export default function NothingWatch() {
       })
       .finally(() => setEpisodesLoading(false));
 
-    // Lazy load broadcast info after episodes are ready
+    // Lazy load broadcast info (non-critical data)
     if (storedAnime) {
       const animeData = JSON.parse(storedAnime);
       if (animeData.title) {
@@ -575,9 +576,7 @@ export default function NothingWatch() {
     broadcastInfo?.status === "airing" || broadcastInfo?.status === "upcoming";
   const shouldShowBroadcast = isBroadcastLoading || isBroadcastActive;
 
-  if (episodesLoading) {
-    return <FullscreenLoader label="Loading anime..." subLabel="Fetching episodes" />;
-  }
+  // Removed fullscreen loader - show page immediately with inline loading states
 
   return (
     <div data-theme="nothing" className="min-h-screen bg-[#F5F7FB] text-[#050814]">
