@@ -17,126 +17,6 @@ import { Button } from "@/components/ui/button";
 import { useCast } from "@/hooks/use-cast";
 
 interface RetroVideoPlayerProps {
->>>>>>> REPLACE
-<<<<<<< SEARCH
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const hlsRef = useRef<any>(null);
-  const controlsTimeoutRef = useRef<number | null>(null);
-  const hasRestoredProgress = useRef(false);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [buffered, setBuffered] = useState(0);
-  const [showSkipIntro, setShowSkipIntro] = useState(false);
-  const [showSkipOutro, setShowSkipOutro] = useState(false);
-  const [selectedSubtitle, setSelectedSubtitle] = useState("off");
-
-  // Initialize HLS
-=======
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const hlsRef = useRef<any>(null);
-  const controlsTimeoutRef = useRef<number | null>(null);
-  const hasRestoredProgress = useRef(false);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [buffered, setBuffered] = useState(0);
-  const [showSkipIntro, setShowSkipIntro] = useState(false);
-  const [showSkipOutro, setShowSkipOutro] = useState(false);
-  const [selectedSubtitle, setSelectedSubtitle] = useState("off");
-
-  const { isCasting, castAvailable, handleCastClick } = useCast(source, title, tracks);
-
-  // Pause video when casting starts
-  useEffect(() => {
-    if (isCasting && videoRef.current) {
-      videoRef.current.pause();
-    }
-  }, [isCasting]);
-
-  // Initialize HLS
->>>>>>> REPLACE
-<<<<<<< SEARCH
-              <div className="flex items-center gap-1">
-                {tracks && tracks.length > 0 && (
-                  <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
-                    <span>Subs</span>
-                    <select
-                      value={selectedSubtitle}
-                      onChange={handleSubtitleChange}
-                      className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
-                    >
-                      <option value="off">Off</option>
-                      {tracks.map((track, idx) => {
-                        const label = getTrackLabel(track, idx);
-                        return (
-                          <option key={`${label}-${idx}`} value={label}>
-                            {label}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </div>
-                )}
-                <button
-                  onClick={toggleFullscreen}
-                  className="text-[#FF69B4] hover:text-[#FF1493] p-2 transition-colors border-2 border-[#FF69B4] bg-black/50 hover:bg-black"
-                >
-                  {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-                </button>
-              </div>
-=======
-              <div className="flex items-center gap-1">
-                {castAvailable && (
-                  <button
-                    onClick={handleCastClick}
-                    className={`text-[#FF69B4] hover:text-[#FF1493] p-2 transition-colors border-2 border-[#FF69B4] bg-black/50 hover:bg-black ${isCasting ? "bg-[#FF69B4]/20" : ""}`}
-                    title="Cast to TV"
-                  >
-                    <Cast size={18} />
-                  </button>
-                )}
-                {tracks && tracks.length > 0 && (
-                  <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
-                    <span>Subs</span>
-                    <select
-                      value={selectedSubtitle}
-                      onChange={handleSubtitleChange}
-                      className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
-                    >
-                      <option value="off">Off</option>
-                      {tracks.map((track, idx) => {
-                        const label = getTrackLabel(track, idx);
-                        return (
-                          <option key={`${label}-${idx}`} value={label}>
-                            {label}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </div>
-                )}
-                <button
-                  onClick={toggleFullscreen}
-                  className="text-[#FF69B4] hover:text-[#FF1493] p-2 transition-colors border-2 border-[#FF69B4] bg-black/50 hover:bg-black"
-                >
-                  {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-                </button>
-              </div>
   source: string;
   title: string;
   tracks?: Array<{ file: string; label?: string; kind?: string }>;
@@ -179,6 +59,15 @@ export function RetroVideoPlayer({
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showSkipOutro, setShowSkipOutro] = useState(false);
   const [selectedSubtitle, setSelectedSubtitle] = useState("off");
+
+  const { isCasting, castAvailable, handleCastClick } = useCast(source, title, tracks);
+
+  // Pause video when casting starts
+  useEffect(() => {
+    if (isCasting && videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [isCasting]);
 
   // Initialize HLS
   useEffect(() => {
@@ -776,6 +665,15 @@ export function RetroVideoPlayer({
               </div>
 
               <div className="flex items-center gap-1">
+                {castAvailable && (
+                  <button
+                    onClick={handleCastClick}
+                    className={`text-[#FF69B4] hover:text-[#FF1493] p-2 transition-colors border-2 border-[#FF69B4] bg-black/50 hover:bg-black ${isCasting ? "bg-[#FF69B4]/20" : ""}`}
+                    title="Cast to TV"
+                  >
+                    <Cast size={18} />
+                  </button>
+                )}
                 {tracks && tracks.length > 0 && (
                   <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
                     <span>Subs</span>

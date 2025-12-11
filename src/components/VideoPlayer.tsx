@@ -20,145 +20,30 @@ import { parseVTTThumbnails, findThumbnailForTime, type ThumbnailCue } from "@/l
 import { useCast } from "@/hooks/use-cast";
 
 interface VideoPlayerProps {
->>>>>>> REPLACE
-<<<<<<< SEARCH
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const hlsRef = useRef<any>(null);
-  const controlsTimeoutRef = useRef<number | null>(null);
-  const hasRestoredProgress = useRef(false);
-  const wakeLockRef = useRef<any>(null);
-  const castSessionRef = useRef<any>(null);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [resumeTime, setResumeTime] = useState<number | null>(null);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showSubtitles, setShowSubtitles] = useState(false);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [subtitles, setSubtitles] = useState<Array<{ index: number; label: string; language: string }>>([]);
-  const [currentSubtitle, setCurrentSubtitle] = useState(-1);
-  const [buffered, setBuffered] = useState(0);
-  const [showSkipIntro, setShowSkipIntro] = useState(false);
-  const [showSkipOutro, setShowSkipOutro] = useState(false);
-  const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number } | null>(null);
-  const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
-  const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isCasting, setIsCasting] = useState(false);
-  const [castAvailable, setCastAvailable] = useState(false);
-
-  // Initialize Google Cast
-  useEffect(() => {
-    const initializeCast = () => {
-      if (typeof window !== 'undefined' && (window as any).chrome?.cast) {
-        const cast = (window as any).chrome.cast;
-        const sessionRequest = new cast.SessionRequest(cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
-        const apiConfig = new cast.ApiConfig(
-          sessionRequest,
-          (session: any) => {
-            console.log('Cast session started');
-            castSessionRef.current = session;
-            setIsCasting(true);
-            loadMediaToCast(session);
-          },
-          (availability: string) => {
-            setCastAvailable(availability === 'available');
-          }
-        );
-        cast.initialize(apiConfig, () => {
-          console.log('Cast initialized');
-        }, (error: any) => {
-          console.error('Cast initialization error:', error);
-        });
-      }
-    };
-
-    if ((window as any).__onGCastApiAvailable) {
-      initializeCast();
-    } else {
-      (window as any).__onGCastApiAvailable = (isAvailable: boolean) => {
-        if (isAvailable) {
-          initializeCast();
-        }
-      };
-    }
-  }, []);
-
-  const loadMediaToCast = (session: any) => {
-    if (!session || !source) return;
-
-    const cast = (window as any).chrome.cast;
-    const mediaInfo = new cast.media.MediaInfo(source, 'application/x-mpegurl');
-    mediaInfo.metadata = new cast.media.GenericMediaMetadata();
-    mediaInfo.metadata.title = title;
-    
-    // Add subtitle tracks
-    if (tracks && tracks.length > 0) {
-      mediaInfo.tracks = tracks
-        .filter(t => t.kind !== 'thumbnails')
-        .map((track, idx) => {
-          const castTrack = new cast.media.Track(idx, cast.media.TrackType.TEXT);
-          castTrack.trackContentId = track.file;
-          castTrack.trackContentType = 'text/vtt';
-          castTrack.subtype = cast.media.TextTrackType.SUBTITLES;
-          castTrack.name = track.label;
-          castTrack.language = track.label?.slice(0, 2)?.toLowerCase() || 'en';
-          return castTrack;
-        });
-    }
-
-    const request = new cast.media.LoadRequest(mediaInfo);
-    request.currentTime = currentTime || 0;
-    request.autoplay = true;
-
-    session.loadMedia(request).then(
-      () => {
-        console.log('Media loaded to Cast');
-        if (videoRef.current) {
-          videoRef.current.pause();
-        }
-      },
-      (error: any) => {
-        console.error('Error loading media:', error);
-      }
-    );
+  source: string;
+  title: string;
+  tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
+  intro?: { start: number; end: number } | null;
+  outro?: { start: number; end: number } | null;
+  headers?: Record<string, string> | null;
+  onClose: () => void;
+  onNext?: () => void;
+  nextTitle?: string;
+  info?: {
+    title?: string;
+    image?: string;
+    description?: string;
+    type?: string;
+    language?: { sub?: string | null; dub?: string | null };
   };
+  episodes?: Array<{ id: string; title?: string; number?: number }>;
+  currentEpisode?: number;
+  onSelectEpisode?: (ep: { id: string; title?: string; number?: number }) => void;
+  onProgressUpdate?: (currentTime: number, duration: number) => void;
+  resumeFrom?: number;
+}
 
-  const handleCastClick = () => {
-    if (isCasting && castSessionRef.current) {
-      castSessionRef.current.stop(() => {
-        setIsCasting(false);
-        castSessionRef.current = null;
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      }, (error: any) => {
-        console.error('Error stopping cast:', error);
-      });
-    } else {
-      const cast = (window as any).chrome?.cast;
-      if (cast) {
-        cast.requestSession(
-          (session: any) => {
-            castSessionRef.current = session;
-            setIsCasting(true);
-            loadMediaToCast(session);
-          },
-          (error: any) => {
-            console.error('Error requesting cast session:', error);
-          }
-        );
-      }
-    }
-  };
-=======
+export function VideoPlayer({ source, title, tracks, intro, outro, headers, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onNext, nextTitle }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -196,166 +81,6 @@ interface VideoPlayerProps {
       videoRef.current.pause();
     }
   }, [isCasting]);
-  source: string;
-  title: string;
-  tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
-  intro?: { start: number; end: number } | null;
-  outro?: { start: number; end: number } | null;
-  headers?: Record<string, string> | null;
-  onClose: () => void;
-  onNext?: () => void;
-  nextTitle?: string;
-  info?: {
-    title?: string;
-    image?: string;
-    description?: string;
-    type?: string;
-    language?: { sub?: string | null; dub?: string | null };
-  };
-  episodes?: Array<{ id: string; title?: string; number?: number }>;
-  currentEpisode?: number;
-  onSelectEpisode?: (ep: { id: string; title?: string; number?: number }) => void;
-  onProgressUpdate?: (currentTime: number, duration: number) => void;
-  resumeFrom?: number;
-}
-
-export function VideoPlayer({ source, title, tracks, intro, outro, headers, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onNext, nextTitle }: VideoPlayerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const hlsRef = useRef<any>(null);
-  const controlsTimeoutRef = useRef<number | null>(null);
-  const hasRestoredProgress = useRef(false);
-  const wakeLockRef = useRef<any>(null);
-  const castSessionRef = useRef<any>(null);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [resumeTime, setResumeTime] = useState<number | null>(null);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showSubtitles, setShowSubtitles] = useState(false);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [subtitles, setSubtitles] = useState<Array<{ index: number; label: string; language: string }>>([]);
-  const [currentSubtitle, setCurrentSubtitle] = useState(-1);
-  const [buffered, setBuffered] = useState(0);
-  const [showSkipIntro, setShowSkipIntro] = useState(false);
-  const [showSkipOutro, setShowSkipOutro] = useState(false);
-  const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number } | null>(null);
-  const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
-  const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isCasting, setIsCasting] = useState(false);
-  const [castAvailable, setCastAvailable] = useState(false);
-
-  // Initialize Google Cast
-  useEffect(() => {
-    const initializeCast = () => {
-      if (typeof window !== 'undefined' && (window as any).chrome?.cast) {
-        const cast = (window as any).chrome.cast;
-        const sessionRequest = new cast.SessionRequest(cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
-        const apiConfig = new cast.ApiConfig(
-          sessionRequest,
-          (session: any) => {
-            console.log('Cast session started');
-            castSessionRef.current = session;
-            setIsCasting(true);
-            loadMediaToCast(session);
-          },
-          (availability: string) => {
-            setCastAvailable(availability === 'available');
-          }
-        );
-        cast.initialize(apiConfig, () => {
-          console.log('Cast initialized');
-        }, (error: any) => {
-          console.error('Cast initialization error:', error);
-        });
-      }
-    };
-
-    if ((window as any).__onGCastApiAvailable) {
-      initializeCast();
-    } else {
-      (window as any).__onGCastApiAvailable = (isAvailable: boolean) => {
-        if (isAvailable) {
-          initializeCast();
-        }
-      };
-    }
-  }, []);
-
-  const loadMediaToCast = (session: any) => {
-    if (!session || !source) return;
-
-    const cast = (window as any).chrome.cast;
-    const mediaInfo = new cast.media.MediaInfo(source, 'application/x-mpegurl');
-    mediaInfo.metadata = new cast.media.GenericMediaMetadata();
-    mediaInfo.metadata.title = title;
-    
-    // Add subtitle tracks
-    if (tracks && tracks.length > 0) {
-      mediaInfo.tracks = tracks
-        .filter(t => t.kind !== 'thumbnails')
-        .map((track, idx) => {
-          const castTrack = new cast.media.Track(idx, cast.media.TrackType.TEXT);
-          castTrack.trackContentId = track.file;
-          castTrack.trackContentType = 'text/vtt';
-          castTrack.subtype = cast.media.TextTrackType.SUBTITLES;
-          castTrack.name = track.label;
-          castTrack.language = track.label?.slice(0, 2)?.toLowerCase() || 'en';
-          return castTrack;
-        });
-    }
-
-    const request = new cast.media.LoadRequest(mediaInfo);
-    request.currentTime = currentTime || 0;
-    request.autoplay = true;
-
-    session.loadMedia(request).then(
-      () => {
-        console.log('Media loaded to Cast');
-        if (videoRef.current) {
-          videoRef.current.pause();
-        }
-      },
-      (error: any) => {
-        console.error('Error loading media:', error);
-      }
-    );
-  };
-
-  const handleCastClick = () => {
-    if (isCasting && castSessionRef.current) {
-      castSessionRef.current.stop(() => {
-        setIsCasting(false);
-        castSessionRef.current = null;
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
-      }, (error: any) => {
-        console.error('Error stopping cast:', error);
-      });
-    } else {
-      const cast = (window as any).chrome?.cast;
-      if (cast) {
-        cast.requestSession(
-          (session: any) => {
-            castSessionRef.current = session;
-            setIsCasting(true);
-            loadMediaToCast(session);
-          },
-          (error: any) => {
-            console.error('Error requesting cast session:', error);
-          }
-        );
-      }
-    }
-  };
 
   // Wake Lock API - Keep screen awake during fullscreen playback
   useEffect(() => {
