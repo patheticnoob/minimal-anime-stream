@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-export function useCast(source: string | null, title: string, tracks?: any[]) {
+export function useCast(source: string | null, title: string, tracks?: any[], animeImage?: string, animeDescription?: string) {
   const [isCasting, setIsCasting] = useState(false);
   const [castAvailable, setCastAvailable] = useState(false);
   const castSessionRef = useRef<any>(null);
@@ -60,39 +60,76 @@ export function useCast(source: string | null, title: string, tracks?: any[]) {
     try {
       const cast = (window as any).chrome.cast;
       const mediaInfo = new cast.media.MediaInfo(source, 'application/x-mpegurl');
+      
+      // Enhanced metadata with anime information
       mediaInfo.metadata = new cast.media.GenericMediaMetadata();
       mediaInfo.metadata.title = title;
       
-      // Add subtitle tracks
+      if (animeImage) {
+        mediaInfo.metadata.images = [new cast.media.Image(animeImage)];
+      }
+      
+      if (animeDescription) {
+        mediaInfo.metadata.subtitle = animeDescription;
+      }
+      
+      // Map all tracks including subtitles and thumbnails
       if (tracks && tracks.length > 0) {
-        mediaInfo.tracks = tracks
-          .filter((t: any) => t.kind !== 'thumbnails')
-          .map((track: any, idx: number) => {
-            const castTrack = new cast.media.Track(idx, cast.media.TrackType.TEXT);
-            castTrack.trackContentId = track.file;
-            castTrack.trackContentType = 'text/vtt';
-            castTrack.subtype = cast.media.TextTrackType.SUBTITLES;
-            castTrack.name = track.label;
-            castTrack.language = track.label?.slice(0, 2)?.toLowerCase() || 'en';
-            return castTrack;
-          });
+        const castTracks: any[] = [];
+        let trackId = 0;
+        
+        tracks.forEach((track: any) => {
+          if (track.kind === 'thumbnails') {
+            // Add thumbnail track for seeking preview
+            const thumbTrack = new cast.media.Track(trackId++, cast.media.TrackType.TEXT);
+            thumbTrack.trackContentId = track.file;
+            thumbTrack.trackContentType = 'text/vtt';
+            thumbTrack.subtype = cast.media.TextTrackType.THUMBNAILS;
+            thumbTrack.name = 'Thumbnails';
+            castTracks.push(thumbTrack);
+            console.log('✅ Added thumbnail track to Cast:', track.file);
+          } else if (track.kind === 'subtitles' || track.kind === 'captions' || !track.kind) {
+            // Add subtitle/caption tracks
+            const subTrack = new cast.media.Track(trackId++, cast.media.TrackType.TEXT);
+            subTrack.trackContentId = track.file;
+            subTrack.trackContentType = 'text/vtt';
+            subTrack.subtype = cast.media.TextTrackType.SUBTITLES;
+            subTrack.name = track.label || 'Unknown';
+            subTrack.language = track.label?.slice(0, 2)?.toLowerCase() || 'en';
+            castTracks.push(subTrack);
+            console.log('✅ Added subtitle track to Cast:', track.label);
+          }
+        });
+        
+        if (castTracks.length > 0) {
+          mediaInfo.tracks = castTracks;
+          console.log(`📺 Total tracks added to Cast: ${castTracks.length}`);
+        }
       }
 
       const request = new cast.media.LoadRequest(mediaInfo);
       request.autoplay = true;
+      
+      // Enable the first subtitle track by default if available
+      const subtitleTracks = mediaInfo.tracks?.filter((t: any) => 
+        t.subtype === cast.media.TextTrackType.SUBTITLES
+      );
+      if (subtitleTracks && subtitleTracks.length > 0) {
+        request.activeTrackIds = [subtitleTracks[0].trackId];
+      }
 
       session.loadMedia(request).then(
         () => {
-          console.log('Media loaded to Cast');
+          console.log('✅ Media loaded to Cast with metadata and tracks');
         },
         (error: any) => {
-          console.error('Error loading media:', error);
+          console.error('❌ Error loading media to Cast:', error);
         }
       );
     } catch (err) {
       console.error("Error loading media to cast:", err);
     }
-  }, [source, title, tracks]);
+  }, [source, title, tracks, animeImage, animeDescription]);
 
   const handleCastClick = useCallback(() => {
     if (isCasting && castSessionRef.current) {

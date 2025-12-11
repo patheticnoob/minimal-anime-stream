@@ -27,6 +27,8 @@ interface RetroVideoPlayerProps {
   nextTitle?: string;
   onProgressUpdate?: (currentTime: number, duration: number) => void;
   resumeFrom?: number;
+  animeImage?: string;
+  animeDescription?: string;
 }
 
 export function RetroVideoPlayer({ 
@@ -39,7 +41,9 @@ export function RetroVideoPlayer({
   onProgressUpdate, 
   resumeFrom,
   onNext,
-  nextTitle 
+  nextTitle,
+  animeImage,
+  animeDescription
 }: RetroVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -60,7 +64,13 @@ export function RetroVideoPlayer({
   const [showSkipOutro, setShowSkipOutro] = useState(false);
   const [selectedSubtitle, setSelectedSubtitle] = useState("off");
 
-  const { isCasting, castAvailable, handleCastClick } = useCast(source, title, tracks);
+  const { isCasting, castAvailable, handleCastClick } = useCast(
+    source, 
+    title, 
+    tracks,
+    animeImage,
+    animeDescription
+  );
 
   // Pause video when casting starts
   useEffect(() => {

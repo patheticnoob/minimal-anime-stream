@@ -422,6 +422,8 @@ export default function Landing() {
               }
               onNext={playNextEpisode}
               nextTitle={nextEpisodeTitle}
+              animeImage={lastSelectedAnime?.image}
+              animeDescription={lastSelectedAnime?.title}
             />
           ) : (
             <VideoPlayer

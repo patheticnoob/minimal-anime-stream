@@ -72,7 +72,13 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const { isCasting, castAvailable, handleCastClick } = useCast(source, title, tracks);
+  const { isCasting, castAvailable, handleCastClick } = useCast(
+    source, 
+    title, 
+    tracks,
+    info?.image,
+    info?.description
+  );
 
   // Pause video when casting starts
   useEffect(() => {
