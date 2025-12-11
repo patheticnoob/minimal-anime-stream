@@ -19,7 +19,6 @@ const normalizeEpisodeNumber = (value?: number | string | null) => {
 
 export function usePlayerLogic(isAuthenticated: boolean) {
   const fetchEpisodes = useAction(api.hianime.episodes);
-  const fetchEpisodesViaYuma = useAction(api.yumaApi.getEpisodesViaYuma);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
   const saveProgress = useMutation(api.watchProgress.saveProgress);
@@ -54,14 +53,7 @@ export function usePlayerLogic(isAuthenticated: boolean) {
     let cancelled = false;
     setEpisodesLoading(true);
 
-    // Check if this is from Yuma (recent episodes) or Hianime (all other sources)
-    const isYumaSource = (selected as any).isYumaSource === true;
-
-    const fetchPromise = isYumaSource 
-      ? fetchEpisodesViaYuma({ animeId: selected.dataId })
-      : fetchEpisodes({ dataId: selected.dataId });
-
-    fetchPromise
+    fetchEpisodes({ dataId: selected.dataId })
       .then((eps) => {
         if (cancelled) return;
         const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
@@ -86,7 +78,7 @@ export function usePlayerLogic(isAuthenticated: boolean) {
     return () => {
       cancelled = true;
     };
-  }, [selected?.dataId, fetchEpisodes, fetchEpisodesViaYuma]);
+  }, [selected?.dataId, fetchEpisodes]);
 
   const playEpisode = async (episode: Episode) => {
     if (!isAuthenticated) {

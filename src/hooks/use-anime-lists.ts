@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { fetchYumaRecentEpisodes } from "@/lib/external-api";
 import { AnimeItem } from "@/shared/types";
 
 export function useAnimeLists() {
@@ -17,7 +16,6 @@ export function useAnimeLists() {
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
   const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
-  const [recentEpisodesItems, setRecentEpisodesItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
   
   const [query, setQuery] = useState("");
@@ -29,13 +27,11 @@ export function useAnimeLists() {
   const [airingPage, setAiringPage] = useState(1);
   const [moviePage, setMoviePage] = useState(1);
   const [tvShowPage, setTVShowPage] = useState(1);
-  const [recentEpisodesPage, setRecentEpisodesPage] = useState(1);
   
   const [popularHasMore, setPopularHasMore] = useState(false);
   const [airingHasMore, setAiringHasMore] = useState(false);
   const [movieHasMore, setMovieHasMore] = useState(false);
   const [tvShowHasMore, setTVShowHasMore] = useState(false);
-  const [recentEpisodesHasMore, setRecentEpisodesHasMore] = useState(false);
   
   const [loadingMore, setLoadingMore] = useState<string | null>(null);
 
@@ -49,9 +45,8 @@ export function useAnimeLists() {
       fetchTopAiring({ page: 1 }),
       fetchMovies({ page: 1 }),
       fetchTVShows({ page: 1 }),
-      fetchYumaRecentEpisodes(1),
     ])
-      .then(([popular, airing, movies, tvShows, recentEps]) => {
+      .then(([popular, airing, movies, tvShows]) => {
         if (!mounted) return;
         
         const popularData = popular as { results: AnimeItem[]; hasNextPage: boolean };
@@ -63,13 +58,11 @@ export function useAnimeLists() {
         setAiringItems(airingData.results || []);
         setMovieItems(moviesData.results || []);
         setTVShowItems(tvShowsData.results || []);
-        setRecentEpisodesItems(recentEps.results || []);
         
         setPopularHasMore(popularData.hasNextPage || false);
         setAiringHasMore(airingData.hasNextPage || false);
         setMovieHasMore(moviesData.hasNextPage || false);
         setTVShowHasMore(tvShowsData.hasNextPage || false);
-        setRecentEpisodesHasMore(recentEps.hasNextPage || false);
 
         // Combine popular and airing for hero rotation
         const heroPool = [
@@ -141,7 +134,7 @@ export function useAnimeLists() {
     return () => clearTimeout(timeoutId);
   }, [query, searchAnime]);
 
-  const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows' | 'recentEpisodes') => {
+  const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows') => {
     setLoadingMore(category);
     
     try {
@@ -180,14 +173,6 @@ export function useAnimeLists() {
           setPage = setTVShowPage;
           setHasMore = setTVShowHasMore;
           break;
-        case 'recentEpisodes':
-          nextPage = recentEpisodesPage + 1;
-          const recentResult = await fetchYumaRecentEpisodes(nextPage);
-          setRecentEpisodesItems((prev) => [...prev, ...recentResult.results]);
-          setRecentEpisodesPage(nextPage);
-          setRecentEpisodesHasMore(recentResult.hasNextPage);
-          setLoadingMore(null);
-          return;
       }
       
       if (fetchFunction) {
@@ -212,7 +197,6 @@ export function useAnimeLists() {
     airingItems,
     movieItems,
     tvShowItems,
-    recentEpisodesItems,
     heroAnime,
     query,
     setQuery,
@@ -225,7 +209,6 @@ export function useAnimeLists() {
       airing: airingHasMore,
       movies: movieHasMore,
       tvShows: tvShowHasMore,
-      recentEpisodes: recentEpisodesHasMore,
     }
   };
 }

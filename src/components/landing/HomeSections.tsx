@@ -5,20 +5,18 @@ interface HomeSectionsProps {
   isAuthenticated: boolean;
   continueWatchingItems: AnimeItem[];
   watchlistItems: AnimeItem[];
-  recentEpisodesItems: AnimeItem[];
   popularItems: AnimeItem[];
   airingItems: AnimeItem[];
   movieItems: AnimeItem[];
   tvShowItems: AnimeItem[];
   onOpenAnime: (anime: AnimeItem) => void;
-  onLoadMore: (category: 'popular' | 'airing' | 'movies' | 'tvShows' | 'recentEpisodes') => void;
+  onLoadMore: (category: 'popular' | 'airing' | 'movies' | 'tvShows') => void;
   loadingMore: string | null;
   hasMore: {
     popular: boolean;
     airing: boolean;
     movies: boolean;
     tvShows: boolean;
-    recentEpisodes: boolean;
   };
 }
 
@@ -26,7 +24,6 @@ export function HomeSections({
   isAuthenticated,
   continueWatchingItems,
   watchlistItems,
-  recentEpisodesItems,
   popularItems,
   airingItems,
   movieItems,
@@ -53,19 +50,6 @@ export function HomeSections({
           title="My Watchlist"
           items={watchlistItems}
           onItemClick={onOpenAnime}
-        />
-      )}
-
-      {/* Recent Episodes */}
-      {recentEpisodesItems.length > 0 && (
-        <ContentRail
-          title="Recent Episodes"
-          items={recentEpisodesItems}
-          onItemClick={onOpenAnime}
-          enableInfiniteScroll
-          onLoadMore={() => onLoadMore('recentEpisodes')}
-          hasMore={hasMore.recentEpisodes}
-          isLoadingMore={loadingMore === 'recentEpisodes'}
         />
       )}
 

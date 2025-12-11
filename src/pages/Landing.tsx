@@ -41,7 +41,6 @@ export default function Landing() {
     airingItems,
     movieItems,
     tvShowItems,
-    recentEpisodesItems,
     heroAnime,
     query,
     setQuery,
@@ -339,7 +338,6 @@ export default function Landing() {
                   isAuthenticated={isAuthenticated}
                   continueWatchingItems={continueWatchingItems}
                   watchlistItems={watchlistItems}
-                  recentEpisodesItems={recentEpisodesItems}
                   popularItems={popularItems}
                   airingItems={airingItems}
                   movieItems={movieItems}
