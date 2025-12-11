@@ -9,11 +9,9 @@ export async function fetchYumaRecentEpisodes(page: number = 1): Promise<{ resul
     const data = await response.json();
     
     const results = (data.results || []).map((item: any) => {
-      // The 'id' field from recent-episodes is the correct anime ID
-      // Use it directly as dataId for fetching episodes via hianime
       return {
         id: item.id,
-        dataId: item.id, // Use the ID directly without any parsing
+        dataId: item.id, // Slug-based ID from Yuma (e.g., "awkward-senpai-19918")
         title: item.title,
         image: item.image,
         type: item.type,
@@ -22,6 +20,7 @@ export async function fetchYumaRecentEpisodes(page: number = 1): Promise<{ resul
           dub: item.dub ? String(item.dub) : null,
         },
         sourceCategory: "recentEpisodes" as const,
+        isYumaSource: true, // Flag to indicate this needs Yuma translation
       };
     });
 

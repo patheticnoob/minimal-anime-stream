@@ -45,6 +45,7 @@ export default function Landing() {
   const fetchMovies = useAction(api.hianime.movies);
   const fetchTVShows = useAction(api.hianime.tvShows);
   const fetchEpisodes = useAction(api.hianime.episodes);
+  const fetchEpisodesViaYuma = useAction(api.yumaApi.getEpisodesViaYuma);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
   const searchAnime = useAction(api.hianime.search);
@@ -305,7 +306,14 @@ export default function Landing() {
     let cancelled = false;
     setEpisodesLoading(true);
 
-    fetchEpisodes({ dataId: selected.dataId })
+    // Check if this is from Yuma (recent episodes) or Hianime (all other sources)
+    const isYumaSource = (selected as any).isYumaSource === true;
+
+    const fetchPromise = isYumaSource 
+      ? fetchEpisodesViaYuma({ animeId: selected.dataId })
+      : fetchEpisodes({ dataId: selected.dataId });
+
+    fetchPromise
       .then((eps) => {
         if (cancelled) return;
         const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
@@ -330,7 +338,7 @@ export default function Landing() {
     return () => {
       cancelled = true;
     };
-  }, [selected?.dataId, fetchEpisodes]);
+  }, [selected?.dataId, fetchEpisodes, fetchEpisodesViaYuma]);
 
   useEffect(() => {
     if (!selected?.title) {
