@@ -114,12 +114,28 @@ export const tvShows = action({
 });
 
 // Get episodes for an anime (by dataId)
+// Now accepts slug-based ID and fetches anilist_id from Yuma first
 export const episodes = action({
   args: { dataId: v.string() },
   handler: async (_, args) => {
     try {
+      // First, fetch anilist_id from Yuma API using the slug-based dataId
+      const yumaResponse = await fetch(`https://yumaapi.vercel.app/info/${args.dataId}`);
+      
+      if (!yumaResponse.ok) {
+        throw new Error(`Yuma API returned ${yumaResponse.status} for anime info`);
+      }
+      
+      const yumaData = await yumaResponse.json();
+      const anilistId = yumaData.anilist_id;
+      
+      if (!anilistId) {
+        throw new Error(`No anilist_id found for anime: ${args.dataId}`);
+      }
+      
+      // Now use the numeric anilist_id with Hianime package
       const client = await getClient();
-      const res = await client.getEpisodes(args.dataId);
+      const res = await client.getEpisodes(anilistId);
       return res;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch episodes";
