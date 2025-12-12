@@ -44,6 +44,13 @@
   text-rendering: optimizeSpeed;
 }
 
+.dark[data-theme="nothing"] body,
+.dark[data-theme="nothing"] .min-h-screen,
+.dark[data-theme="nothing"] main {
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+}
+
 [data-theme="nothing"]::before {
   content: '';
   position: fixed;
@@ -76,6 +83,7 @@
 .dark[data-theme="nothing"] .content-rail {
   background: var(--nothing-elevated);
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  border-color: rgba(161, 161, 170, 0.15);
 }
 
 .dark[data-theme="nothing"] .content-rail:hover {
