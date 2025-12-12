@@ -1,7 +1,7 @@
 /* NothingOS Theme - Minimalist Design System */
 
 [data-theme="nothing"] {
-  /* Core Colors */
+  /* Core Colors - Light Mode */
   --nothing-bg: #f5f6fb;
   --nothing-fg: #0a0f1f;
   --nothing-accent: #ff3b3b;
@@ -14,6 +14,22 @@
   --nothing-soft-shadow: 0 25px 80px rgba(8, 10, 24, 0.12);
   --nothing-card-shadow: 0 20px 45px rgba(10, 14, 32, 0.08);
   --nothing-pill-shadow: 0 12px 30px rgba(255, 59, 59, 0.3);
+}
+
+[data-theme="nothing"].dark {
+  /* Core Colors - Dark Mode */
+  --nothing-bg: #0a0f1f;
+  --nothing-fg: #f5f6fb;
+  --nothing-accent: #ff4d4f;
+  --nothing-gray-1: #1a1f2f;
+  --nothing-gray-2: #151a28;
+  --nothing-gray-3: #2a3040;
+  --nothing-gray-4: #6a7080;
+  --nothing-border: rgba(245, 246, 251, 0.12);
+  --nothing-elevated: #1a1f2f;
+  --nothing-soft-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  --nothing-card-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+  --nothing-pill-shadow: 0 12px 30px rgba(255, 77, 79, 0.4);
 }
 
 /* Base Styles */

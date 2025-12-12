@@ -1,11 +1,13 @@
 import { cn } from "@/lib/utils";
-import { Bell, LogOut, Search, User } from "lucide-react";
+import { LogOut, Search, User, Moon, Sun } from "lucide-react";
 
 interface NothingNavBarProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
   isAuthenticated: boolean;
   onLogout: () => void;
+  isDarkMode?: boolean;
+  onToggleDarkMode?: () => void;
 }
 
 const navItems = [
@@ -20,6 +22,8 @@ export function NothingNavBar({
   onSectionChange,
   isAuthenticated,
   onLogout,
+  isDarkMode = false,
+  onToggleDarkMode,
 }: NothingNavBarProps) {
   const iconButtonClasses =
     "w-10 h-10 rounded-full border border-black/5 bg-white/90 text-[#4b5563] hover:text-black hover:border-black/20 transition-colors flex items-center justify-center";
@@ -35,7 +39,7 @@ export function NothingNavBar({
               aria-label="Go to home"
             >
               <span className="w-2 h-2 rounded-full bg-[#ff4d4f]" />
-              NOTHING
+              GOJOSTREAM
             </button>
 
             <span className="hidden sm:block h-8 w-px bg-black/10" />
@@ -70,11 +74,11 @@ export function NothingNavBar({
               </button>
 
               <button
-                onClick={() => onSectionChange("recent")}
+                onClick={onToggleDarkMode}
                 className={iconButtonClasses}
-                aria-label="Recent activity"
+                aria-label="Toggle dark mode"
               >
-                <Bell className="h-4 w-4" />
+                {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
 
               <button
