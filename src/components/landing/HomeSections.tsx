@@ -1,6 +1,7 @@
 import { ContentRail } from "@/components/ContentRail";
 import { AnimeItem } from "@/shared/types";
 import { Loader2 } from "lucide-react";
+import { useTheme } from "@/hooks/use-theme";
 
 interface HomeSectionsProps {
   isAuthenticated: boolean;
@@ -26,9 +27,10 @@ interface HomeSectionsProps {
 }
 
 function LoadingSkeleton() {
+  const { theme } = useTheme();
   return (
     <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      <Loader2 className={`h-8 w-8 animate-spin ${theme === "nothing" ? "text-[var(--nothing-accent)]" : "text-blue-500"}`} />
     </div>
   );
 }
@@ -50,6 +52,8 @@ export function HomeSections({
   loadingMore,
   hasMore,
 }: HomeSectionsProps) {
+  const { theme } = useTheme();
+  
   return (
     <div className="space-y-8">
       {/* Continue Watching */}
@@ -73,7 +77,7 @@ export function HomeSections({
       {/* Trending Now */}
       {popularLoading ? (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Trending Now</h2>
+          <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Trending Now</h2>
           <LoadingSkeleton />
         </div>
       ) : (
@@ -91,7 +95,7 @@ export function HomeSections({
       {/* Top Airing */}
       {airingLoading ? (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Top Airing</h2>
+          <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Top Airing</h2>
           <LoadingSkeleton />
         </div>
       ) : (
@@ -109,7 +113,7 @@ export function HomeSections({
       {/* Popular Movies */}
       {moviesLoading ? (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Popular Movies</h2>
+          <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Popular Movies</h2>
           <LoadingSkeleton />
         </div>
       ) : (
@@ -127,7 +131,7 @@ export function HomeSections({
       {/* TV Series */}
       {tvShowsLoading ? (
         <div>
-          <h2 className="text-2xl font-bold mb-4">TV Series</h2>
+          <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>TV Series</h2>
           <LoadingSkeleton />
         </div>
       ) : (
