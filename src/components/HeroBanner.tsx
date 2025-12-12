@@ -52,7 +52,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
         >
           {/* Status Badge */}
           <div className="mb-4">
-            <span className="inline-block border-2 border-gray-900 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase text-gray-900">
+            <span className="inline-block border-2 border-gray-900 dark:border-white rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase text-gray-900 dark:text-white dark:bg-[#E50914] dark:border-[#E50914]">
               {heroStatusLabel}
             </span>
           </div>
