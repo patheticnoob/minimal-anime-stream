@@ -5,6 +5,7 @@ import { NothingPlayerControls } from "./NothingPlayerControls";
 import { NothingPlayerOverlay } from "./NothingPlayerOverlay";
 import { NothingGestureOverlay } from "./NothingGestureOverlay";
 import { usePlayerGestures } from "./NothingPlayerGestures";
+import { useCast } from "@/hooks/use-cast";
 
 interface NothingVideoPlayerV2Props {
   source: string;
@@ -59,6 +60,14 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
+  const { isCasting, castAvailable, handleCastClick } = useCast(
+    source, 
+    title, 
+    tracks,
+    info?.image,
+    info?.description
+  );
+
   const CONTROL_VISIBILITY_DURATION = 3000;
 
   const updateControlsVisibility = useCallback(
@@ -74,6 +83,13 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     },
     [],
   );
+
+  // Pause video when casting starts
+  useEffect(() => {
+    if (isCasting && videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [isCasting]);
 
   // Wake Lock API - Keep screen awake during fullscreen playback
   useEffect(() => {
@@ -773,6 +789,9 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           isDragging={isDragging}
           onDragStart={() => setIsDragging(true)}
           onDragEnd={() => setIsDragging(false)}
+          castAvailable={castAvailable}
+          isCasting={isCasting}
+          onCastClick={handleCastClick}
         />
       </motion.div>
     </AnimatePresence>

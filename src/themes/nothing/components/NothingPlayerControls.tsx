@@ -43,6 +43,9 @@ interface NothingPlayerControlsProps {
   isDragging: boolean;
   onDragStart: () => void;
   onDragEnd: () => void;
+  castAvailable?: boolean;
+  isCasting?: boolean;
+  onCastClick?: () => void;
 }
 
 export function NothingPlayerControls({
