@@ -65,12 +65,12 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               </span>
             )}
             {availableLanguages.length > 0 && (
-              <span className="bg-[#E50914] text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide shadow-lg">
+              <span className="bg-white dark:bg-[#E50914] text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide border-2 border-gray-900 dark:border-[#E50914] shadow-lg">
                 {availableLanguages.join(" • ")}
               </span>
             )}
-            <div className="flex items-center gap-1 bg-[#E50914] text-white text-[10px] font-bold px-2.5 py-1 rounded shadow-lg">
-              <span className="text-yellow-300 text-xs">★</span>
+            <div className="flex items-center gap-1 bg-white dark:bg-[#E50914] text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded border-2 border-gray-900 dark:border-[#E50914] shadow-lg">
+              <span className="text-yellow-500 dark:text-yellow-300 text-xs">★</span>
               <span>4.8 / 5</span>
             </div>
           </div>
