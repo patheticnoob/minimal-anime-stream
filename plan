@@ -1,0 +1,2 @@
+1. Run type checker to verify the refactor.
+2. If successful, inform the user that the dependency issue has been resolved.

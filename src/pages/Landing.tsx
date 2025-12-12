@@ -13,8 +13,189 @@ import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { SearchSection } from "@/components/SearchSection";
 import { useTheme } from "@/hooks/use-theme";
-import { NothingNavBar } from "@/themes/nothing/components/NothingNavBar";
+interface LandingProps {
+  NavBarComponent?: React.ComponentType<any>;
+}
+
+export default function Landing({ NavBarComponent }: LandingProps = {}) {
+  const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+      {NavBarComponent ? (
+        <NavBarComponent
+          activeSection={activeSection}
+          onSectionChange={(section: string) => {
+            if (section === "history") {
+              navigate("/history");
+              return;
+            }
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") setQuery("");
+            setActiveSection(section);
+          }}
+          isAuthenticated={isAuthenticated}
+          onLogout={async () => {
+            await signOut();
+            toast.success("Logged out successfully");
+            setActiveSection("home");
+          }}
+        />
+      ) : (
+        <Sidebar
+          activeSection={activeSection}
+          onSectionChange={(section) => {
+            if (section === "history") {
+              navigate("/history");
+              return;
+            }
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") setQuery("");
+            setActiveSection(section);
+          }}
+        />
+      )}
+=======
+      {NavBarComponent ? (
+        <NavBarComponent
+          activeSection={activeSection}
+          onSectionChange={(section: string) => {
+            if (section === "history") {
+              navigate("/history");
+              return;
+            }
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") setQuery("");
+            setActiveSection(section);
+          }}
+          isAuthenticated={isAuthenticated}
+          onLogout={async () => {
+            await signOut();
+            toast.success("Logged out successfully");
+            setActiveSection("home");
+          }}
+        />
+      ) : (
+        <Sidebar
+          activeSection={activeSection}
+          onSectionChange={(section) => {
+            if (section === "history") {
+              navigate("/history");
+              return;
+            }
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") setQuery("");
+            setActiveSection(section);
+          }}
+        />
+      )}
+import { AnimeItem } from "@/shared/types";
+=======
 import { HomeSections } from "@/components/landing/HomeSections";
+import { AnimeItem } from "@/shared/types";
+=======
+interface LandingProps {
+  NavBarComponent?: React.ComponentType<any>;
+}
+
+export default function Landing({ NavBarComponent }: LandingProps = {}) {
+  const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+      {theme === "nothing" ? (
+        <NothingNavBar
+          activeSection={activeSection}
+          onSectionChange={(section) => {
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") setQuery("");
+            setActiveSection(section);
+          }}
+          isAuthenticated={isAuthenticated}
+          onLogout={async () => {
+            await signOut();
+            toast.success("Logged out successfully");
+            setActiveSection("home");
+          }}
+        />
+      ) : (
+        <Sidebar
+          activeSection={activeSection}
+          onSectionChange={(section) => {
+            if (section === "history") {
+              navigate("/history");
+              return;
+            }
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") setQuery("");
+            setActiveSection(section);
+          }}
+        />
+      )}
+=======
+      {NavBarComponent ? (
+        <NavBarComponent
+          activeSection={activeSection}
+          onSectionChange={(section: string) => {
+            if (section === "history") {
+              navigate("/history");
+              return;
+            }
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") setQuery("");
+            setActiveSection(section);
+          }}
+          isAuthenticated={isAuthenticated}
+          onLogout={async () => {
+            await signOut();
+            toast.success("Logged out successfully");
+            setActiveSection("home");
+          }}
+        />
+      ) : (
+        <Sidebar
+          activeSection={activeSection}
+          onSectionChange={(section) => {
+            if (section === "history") {
+              navigate("/history");
+              return;
+            }
+            if (section === "profile" && !isAuthenticated) {
+              toast.error("Please sign in to view your profile");
+              navigate("/auth");
+              return;
+            }
+            if (section === "search") setQuery("");
+            setActiveSection(section);
+          }}
+        />
+      )}
 import { AnimeItem } from "@/shared/types";
 import { useAnimeLists } from "@/hooks/use-anime-lists";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
@@ -26,7 +207,11 @@ import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 // Track if this is the first load
 const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
 
-export default function Landing() {
+interface LandingProps {
+  NavBarComponent?: React.ComponentType<any>;
+}
+
+export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
