@@ -56,8 +56,8 @@ export function ProfileDashboard({
       {/* Profile Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">My Profile</h1>
-          <p className="text-gray-400 mt-1">{userEmail}</p>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[var(--nothing-fg,white)]">My Profile</h1>
+          <p className="text-[var(--nothing-gray-4,#8a90a6)] mt-1">{userEmail}</p>
         </div>
         <Button
           variant="outline"
@@ -70,8 +70,8 @@ export function ProfileDashboard({
       </div>
 
       {/* Theme Switcher */}
-      <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-4">Theme Settings</h2>
+      <div className="bg-[var(--nothing-elevated,white/5)] border border-[var(--nothing-border,white/10)] rounded-lg p-6">
+        <h2 className="text-xl font-bold mb-4 text-[var(--nothing-fg,white)]">Theme Settings</h2>
         <div className="flex flex-wrap gap-3">
           <Button
             variant={theme === "classic" ? "default" : "outline"}
@@ -95,15 +95,15 @@ export function ProfileDashboard({
             NothingOS
           </Button>
         </div>
-        <p className="text-sm text-gray-400 mt-3">
-          Current theme: <span className="font-semibold text-white capitalize">{theme}</span>
+        <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
+          Current theme: <span className="font-semibold text-[var(--nothing-fg,white)] capitalize">{theme}</span>
         </p>
       </div>
 
       {/* Continue Watching Section */}
       {continueWatching && continueWatching.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Continue Watching</h2>
+          <h2 className="text-2xl font-bold mb-4 text-[var(--nothing-fg,white)]">Continue Watching</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {continueWatching.map((anime, idx) => (
               <AnimeCard
@@ -120,7 +120,7 @@ export function ProfileDashboard({
       {/* Watchlist Section */}
       {watchlist && watchlist.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">My Watchlist</h2>
+          <h2 className="text-2xl font-bold mb-4 text-[var(--nothing-fg,white)]">My Watchlist</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {watchlist.map((anime, idx) => (
               <AnimeCard
@@ -138,8 +138,8 @@ export function ProfileDashboard({
       {(!continueWatching || continueWatching.length === 0) &&
         (!watchlist || watchlist.length === 0) && (
           <div className="text-center py-16">
-            <p className="text-gray-400 text-lg">No anime in your library yet.</p>
-            <p className="text-gray-500 mt-2">Start watching to build your collection!</p>
+            <p className="text-[var(--nothing-gray-4,gray-400)] text-lg">No anime in your library yet.</p>
+            <p className="text-[var(--nothing-gray-4,gray-500)] mt-2">Start watching to build your collection!</p>
           </div>
         )}
     </div>

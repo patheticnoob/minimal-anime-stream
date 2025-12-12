@@ -16,7 +16,7 @@
   --nothing-pill-shadow: 0 12px 30px rgba(255, 59, 59, 0.3);
 }
 
-[data-theme="nothing"].dark {
+.dark[data-theme="nothing"] {
   /* Core Colors - Dark Mode */
   --nothing-bg: #0a0f1f;
   --nothing-fg: #f5f6fb;
@@ -24,7 +24,7 @@
   --nothing-gray-1: #1a1f2f;
   --nothing-gray-2: #151a28;
   --nothing-gray-3: #2a3040;
-  --nothing-gray-4: #6a7080;
+  --nothing-gray-4: #8a90a6;
   --nothing-border: rgba(245, 246, 251, 0.12);
   --nothing-elevated: #1a1f2f;
   --nothing-soft-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
@@ -172,6 +172,10 @@
   box-shadow: var(--nothing-soft-shadow);
   overflow: hidden;
   background: linear-gradient(135deg, #ffffff 5%, #f3f5ff 65%);
+}
+
+.dark[data-theme="nothing"] .hero-banner-modern {
+  background: linear-gradient(135deg, #1a1f2f 5%, #151a28 65%);
 }
 
 /* Modal/Sheet - NothingCN Style */
