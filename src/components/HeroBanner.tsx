@@ -60,28 +60,28 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
           {/* Compact Meta Info - Small inline tags */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
             {anime.type && (
-              <span className="bg-[#FF3333] text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
+              <span className="bg-[#E50914] text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide shadow-lg">
                 {anime.type}
               </span>
             )}
             {availableLanguages.length > 0 && (
-              <span className="border border-gray-900 text-gray-900 text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
+              <span className="bg-[#E50914] text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide shadow-lg">
                 {availableLanguages.join(" • ")}
               </span>
             )}
-            <div className="flex items-center gap-1 border border-gray-900 text-gray-900 text-[10px] font-bold px-2.5 py-1 rounded">
-              <span className="text-yellow-400 text-xs">★</span>
+            <div className="flex items-center gap-1 bg-[#E50914] text-white text-[10px] font-bold px-2.5 py-1 rounded shadow-lg">
+              <span className="text-yellow-300 text-xs">★</span>
               <span>4.8 / 5</span>
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="text-5xl md:text-7xl font-black my-4 leading-none text-gray-900 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-black my-4 leading-none text-gray-900 dark:text-white tracking-tight">
             {anime.title ?? "Featured Anime"}
           </h1>
 
           {/* Description */}
-          <p className="text-gray-600 max-w-xl mb-6 text-base leading-relaxed">
+          <p className="text-gray-600 dark:text-[#D1D5DB] max-w-xl mb-6 text-base leading-relaxed">
             Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio
             options available. Join the adventure today.
           </p>
@@ -91,7 +91,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             <Button
               size="lg"
               onClick={onPlay}
-              className="bg-[#FF3333] hover:bg-[#FF3333]/90 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2 shadow-lg"
+              className="bg-[#E50914] hover:bg-[#C4070F] text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2 shadow-[0_12px_30px_rgba(229,9,20,0.35)]"
             >
               <Play className="h-5 w-5 fill-white" />
               WATCH NOW
@@ -101,7 +101,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               size="lg"
               variant="outline"
               onClick={onMoreInfo}
-              className="border-2 border-gray-900 bg-white text-gray-900 font-bold py-3 px-8 rounded-lg flex items-center gap-2 hover:bg-gray-900 hover:text-white transition-colors"
+              className="border-2 border-gray-900 dark:border-[#A1A1AA]/30 bg-white dark:bg-[#1C212C] text-gray-900 dark:text-[#F5F5F7] font-bold py-3 px-8 rounded-lg flex items-center gap-2 hover:bg-gray-900 hover:text-white dark:hover:bg-[#2A2F3A] transition-colors"
             >
               <Info className="h-5 w-5" />
               MORE INFO
@@ -110,7 +110,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-gray-900 bg-white text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-gray-900 hover:text-white transition-colors"
+              className="border-2 border-gray-900 dark:border-[#A1A1AA]/30 bg-white dark:bg-[#1C212C] text-gray-900 dark:text-[#F5F5F7] font-bold py-3 px-4 rounded-lg hover:bg-gray-900 hover:text-white dark:hover:bg-[#2A2F3A] transition-colors"
             >
               <Plus className="h-6 w-6" />
             </Button>
@@ -120,12 +120,12 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
         {/* Right Image - Hidden on mobile */}
         {anime.image && (
           <motion.div
-            className="hidden lg:block w-2/5 relative"
+            className="hidden lg:block w-2/5 relative hero-banner-art"
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15, duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white/50 z-10" />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white/50 dark:from-transparent dark:to-[#1A1D24]/80 z-10" />
             <img
               src={anime.image}
               alt={anime.title || "Anime poster"}

@@ -217,8 +217,61 @@
 }
 
 .dark[data-theme="nothing"] .hero-banner-modern {
-  background: linear-gradient(135deg, #1A1D24 5%, #0B0D10 65%);
+  background: #1A1D24;
   border-color: rgba(161, 161, 170, 0.2);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
+}
+
+/* Hero Banner Image Overlay for Dark Mode */
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(11,13,16,0.55), rgba(11,13,16,0.85));
+  pointer-events: none;
+}
+
+/* Hero Banner Text Contrast */
+.dark[data-theme="nothing"] .hero-banner-modern h1 {
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.dark[data-theme="nothing"] .hero-banner-modern p {
+  color: #D1D5DB !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Hero Banner Badges */
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-pill,
+.dark[data-theme="nothing"] .hero-banner-modern span[class*="border"] {
+  background: #E50914 !important;
+  color: #FFFFFF !important;
+  border-color: #E50914 !important;
+  text-shadow: none;
+}
+
+/* Hero Banner Buttons - Critical Fix */
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-primary-btn,
+.dark[data-theme="nothing"] .hero-banner-modern button[class*="bg-[#FF3333]"] {
+  background: #E50914 !important;
+  color: #FFFFFF !important;
+  border-color: #E50914 !important;
+  box-shadow: 0 12px 30px rgba(229, 9, 20, 0.35) !important;
+  text-shadow: none;
+}
+
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-secondary-btn,
+.dark[data-theme="nothing"] .hero-banner-modern button[class*="border-2"][class*="border-gray-900"] {
+  background: #1C212C !important;
+  color: #F5F5F7 !important;
+  border-color: rgba(161, 161, 170, 0.3) !important;
+  text-shadow: none;
+}
+
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-secondary-btn:hover {
+  background: #2A2F3A !important;
+  border-color: rgba(229, 9, 20, 0.4) !important;
 }
 
 /* Modal/Sheet - NothingCN Style */
