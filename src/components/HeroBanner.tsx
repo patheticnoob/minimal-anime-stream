@@ -60,7 +60,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
           {/* Compact Meta Info - Small inline tags */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
             {anime.type && (
-              <span className="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
+              <span className="bg-[#FF3333] text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
                 {anime.type}
               </span>
             )}
@@ -101,7 +101,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               size="lg"
               variant="outline"
               onClick={onMoreInfo}
-              className="border-2 border-gray-900 text-gray-900 font-bold py-3 px-8 rounded-lg flex items-center gap-2 hover:bg-gray-900 hover:text-white transition-colors"
+              className="border-2 border-gray-900 bg-white text-gray-900 font-bold py-3 px-8 rounded-lg flex items-center gap-2 hover:bg-gray-900 hover:text-white transition-colors"
             >
               <Info className="h-5 w-5" />
               MORE INFO
@@ -110,7 +110,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-gray-900 text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-gray-900 hover:text-white transition-colors"
+              className="border-2 border-gray-900 bg-white text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-gray-900 hover:text-white transition-colors"
             >
               <Plus className="h-6 w-6" />
             </Button>
