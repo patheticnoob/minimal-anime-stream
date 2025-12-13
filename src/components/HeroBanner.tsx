@@ -91,7 +91,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             <Button
               size="lg"
               onClick={onPlay}
-              className="bg-gray-100 dark:bg-transparent border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+              className="bg-[#E50914] border-2 border-[#E50914] text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-[#C4070F] hover:border-[#C4070F] transition-colors"
             >
               <Play className="h-5 w-5" />
               WATCH NOW
@@ -101,7 +101,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               size="lg"
               variant="outline"
               onClick={onMoreInfo}
-              className="border-2 border-gray-900 dark:border-white bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+              className="border-2 border-gray-900 dark:border-white bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
             >
               <Info className="h-5 w-5" />
               MORE INFO
@@ -110,7 +110,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-gray-900 dark:border-white bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white font-bold py-3 px-4 rounded-full hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+              className="border-2 border-gray-900 dark:border-white bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white font-bold py-3 px-4 rounded-full hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
             >
               <Plus className="h-6 w-6" />
             </Button>
