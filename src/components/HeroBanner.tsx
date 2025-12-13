@@ -60,16 +60,16 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
           {/* Compact Meta Info - Small inline tags */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
             {anime.type && (
-              <span className="bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide">
+              <span className="bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide rounded">
                 {anime.type}
               </span>
             )}
             {availableLanguages.length > 0 && (
-              <span className="bg-white dark:bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide border-2 border-gray-900 dark:border-white">
+              <span className="bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide border-2 border-gray-900 dark:border-white">
                 {availableLanguages.join(" • ")}
               </span>
             )}
-            <div className="flex items-center gap-1 bg-white dark:bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded border-2 border-gray-900 dark:border-white">
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded border-2 border-gray-900 dark:border-white">
               <span className="text-yellow-500 dark:text-yellow-300 text-xs">★</span>
               <span>4.8 / 5</span>
             </div>
@@ -91,7 +91,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             <Button
               size="lg"
               onClick={onPlay}
-              className="bg-transparent border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+              className="bg-gray-100 dark:bg-transparent border-2 border-gray-900 dark:border-white text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
             >
               <Play className="h-5 w-5" />
               WATCH NOW
@@ -101,7 +101,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               size="lg"
               variant="outline"
               onClick={onMoreInfo}
-              className="border-2 border-gray-900 dark:border-white bg-transparent text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+              className="border-2 border-gray-900 dark:border-white bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
             >
               <Info className="h-5 w-5" />
               MORE INFO
@@ -110,7 +110,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-gray-900 dark:border-white bg-transparent text-gray-900 dark:text-white font-bold py-3 px-4 rounded-full hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
+              className="border-2 border-gray-900 dark:border-white bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white font-bold py-3 px-4 rounded-full hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors"
             >
               <Plus className="h-6 w-6" />
             </Button>
