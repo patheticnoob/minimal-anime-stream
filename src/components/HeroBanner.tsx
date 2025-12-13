@@ -52,7 +52,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
         >
           {/* Status Badge */}
           <div className="mb-4">
-            <span className="inline-block border-2 border-gray-900 dark:border-white rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase text-gray-900 dark:text-white dark:bg-[#E50914] dark:border-[#E50914]">
+            <span className="inline-block border-2 border-gray-900 dark:border-[#E50914] rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase text-gray-900 dark:text-white bg-white dark:bg-[#E50914]">
               {heroStatusLabel}
             </span>
           </div>
@@ -65,12 +65,12 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
               </span>
             )}
             {availableLanguages.length > 0 && (
-              <span className="bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide border-2 border-gray-900 dark:border-white">
+              <span className="bg-gray-100 dark:bg-[#E50914] text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide border-2 border-gray-900 dark:border-[#E50914]">
                 {availableLanguages.join(" • ")}
               </span>
             )}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded border-2 border-gray-900 dark:border-white">
-              <span className="text-yellow-500 dark:text-yellow-300 text-xs">★</span>
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-white text-gray-900 dark:text-gray-900 text-[10px] font-bold px-2.5 py-1 rounded border-2 border-gray-900 dark:border-white">
+              <span className="text-yellow-500 text-xs">★</span>
               <span>4.8 / 5</span>
             </div>
           </div>
