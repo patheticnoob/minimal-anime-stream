@@ -60,7 +60,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
           {/* Compact Meta Info - Small inline tags */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
             {anime.type && (
-              <span className="bg-gray-100 dark:bg-transparent text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide rounded">
+              <span className="bg-[#E50914] text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide rounded">
                 {anime.type}
               </span>
             )}
