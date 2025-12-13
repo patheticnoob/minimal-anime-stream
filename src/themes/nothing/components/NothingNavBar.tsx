@@ -26,12 +26,12 @@ export function NothingNavBar({
   onToggleDarkMode,
 }: NothingNavBarProps) {
   const iconButtonClasses =
-    "w-10 h-10 rounded-full border border-black/5 dark:border-white/10 bg-white/90 dark:bg-white/10 text-[#4b5563] dark:text-white hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/20 transition-colors flex items-center justify-center";
+    "w-10 h-10 rounded-full border border-black/5 dark:border-white/10 bg-white/90 dark:bg-[#2A2F3A] text-[#4b5563] dark:text-white hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/20 transition-colors flex items-center justify-center";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 pt-4">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-        <div className="rounded-full border border-black/5 dark:border-white/10 bg-white/95 dark:bg-[#1A1D24]/95 px-4 sm:px-6 shadow-[0_20px_80px_rgba(5,8,20,0.08)] dark:shadow-[0_20px_80px_rgba(0,0,0,0.5)] backdrop-blur">
+        <div className="rounded-full border border-black/5 dark:border-white/10 bg-white/95 dark:bg-[#1A1D24]/95 px-4 sm:px-6 shadow-[0_20px_80px_rgba(5,8,20,0.08)] dark:shadow-[0_20px_80px_rgba(0,0,0,0.5)] backdrop-blur dark:backdrop-blur-xl">
           <div className="flex items-center h-16 gap-4">
             <button
               onClick={() => onSectionChange("home")}
