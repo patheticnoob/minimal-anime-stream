@@ -61,6 +61,38 @@ export default function NothingWatch() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
+  // Get dark mode state from localStorage
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem("nothing-dark-mode");
+    return saved === "true";
+  });
+
+  // Sync with localStorage changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem("nothing-dark-mode");
+      setIsDarkMode(saved === "true");
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    // Also check on mount and periodically
+    const interval = setInterval(handleStorageChange, 100);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Apply dark class to document
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
+
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
