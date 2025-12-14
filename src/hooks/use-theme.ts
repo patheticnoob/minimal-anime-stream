@@ -18,7 +18,7 @@ export function useTheme() {
   };
 
   return {
-    theme: currentTheme || "classic",
+    theme: currentTheme || "nothing",
     setTheme,
   };
 }

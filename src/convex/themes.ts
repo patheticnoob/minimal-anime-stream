@@ -8,12 +8,12 @@ export const getUserTheme = query({
     const userId = await getAuthUserId(ctx);
     
     if (!userId) {
-      return "classic";
+      return "nothing";
     }
 
     const user = await ctx.db.get(userId);
 
-    return user?.theme || "classic";
+    return user?.theme || "nothing";
   },
 });
 
