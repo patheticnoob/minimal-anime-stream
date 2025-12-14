@@ -1,32 +1,16 @@
-import { useState, useEffect } from "react";
 import Landing from "@/pages/Landing";
 import { NothingNavBar } from "../components/NothingNavBar";
+import { useNothingTheme } from "../hooks/useNothingTheme";
 
 export default function NothingLanding() {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem("nothing-dark-mode");
-    return saved === "true";
-  });
+  const { isDarkMode, toggleTheme } = useNothingTheme();
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("nothing-dark-mode", String(isDarkMode));
-  }, [isDarkMode]);
-
-  const handleToggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
+  // Memoize the component to prevent unnecessary re-renders of the navbar
   const NavBarWithDarkMode = (props: any) => (
     <NothingNavBar
       {...props}
       isDarkMode={isDarkMode}
-      onToggleDarkMode={handleToggleDarkMode}
+      onToggleDarkMode={toggleTheme}
     />
   );
 

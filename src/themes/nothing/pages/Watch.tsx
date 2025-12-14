@@ -12,6 +12,8 @@ import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
 import { animeCache } from "@/lib/anime-cache";
+import { useNothingTheme } from "../hooks/useNothingTheme";
+import { Moon, Sun } from "lucide-react";
 
 type Episode = {
   id: string;
@@ -60,9 +62,10 @@ export default function NothingWatch() {
   const { animeId } = useParams<{ animeId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { isDarkMode, toggleTheme } = useNothingTheme();
 
   // Get dark mode state from localStorage
-  const [isDarkMode, setIsDarkMode] = useState(() => {
+  const [isDarkModeState, setIsDarkModeState] = useState(() => {
     const saved = localStorage.getItem("nothing-dark-mode");
     return saved === "true";
   });
@@ -71,7 +74,7 @@ export default function NothingWatch() {
   useEffect(() => {
     const handleStorageChange = () => {
       const saved = localStorage.getItem("nothing-dark-mode");
-      setIsDarkMode(saved === "true");
+      setIsDarkModeState(saved === "true");
     };
     
     window.addEventListener("storage", handleStorageChange);
@@ -86,12 +89,12 @@ export default function NothingWatch() {
 
   // Apply dark class to document
   useEffect(() => {
-    if (isDarkMode) {
+    if (isDarkModeState) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [isDarkMode]);
+  }, [isDarkModeState]);
 
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
@@ -616,18 +619,16 @@ export default function NothingWatch() {
     broadcastInfo?.status === "airing" || broadcastInfo?.status === "upcoming";
   const shouldShowBroadcast = isBroadcastLoading || isBroadcastActive;
 
-  // Removed fullscreen loader - show page immediately with inline loading states
-
   return (
-    <div data-theme="nothing" className="min-h-screen bg-[#F5F7FB] dark:bg-[#0B0F19] text-[#050814] dark:text-white">
+    <div data-theme="nothing" className="min-h-screen bg-[#F5F7FB] dark:bg-[#0B0F19] text-[#050814] dark:text-white transition-colors duration-300">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#1A1D24]/95 backdrop-blur-lg border-b border-black/5 dark:border-white/10">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#1A1D24]/95 backdrop-blur-lg border-b border-black/5 dark:border-white/10 transition-colors duration-300">
         <div className="max-w-[2000px] mx-auto px-6 py-4 flex items-center gap-4">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-gray-500 hover:text-black transition-colors group"
+            className="flex items-center gap-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors group"
           >
-            <div className="p-2 rounded-full bg-black/5 group-hover:bg-black/10 transition-colors">
+            <div className="p-2 rounded-full bg-black/5 dark:bg-white/10 group-hover:bg-black/10 dark:group-hover:bg-white/20 transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </div>
             <span className="text-sm font-medium tracking-widest uppercase">Back</span>
@@ -635,11 +636,21 @@ export default function NothingWatch() {
           <div className="flex-1">
             <h1 className="text-xl font-bold truncate tracking-wide text-[#050814] dark:text-white">{anime?.title || "Loading..."}</h1>
           </div>
+          
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="w-10 h-10 rounded-full border transition-colors flex items-center justify-center border-black/5 bg-white/90 text-[#4b5563] hover:text-black hover:border-black/20 dark:border-white/10 dark:bg-[#2A2F3A] dark:text-white dark:hover:text-white dark:hover:border-white/20"
+            aria-label="Toggle dark mode"
+          >
+            {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+
           <Button
             onClick={handleToggleWatchlist}
             variant="outline"
             size="sm"
-            className="gap-2 border-black/10 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 text-[#050814] dark:text-white"
+            className="gap-2 border-black/10 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 text-[#050814] dark:text-white bg-transparent"
           >
             {isInWatchlist ? (
               <>
@@ -662,7 +673,7 @@ export default function NothingWatch() {
           {/* Left: Anime Info and Video Player */}
           <div className="space-y-8 mt-8 md:mt-0">
             {/* Anime Info */}
-            <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-8 relative overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-8 relative overflow-hidden shadow-sm transition-colors duration-300">
               <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
                 <h1 className="text-9xl font-bold tracking-tighter text-black dark:text-white">NOTHING</h1>
               </div>
@@ -673,7 +684,7 @@ export default function NothingWatch() {
                     <img
                       src={anime.image}
                       alt={anime.title}
-                      className="w-40 h-60 object-cover rounded-2xl shadow-lg border border-black/5"
+                      className="w-40 h-60 object-cover rounded-2xl shadow-lg border border-black/5 dark:border-white/5"
                     />
                   </div>
                 )}
@@ -781,8 +792,8 @@ export default function NothingWatch() {
           </div>
 
           {/* Right: Episode List */}
-          <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] overflow-y-auto flex flex-col shadow-sm">
-            <div className="flex items-center justify-between mb-6 sticky top-0 bg-white dark:bg-[#1A1D24] z-10 py-2">
+          <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] overflow-y-auto flex flex-col shadow-sm transition-colors duration-300">
+            <div className="flex items-center justify-between mb-6 sticky top-0 bg-white dark:bg-[#1A1D24] z-10 py-2 transition-colors duration-300">
               <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-black/40 dark:text-white/40">Episodes</h3>
               <span className="text-xs font-mono text-black/30 dark:text-white/30">{episodes.length} TOTAL</span>
             </div>
