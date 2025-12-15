@@ -175,4 +175,21 @@ export class EpisodeDownloadManager {
     
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   }
+
+  /**
+   * Open video URL for download (Option C)
+   */
+  static openForDownload(videoUrl: string, filename: string): void {
+    // Create a temporary anchor element to trigger download
+    const link = document.createElement('a');
+    link.href = videoUrl;
+    link.download = filename;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    
+    // Trigger click
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }

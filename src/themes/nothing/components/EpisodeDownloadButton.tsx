@@ -51,6 +51,11 @@ export function EpisodeDownloadButton({
     try {
       const { videoUrl, tracks } = await onDownload();
 
+      // Open video URL in new tab for download
+      const filename = `${title.replace(/[^a-z0-9]/gi, '_')}_Episode_${episodeNumber}.m3u8`;
+      EpisodeDownloadManager.openForDownload(videoUrl, filename);
+
+      // Save metadata to localStorage
       const episode: DownloadedEpisode = {
         episodeId,
         animeId,
@@ -65,13 +70,13 @@ export function EpisodeDownloadButton({
 
       if (success) {
         setIsDownloaded(true);
-        toast.success("Episode cached successfully!");
+        toast.success("Download link opened! Episode metadata cached.");
       } else {
         toast.error("Storage quota exceeded. Please delete some downloads.");
       }
     } catch (error) {
       console.error("Download failed:", error);
-      toast.error("Failed to cache episode");
+      toast.error("Failed to prepare download");
     } finally {
       setIsDownloading(false);
     }
@@ -88,7 +93,7 @@ export function EpisodeDownloadButton({
           ? "text-green-500 hover:text-red-500"
           : "text-gray-400 hover:text-white"
       }`}
-      title={isDownloaded ? "Remove cached episode" : "Cache episode for offline"}
+      title={isDownloaded ? "Remove cached episode" : "Download episode"}
     >
       {isDownloading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
