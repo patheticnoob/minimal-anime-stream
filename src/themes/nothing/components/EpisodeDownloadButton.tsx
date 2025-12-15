@@ -51,9 +51,9 @@ export function EpisodeDownloadButton({
     try {
       const { videoUrl, tracks } = await onDownload();
 
-      // Open video URL in new tab for download
+      // Open video URL and copy to clipboard
       const filename = `${title.replace(/[^a-z0-9]/gi, '_')}_Episode_${episodeNumber}.m3u8`;
-      EpisodeDownloadManager.openForDownload(videoUrl, filename);
+      const clipboardSuccess = await EpisodeDownloadManager.openForDownload(videoUrl, filename);
 
       // Save metadata to localStorage
       const episode: DownloadedEpisode = {
@@ -70,7 +70,11 @@ export function EpisodeDownloadButton({
 
       if (success) {
         setIsDownloaded(true);
-        toast.success("Download link opened! Episode metadata cached.");
+        if (clipboardSuccess) {
+          toast.success("Video URL copied to clipboard! Use a download manager like IDM or JDownloader to download the HLS stream.");
+        } else {
+          toast.success("Video URL opened in new tab. Episode metadata cached.");
+        }
       } else {
         toast.error("Storage quota exceeded. Please delete some downloads.");
       }

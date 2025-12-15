@@ -177,19 +177,22 @@ export class EpisodeDownloadManager {
   }
 
   /**
-   * Open video URL for download (Option C)
+   * Open video URL and copy to clipboard for external download tools
    */
-  static openForDownload(videoUrl: string, filename: string): void {
-    // Create a temporary anchor element to trigger download
-    const link = document.createElement('a');
-    link.href = videoUrl;
-    link.download = filename;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    
-    // Trigger click
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  static async openForDownload(videoUrl: string, filename: string): Promise<boolean> {
+    try {
+      // Copy URL to clipboard
+      await navigator.clipboard.writeText(videoUrl);
+      
+      // Open URL in new tab
+      window.open(videoUrl, '_blank', 'noopener,noreferrer');
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to copy URL:', error);
+      // Still try to open the URL even if clipboard fails
+      window.open(videoUrl, '_blank', 'noopener,noreferrer');
+      return false;
+    }
   }
 }
