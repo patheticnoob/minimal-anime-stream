@@ -20,7 +20,7 @@ Download the extension from the Chrome Web Store (coming soon) or install manual
 - **Navigation** - Browse episodes and menus with controller
 - **Episode switching** - Quick access to previous/next episodes
 - **Fullscreen control** - Toggle fullscreen mode
-- **Visual feedback** - On-screen notifications for actions
+- **Visual feedback** - On-screen notifications and status indicator
 
 ## Button Mapping
 
@@ -41,12 +41,41 @@ Download the extension from the Chrome Web Store (coming soon) or install manual
 | Start | Go to Home |
 | Select | Open Settings |
 
+## Troubleshooting
+
+### Controller Not Detected?
+
+1. **Connect your controller** - Make sure it's plugged in via USB or connected via Bluetooth
+2. **Press any button** - The Gamepad API requires user interaction to activate
+3. **Check the status indicator** - Look for the controller status in the top-right corner
+4. **Reload the page** - Sometimes a refresh helps
+5. **Check Chrome console** - Press F12 and look for 🎮 messages
+
+### Common Issues
+
+- **"No controller detected"** - Connect your controller and press any button
+- **Buttons not working** - Make sure the page has focus (click on it)
+- **Extension not loading** - Check that it's enabled in `chrome://extensions/`
+
 ## Compatibility
 
 - Chrome 88+
 - Edge 88+
 - Any Chromium-based browser
+- Works with Xbox, PlayStation, and generic USB/Bluetooth controllers
 
 ## Privacy
 
 This extension only runs on GojoStream domains and does not collect any user data.
+
+## Development
+
+The extension consists of:
+- `manifest.json` - Extension configuration
+- `content.js` - Main controller logic
+- `background.js` - Background service worker
+- `popup.html/js` - Extension popup UI
+
+## Support
+
+For issues or feature requests, please visit the GitHub repository.

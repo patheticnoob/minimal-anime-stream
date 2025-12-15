@@ -8,6 +8,7 @@
   const AXIS_THRESHOLD = 0.3;
   const BUTTON_COOLDOWN = 300; // ms
   const lastButtonPress = {};
+  let pollingInterval = null;
 
   // Controller button mapping
   const BUTTONS = {
@@ -38,248 +39,150 @@
   };
 
   console.log('🎮 GojoStream Controller Support Loaded');
+  
+  // Create status indicator
+  function createStatusIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'controller-status';
+    indicator.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 14px;
+      z-index: 10000;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    `;
+    indicator.innerHTML = '🎮 Searching for controller...';
+    document.body.appendChild(indicator);
+    return indicator;
+  }
+
+  const statusIndicator = createStatusIndicator();
+
+  // Update status indicator
+  function updateStatus(message, color = '#fff') {
+    if (statusIndicator) {
+      statusIndicator.innerHTML = message;
+      statusIndicator.style.color = color;
+    }
+  }
+
+  // Check for gamepads immediately and periodically
+  function checkForGamepads() {
+    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (let i = 0; i < gamepads.length; i++) {
+      if (gamepads[i]) {
+        console.log('🎮 Found gamepad:', gamepads[i].id);
+        gamepadIndex = i;
+        updateStatus(`🎮 ${gamepads[i].id}`, '#4ade80');
+        startPolling();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Initial check
+  setTimeout(() => {
+    if (!checkForGamepads()) {
+      updateStatus('❌ No controller detected', '#ef4444');
+      console.log('💡 Tip: Connect your controller and press any button');
+    }
+  }, 1000);
+
+  // Periodic check every 2 seconds
+  setInterval(() => {
+    if (gamepadIndex === null) {
+      checkForGamepads();
+    }
+  }, 2000);
 
   // Initialize gamepad detection
   window.addEventListener('gamepadconnected', (e) => {
     console.log('🎮 Gamepad connected:', e.gamepad.id);
     gamepadIndex = e.gamepad.index;
+    updateStatus(`🎮 ${e.gamepad.id}`, '#4ade80');
     showNotification('Controller Connected', e.gamepad.id);
     startPolling();
   });
 
   window.addEventListener('gamepaddisconnected', (e) => {
     console.log('🎮 Gamepad disconnected');
-    showNotification('Controller Disconnected', 'Controller has been removed');
     gamepadIndex = null;
+    updateStatus('❌ Controller disconnected', '#ef4444');
+    showNotification('Controller Disconnected', 'Please reconnect your controller');
+    stopPolling();
   });
 
+  // Show notification
   function showNotification(title, message) {
-    // Create toast notification
-    const toast = document.createElement('div');
-    toast.style.cssText = `
+    const notification = document.createElement('div');
+    notification.style.cssText = `
       position: fixed;
-      top: 20px;
+      top: 80px;
       right: 20px;
       background: rgba(0, 0, 0, 0.9);
       color: white;
       padding: 16px 24px;
       border-radius: 12px;
-      z-index: 10000;
       font-family: system-ui, -apple-system, sans-serif;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      animation: slideIn 0.3s ease-out;
+      z-index: 10000;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      animation: slideIn 0.3s ease;
     `;
-    toast.innerHTML = `
-      <div style="font-weight: bold; margin-bottom: 4px;">🎮 ${title}</div>
-      <div style="font-size: 14px; opacity: 0.8;">${message}</div>
+    notification.innerHTML = `
+      <div style="font-weight: bold; margin-bottom: 4px;">${title}</div>
+      <div style="font-size: 12px; opacity: 0.8;">${message}</div>
     `;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.style.animation = 'slideOut 0.3s ease-out';
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
   }
 
-  function canPressButton(buttonIndex) {
-    const now = Date.now();
-    if (lastButtonPress[buttonIndex] && now - lastButtonPress[buttonIndex] < BUTTON_COOLDOWN) {
-      return false;
-    }
-    lastButtonPress[buttonIndex] = now;
-    return true;
+  // Start polling gamepad state
+  function startPolling() {
+    if (pollingInterval) return;
+    pollingInterval = setInterval(pollGamepad, 16); // ~60fps
   }
 
-  function getVideoElement() {
-    return document.querySelector('video');
-  }
-
-  function handleButtonPress(buttonIndex) {
-    if (!canPressButton(buttonIndex)) return;
-
-    const video = getVideoElement();
-
-    switch(buttonIndex) {
-      case BUTTONS.A:
-        // Play/Pause or click focused element
-        if (video) {
-          if (video.paused) {
-            video.play();
-            showNotification('Play', '▶️');
-          } else {
-            video.pause();
-            showNotification('Pause', '⏸️');
-          }
-        } else {
-          // Click focused element
-          const focused = document.activeElement;
-          if (focused && focused.tagName !== 'BODY') {
-            focused.click();
-          }
-        }
-        break;
-
-      case BUTTONS.B:
-        // Back/Close
-        const closeBtn = document.querySelector('[aria-label="Close"]') || 
-                        document.querySelector('button[class*="close"]');
-        if (closeBtn) {
-          closeBtn.click();
-        } else {
-          window.history.back();
-        }
-        break;
-
-      case BUTTONS.X:
-        // Skip Intro/Outro
-        const skipBtn = document.querySelector('button[class*="skip"]');
-        if (skipBtn) {
-          skipBtn.click();
-          showNotification('Skip', '⏭️');
-        }
-        break;
-
-      case BUTTONS.Y:
-        // Toggle Fullscreen
-        if (video) {
-          if (!document.fullscreenElement) {
-            video.requestFullscreen();
-            showNotification('Fullscreen', 'Enabled');
-          } else {
-            document.exitFullscreen();
-            showNotification('Fullscreen', 'Disabled');
-          }
-        }
-        break;
-
-      case BUTTONS.LB:
-        // Previous Episode
-        const prevBtn = document.querySelector('button[aria-label*="Previous"]') ||
-                       document.querySelector('button[class*="prev"]');
-        if (prevBtn) {
-          prevBtn.click();
-          showNotification('Previous', '⏮️');
-        }
-        break;
-
-      case BUTTONS.RB:
-        // Next Episode
-        const nextBtn = document.querySelector('button[aria-label*="Next"]') ||
-                       document.querySelector('button[class*="next"]');
-        if (nextBtn) {
-          nextBtn.click();
-          showNotification('Next', '⏭️');
-        }
-        break;
-
-      case BUTTONS.LT:
-        // Volume Down
-        if (video) {
-          video.volume = Math.max(0, video.volume - 0.1);
-          showNotification('Volume', `${Math.round(video.volume * 100)}%`);
-        }
-        break;
-
-      case BUTTONS.RT:
-        // Volume Up
-        if (video) {
-          video.volume = Math.min(1, video.volume + 0.1);
-          showNotification('Volume', `${Math.round(video.volume * 100)}%`);
-        }
-        break;
-
-      case BUTTONS.SELECT:
-        // Settings
-        const settingsBtn = document.querySelector('button[aria-label*="Settings"]') ||
-                           document.querySelector('button[class*="settings"]');
-        if (settingsBtn) {
-          settingsBtn.click();
-        }
-        break;
-
-      case BUTTONS.START:
-        // Menu/Home
-        window.location.href = '/';
-        break;
-
-      case BUTTONS.L_STICK:
-        // Toggle Subtitles
-        const subsBtn = document.querySelector('button[aria-label*="Subtitle"]') ||
-                       document.querySelector('button[class*="subtitle"]');
-        if (subsBtn) {
-          subsBtn.click();
-          showNotification('Subtitles', 'Toggled');
-        }
-        break;
-
-      case BUTTONS.DPAD_UP:
-        // Navigate Up
-        navigateFocus('up');
-        break;
-
-      case BUTTONS.DPAD_DOWN:
-        // Navigate Down
-        navigateFocus('down');
-        break;
-
-      case BUTTONS.DPAD_LEFT:
-        // Seek Backward
-        if (video) {
-          video.currentTime = Math.max(0, video.currentTime - 10);
-          showNotification('Seek', '-10s');
-        }
-        break;
-
-      case BUTTONS.DPAD_RIGHT:
-        // Seek Forward
-        if (video) {
-          video.currentTime = Math.min(video.duration, video.currentTime + 10);
-          showNotification('Seek', '+10s');
-        }
-        break;
+  function stopPolling() {
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      pollingInterval = null;
     }
   }
 
-  function navigateFocus(direction) {
-    const focusable = Array.from(document.querySelectorAll(
-      'button, a, input, [tabindex]:not([tabindex="-1"])'
-    )).filter(el => {
-      const rect = el.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0;
-    });
-
-    const current = document.activeElement;
-    const currentIndex = focusable.indexOf(current);
-
-    if (direction === 'down' && currentIndex < focusable.length - 1) {
-      focusable[currentIndex + 1].focus();
-    } else if (direction === 'up' && currentIndex > 0) {
-      focusable[currentIndex - 1].focus();
-    } else if (currentIndex === -1 && focusable.length > 0) {
-      focusable[0].focus();
-    }
-  }
-
-  function handleAxisMovement(axisIndex, value) {
-    const video = getVideoElement();
-
-    // Left stick Y-axis for scrolling
-    if (axisIndex === AXES.LEFT_STICK_Y && Math.abs(value) > AXIS_THRESHOLD) {
-      window.scrollBy(0, value * 20);
-    }
-
-    // Right stick X-axis for seeking
-    if (axisIndex === AXES.RIGHT_STICK_X && Math.abs(value) > AXIS_THRESHOLD && video) {
-      video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + value * 2));
-    }
-  }
-
+  // Poll gamepad state
   function pollGamepad() {
     if (gamepadIndex === null) return;
 
     const gamepads = navigator.getGamepads();
     const gamepad = gamepads[gamepadIndex];
 
-    if (!gamepad) return;
+    if (!gamepad) {
+      gamepadIndex = null;
+      updateStatus('❌ Controller disconnected', '#ef4444');
+      stopPolling();
+      return;
+    }
 
     // Check buttons
     gamepad.buttons.forEach((button, index) => {
@@ -297,55 +200,94 @@
     gamepad.axes.forEach((value, index) => {
       const lastValue = lastAxisStates[index] || 0;
       
-      if (Math.abs(value) > AXIS_THRESHOLD || Math.abs(lastValue) > AXIS_THRESHOLD) {
-        handleAxisMovement(index, value);
+      if (Math.abs(value) > AXIS_THRESHOLD && Math.abs(lastValue) <= AXIS_THRESHOLD) {
+        handleAxisChange(index, value);
       }
 
       lastAxisStates[index] = value;
     });
   }
 
-  let pollingInterval;
-  function startPolling() {
-    if (pollingInterval) return;
-    pollingInterval = setInterval(pollGamepad, 16); // ~60fps
+  // Handle button press
+  function handleButtonPress(buttonIndex) {
+    const now = Date.now();
+    if (lastButtonPress[buttonIndex] && now - lastButtonPress[buttonIndex] < BUTTON_COOLDOWN) {
+      return;
+    }
+    lastButtonPress[buttonIndex] = now;
+
+    console.log('🎮 Button pressed:', buttonIndex);
+
+    const video = document.querySelector('video');
+    
+    switch(buttonIndex) {
+      case BUTTONS.A:
+        if (video) {
+          video.paused ? video.play() : video.pause();
+          showNotification('Playback', video.paused ? 'Paused' : 'Playing');
+        }
+        break;
+      
+      case BUTTONS.B:
+        window.history.back();
+        break;
+      
+      case BUTTONS.Y:
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+        break;
+      
+      case BUTTONS.DPAD_LEFT:
+        if (video) {
+          video.currentTime = Math.max(0, video.currentTime - 10);
+          showNotification('Seek', '-10 seconds');
+        }
+        break;
+      
+      case BUTTONS.DPAD_RIGHT:
+        if (video) {
+          video.currentTime = Math.min(video.duration, video.currentTime + 10);
+          showNotification('Seek', '+10 seconds');
+        }
+        break;
+      
+      case BUTTONS.LT:
+        if (video) {
+          video.volume = Math.max(0, video.volume - 0.1);
+          showNotification('Volume', `${Math.round(video.volume * 100)}%`);
+        }
+        break;
+      
+      case BUTTONS.RT:
+        if (video) {
+          video.volume = Math.min(1, video.volume + 0.1);
+          showNotification('Volume', `${Math.round(video.volume * 100)}%`);
+        }
+        break;
+      
+      case BUTTONS.START:
+        window.location.href = '/';
+        break;
+    }
   }
 
-  // Check for already connected gamepads
-  const gamepads = navigator.getGamepads();
-  for (let i = 0; i < gamepads.length; i++) {
-    if (gamepads[i]) {
-      gamepadIndex = i;
-      console.log('🎮 Gamepad already connected:', gamepads[i].id);
-      showNotification('Controller Detected', gamepads[i].id);
-      startPolling();
-      break;
+  // Handle axis change
+  function handleAxisChange(axisIndex, value) {
+    console.log('🎮 Axis changed:', axisIndex, value);
+    
+    if (axisIndex === AXES.LEFT_STICK_Y) {
+      window.scrollBy(0, value * 50);
     }
   }
 
-  // Add CSS animations
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideIn {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
+  // Press any button to activate
+  document.addEventListener('click', () => {
+    if (gamepadIndex === null) {
+      checkForGamepads();
     }
-    @keyframes slideOut {
-      from {
-        transform: translateX(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-    }
-  `;
-  document.head.appendChild(style);
+  }, { once: true });
+
 })();
