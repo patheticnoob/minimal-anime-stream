@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Download, Check, Loader2, Trash2 } from "lucide-react";
+import { Download, Check, Loader2, X, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EpisodeDownloadManager, type DownloadedEpisode } from "@/lib/episode-download-manager";
+import { downloadOrchestrator } from "@/download/download-orchestrator";
+import type { DownloadMetadata } from "@/download/types";
 import { toast } from "sonner";
 
 interface EpisodeDownloadButtonProps {
@@ -22,67 +23,130 @@ export function EpisodeDownloadButton({
   title,
   onDownload,
 }: EpisodeDownloadButtonProps) {
-  const [isDownloaded, setIsDownloaded] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadStatus, setDownloadStatus] = useState<DownloadMetadata | null>(null);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    setIsDownloaded(EpisodeDownloadManager.isDownloaded(episodeId));
+    // Load initial status
+    downloadOrchestrator.getDownloadStatus(episodeId).then(setDownloadStatus);
+
+    // Subscribe to progress updates
+    const unsubscribe = downloadOrchestrator.onProgress(episodeId, (progressEvent) => {
+      setProgress(progressEvent.progress);
+    });
+
+    // Poll for status updates
+    const interval = setInterval(async () => {
+      const status = await downloadOrchestrator.getDownloadStatus(episodeId);
+      setDownloadStatus(status);
+    }, 1000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, [episodeId]);
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (isDownloaded) {
+    if (downloadStatus?.status === 'completed') {
       // Delete download
-      const success = EpisodeDownloadManager.deleteDownload(episodeId);
-      if (success) {
-        setIsDownloaded(false);
-        toast.success("Download removed");
-      } else {
-        toast.error("Failed to remove download");
-      }
+      await downloadOrchestrator.deleteDownload(episodeId);
+      setDownloadStatus(null);
+      setProgress(0);
+      toast.success("Download removed");
+      return;
+    }
+
+    if (downloadStatus?.status === 'downloading') {
+      // Cancel download
+      await downloadOrchestrator.cancelDownload(episodeId);
+      toast.info("Download cancelled");
       return;
     }
 
     // Start download
-    setIsDownloading(true);
     toast.loading("Preparing download...");
 
     try {
-      const { videoUrl, tracks } = await onDownload();
+      const { videoUrl } = await onDownload();
 
-      // Open video URL and copy to clipboard
-      const filename = `${title.replace(/[^a-z0-9]/gi, '_')}_Episode_${episodeNumber}.m3u8`;
-      const clipboardSuccess = await EpisodeDownloadManager.openForDownload(videoUrl, filename);
-
-      // Save metadata to localStorage
-      const episode: DownloadedEpisode = {
+      await downloadOrchestrator.startDownload(
         episodeId,
         animeId,
         episodeNumber,
         title,
-        videoUrl,
-        tracks,
-        downloadedAt: Date.now(),
-      };
+        videoUrl
+      );
 
-      const success = await EpisodeDownloadManager.saveDownload(episode);
-
-      if (success) {
-        setIsDownloaded(true);
-        if (clipboardSuccess) {
-          toast.success("Video URL copied to clipboard! Use a download manager like IDM or JDownloader to download the HLS stream.");
-        } else {
-          toast.success("Video URL opened in new tab. Episode metadata cached.");
-        }
-      } else {
-        toast.error("Storage quota exceeded. Please delete some downloads.");
-      }
+      toast.success("Download started in background");
     } catch (error) {
       console.error("Download failed:", error);
-      toast.error("Failed to prepare download");
-    } finally {
-      setIsDownloading(false);
+      toast.error("Failed to start download");
+    }
+  };
+
+  const getButtonContent = () => {
+    if (!downloadStatus) {
+      return <Download className="h-4 w-4" />;
+    }
+
+    switch (downloadStatus.status) {
+      case 'downloading':
+      case 'pending':
+        return (
+          <div className="relative flex items-center justify-center">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="absolute text-[8px] font-bold">
+              {Math.round(progress)}
+            </span>
+          </div>
+        );
+      case 'completed':
+        return <Check className="h-4 w-4" />;
+      case 'failed':
+        return <X className="h-4 w-4" />;
+      case 'cancelled':
+        return <Pause className="h-4 w-4" />;
+      default:
+        return <Download className="h-4 w-4" />;
+    }
+  };
+
+  const getButtonColor = () => {
+    if (!downloadStatus) return "text-gray-400 hover:text-white";
+    
+    switch (downloadStatus.status) {
+      case 'completed':
+        return "text-green-500 hover:text-red-500";
+      case 'downloading':
+      case 'pending':
+        return "text-blue-500 hover:text-red-500";
+      case 'failed':
+        return "text-red-500 hover:text-white";
+      case 'cancelled':
+        return "text-yellow-500 hover:text-white";
+      default:
+        return "text-gray-400 hover:text-white";
+    }
+  };
+
+  const getTitle = () => {
+    if (!downloadStatus) return "Download episode";
+    
+    switch (downloadStatus.status) {
+      case 'completed':
+        return "Remove cached episode";
+      case 'downloading':
+      case 'pending':
+        return `Downloading... ${Math.round(progress)}%`;
+      case 'failed':
+        return "Download failed - Click to retry";
+      case 'cancelled':
+        return "Download cancelled - Click to retry";
+      default:
+        return "Download episode";
     }
   };
 
@@ -91,21 +155,10 @@ export function EpisodeDownloadButton({
       variant="ghost"
       size="sm"
       onClick={handleDownload}
-      disabled={isDownloading}
-      className={`h-8 w-8 p-0 ${
-        isDownloaded
-          ? "text-green-500 hover:text-red-500"
-          : "text-gray-400 hover:text-white"
-      }`}
-      title={isDownloaded ? "Remove cached episode" : "Download episode"}
+      className={`h-8 w-8 p-0 ${getButtonColor()}`}
+      title={getTitle()}
     >
-      {isDownloading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : isDownloaded ? (
-        <Check className="h-4 w-4" />
-      ) : (
-        <Download className="h-4 w-4" />
-      )}
+      {getButtonContent()}
     </Button>
   );
 }
