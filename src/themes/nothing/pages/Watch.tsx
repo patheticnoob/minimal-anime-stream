@@ -14,6 +14,7 @@ import { DateTime } from "luxon";
 import { animeCache } from "@/lib/anime-cache";
 import { useNothingTheme } from "../hooks/useNothingTheme";
 import { Moon, Sun } from "lucide-react";
+import { EpisodeDownloadButton } from "../components/EpisodeDownloadButton";
 
 type Episode = {
   id: string;
@@ -837,6 +838,55 @@ export default function NothingWatch() {
                             EP {ep.number ?? "?"}
                           </p>
                         </div>
+
+                        <EpisodeDownloadButton
+                          episodeId={ep.id}
+                          animeId={animeId!}
+                          episodeNumber={ep.number ?? 0}
+                          title={ep.title || `Episode ${ep.number ?? "?"}`}
+                          onDownload={async () => {
+                            // Fetch episode sources for download
+                            const servers = await fetchServers({ episodeId: ep.id });
+                            const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
+                            const hd2Server = serverData.sub?.find(s => s.name === "HD-2") || serverData.sub?.[0];
+                            
+                            if (!hd2Server) {
+                              throw new Error("No server available");
+                            }
+
+                            const sources = await fetchSources({ serverId: hd2Server.id });
+                            const sourcesData = sources as {
+                              sources: Array<{ file: string; type: string }>;
+                              tracks?: Array<{ file: string; label: string; kind?: string }>;
+                            };
+
+                            const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
+                            const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
+
+                            const raw = import.meta.env.VITE_CONVEX_URL as string;
+                            let base = raw;
+                            try {
+                              const u = new URL(raw);
+                              const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
+                              base = `${u.protocol}//${hostname}`;
+                            } catch {
+                              base = raw.replace("convex.cloud", "convex.site");
+                            }
+                            base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+
+                            const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
+                            const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
+                              ...t,
+                              kind: t.kind || "subtitles",
+                              file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+                            }));
+
+                            return {
+                              videoUrl: proxiedUrl,
+                              tracks: proxiedTracks,
+                            };
+                          }}
+                        />
 
                         {isCurrentEpisode ? (
                           <div className="w-2 h-2 rounded-full bg-[#ff4d4f] animate-pulse" />
