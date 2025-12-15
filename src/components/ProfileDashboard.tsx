@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Palette } from "lucide-react";
+import { LogOut, Palette, Gamepad2, Download, ExternalLink } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -98,6 +98,83 @@ export function ProfileDashboard({
         <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
           Current theme: <span className="font-semibold text-[var(--nothing-fg,white)] capitalize">{theme}</span>
         </p>
+      </div>
+
+      {/* Controller Extension Section */}
+      <div className="bg-[var(--nothing-elevated,white/5)] border border-[var(--nothing-border,white/10)] rounded-lg p-6">
+        <div className="flex items-start gap-4">
+          <div className="p-3 rounded-full bg-purple-500/10">
+            <Gamepad2 className="h-6 w-6 text-purple-400" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-xl font-bold mb-2 text-[var(--nothing-fg,white)]">Controller Support</h2>
+            <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mb-4">
+              Use your Xbox, PlayStation, or any gamepad to control video playback and navigate the site. 
+              Install our Chrome extension for the best experience.
+            </p>
+            
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="text-xs">
+                  <Gamepad2 className="h-3 w-3 mr-1" />
+                  Xbox Controllers
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  <Gamepad2 className="h-3 w-3 mr-1" />
+                  PlayStation Controllers
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  <Gamepad2 className="h-3 w-3 mr-1" />
+                  Generic Gamepads
+                </Badge>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  variant="default"
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={() => {
+                    // Download extension
+                    const link = document.createElement('a');
+                    link.href = '/extension.zip';
+                    link.download = 'gojostream-controller-extension.zip';
+                    link.click();
+                  }}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Extension
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => window.open('https://github.com/yourusername/gojostream-controller-extension', '_blank')}
+                >
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  View on GitHub
+                </Button>
+              </div>
+
+              <div className="mt-4 p-4 rounded-lg bg-[var(--nothing-bg,black/20)] border border-[var(--nothing-border,white/5)]">
+                <h3 className="text-sm font-semibold mb-2 text-[var(--nothing-fg,white)]">Quick Setup:</h3>
+                <ol className="text-xs text-[var(--nothing-gray-4,gray-400)] space-y-1 list-decimal list-inside">
+                  <li>Download the extension ZIP file</li>
+                  <li>Extract the ZIP to a folder</li>
+                  <li>Open Chrome and go to <code className="bg-black/30 px-1 rounded">chrome://extensions/</code></li>
+                  <li>Enable "Developer mode" (top right)</li>
+                  <li>Click "Load unpacked" and select the extracted folder</li>
+                  <li>Connect your controller and start playing!</li>
+                </ol>
+              </div>
+
+              <div className="mt-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <p className="text-xs text-blue-300">
+                  💡 <strong>Tip:</strong> Press the <strong>A button</strong> to play/pause, <strong>D-Pad</strong> to seek, 
+                  and <strong>LB/RB</strong> to switch episodes!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Continue Watching Section */}
