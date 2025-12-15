@@ -20,7 +20,8 @@ Download the extension from the Chrome Web Store (coming soon) or install manual
 - **Navigation** - Browse episodes and menus with controller
 - **Episode switching** - Quick access to previous/next episodes
 - **Fullscreen control** - Toggle fullscreen mode
-- **Visual feedback** - On-screen notifications and status indicator
+- **Silent operation** - Works in the background without UI clutter
+- **Action notifications** - Brief on-screen feedback only when buttons are pressed
 
 ## Button Mapping
 
