@@ -7,18 +7,8 @@ import { ThemedLanding, ThemedAuth, ThemedWatchHistory, ThemedWatch } from "./sh
 import NotFound from "./pages/NotFound";
 import "./index.css";
 import { Toaster } from "sonner";
-import { registerDownloadServiceWorker } from "./download/service-worker-manager";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
-
-// Register download service worker
-registerDownloadServiceWorker().then((success) => {
-  if (success) {
-    console.log("✅ Download Service Worker registered successfully");
-  } else {
-    console.warn("⚠️ Download Service Worker registration failed");
-  }
-});
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
