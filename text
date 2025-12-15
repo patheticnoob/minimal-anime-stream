@@ -1,2 +1,0 @@
-Tool Call:
-executeCommandTool(command='cd extension && node create-zip.cjs')
