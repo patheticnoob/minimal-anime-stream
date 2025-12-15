@@ -110,7 +110,7 @@ export function ProfileDashboard({
             <h2 className="text-xl font-bold mb-2 text-[var(--nothing-fg,white)]">Controller Support</h2>
             <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mb-4">
               Use your Xbox, PlayStation, or any gamepad to control video playback and navigate the site. 
-              Install our Chrome extension for the best experience.
+              Download the extension folder from GitHub and load it as an unpacked extension.
             </p>
             
             <div className="space-y-3">
@@ -133,21 +133,15 @@ export function ProfileDashboard({
                 <Button
                   variant="default"
                   className="bg-purple-600 hover:bg-purple-700 text-white"
-                  onClick={() => {
-                    // Download extension
-                    const link = document.createElement('a');
-                    link.href = '/extension.zip';
-                    link.download = 'gojostream-controller-extension.zip';
-                    link.click();
-                  }}
+                  onClick={() => window.open('https://github.com/yourusername/gojostream/tree/main/extension', '_blank')}
                 >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Extension
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  View Extension Folder
                 </Button>
                 
                 <Button
                   variant="outline"
-                  onClick={() => window.open('https://github.com/yourusername/gojostream-controller-extension', '_blank')}
+                  onClick={() => window.open('https://github.com/yourusername/gojostream', '_blank')}
                 >
                   <ExternalLink className="mr-2 h-4 w-4" />
                   View on GitHub
@@ -157,11 +151,10 @@ export function ProfileDashboard({
               <div className="mt-4 p-4 rounded-lg bg-[var(--nothing-bg,black/20)] border border-[var(--nothing-border,white/5)]">
                 <h3 className="text-sm font-semibold mb-2 text-[var(--nothing-fg,white)]">Quick Setup:</h3>
                 <ol className="text-xs text-[var(--nothing-gray-4,gray-400)] space-y-1 list-decimal list-inside">
-                  <li>Download the extension ZIP file</li>
-                  <li>Extract the ZIP to a folder</li>
+                  <li>Download the <code className="bg-black/30 px-1 rounded">extension/</code> folder from GitHub</li>
                   <li>Open Chrome and go to <code className="bg-black/30 px-1 rounded">chrome://extensions/</code></li>
                   <li>Enable "Developer mode" (top right)</li>
-                  <li>Click "Load unpacked" and select the extracted folder</li>
+                  <li>Click "Load unpacked" and select the extension folder</li>
                   <li>Connect your controller and start playing!</li>
                 </ol>
               </div>
