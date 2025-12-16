@@ -20,6 +20,7 @@ import { usePlayerLogic } from "@/hooks/use-player-logic";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 
+// Force rebuild comment - fixing dynamic import error
 // Track if this is the first load
 const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
 

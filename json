@@ -1,11 +1,3 @@
 {
-  "episodes": [
-    {
-      "id": "super-dragon-ball-heroes-9688$episode$10218",  // ← Episode ID format
-      "number": 1,
-      "title": "Bulma and Son Goku",
-      "is_subbed": true,
-      "is_dubbed": true
-    }
-  ]
+  "plan": "1. Verify if the fullscreen error is resolved on iOS devices.\n2. Check if the Landing page loads correctly without the dynamic import error.\n3. If errors persist, investigate `usePlayerLogic` or other hooks used in Landing."
 }
