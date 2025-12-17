@@ -573,18 +573,27 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const video = videoRef.current;
     if (!video) return;
 
-    // Update local video player subtitles
+    console.log(`🎬 Changing subtitle to track ${trackIndex}`);
+
+    // Disable all text tracks first
     for (let i = 0; i < video.textTracks.length; i++) {
-      video.textTracks[i].mode = "disabled";
+      const track = video.textTracks[i];
+      if (track.kind === "metadata") continue;
+      track.mode = "disabled";
     }
 
+    // Enable the selected track
     if (trackIndex >= 0 && trackIndex < video.textTracks.length) {
-      video.textTracks[trackIndex].mode = "showing";
+      const selectedTrack = video.textTracks[trackIndex];
+      if (selectedTrack.kind !== "metadata") {
+        selectedTrack.mode = "showing";
+        console.log(`✅ Enabled subtitle track ${trackIndex}: ${selectedTrack.label}`);
+      }
       setCurrentSubtitle(trackIndex);
       
       // Sync with Cast if casting
       if (isCasting && setCastSubtitle && tracks) {
-        const selectedTrack = tracks.find((_, idx) => {
+        const selectedApiTrack = tracks.find((_, idx) => {
           let subtitleIndex = 0;
           for (let i = 0; i < tracks.length; i++) {
             if (tracks[i].kind !== 'thumbnails') {
@@ -595,11 +604,13 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           return false;
         });
         
-        if (selectedTrack) {
-          setCastSubtitle(selectedTrack.file);
+        if (selectedApiTrack) {
+          console.log(`📺 Syncing Cast subtitle: ${selectedApiTrack.label}`);
+          setCastSubtitle(selectedApiTrack.file);
         }
       }
     } else {
+      console.log(`❌ Disabled all subtitles`);
       setCurrentSubtitle(-1);
       
       // Turn off Cast subtitles
