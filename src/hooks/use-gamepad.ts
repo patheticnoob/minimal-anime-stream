@@ -13,8 +13,9 @@ export function useGamepad() {
     buttonPressed: null,
   });
   
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const lastButtonStateRef = useRef<boolean[]>([]);
+  const buttonPressTimeoutRef = useRef<number | null>(null);
 
   const pollGamepad = () => {
     const gamepads = navigator.getGamepads();
@@ -29,15 +30,41 @@ export function useGamepad() {
         
         if (isPressed && !wasPressed) {
           pressedButton = index;
+          console.log('🎮 Button pressed:', index);
         }
         lastButtonStateRef.current[index] = isPressed;
       });
 
-      setGamepadState({
-        connected: true,
-        gamepad,
-        buttonPressed: pressedButton,
-      });
+      // Update state with proper change detection
+      if (pressedButton !== null) {
+        // Clear any existing timeout
+        if (buttonPressTimeoutRef.current) {
+          clearTimeout(buttonPressTimeoutRef.current);
+        }
+
+        setGamepadState({
+          connected: true,
+          gamepad,
+          buttonPressed: pressedButton,
+        });
+
+        // Clear button press after a short delay to ensure React can process it
+        buttonPressTimeoutRef.current = window.setTimeout(() => {
+          setGamepadState((prev) => ({
+            ...prev,
+            buttonPressed: null,
+          }));
+          buttonPressTimeoutRef.current = null;
+        }, 100);
+      } else {
+        setGamepadState((prev) => {
+          // Only update if connection state changed
+          if (!prev.connected) {
+            return { connected: true, gamepad, buttonPressed: null };
+          }
+          return prev;
+        });
+      }
     } else {
       setGamepadState({
         connected: false,
@@ -72,6 +99,9 @@ export function useGamepad() {
       window.removeEventListener('gamepaddisconnected', handleGamepadDisconnected);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (buttonPressTimeoutRef.current) {
+        clearTimeout(buttonPressTimeoutRef.current);
       }
     };
   }, []);

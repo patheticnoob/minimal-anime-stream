@@ -64,6 +64,8 @@ export function ProfileDashboard({
   useEffect(() => {
     if (buttonPressed === null) return;
 
+    console.log('🎮 ProfileDashboard received button:', buttonPressed, 'Current section:', selectedSection, 'Index:', selectedIndex);
+
     switch (buttonPressed) {
       case GAMEPAD_BUTTONS.DPAD_LEFT:
         setSelectedIndex((prev) => Math.max(0, prev - 1));
