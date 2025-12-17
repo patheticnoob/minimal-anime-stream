@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { parseVTTThumbnails, findThumbnailForTime, type ThumbnailCue } from "@/lib/vttParser";
 import { useCast } from "@/hooks/use-cast";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 interface VideoPlayerProps {
   source: string;
@@ -71,6 +72,8 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const { buttonPressed } = useGamepad();
+  const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
 
   const { isCasting, castAvailable, handleCastClick } = useCast(
     source, 
@@ -697,6 +700,58 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     };
   }, [tracks]);
 
+  // Gamepad controls for video player
+  useEffect(() => {
+    if (buttonPressed === null) return;
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.A:
+        togglePlay();
+        break;
+
+      case GAMEPAD_BUTTONS.B:
+        onClose();
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_LEFT:
+        skip(-10);
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_RIGHT:
+        skip(10);
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        setVolume((v) => Math.min(1, v + 0.1));
+        if (videoRef.current) videoRef.current.volume = Math.min(1, volume + 0.1);
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        setVolume((v) => Math.max(0, v - 0.1));
+        if (videoRef.current) videoRef.current.volume = Math.max(0, volume - 0.1);
+        break;
+
+      case GAMEPAD_BUTTONS.X:
+        toggleFullscreen();
+        break;
+
+      case GAMEPAD_BUTTONS.Y:
+        toggleMute();
+        break;
+
+      case GAMEPAD_BUTTONS.LB:
+        if (showSkipIntro) skipIntro();
+        break;
+
+      case GAMEPAD_BUTTONS.RB:
+        if (onNext && nextTitle) onNext();
+        break;
+    }
+
+    setGamepadControlsActive(true);
+    setTimeout(() => setGamepadControlsActive(false), 2000);
+  }, [buttonPressed, volume, showSkipIntro, onNext, nextTitle]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -769,6 +824,18 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         onMouseLeave={() => isPlaying && setShowControls(false)}
         data-testid="video-player-container"
       >
+        {/* Gamepad indicator */}
+        {gamepadControlsActive && (
+          <motion.div
+            className="absolute top-20 right-4 z-[100] bg-blue-600/90 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+          >
+            🎮 Gamepad Active
+          </motion.div>
+        )}
+
         {/* Close Button */}
         <motion.div
           className="absolute top-4 right-4 z-[100]"

@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BroadcastInfo } from "@/types/broadcast";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 type Episode = {
   id: string;
@@ -62,6 +63,39 @@ export function InfoModal({
   
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
+  const { buttonPressed } = useGamepad();
+  const [focusedEpisodeIndex, setFocusedEpisodeIndex] = useState(0);
+  const [isNavigatingModal, setIsNavigatingModal] = useState(false);
+
+  // Calculate episode ranges (100 episodes per range)
+  const episodeRanges = useMemo(() => {
+    if (episodes.length <= 100) return [];
+    
+    const ranges: Array<{ label: string; start: number; end: number }> = [];
+    for (let i = 0; i < episodes.length; i += 100) {
+      const start = i + 1;
+      const end = Math.min(i + 100, episodes.length);
+      ranges.push({
+        label: `${start}-${end}`,
+        start: i,
+        end: Math.min(i + 100, episodes.length),
+      });
+    }
+    return ranges;
+  }, [episodes.length]);
+
+  // Filter episodes based on selected range
+  const displayedEpisodes = useMemo(() => {
+    if (episodeRanges.length === 0) return episodes;
+    
+    // Safety check: ensure episodeRange is valid
+    const currentIndex = episodeRange >= episodeRanges.length ? 0 : episodeRange;
+    const range = episodeRanges[currentIndex];
+    
+    if (!range) return episodes;
+    
+    return episodes.slice(range.start, range.end);
+  }, [episodes, episodeRange, episodeRanges]);
 
   const broadcastDetails = useMemo(() => {
     if (!broadcastInfo?.day || !broadcastInfo?.time || !broadcastInfo?.timezone) {
@@ -123,35 +157,54 @@ export function InfoModal({
     };
   }, [isOpen]);
 
-  // Calculate episode ranges (100 episodes per range)
-  const episodeRanges = useMemo(() => {
-    if (episodes.length <= 100) return [];
-    
-    const ranges: Array<{ label: string; start: number; end: number }> = [];
-    for (let i = 0; i < episodes.length; i += 100) {
-      const start = i + 1;
-      const end = Math.min(i + 100, episodes.length);
-      ranges.push({
-        label: `${start}-${end}`,
-        start: i,
-        end: Math.min(i + 100, episodes.length),
-      });
-    }
-    return ranges;
-  }, [episodes.length]);
+  // Gamepad navigation for InfoModal
+  useEffect(() => {
+    if (!isOpen || buttonPressed === null) return;
 
-  // Filter episodes based on selected range
-  const displayedEpisodes = useMemo(() => {
-    if (episodeRanges.length === 0) return episodes;
-    
-    // Safety check: ensure episodeRange is valid
-    const currentIndex = episodeRange >= episodeRanges.length ? 0 : episodeRange;
-    const range = episodeRanges[currentIndex];
-    
-    if (!range) return episodes;
-    
-    return episodes.slice(range.start, range.end);
-  }, [episodes, episodeRange, episodeRanges]);
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        if (isNavigatingModal) {
+          setFocusedEpisodeIndex(prev => Math.max(0, prev - 1));
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        if (isNavigatingModal) {
+          setFocusedEpisodeIndex(prev => Math.min(displayedEpisodes.length - 1, prev + 1));
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.A:
+        if (isNavigatingModal && displayedEpisodes[focusedEpisodeIndex]) {
+          onPlayEpisode(displayedEpisodes[focusedEpisodeIndex]);
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.B:
+        onClose();
+        break;
+
+      case GAMEPAD_BUTTONS.X:
+        setIsNavigatingModal(!isNavigatingModal);
+        break;
+
+      case GAMEPAD_BUTTONS.Y:
+        if (onToggleWatchlist) {
+          onToggleWatchlist();
+        }
+        break;
+    }
+  }, [buttonPressed, isOpen, isNavigatingModal, focusedEpisodeIndex, displayedEpisodes, onToggleWatchlist, onPlayEpisode, onClose]);
+
+  // Auto-scroll focused episode into view
+  useEffect(() => {
+    if (isNavigatingModal && focusedEpisodeIndex >= 0) {
+      const episodeElement = document.querySelector(`[data-modal-episode-index="${focusedEpisodeIndex}"]`);
+      if (episodeElement) {
+        episodeElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+  }, [focusedEpisodeIndex, isNavigatingModal]);
 
   if (!isOpen || !anime) return null;
 
@@ -309,16 +362,22 @@ export function InfoModal({
                 <div className="detail-placeholder">Loading episodes...</div>
               ) : displayedEpisodes.length > 0 ? (
                 <div className="detail-episode-list">
-                  {displayedEpisodes.map((ep) => {
+                  {displayedEpisodes.map((ep, idx) => {
                     const progressPercentage = ep.currentTime && ep.duration 
                       ? (ep.currentTime / ep.duration) * 100 
                       : 0;
+                    const isFocused = isNavigatingModal && focusedEpisodeIndex === idx;
 
                     return (
                       <button
                         key={ep.id}
-                        className="detail-episode"
+                        data-modal-episode-index={idx}
                         onClick={() => onPlayEpisode(ep)}
+                        className={`group relative w-full text-left p-4 rounded-lg border transition-all ${
+                          isFocused
+                            ? "bg-blue-500/20 border-blue-500 ring-2 ring-blue-500"
+                            : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                        }`}
                       >
                         <div className="detail-episode-thumb-wrapper">
                           <div className="detail-episode-thumb placeholder relative">

@@ -274,14 +274,24 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       case GAMEPAD_BUTTONS.B:
         if (!isNavigatingRails) {
           setIsNavigatingRails(true);
+        } else {
+          // Navigate to search or profile
+          setActiveSection("search");
         }
         break;
 
       case GAMEPAD_BUTTONS.X:
         setIsNavigatingRails(!isNavigatingRails);
         break;
+
+      case GAMEPAD_BUTTONS.Y:
+        // Quick access to profile
+        if (isAuthenticated) {
+          setActiveSection("profile");
+        }
+        break;
     }
-  }, [buttonPressed, activeSection, focusedRailIndex, focusedItemIndex, isNavigatingRails, selected, heroAnime, continueWatchingItems, watchlistItems, popularItems, airingItems, movieItems, tvShowItems]);
+  }, [buttonPressed, activeSection, focusedRailIndex, focusedItemIndex, isNavigatingRails, selected, heroAnime, continueWatchingItems, watchlistItems, popularItems, airingItems, movieItems, tvShowItems, isAuthenticated]);
 
   const handleToggleWatchlist = async () => {
     if (!isAuthenticated) {

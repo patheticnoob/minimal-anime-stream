@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 type Episode = {
   id: string;
@@ -62,6 +63,7 @@ export default function Watch() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
+  const { buttonPressed } = useGamepad();
 
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
@@ -81,6 +83,8 @@ export default function Watch() {
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
+  const [focusedEpisodeIndex, setFocusedEpisodeIndex] = useState(0);
+  const [isNavigatingEpisodes, setIsNavigatingEpisodes] = useState(false);
 
   const saveProgress = useMutation(api.watchProgress.saveProgress);
   const addToWatchlist = useMutation(api.watchlist.addToWatchlist);
@@ -178,6 +182,49 @@ export default function Watch() {
       }
     }
   }, [animeId, fetchEpisodes, fetchBroadcastInfo, navigate]);
+
+  // Gamepad navigation for Watch page
+  useEffect(() => {
+    if (buttonPressed === null || videoSource) return;
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        if (isNavigatingEpisodes) {
+          setFocusedEpisodeIndex(prev => Math.max(0, prev - 1));
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        if (isNavigatingEpisodes) {
+          setFocusedEpisodeIndex(prev => Math.min(episodes.length - 1, prev + 1));
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.A:
+        if (isNavigatingEpisodes && episodes[focusedEpisodeIndex]) {
+          playEpisode(episodes[focusedEpisodeIndex]);
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.B:
+        navigate("/");
+        break;
+
+      case GAMEPAD_BUTTONS.X:
+        setIsNavigatingEpisodes(!isNavigatingEpisodes);
+        break;
+    }
+  }, [buttonPressed, videoSource, isNavigatingEpisodes, focusedEpisodeIndex, episodes, navigate]);
+
+  // Auto-scroll focused episode into view
+  useEffect(() => {
+    if (isNavigatingEpisodes && focusedEpisodeIndex >= 0) {
+      const episodeElement = document.querySelector(`[data-episode-index="${focusedEpisodeIndex}"]`);
+      if (episodeElement) {
+        episodeElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+  }, [focusedEpisodeIndex, isNavigatingEpisodes]);
 
   const handleToggleWatchlist = async () => {
     if (!isAuthenticated) {
@@ -379,7 +426,7 @@ export default function Watch() {
         <div className="max-w-[2000px] mx-auto px-6 py-4 flex items-center gap-4">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-2 py-1"
           >
             <ArrowLeft className="h-5 w-5" />
             <span className="text-sm font-medium">Back</span>
@@ -460,6 +507,9 @@ export default function Watch() {
                 <div className="text-center">
                   <Play className="h-16 w-16 mx-auto mb-4 text-gray-600" />
                   <p className="text-gray-400">Select an episode to start watching</p>
+                  {!isNavigatingEpisodes && (
+                    <p className="text-xs text-gray-500 mt-2">Press X to navigate episodes with gamepad</p>
+                  )}
                 </div>
               </div>
             )}
@@ -524,22 +574,31 @@ export default function Watch() {
 
           {/* Right: Episode List */}
           <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-fit max-h-[calc(100vh-120px)] overflow-y-auto">
-            <h3 className="text-lg font-bold mb-4 uppercase tracking-wider">Episodes</h3>
+            <h3 className="text-lg font-bold mb-4 uppercase tracking-wider">
+              Episodes
+              {isNavigatingEpisodes && (
+                <span className="text-xs text-blue-400 ml-2">(Gamepad Active)</span>
+              )}
+            </h3>
             {episodes.length > 0 ? (
               <div className="space-y-2">
-                {episodes.map((ep) => {
+                {episodes.map((ep, idx) => {
                   const progressPercentage = ep.currentTime && ep.duration
                     ? (ep.currentTime / ep.duration) * 100
                     : 0;
                   const isCurrentEpisode = currentEpisodeData?.id === ep.id;
+                  const isFocused = isNavigatingEpisodes && focusedEpisodeIndex === idx;
 
                   return (
                     <button
                       key={ep.id}
+                      data-episode-index={idx}
                       onClick={() => playEpisode(ep)}
                       className={`w-full text-left p-3 rounded-lg border transition-all ${
                         isCurrentEpisode
                           ? "bg-blue-500/20 border-blue-500"
+                          : isFocused
+                          ? "bg-white/10 border-blue-500 ring-2 ring-blue-500"
                           : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                       }`}
                     >
