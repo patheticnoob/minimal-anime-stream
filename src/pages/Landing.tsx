@@ -19,6 +19,7 @@ import { useAnimeLists } from "@/hooks/use-anime-lists";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 // Force rebuild comment - fixing dynamic import error
 // Track if this is the first load
@@ -32,6 +33,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { buttonPressed } = useGamepad();
   
   const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
@@ -39,6 +41,11 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
   const [showInitialLoader, setShowInitialLoader] = useState(!hasLoadedBefore);
+
+  // Gamepad navigation state
+  const [focusedRailIndex, setFocusedRailIndex] = useState(0);
+  const [focusedItemIndex, setFocusedItemIndex] = useState(0);
+  const [isNavigatingRails, setIsNavigatingRails] = useState(true);
 
   // Use custom hooks for data and player logic
   const {
@@ -190,6 +197,92 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     };
   }, [selected?.title, episodesLoading, fetchBroadcastInfo]);
 
+  // Convert continue watching to AnimeItem format
+  const continueWatchingItems: AnimeItem[] = (continueWatching || []).map((item) => ({
+    title: item.animeTitle,
+    image: item.animeImage || undefined,
+    dataId: item.animeId,
+    id: item.animeId,
+    episodeNumber: item.episodeNumber,
+    currentTime: item.currentTime,
+    duration: item.duration,
+    sourceCategory: "continueWatching" as const,
+  }));
+
+  // Convert watchlist to AnimeItem format
+  const watchlistItems: AnimeItem[] = (watchlist || []).map((item) => ({
+    title: item.animeTitle,
+    image: item.animeImage,
+    type: item.animeType,
+    dataId: item.animeId,
+    id: item.animeId,
+    language: item.language,
+    sourceCategory: "watchlist" as const,
+  }));
+
+  // Gamepad navigation for home section
+  useEffect(() => {
+    if (buttonPressed === null || activeSection !== "home" || selected) return;
+
+    const rails = [
+      { name: "hero", items: heroAnime ? [heroAnime] : [] },
+      { name: "continue", items: continueWatchingItems },
+      { name: "watchlist", items: watchlistItems },
+      { name: "popular", items: popularItems },
+      { name: "airing", items: airingItems },
+      { name: "movies", items: movieItems },
+      { name: "tvShows", items: tvShowItems },
+    ].filter(rail => rail.items.length > 0);
+
+    const currentRail = rails[focusedRailIndex];
+    if (!currentRail) return;
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        if (isNavigatingRails) {
+          setFocusedRailIndex(prev => Math.max(0, prev - 1));
+          setFocusedItemIndex(0);
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        if (isNavigatingRails) {
+          setFocusedRailIndex(prev => Math.min(rails.length - 1, prev + 1));
+          setFocusedItemIndex(0);
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_LEFT:
+        if (!isNavigatingRails) {
+          setFocusedItemIndex(prev => Math.max(0, prev - 1));
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_RIGHT:
+        if (!isNavigatingRails) {
+          setFocusedItemIndex(prev => Math.min(currentRail.items.length - 1, prev + 1));
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.A:
+        const selectedItem = currentRail.items[focusedItemIndex];
+        if (selectedItem) {
+          openAnime(selectedItem);
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.B:
+        if (!isNavigatingRails) {
+          setIsNavigatingRails(true);
+        }
+        break;
+
+      case GAMEPAD_BUTTONS.X:
+        setIsNavigatingRails(!isNavigatingRails);
+        break;
+    }
+  }, [buttonPressed, activeSection, focusedRailIndex, focusedItemIndex, isNavigatingRails, selected, heroAnime, continueWatchingItems, watchlistItems, popularItems, airingItems, movieItems, tvShowItems]);
+
   const handleToggleWatchlist = async () => {
     if (!isAuthenticated) {
       toast.error("Please sign in to use watchlist");
@@ -230,29 +323,6 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   };
 
   const sectionContent = getSectionContent();
-
-  // Convert continue watching to AnimeItem format
-  const continueWatchingItems: AnimeItem[] = (continueWatching || []).map((item) => ({
-    title: item.animeTitle,
-    image: item.animeImage || undefined,
-    dataId: item.animeId,
-    id: item.animeId,
-    episodeNumber: item.episodeNumber,
-    currentTime: item.currentTime,
-    duration: item.duration,
-    sourceCategory: "continueWatching" as const,
-  }));
-
-  // Convert watchlist to AnimeItem format
-  const watchlistItems: AnimeItem[] = (watchlist || []).map((item) => ({
-    title: item.animeTitle,
-    image: item.animeImage,
-    type: item.animeType,
-    dataId: item.animeId,
-    id: item.animeId,
-    language: item.language,
-    sourceCategory: "watchlist" as const,
-  }));
 
   // Show initial loader only on first visit
   if (showInitialLoader && (loading || authLoading)) {
@@ -341,11 +411,13 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
           ) : (
             <>
               {activeSection === "home" && heroAnime && (
-                <HeroBanner
-                  anime={heroAnime}
-                  onPlay={() => openAnime(heroAnime)}
-                  onMoreInfo={() => openAnime(heroAnime)}
-                />
+                <div className={focusedRailIndex === 0 && isNavigatingRails ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0B0F19] rounded-lg" : ""}>
+                  <HeroBanner
+                    anime={heroAnime}
+                    onPlay={() => openAnime(heroAnime)}
+                    onMoreInfo={() => openAnime(heroAnime)}
+                  />
+                </div>
               )}
 
               {sectionContent ? (
@@ -381,6 +453,9 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                   onLoadMore={loadMoreItems}
                   loadingMore={loadingMore}
                   hasMore={hasMore}
+                  focusedRailIndex={focusedRailIndex}
+                  focusedItemIndex={focusedItemIndex}
+                  isNavigatingRails={isNavigatingRails}
                 />
               )}
             </>

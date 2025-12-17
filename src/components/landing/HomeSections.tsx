@@ -24,6 +24,9 @@ interface HomeSectionsProps {
     movies: boolean;
     tvShows: boolean;
   };
+  focusedRailIndex?: number;
+  focusedItemIndex?: number;
+  isNavigatingRails?: boolean;
 }
 
 function LoadingSkeleton() {
@@ -51,8 +54,15 @@ export function HomeSections({
   onLoadMore,
   loadingMore,
   hasMore,
+  focusedRailIndex = -1,
+  focusedItemIndex = 0,
+  isNavigatingRails = false,
 }: HomeSectionsProps) {
   const { theme } = useTheme();
+  
+  // Calculate rail indices accounting for hero banner (index 0)
+  let currentRailIndex = 1; // Start after hero
+  const getRailIndex = () => currentRailIndex++;
   
   return (
     <div className="space-y-8">
@@ -62,6 +72,9 @@ export function HomeSections({
           title="Continue Watching"
           items={continueWatchingItems}
           onItemClick={onOpenAnime}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
         />
       )}
 
@@ -71,6 +84,9 @@ export function HomeSections({
           title="My Watchlist"
           items={watchlistItems}
           onItemClick={onOpenAnime}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
         />
       )}
 
@@ -89,6 +105,9 @@ export function HomeSections({
           onLoadMore={() => onLoadMore('popular')}
           hasMore={hasMore.popular}
           isLoadingMore={loadingMore === 'popular'}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
         />
       )}
 
@@ -107,6 +126,9 @@ export function HomeSections({
           onLoadMore={() => onLoadMore('airing')}
           hasMore={hasMore.airing}
           isLoadingMore={loadingMore === 'airing'}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
         />
       )}
 
@@ -125,6 +147,9 @@ export function HomeSections({
           onLoadMore={() => onLoadMore('movies')}
           hasMore={hasMore.movies}
           isLoadingMore={loadingMore === 'movies'}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
         />
       )}
 
@@ -143,6 +168,9 @@ export function HomeSections({
           onLoadMore={() => onLoadMore('tvShows')}
           hasMore={hasMore.tvShows}
           isLoadingMore={loadingMore === 'tvShows'}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
         />
       )}
     </div>

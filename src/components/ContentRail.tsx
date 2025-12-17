@@ -26,6 +26,9 @@ interface ContentRailProps {
   onLoadMore?: () => void;
   hasMore?: boolean;
   isLoadingMore?: boolean;
+  isFocused?: boolean;
+  focusedItemIndex?: number;
+  isNavigatingRails?: boolean;
 }
 
 export function ContentRail({ 
@@ -37,13 +40,28 @@ export function ContentRail({
   enableInfiniteScroll = false,
   onLoadMore,
   hasMore = false,
-  isLoadingMore = false
+  isLoadingMore = false,
+  isFocused = false,
+  focusedItemIndex = 0,
+  isNavigatingRails = false
 }: ContentRailProps) {
   const { theme } = useTheme();
   const [displayCount, setDisplayCount] = useState(12);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // Auto-scroll to focused item
+  useEffect(() => {
+    if (isFocused && !isNavigatingRails && scrollRef.current) {
+      const itemWidth = variant === "landscape" ? 170 : 120;
+      const scrollPosition = focusedItemIndex * (itemWidth + 12); // 12px gap
+      scrollRef.current.scrollTo({
+        left: scrollPosition - scrollRef.current.clientWidth / 2 + itemWidth / 2,
+        behavior: "smooth"
+      });
+    }
+  }, [isFocused, focusedItemIndex, isNavigatingRails, variant]);
 
   const displayedItems = useMemo(
     () => (enableInfiniteScroll ? items : items.slice(0, displayCount)),
@@ -97,7 +115,7 @@ export function ContentRail({
   }, [enableInfiniteScroll, hasMore, onLoadMore]);
 
   return (
-    <section className="content-rail mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <section className={`content-rail mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ${isFocused && isNavigatingRails ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0B0F19] rounded-lg p-2" : ""}`}>
       <div className="content-rail-header flex items-center justify-between mb-4 px-4 md:px-0">
         <h2 className={`text-lg md:text-xl font-bold ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"} tracking-wide uppercase`}>
           {title}
@@ -147,7 +165,11 @@ export function ContentRail({
           {displayedItems.map((item, idx) => (
             <div
               key={item.id ?? item.dataId ?? idx}
-              className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"}`}
+              className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"} ${
+                isFocused && !isNavigatingRails && focusedItemIndex === idx 
+                  ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0B0F19] rounded-lg scale-105 transition-all" 
+                  : ""
+              }`}
             >
               <AnimeCard
                 anime={item}
