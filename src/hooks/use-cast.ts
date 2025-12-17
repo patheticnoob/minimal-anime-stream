@@ -95,7 +95,20 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
             subTrack.trackContentType = 'text/vtt';
             subTrack.subtype = cast.media.TextTrackType.SUBTITLES;
             subTrack.name = track.label || 'Unknown';
-            subTrack.language = track.label?.slice(0, 2)?.toLowerCase() || 'en';
+            // Extract proper language code from label or use the language field
+            const langCode = track.language?.toLowerCase() || 
+                           (track.label?.toLowerCase().includes('english') ? 'en' : 
+                            track.label?.toLowerCase().includes('spanish') ? 'es' :
+                            track.label?.toLowerCase().includes('french') ? 'fr' :
+                            track.label?.toLowerCase().includes('german') ? 'de' :
+                            track.label?.toLowerCase().includes('japanese') ? 'ja' :
+                            track.label?.toLowerCase().includes('chinese') ? 'zh' :
+                            track.label?.toLowerCase().includes('korean') ? 'ko' :
+                            track.label?.toLowerCase().includes('portuguese') ? 'pt' :
+                            track.label?.toLowerCase().includes('italian') ? 'it' :
+                            track.label?.toLowerCase().includes('russian') ? 'ru' :
+                            track.label?.slice(0, 2)?.toLowerCase() || 'en');
+            subTrack.language = langCode;
             castTracks.push(subTrack);
             console.log('✅ Added subtitle track to Cast:', track.label);
           }
@@ -116,7 +129,17 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
       );
       if (subtitleTracks && subtitleTracks.length > 0) {
         request.activeTrackIds = [subtitleTracks[0].trackId];
+        console.log(`✅ Enabled default subtitle track: ${subtitleTracks[0].name} (${subtitleTracks[0].language})`);
       }
+      
+      // Set text track style for better visibility
+      const textTrackStyle = new cast.media.TextTrackStyle();
+      textTrackStyle.backgroundColor = '#000000CC';
+      textTrackStyle.foregroundColor = '#FFFFFF';
+      textTrackStyle.edgeType = cast.media.TextTrackEdgeType.DROP_SHADOW;
+      textTrackStyle.fontFamily = 'SANS_SERIF';
+      textTrackStyle.fontScale = 1.0;
+      request.textTrackStyle = textTrackStyle;
 
       session.loadMedia(request).then(
         () => {
