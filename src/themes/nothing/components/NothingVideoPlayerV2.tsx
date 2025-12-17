@@ -6,6 +6,7 @@ import { NothingPlayerOverlay } from "./NothingPlayerOverlay";
 import { NothingGestureOverlay } from "./NothingGestureOverlay";
 import { usePlayerGestures } from "./NothingPlayerGestures";
 import { useCast } from "@/hooks/use-cast";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 interface NothingVideoPlayerV2Props {
   source: string;
@@ -67,6 +68,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     info?.image,
     info?.description
   );
+
+  const { buttonPressed } = useGamepad();
 
   const CONTROL_VISIBILITY_DURATION = 3000;
 
@@ -708,6 +711,45 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       video.textTracks.removeEventListener?.("change", handleTrackChange);
     };
   }, [tracks]);
+
+  // Add gamepad controls for video player
+  useEffect(() => {
+    if (buttonPressed === null) return;
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.A:
+        togglePlay();
+        break;
+      case GAMEPAD_BUTTONS.B:
+        onClose();
+        break;
+      case GAMEPAD_BUTTONS.Y:
+        toggleFullscreen();
+        break;
+      case GAMEPAD_BUTTONS.DPAD_LEFT:
+        skip(-10);
+        break;
+      case GAMEPAD_BUTTONS.DPAD_RIGHT:
+        skip(10);
+        break;
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        handleVolumeChange(Math.min(1, volume + 0.1));
+        break;
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        handleVolumeChange(Math.max(0, volume - 0.1));
+        break;
+      case GAMEPAD_BUTTONS.LB:
+        // Previous episode logic could go here
+        break;
+      case GAMEPAD_BUTTONS.RB:
+        if (onNext) onNext();
+        break;
+      case GAMEPAD_BUTTONS.X:
+        if (showSkipIntro) skipIntro();
+        else if (showSkipOutro) skipOutro();
+        break;
+    }
+  }, [buttonPressed, togglePlay, onClose, toggleFullscreen, skip, volume, handleVolumeChange, onNext, showSkipIntro, showSkipOutro, skipIntro, skipOutro]);
 
   // Gesture Hook
   const { gestureHandlers, overlayProps } = usePlayerGestures({
