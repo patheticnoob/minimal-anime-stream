@@ -12,7 +12,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { AnimeCard } from "@/components/AnimeCard";
 import { ControllerStatus } from "@/components/ControllerStatus";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type ProfileAnime = {
   title?: string;
@@ -40,9 +40,12 @@ const shimmerHighlight =
 const emptyIllustration = "/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png";
 
 const themeOptions = [
-  { value: "classic", label: "Classic (Blue-Cyan)" },
-  { value: "retro", label: "Retro Home Screen" },
+  { value: "classic", label: "Classic", accentClass: "bg-blue-600 hover:bg-blue-700" },
+  { value: "retro", label: "Retro", accentClass: "bg-purple-600 hover:bg-purple-700" },
+  { value: "nothing", label: "NothingOS", accentClass: "bg-red-600 hover:bg-red-700" },
 ] as const;
+
+type FocusSection = "continue" | "watchlist" | "theme" | "signout";
 
 export function ProfileDashboard({
   userName,
@@ -55,57 +58,119 @@ export function ProfileDashboard({
   const { theme, setTheme } = useTheme();
   const { buttonPressed } = useGamepad();
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedSection, setSelectedSection] = useState<'continue' | 'watchlist'>('continue');
-  
-  const allItems = selectedSection === 'continue' ? continueWatching : watchlist;
+  const [selectedSection, setSelectedSection] = useState<FocusSection>("continue");
+  const safeContinueWatching = continueWatching ?? [];
+  const safeWatchlist = watchlist ?? [];
+  const availableSections = useMemo<FocusSection[]>(() => {
+    const sections: FocusSection[] = [];
+    if (safeContinueWatching.length > 0) sections.push("continue");
+    if (safeWatchlist.length > 0) sections.push("watchlist");
+    sections.push("theme", "signout");
+    return sections;
+  }, [safeContinueWatching.length, safeWatchlist.length]);
+  const getSectionItemCount = (section: FocusSection) => {
+    switch (section) {
+      case "continue":
+        return safeContinueWatching.length;
+      case "watchlist":
+        return safeWatchlist.length;
+      case "theme":
+        return themeOptions.length;
+      case "signout":
+        return 1;
+      default:
+        return 0;
+    }
+  };
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Handle gamepad navigation
   useEffect(() => {
+    if (!availableSections.includes(selectedSection)) {
+      setSelectedSection(availableSections[0]);
+      setSelectedIndex(0);
+    }
+  }, [availableSections, selectedSection]);
+
+  useEffect(() => {
+    const count = getSectionItemCount(selectedSection);
+    if (count === 0) {
+      setSelectedIndex(0);
+    } else {
+      setSelectedIndex((prev) => Math.min(prev, count - 1));
+    }
+  }, [selectedSection, safeContinueWatching.length, safeWatchlist.length]);
+
+  useEffect(() => {
     if (buttonPressed === null) return;
-
-    console.log('🎮 ProfileDashboard received button:', buttonPressed, 'Current section:', selectedSection, 'Index:', selectedIndex);
-
+    const itemCount = getSectionItemCount(selectedSection);
     switch (buttonPressed) {
       case GAMEPAD_BUTTONS.DPAD_LEFT:
-        setSelectedIndex((prev) => Math.max(0, prev - 1));
+        if (itemCount > 0) {
+          setSelectedIndex((prev) => Math.max(0, prev - 1));
+        }
         break;
       case GAMEPAD_BUTTONS.DPAD_RIGHT:
-        setSelectedIndex((prev) => Math.min(allItems.length - 1, prev + 1));
+        if (itemCount > 0) {
+          setSelectedIndex((prev) => Math.min(itemCount - 1, prev + 1));
+        }
         break;
-      case GAMEPAD_BUTTONS.DPAD_UP:
-        if (selectedSection === 'watchlist' && continueWatching.length > 0) {
-          setSelectedSection('continue');
+      case GAMEPAD_BUTTONS.DPAD_UP: {
+        const idx = availableSections.indexOf(selectedSection);
+        if (idx > 0) {
+          setSelectedSection(availableSections[idx - 1]);
           setSelectedIndex(0);
         }
         break;
-      case GAMEPAD_BUTTONS.DPAD_DOWN:
-        if (selectedSection === 'continue' && watchlist.length > 0) {
-          setSelectedSection('watchlist');
+      }
+      case GAMEPAD_BUTTONS.DPAD_DOWN: {
+        const idx = availableSections.indexOf(selectedSection);
+        if (idx < availableSections.length - 1) {
+          setSelectedSection(availableSections[idx + 1]);
           setSelectedIndex(0);
         }
         break;
-      case GAMEPAD_BUTTONS.A:
-        if (allItems[selectedIndex]) {
-          onSelectAnime(allItems[selectedIndex]);
+      }
+      case GAMEPAD_BUTTONS.A: {
+        if (selectedSection === "theme") {
+          const option = themeOptions[selectedIndex] ?? themeOptions[0];
+          setTheme(option.value);
+        } else if (selectedSection === "signout") {
+          onLogout?.();
+        } else {
+          const items = selectedSection === "continue" ? safeContinueWatching : safeWatchlist;
+          const target = items[selectedIndex];
+          if (target) {
+            onSelectAnime(target);
+          }
         }
         break;
-      case GAMEPAD_BUTTONS.B:
-        // Could add back navigation here
-        break;
+      }
     }
-  }, [buttonPressed, selectedIndex, selectedSection, allItems, continueWatching.length, watchlist.length, onSelectAnime]);
+  }, [
+    buttonPressed,
+    selectedSection,
+    availableSections,
+    safeContinueWatching,
+    safeWatchlist,
+    onSelectAnime,
+    onLogout,
+    setTheme,
+    selectedIndex,
+  ]);
 
-  // Scroll selected item into view
   useEffect(() => {
-    if (itemRefs.current[selectedIndex]) {
+    if (
+      (selectedSection === "continue" || selectedSection === "watchlist") &&
+      itemRefs.current[selectedIndex]
+    ) {
       itemRefs.current[selectedIndex]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center',
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
       });
     }
-  }, [selectedIndex]);
+  }, [selectedIndex, selectedSection]);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -118,7 +183,11 @@ export function ProfileDashboard({
         <Button
           variant="outline"
           onClick={onLogout}
-          className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+          className={`border-red-500/50 text-red-400 hover:bg-red-500/10 ${
+            selectedSection === "signout"
+              ? "ring-2 ring-[#ff4d4f] ring-offset-2 ring-offset-[#0B0F19]"
+              : ""
+          }`}
         >
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out
@@ -132,27 +201,28 @@ export function ProfileDashboard({
       <div className="bg-[var(--nothing-elevated,white/5)] border border-[var(--nothing-border,white/10)] rounded-lg p-6">
         <h2 className="text-xl font-bold mb-4 text-[var(--nothing-fg,white)]">Theme Settings</h2>
         <div className="flex flex-wrap gap-3">
-          <Button
-            variant={theme === "classic" ? "default" : "outline"}
-            onClick={() => setTheme("classic")}
-            className={theme === "classic" ? "bg-blue-600 hover:bg-blue-700" : ""}
-          >
-            Classic
-          </Button>
-          <Button
-            variant={theme === "retro" ? "default" : "outline"}
-            onClick={() => setTheme("retro")}
-            className={theme === "retro" ? "bg-purple-600 hover:bg-purple-700" : ""}
-          >
-            Retro
-          </Button>
-          <Button
-            variant={theme === "nothing" ? "default" : "outline"}
-            onClick={() => setTheme("nothing")}
-            className={theme === "nothing" ? "bg-red-600 hover:bg-red-700" : ""}
-          >
-            NothingOS
-          </Button>
+          {themeOptions.map((option, idx) => (
+            <div
+              key={option.value}
+              className={`rounded-lg ${
+                selectedSection === "theme" && selectedIndex === idx
+                  ? "ring-2 ring-[#ff4d4f] ring-offset-2 ring-offset-[#0B0F19]"
+                  : ""
+              }`}
+            >
+              <Button
+                variant={theme === option.value ? "default" : "outline"}
+                onClick={() => {
+                  setSelectedSection("theme");
+                  setSelectedIndex(idx);
+                  setTheme(option.value);
+                }}
+                className={theme === option.value ? option.accentClass : ""}
+              >
+                {option.label}
+              </Button>
+            </div>
+          ))}
         </div>
         <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
           Current theme: <span className="font-semibold text-[var(--nothing-fg,white)] capitalize">{theme}</span>
@@ -160,20 +230,20 @@ export function ProfileDashboard({
       </div>
 
       {/* Continue Watching Section */}
-      {continueWatching && continueWatching.length > 0 && (
+      {safeContinueWatching && safeContinueWatching.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold mb-4 text-[var(--nothing-fg,white)]">Continue Watching</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {continueWatching.map((anime, idx) => (
+            {safeContinueWatching.map((anime, idx) => (
               <div
                 key={anime.id ?? idx}
                 ref={(el) => {
-                  if (selectedSection === 'continue') {
+                  if (selectedSection === "continue") {
                     itemRefs.current[idx] = el;
                   }
                 }}
                 className={`transition-all duration-200 ${
-                  selectedSection === 'continue' && selectedIndex === idx
+                  selectedSection === "continue" && selectedIndex === idx
                     ? 'ring-2 ring-[#ff4d4f] ring-offset-2 ring-offset-[#0B0F19] scale-105'
                     : ''
                 }`}
@@ -190,20 +260,20 @@ export function ProfileDashboard({
       )}
 
       {/* Watchlist Section */}
-      {watchlist && watchlist.length > 0 && (
+      {safeWatchlist && safeWatchlist.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold mb-4 text-[var(--nothing-fg,white)]">My Watchlist</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {watchlist.map((anime, idx) => (
+            {safeWatchlist.map((anime, idx) => (
               <div
                 key={anime.id ?? idx}
                 ref={(el) => {
-                  if (selectedSection === 'watchlist') {
+                  if (selectedSection === "watchlist") {
                     itemRefs.current[idx] = el;
                   }
                 }}
                 className={`transition-all duration-200 ${
-                  selectedSection === 'watchlist' && selectedIndex === idx
+                  selectedSection === "watchlist" && selectedIndex === idx
                     ? 'ring-2 ring-[#ff4d4f] ring-offset-2 ring-offset-[#0B0F19] scale-105'
                     : ''
                 }`}
@@ -220,8 +290,8 @@ export function ProfileDashboard({
       )}
 
       {/* Empty States */}
-      {(!continueWatching || continueWatching.length === 0) &&
-        (!watchlist || watchlist.length === 0) && (
+      {(!safeContinueWatching || safeContinueWatching.length === 0) &&
+        (!safeWatchlist || safeWatchlist.length === 0) && (
           <div className="text-center py-16">
             <p className="text-[var(--nothing-gray-4,gray-400)] text-lg">No anime in your library yet.</p>
             <p className="text-[var(--nothing-gray-4,gray-500)] mt-2">Start watching to build your collection!</p>

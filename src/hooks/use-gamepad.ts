@@ -16,6 +16,12 @@ export function useGamepad() {
   const animationFrameRef = useRef<number | undefined>(undefined);
   const lastButtonStateRef = useRef<boolean[]>([]);
   const buttonPressTimeoutRef = useRef<number | null>(null);
+  const axisStateRef = useRef<Record<number, -1 | 0 | 1>>({});
+  const axisThreshold = 0.6;
+  const axisMappings = [
+    { axis: 0, negative: GAMEPAD_BUTTONS.DPAD_LEFT, positive: GAMEPAD_BUTTONS.DPAD_RIGHT },
+    { axis: 1, negative: GAMEPAD_BUTTONS.DPAD_UP, positive: GAMEPAD_BUTTONS.DPAD_DOWN },
+  ] as const;
 
   const pollGamepad = () => {
     const gamepads = navigator.getGamepads();
@@ -26,7 +32,7 @@ export function useGamepad() {
       let pressedButton: number | null = null;
       gamepad.buttons.forEach((button, index) => {
         const wasPressed = lastButtonStateRef.current[index] || false;
-        const isPressed = button.pressed;
+        const isPressed = button.pressed || button.value > 0.5;
         
         if (isPressed && !wasPressed) {
           pressedButton = index;
@@ -34,6 +40,32 @@ export function useGamepad() {
         }
         lastButtonStateRef.current[index] = isPressed;
       });
+
+      if (pressedButton === null) {
+        for (const mapping of axisMappings) {
+          const value = gamepad.axes[mapping.axis];
+          if (typeof value !== "number") {
+            continue;
+          }
+
+          const direction: -1 | 0 | 1 =
+            value > axisThreshold ? 1 : value < -axisThreshold ? -1 : 0;
+
+          if (axisStateRef.current[mapping.axis] !== direction) {
+            axisStateRef.current[mapping.axis] = direction;
+
+            if (direction === -1) {
+              pressedButton = mapping.negative;
+              break;
+            }
+
+            if (direction === 1) {
+              pressedButton = mapping.positive;
+              break;
+            }
+          }
+        }
+      }
 
       // Update state with proper change detection
       if (pressedButton !== null) {
@@ -72,6 +104,7 @@ export function useGamepad() {
         buttonPressed: null,
       });
       lastButtonStateRef.current = [];
+      axisStateRef.current = {};
     }
   };
 
