@@ -60,7 +60,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
-  const { isCasting, castAvailable, handleCastClick } = useCast(
+  const { isCasting, castAvailable, handleCastClick, setCastSubtitle } = useCast(
     source, 
     title, 
     tracks,
@@ -573,15 +573,39 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const video = videoRef.current;
     if (!video) return;
 
+    // Update local video player subtitles
     for (let i = 0; i < video.textTracks.length; i++) {
-      video.textTracks[i].mode = "hidden";
+      video.textTracks[i].mode = "disabled";
     }
 
     if (trackIndex >= 0 && trackIndex < video.textTracks.length) {
       video.textTracks[trackIndex].mode = "showing";
       setCurrentSubtitle(trackIndex);
+      
+      // Sync with Cast if casting
+      if (isCasting && setCastSubtitle && tracks) {
+        const selectedTrack = tracks.find((_, idx) => {
+          let subtitleIndex = 0;
+          for (let i = 0; i < tracks.length; i++) {
+            if (tracks[i].kind !== 'thumbnails') {
+              if (subtitleIndex === trackIndex) return i === idx;
+              subtitleIndex++;
+            }
+          }
+          return false;
+        });
+        
+        if (selectedTrack) {
+          setCastSubtitle(selectedTrack.file);
+        }
+      }
     } else {
       setCurrentSubtitle(-1);
+      
+      // Turn off Cast subtitles
+      if (isCasting && setCastSubtitle) {
+        setCastSubtitle('');
+      }
     }
     setShowSubtitles(false);
   };

@@ -3,7 +3,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 export function useCast(source: string | null, title: string, tracks?: any[], animeImage?: string, animeDescription?: string) {
   const [isCasting, setIsCasting] = useState(false);
   const [castAvailable, setCastAvailable] = useState(false);
+  const [setCastSubtitle, setSetCastSubtitle] = useState<((trackFile: string) => void) | null>(null);
   const castSessionRef = useRef<any>(null);
+  const castTracksMapRef = useRef<Map<string, number>>(new Map());
 
   useEffect(() => {
     const initializeCast = () => {
@@ -57,6 +59,9 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
   const loadMediaToCast = useCallback((session: any) => {
     if (!session || !source) return;
 
+    // Clear previous track mappings
+    castTracksMapRef.current.clear();
+
     try {
       const cast = (window as any).chrome.cast;
       const mediaInfo = new cast.media.MediaInfo(source, 'application/x-mpegurl');
@@ -76,7 +81,7 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
       // Map all tracks including subtitles and thumbnails
       if (tracks && tracks.length > 0) {
         const castTracks: any[] = [];
-        let trackId = 0;
+        let trackId = 1; // Start from 1 instead of 0
         
         tracks.forEach((track: any) => {
           if (track.kind === 'thumbnails') {
@@ -90,11 +95,15 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
             console.log('✅ Added thumbnail track to Cast:', track.file);
           } else if (track.kind === 'subtitles' || track.kind === 'captions' || !track.kind) {
             // Add subtitle/caption tracks
-            const subTrack = new cast.media.Track(trackId++, cast.media.TrackType.TEXT);
+            const currentTrackId = trackId++;
+            const subTrack = new cast.media.Track(currentTrackId, cast.media.TrackType.TEXT);
             subTrack.trackContentId = track.file;
             subTrack.trackContentType = 'text/vtt';
             subTrack.subtype = cast.media.TextTrackType.SUBTITLES;
             subTrack.name = track.label || 'Unknown';
+            
+            // Map track file to Cast track ID
+            castTracksMapRef.current.set(track.file, currentTrackId);
             // Extract proper language code from label or use the language field
             const langCode = track.language?.toLowerCase() || 
                            (track.label?.toLowerCase().includes('english') ? 'en' : 
@@ -145,6 +154,33 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
       session.loadMedia(request).then(
         () => {
           console.log('✅ Media loaded to Cast with metadata and tracks');
+          
+          // Create subtitle control function
+          const subtitleController = (trackFile: string) => {
+            if (!session) return;
+            
+            const media = session.getMediaSession();
+            if (!media) return;
+            
+            const castTrackId = castTracksMapRef.current.get(trackFile);
+            
+            if (castTrackId !== undefined) {
+              const tracksInfoRequest = new cast.media.EditTracksInfoRequest([castTrackId]);
+              media.editTracksInfo(tracksInfoRequest, 
+                () => console.log(`✅ Cast subtitle changed to track ${castTrackId}`),
+                (error: any) => console.error('❌ Error changing Cast subtitle:', error)
+              );
+            } else {
+              // Turn off subtitles
+              const tracksInfoRequest = new cast.media.EditTracksInfoRequest([]);
+              media.editTracksInfo(tracksInfoRequest,
+                () => console.log('✅ Cast subtitles turned off'),
+                (error: any) => console.error('❌ Error turning off Cast subtitles:', error)
+              );
+            }
+          };
+          
+          setSetCastSubtitle(() => subtitleController);
         },
         (error: any) => {
           console.error('❌ Error loading media to Cast:', error);
@@ -184,5 +220,5 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
     }
   }, [isCasting, loadMediaToCast]);
 
-  return { isCasting, castAvailable, handleCastClick };
+  return { isCasting, castAvailable, handleCastClick, setCastSubtitle };
 }
