@@ -123,6 +123,16 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
       const request = new cast.media.LoadRequest(mediaInfo);
       request.autoplay = true;
       
+      // Set text track style BEFORE enabling tracks for better visibility
+      const textTrackStyle = new cast.media.TextTrackStyle();
+      textTrackStyle.backgroundColor = '#000000CC';
+      textTrackStyle.foregroundColor = '#FFFFFF';
+      textTrackStyle.edgeType = cast.media.TextTrackEdgeType.DROP_SHADOW;
+      textTrackStyle.fontFamily = 'SANS_SERIF';
+      textTrackStyle.fontScale = 1.2; // Slightly larger for better readability
+      textTrackStyle.fontGenericFamily = cast.media.TextTrackFontGenericFamily.SANS_SERIF;
+      request.textTrackStyle = textTrackStyle;
+      
       // Enable the first subtitle track by default if available
       const subtitleTracks = mediaInfo.tracks?.filter((t: any) => 
         t.subtype === cast.media.TextTrackType.SUBTITLES
@@ -131,19 +141,28 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
         request.activeTrackIds = [subtitleTracks[0].trackId];
         console.log(`✅ Enabled default subtitle track: ${subtitleTracks[0].name} (${subtitleTracks[0].language})`);
       }
-      
-      // Set text track style for better visibility
-      const textTrackStyle = new cast.media.TextTrackStyle();
-      textTrackStyle.backgroundColor = '#000000CC';
-      textTrackStyle.foregroundColor = '#FFFFFF';
-      textTrackStyle.edgeType = cast.media.TextTrackEdgeType.DROP_SHADOW;
-      textTrackStyle.fontFamily = 'SANS_SERIF';
-      textTrackStyle.fontScale = 1.0;
-      request.textTrackStyle = textTrackStyle;
 
       session.loadMedia(request).then(
         () => {
           console.log('✅ Media loaded to Cast with metadata and tracks');
+          
+          // Force subtitle track activation after a short delay to ensure it loads
+          setTimeout(() => {
+            const media = session.getMediaSession();
+            if (media && subtitleTracks && subtitleTracks.length > 0) {
+              const tracksRequest = new cast.media.EditTracksInfoRequest([subtitleTracks[0].trackId]);
+              tracksRequest.textTrackStyle = textTrackStyle;
+              
+              media.editTracksInfo(tracksRequest, 
+                () => {
+                  console.log('✅ Subtitle track force-activated after load');
+                },
+                (error: any) => {
+                  console.warn('⚠️ Failed to force-activate subtitle:', error);
+                }
+              );
+            }
+          }, 1000);
         },
         (error: any) => {
           console.error('❌ Error loading media to Cast:', error);
