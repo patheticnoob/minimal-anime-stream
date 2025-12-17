@@ -653,18 +653,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       }
 
       setCurrentSubtitle(defaultTrackIndex >= 0 ? defaultTrackIndex : -1);
-      
-      // Double-check after a short delay to ensure subtitles are visible
-      setTimeout(() => {
-        if (defaultTrackIndex >= 0 && video.textTracks[defaultTrackIndex]) {
-          video.textTracks[defaultTrackIndex].mode = "showing";
-          // Also try setting it to hidden then showing to force refresh
-          // video.textTracks[defaultTrackIndex].mode = "hidden";
-          // setTimeout(() => {
-          //   video.textTracks[defaultTrackIndex].mode = "showing";
-          // }, 50);
-        }
-      }, 500);
     };
 
     const handleTrackChange = () => {

@@ -145,24 +145,6 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
       session.loadMedia(request).then(
         () => {
           console.log('✅ Media loaded to Cast with metadata and tracks');
-          
-          // Force subtitle track activation after a short delay to ensure it loads
-          setTimeout(() => {
-            const media = session.getMediaSession();
-            if (media && subtitleTracks && subtitleTracks.length > 0) {
-              const tracksRequest = new cast.media.EditTracksInfoRequest([subtitleTracks[0].trackId]);
-              tracksRequest.textTrackStyle = textTrackStyle;
-              
-              media.editTracksInfo(tracksRequest, 
-                () => {
-                  console.log('✅ Subtitle track force-activated after load');
-                },
-                (error: any) => {
-                  console.warn('⚠️ Failed to force-activate subtitle:', error);
-                }
-              );
-            }
-          }, 1000);
         },
         (error: any) => {
           console.error('❌ Error loading media to Cast:', error);
