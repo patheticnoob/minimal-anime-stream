@@ -183,9 +183,12 @@ export default function Watch() {
     }
   }, [animeId, fetchEpisodes, fetchBroadcastInfo, navigate]);
 
-  // Gamepad navigation for Watch page
+  // Enhanced Gamepad navigation for Watch page
   useEffect(() => {
-    if (buttonPressed === null || videoSource) return;
+    if (buttonPressed === null) return;
+
+    // If video is playing, let the video player handle controls
+    if (videoSource) return;
 
     switch (buttonPressed) {
       case GAMEPAD_BUTTONS.DPAD_UP:
@@ -207,11 +210,19 @@ export default function Watch() {
         break;
 
       case GAMEPAD_BUTTONS.B:
-        navigate("/");
+        if (isNavigatingEpisodes) {
+          setIsNavigatingEpisodes(false);
+        } else {
+          navigate("/");
+        }
         break;
 
       case GAMEPAD_BUTTONS.X:
         setIsNavigatingEpisodes(!isNavigatingEpisodes);
+        break;
+
+      case GAMEPAD_BUTTONS.Y:
+        handleToggleWatchlist();
         break;
     }
   }, [buttonPressed, videoSource, isNavigatingEpisodes, focusedEpisodeIndex, episodes, navigate]);
@@ -507,8 +518,13 @@ export default function Watch() {
                 <div className="text-center">
                   <Play className="h-16 w-16 mx-auto mb-4 text-gray-600" />
                   <p className="text-gray-400">Select an episode to start watching</p>
-                  {!isNavigatingEpisodes && (
-                    <p className="text-xs text-gray-500 mt-2">Press X to navigate episodes with gamepad</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Press X to {isNavigatingEpisodes ? "disable" : "enable"} gamepad navigation
+                  </p>
+                  {isNavigatingEpisodes && (
+                    <p className="text-xs text-blue-400 mt-1">
+                      Use D-pad Up/Down to navigate • A to play • B to exit
+                    </p>
                   )}
                 </div>
               </div>
@@ -598,7 +614,7 @@ export default function Watch() {
                         isCurrentEpisode
                           ? "bg-blue-500/20 border-blue-500"
                           : isFocused
-                          ? "bg-white/10 border-blue-500 ring-2 ring-blue-500"
+                          ? "bg-white/10 border-blue-500 ring-2 ring-blue-500 shadow-lg shadow-blue-500/50"
                           : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                       }`}
                     >

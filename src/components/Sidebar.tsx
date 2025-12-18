@@ -1,5 +1,6 @@
 import { Home, Tv, Film, Sparkles, History, User, Search, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 interface SidebarProps {
   activeSection?: string;
@@ -8,6 +9,9 @@ interface SidebarProps {
 
 export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [focusedNavIndex, setFocusedNavIndex] = useState(0);
+  const [isSidebarFocused, setIsSidebarFocused] = useState(false);
+  const { buttonPressed } = useGamepad();
 
   const navItems = [
     { id: "home", label: "Home", icon: Home },
@@ -23,6 +27,43 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
     setIsMobileMenuOpen(false);
   };
 
+  // Gamepad navigation for Sidebar
+  useEffect(() => {
+    if (buttonPressed === null || !isSidebarFocused) return;
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        setFocusedNavIndex(prev => Math.max(0, prev - 1));
+        break;
+
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        setFocusedNavIndex(prev => Math.min(navItems.length - 1, prev + 1));
+        break;
+
+      case GAMEPAD_BUTTONS.A:
+        handleNavClick(navItems[focusedNavIndex].id);
+        break;
+
+      case GAMEPAD_BUTTONS.B:
+        setIsSidebarFocused(false);
+        break;
+
+      case GAMEPAD_BUTTONS.START:
+        setIsSidebarFocused(true);
+        break;
+    }
+  }, [buttonPressed, isSidebarFocused, focusedNavIndex, navItems]);
+
+  // Auto-scroll focused nav item into view
+  useEffect(() => {
+    if (isSidebarFocused && focusedNavIndex >= 0) {
+      const navElement = document.querySelector(`[data-sidebar-nav-index="${focusedNavIndex}"]`);
+      if (navElement) {
+        navElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+  }, [focusedNavIndex, isSidebarFocused]);
+
   return (
     <>
       {/* Desktop Sidebar */}
@@ -35,14 +76,23 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
 
           {/* Navigation */}
           <nav className="sidebar-nav">
-            {navItems.map((item) => {
+            {isSidebarFocused && (
+              <div className="text-xs text-blue-400 mb-2 px-4">
+                Gamepad Active - Press B to exit
+              </div>
+            )}
+            {navItems.map((item, idx) => {
               const Icon = item.icon;
               const isActive = activeSection === item.id;
+              const isFocused = isSidebarFocused && focusedNavIndex === idx;
               
               return (
                 <button
                   key={item.id}
-                  className={`nav-item ${isActive ? "nav-item--active" : ""}`}
+                  data-sidebar-nav-index={idx}
+                  className={`nav-item ${isActive ? "nav-item--active" : ""} ${
+                    isFocused ? "ring-2 ring-blue-500 bg-blue-500/20" : ""
+                  }`}
                   onClick={() => onSectionChange?.(item.id)}
                 >
                   <span className="nav-icon">
