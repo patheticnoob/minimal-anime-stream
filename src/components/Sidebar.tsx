@@ -1,6 +1,7 @@
-import { Home, Tv, Film, Sparkles, History, User, Search, Menu, X } from "lucide-react";
+import { Home, Tv, Film, Sparkles, History, User, Search, Menu, X, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
+import { GamepadSettings } from "@/components/GamepadSettings";
 
 interface SidebarProps {
   activeSection?: string;
@@ -11,6 +12,7 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [focusedNavIndex, setFocusedNavIndex] = useState(0);
   const [isSidebarFocused, setIsSidebarFocused] = useState(false);
+  const [showGamepadSettings, setShowGamepadSettings] = useState(false);
   const { buttonPressed } = useGamepad();
 
   const navItems = [
@@ -77,8 +79,15 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
           {/* Navigation */}
           <nav className="sidebar-nav">
             {isSidebarFocused && (
-              <div className="text-xs text-blue-400 mb-2 px-4">
-                Gamepad Active - Press B to exit
+              <div className="text-xs text-blue-400 mb-2 px-4 flex items-center justify-between">
+                <span>Gamepad Active - Press B to exit</span>
+                <button
+                  onClick={() => setShowGamepadSettings(true)}
+                  className="p-1 hover:bg-white/10 rounded transition-colors"
+                  title="Gamepad Settings"
+                >
+                  <Settings className="h-4 w-4" />
+                </button>
               </div>
             )}
             {navItems.map((item, idx) => {
@@ -91,7 +100,7 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
                   key={item.id}
                   data-sidebar-nav-index={idx}
                   className={`nav-item ${isActive ? "nav-item--active" : ""} ${
-                    isFocused ? "ring-2 ring-blue-500 bg-blue-500/20" : ""
+                    isFocused ? "ring-4 ring-blue-400 bg-blue-500/20 shadow-lg shadow-blue-500/50 scale-105" : ""
                   }`}
                   onClick={() => onSectionChange?.(item.id)}
                 >
@@ -133,6 +142,12 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
           </button>
         </div>
       </nav>
+
+      {/* Gamepad Settings Modal */}
+      <GamepadSettings
+        isOpen={showGamepadSettings}
+        onClose={() => setShowGamepadSettings(false)}
+      />
 
       {/* Mobile Side Panel Overlay */}
       {isMobileMenuOpen && (

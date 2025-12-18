@@ -612,9 +612,9 @@ export default function Watch() {
                       onClick={() => playEpisode(ep)}
                       className={`w-full text-left p-3 rounded-lg border transition-all ${
                         isCurrentEpisode
-                          ? "bg-blue-500/20 border-blue-500"
+                          ? "bg-blue-500/20 border-blue-500 ring-2 ring-blue-400/50"
                           : isFocused
-                          ? "bg-white/10 border-blue-500 ring-2 ring-blue-500 shadow-lg shadow-blue-500/50"
+                          ? "bg-blue-500/10 border-blue-400 ring-4 ring-blue-400 shadow-xl shadow-blue-500/60 scale-[1.02]"
                           : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                       }`}
                     >
