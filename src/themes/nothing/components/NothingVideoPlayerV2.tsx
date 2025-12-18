@@ -726,6 +726,9 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       case GAMEPAD_BUTTONS.Y:
         toggleFullscreen();
         break;
+      case GAMEPAD_BUTTONS.X:
+        toggleFullscreen();
+        break;
       case GAMEPAD_BUTTONS.DPAD_LEFT:
         skip(-10);
         break;
@@ -739,14 +742,11 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         handleVolumeChange(Math.max(0, volume - 0.1));
         break;
       case GAMEPAD_BUTTONS.LB:
-        // Previous episode logic could go here
+        if (showSkipIntro) skipIntro();
         break;
       case GAMEPAD_BUTTONS.RB:
-        if (onNext) onNext();
-        break;
-      case GAMEPAD_BUTTONS.X:
-        if (showSkipIntro) skipIntro();
-        else if (showSkipOutro) skipOutro();
+        if (showSkipOutro) skipOutro();
+        else if (onNext) onNext();
         break;
     }
   }, [buttonPressed, togglePlay, onClose, toggleFullscreen, skip, volume, handleVolumeChange, onNext, showSkipIntro, showSkipOutro, skipIntro, skipOutro]);
