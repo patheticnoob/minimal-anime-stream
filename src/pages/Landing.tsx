@@ -239,16 +239,26 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
 
     switch (buttonPressed) {
       case GAMEPAD_BUTTONS.DPAD_UP:
-        if (isNavigatingRails) {
-          setFocusedRailIndex(prev => Math.max(0, prev - 1));
+        setFocusedRailIndex(prev => {
+          const newIndex = Math.max(0, prev - 1);
           setFocusedItemIndex(0);
+          return newIndex;
+        });
+        // Auto-enable rail navigation when moving between rails
+        if (!isNavigatingRails && focusedRailIndex > 0) {
+          setIsNavigatingRails(true);
         }
         break;
 
       case GAMEPAD_BUTTONS.DPAD_DOWN:
-        if (isNavigatingRails) {
-          setFocusedRailIndex(prev => Math.min(rails.length - 1, prev + 1));
+        setFocusedRailIndex(prev => {
+          const newIndex = Math.min(rails.length - 1, prev + 1);
           setFocusedItemIndex(0);
+          return newIndex;
+        });
+        // Auto-enable rail navigation when moving between rails
+        if (!isNavigatingRails && focusedRailIndex < rails.length - 1) {
+          setIsNavigatingRails(true);
         }
         break;
 
@@ -261,6 +271,9 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       case GAMEPAD_BUTTONS.DPAD_RIGHT:
         if (!isNavigatingRails) {
           setFocusedItemIndex(prev => Math.min(currentRail.items.length - 1, prev + 1));
+        } else {
+          // If in rail navigation mode, switch to item navigation
+          setIsNavigatingRails(false);
         }
         break;
 
@@ -291,7 +304,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
         }
         break;
     }
-  }, [buttonPressed, activeSection, focusedRailIndex, focusedItemIndex, isNavigatingRails, selected, heroAnime, continueWatchingItems, watchlistItems, popularItems, airingItems, movieItems, tvShowItems, isAuthenticated]);
+  }, [buttonPressed, activeSection, focusedRailIndex, focusedItemIndex, isNavigatingRails, selected, heroAnime, continueWatchingItems, watchlistItems, popularItems, airingItems, movieItems, tvShowItems, isAuthenticated, openAnime]);
 
   const handleToggleWatchlist = async () => {
     if (!isAuthenticated) {

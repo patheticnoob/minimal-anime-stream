@@ -58,6 +58,10 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [subtitleSize, setSubtitleSize] = useState(() => {
+    const saved = localStorage.getItem('subtitleSize');
+    return saved ? parseInt(saved) : 100;
+  });
   const [showControls, setShowControls] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
