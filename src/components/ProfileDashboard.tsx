@@ -57,121 +57,8 @@ export function ProfileDashboard({
   onLogout,
 }: ProfileDashboardProps) {
   const { theme, setTheme } = useTheme();
-  const { buttonPressed } = useGamepad();
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedSection, setSelectedSection] = useState<FocusSection>("continue");
   const safeContinueWatching = continueWatching ?? [];
   const safeWatchlist = watchlist ?? [];
-  const availableSections = useMemo<FocusSection[]>(() => {
-    const sections: FocusSection[] = [];
-    if (safeContinueWatching.length > 0) sections.push("continue");
-    if (safeWatchlist.length > 0) sections.push("watchlist");
-    sections.push("theme", "signout");
-    return sections;
-  }, [safeContinueWatching.length, safeWatchlist.length]);
-  const getSectionItemCount = (section: FocusSection) => {
-    switch (section) {
-      case "continue":
-        return safeContinueWatching.length;
-      case "watchlist":
-        return safeWatchlist.length;
-      case "theme":
-        return themeOptions.length;
-      case "signout":
-        return 1;
-      default:
-        return 0;
-    }
-  };
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  // Handle gamepad navigation
-  useEffect(() => {
-    if (!availableSections.includes(selectedSection)) {
-      setSelectedSection(availableSections[0]);
-      setSelectedIndex(0);
-    }
-  }, [availableSections, selectedSection]);
-
-  useEffect(() => {
-    const count = getSectionItemCount(selectedSection);
-    if (count === 0) {
-      setSelectedIndex(0);
-    } else {
-      setSelectedIndex((prev) => Math.min(prev, count - 1));
-    }
-  }, [selectedSection, safeContinueWatching.length, safeWatchlist.length]);
-
-  useEffect(() => {
-    if (buttonPressed === null) return;
-    const itemCount = getSectionItemCount(selectedSection);
-    switch (buttonPressed) {
-      case GAMEPAD_BUTTONS.DPAD_LEFT:
-        if (itemCount > 0) {
-          setSelectedIndex((prev) => Math.max(0, prev - 1));
-        }
-        break;
-      case GAMEPAD_BUTTONS.DPAD_RIGHT:
-        if (itemCount > 0) {
-          setSelectedIndex((prev) => Math.min(itemCount - 1, prev + 1));
-        }
-        break;
-      case GAMEPAD_BUTTONS.DPAD_UP: {
-        const idx = availableSections.indexOf(selectedSection);
-        if (idx > 0) {
-          setSelectedSection(availableSections[idx - 1]);
-          setSelectedIndex(0);
-        }
-        break;
-      }
-      case GAMEPAD_BUTTONS.DPAD_DOWN: {
-        const idx = availableSections.indexOf(selectedSection);
-        if (idx < availableSections.length - 1) {
-          setSelectedSection(availableSections[idx + 1]);
-          setSelectedIndex(0);
-        }
-        break;
-      }
-      case GAMEPAD_BUTTONS.A: {
-        if (selectedSection === "theme") {
-          const option = themeOptions[selectedIndex] ?? themeOptions[0];
-          setTheme(option.value);
-        } else if (selectedSection === "signout") {
-          onLogout?.();
-        } else {
-          const items = selectedSection === "continue" ? safeContinueWatching : safeWatchlist;
-          const target = items[selectedIndex];
-          if (target) {
-            onSelectAnime(target);
-          }
-        }
-        break;
-      }
-    }
-  }, [
-    buttonPressed,
-    selectedSection,
-    availableSections,
-    safeContinueWatching,
-    safeWatchlist,
-    onSelectAnime,
-    onLogout,
-    setTheme,
-    selectedIndex,
-  ]);
-
-  useEffect(() => {
-    if (
-      (selectedSection === "continue" || selectedSection === "watchlist") &&
-      itemRefs.current[selectedIndex]
-    ) {
-      itemRefs.current[selectedIndex]?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-    }
-  }, [selectedIndex, selectedSection]);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -184,11 +71,7 @@ export function ProfileDashboard({
         <Button
           variant="outline"
           onClick={onLogout}
-          className={`border-red-500/50 text-red-400 hover:bg-red-500/10 ${
-            selectedSection === "signout"
-              ? "ring-2 ring-[#ff4d4f] ring-offset-2 ring-offset-[#0B0F19]"
-              : ""
-          }`}
+          className="border-red-500/50 text-red-400 hover:bg-red-500/10"
         >
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out
@@ -205,27 +88,15 @@ export function ProfileDashboard({
       <div className="bg-[var(--nothing-elevated,white/5)] border border-[var(--nothing-border,white/10)] rounded-lg p-6">
         <h2 className="text-xl font-bold mb-4 text-[var(--nothing-fg,white)]">Theme Settings</h2>
         <div className="flex flex-wrap gap-3">
-          {themeOptions.map((option, idx) => (
-            <div
+          {themeOptions.map((option) => (
+            <Button
               key={option.value}
-              className={`rounded-lg ${
-                selectedSection === "theme" && selectedIndex === idx
-                  ? "ring-2 ring-[#ff4d4f] ring-offset-2 ring-offset-[#0B0F19]"
-                  : ""
-              }`}
+              variant={theme === option.value ? "default" : "outline"}
+              onClick={() => setTheme(option.value)}
+              className={theme === option.value ? option.accentClass : ""}
             >
-              <Button
-                variant={theme === option.value ? "default" : "outline"}
-                onClick={() => {
-                  setSelectedSection("theme");
-                  setSelectedIndex(idx);
-                  setTheme(option.value);
-                }}
-                className={theme === option.value ? option.accentClass : ""}
-              >
-                {option.label}
-              </Button>
-            </div>
+              {option.label}
+            </Button>
           ))}
         </div>
         <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
@@ -239,25 +110,12 @@ export function ProfileDashboard({
           <h2 className="text-2xl font-bold mb-4 text-[var(--nothing-fg,white)]">Continue Watching</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {safeContinueWatching.map((anime, idx) => (
-              <div
+              <AnimeCard
                 key={anime.id ?? idx}
-                ref={(el) => {
-                  if (selectedSection === "continue") {
-                    itemRefs.current[idx] = el;
-                  }
-                }}
-                className={`transition-all duration-200 ${
-                  selectedSection === "continue" && selectedIndex === idx
-                    ? 'ring-2 ring-[#ff4d4f] ring-offset-2 ring-offset-[#0B0F19] scale-105'
-                    : ''
-                }`}
-              >
-                <AnimeCard
-                  anime={anime}
-                  onClick={() => onSelectAnime(anime)}
-                  index={idx}
-                />
-              </div>
+                anime={anime}
+                onClick={() => onSelectAnime(anime)}
+                index={idx}
+              />
             ))}
           </div>
         </div>
@@ -269,25 +127,12 @@ export function ProfileDashboard({
           <h2 className="text-2xl font-bold mb-4 text-[var(--nothing-fg,white)]">My Watchlist</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {safeWatchlist.map((anime, idx) => (
-              <div
+              <AnimeCard
                 key={anime.id ?? idx}
-                ref={(el) => {
-                  if (selectedSection === "watchlist") {
-                    itemRefs.current[idx] = el;
-                  }
-                }}
-                className={`transition-all duration-200 ${
-                  selectedSection === "watchlist" && selectedIndex === idx
-                    ? 'ring-2 ring-[#ff4d4f] ring-offset-2 ring-offset-[#0B0F19] scale-105'
-                    : ''
-                }`}
-              >
-                <AnimeCard
-                  anime={anime}
-                  onClick={() => onSelectAnime(anime)}
-                  index={idx}
-                />
-              </div>
+                anime={anime}
+                onClick={() => onSelectAnime(anime)}
+                index={idx}
+              />
             ))}
           </div>
         </div>

@@ -79,16 +79,16 @@ export function GamepadCursor() {
           exit={{ opacity: 0, scale: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <div className={`relative ${style.glow}`}>
-            {/* Outer ring */}
+          <div className={`relative flex items-center justify-center ${style.glow}`}>
+            {/* Outer ring - centered */}
             <div
-              className={`absolute inset-0 w-8 h-8 rounded-full border-4 ${style.border} ${style.shadow} animate-ping`}
-              style={{ animationDuration: '1.5s' }}
+              className={`absolute w-8 h-8 rounded-full border-4 ${style.border} ${style.shadow} animate-ping`}
+              style={{ animationDuration: '1.5s', left: '-6px', top: '-6px' }}
             />
             {/* Inner dot */}
             <div className={`w-4 h-4 rounded-full ${style.bg} border-2 ${style.border} ${style.shadow}`} />
             {/* Center dot */}
-            <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute w-1 h-1 bg-white rounded-full" style={{ left: '7px', top: '7px' }} />
           </div>
         </motion.div>
       )}
