@@ -239,26 +239,23 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
 
     switch (buttonPressed) {
       case GAMEPAD_BUTTONS.DPAD_UP:
-        setFocusedRailIndex(prev => {
-          const newIndex = Math.max(0, prev - 1);
-          setFocusedItemIndex(0);
-          return newIndex;
-        });
-        // Auto-enable rail navigation when moving between rails
-        if (!isNavigatingRails && focusedRailIndex > 0) {
+        if (isNavigatingRails || focusedItemIndex === 0) {
+          setFocusedRailIndex(prev => {
+            const newIndex = Math.max(0, prev - 1);
+            setFocusedItemIndex(0);
+            return newIndex;
+          });
           setIsNavigatingRails(true);
         }
         break;
 
       case GAMEPAD_BUTTONS.DPAD_DOWN:
-        setFocusedRailIndex(prev => {
-          const newIndex = Math.min(rails.length - 1, prev + 1);
-          setFocusedItemIndex(0);
-          return newIndex;
-        });
-        // Auto-enable rail navigation when moving between rails
-        if (!isNavigatingRails && focusedRailIndex < rails.length - 1) {
-          setIsNavigatingRails(true);
+        if (isNavigatingRails) {
+          setFocusedRailIndex(prev => {
+            const newIndex = Math.min(rails.length - 1, prev + 1);
+            setFocusedItemIndex(0);
+            return newIndex;
+          });
         }
         break;
 

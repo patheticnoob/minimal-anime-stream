@@ -63,6 +63,10 @@ export function RetroVideoPlayer({
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [showSkipOutro, setShowSkipOutro] = useState(false);
   const [selectedSubtitle, setSelectedSubtitle] = useState("off");
+  const [subtitleSize, setSubtitleSize] = useState(() => {
+    const saved = localStorage.getItem('subtitleSize');
+    return saved ? parseInt(saved) : 100;
+  });
 
   const { isCasting, castAvailable, handleCastClick } = useCast(
     source, 
@@ -325,6 +329,7 @@ export function RetroVideoPlayer({
       }
       video[data-retro-player="true"]::cue {
         transform: translateY(${translateValue}) !important;
+        font-size: ${subtitleSize}% !important;
       }
     `;
 
@@ -340,7 +345,7 @@ export function RetroVideoPlayer({
         styleToRemove.remove();
       }
     };
-  }, [showControls]);
+  }, [showControls, subtitleSize]);
 
   const handleMouseMove = () => {
     setShowControls(true);
@@ -695,6 +700,29 @@ export function RetroVideoPlayer({
                     </select>
                   </div>
                 )}
+                <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
+                  <button
+                    onClick={() => {
+                      const newSize = Math.max(50, subtitleSize - 10);
+                      setSubtitleSize(newSize);
+                      localStorage.setItem('subtitleSize', newSize.toString());
+                    }}
+                    className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 hover:bg-[#FF69B4]/20"
+                  >
+                    -
+                  </button>
+                  <span className="min-w-[3rem] text-center">{subtitleSize}%</span>
+                  <button
+                    onClick={() => {
+                      const newSize = Math.min(200, subtitleSize + 10);
+                      setSubtitleSize(newSize);
+                      localStorage.setItem('subtitleSize', newSize.toString());
+                    }}
+                    className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 hover:bg-[#FF69B4]/20"
+                  >
+                    +
+                  </button>
+                </div>
                 <button
                   onClick={toggleFullscreen}
                   className="text-[#FF69B4] hover:text-[#FF1493] p-2 transition-colors border-2 border-[#FF69B4] bg-black/50 hover:bg-black"
