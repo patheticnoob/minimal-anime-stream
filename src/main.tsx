@@ -7,6 +7,7 @@ import { ThemedLanding, ThemedAuth, ThemedWatchHistory, ThemedWatch } from "./sh
 import NotFound from "./pages/NotFound";
 import "./index.css";
 import { Toaster } from "sonner";
+import { GamepadCursor } from "./components/GamepadCursor";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
@@ -22,6 +23,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster position="top-center" richColors />
+        <GamepadCursor />
       </BrowserRouter>
     </ConvexAuthProvider>
   </StrictMode>

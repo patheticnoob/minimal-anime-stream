@@ -1,0 +1,97 @@
+import { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useGamepadCursor } from '@/hooks/use-gamepad-cursor';
+import { useGamepad, GAMEPAD_BUTTONS } from '@/hooks/use-gamepad';
+import { useTheme } from '@/hooks/use-theme';
+
+export function GamepadCursor() {
+  const { cursorPosition, isVisible, simulateClick } = useGamepadCursor();
+  const { buttonPressed } = useGamepad();
+  const { theme } = useTheme();
+
+  // Handle button clicks
+  useEffect(() => {
+    if (buttonPressed === null) return;
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.A:
+        simulateClick('left');
+        break;
+      case GAMEPAD_BUTTONS.B:
+        // Back/Cancel - simulate escape key
+        const escapeEvent = new KeyboardEvent('keydown', {
+          key: 'Escape',
+          code: 'Escape',
+          bubbles: true,
+          cancelable: true,
+        });
+        document.dispatchEvent(escapeEvent);
+        break;
+      case GAMEPAD_BUTTONS.X:
+        // Double click
+        simulateClick('left');
+        setTimeout(() => simulateClick('left'), 100);
+        break;
+    }
+  }, [buttonPressed, simulateClick]);
+
+  // Theme-based cursor styles
+  const getCursorStyle = () => {
+    switch (theme) {
+      case 'retro':
+        return {
+          bg: 'bg-[#FF69B4]',
+          border: 'border-[#FF1493]',
+          shadow: 'shadow-[0_0_20px_rgba(255,105,180,0.8)]',
+          glow: 'drop-shadow(0_0_10px_rgba(255,105,180,1))',
+        };
+      case 'nothing':
+        return {
+          bg: 'bg-[#ff4d4f]',
+          border: 'border-red-500',
+          shadow: 'shadow-[0_0_20px_rgba(255,77,79,0.8)]',
+          glow: 'drop-shadow(0_0_10px_rgba(255,77,79,1))',
+        };
+      default:
+        return {
+          bg: 'bg-blue-500',
+          border: 'border-blue-400',
+          shadow: 'shadow-[0_0_20px_rgba(59,130,246,0.8)]',
+          glow: 'drop-shadow(0_0_10px_rgba(59,130,246,1))',
+        };
+    }
+  };
+
+  const style = getCursorStyle();
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          className="fixed pointer-events-none z-[9999]"
+          style={{
+            left: cursorPosition.x,
+            top: cursorPosition.y,
+            transform: 'translate(-50%, -50%)',
+          }}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className={`relative ${style.glow}`}>
+            {/* Outer ring */}
+            <div
+              className={`absolute inset-0 w-8 h-8 rounded-full border-4 ${style.border} ${style.shadow} animate-ping`}
+              style={{ animationDuration: '1.5s' }}
+            />
+            {/* Inner dot */}
+            <div className={`w-4 h-4 rounded-full ${style.bg} border-2 ${style.border} ${style.shadow}`} />
+            {/* Center dot */}
+            <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2" />
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}

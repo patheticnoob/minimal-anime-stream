@@ -11,6 +11,7 @@ import {
 import { useTheme } from "@/hooks/use-theme";
 import { AnimeCard } from "@/components/AnimeCard";
 import { ControllerStatus } from "@/components/ControllerStatus";
+import { GamepadButtonMapping } from "@/components/GamepadButtonMapping";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -196,6 +197,9 @@ export function ProfileDashboard({
 
       {/* Controller Status */}
       <ControllerStatus showDetails={true} />
+
+      {/* Controller Button Mapping Section */}
+      <GamepadButtonMapping />
 
       {/* Theme Switcher */}
       <div className="bg-[var(--nothing-elevated,white/5)] border border-[var(--nothing-border,white/10)] rounded-lg p-6">
