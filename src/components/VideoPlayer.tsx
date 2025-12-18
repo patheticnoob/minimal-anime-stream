@@ -379,6 +379,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         video::cue {
           transform: translateY(-80px) !important;
           background-color: rgba(0, 0, 0, 0.7) !important;
+          font-size: ${subtitleSize}% !important;
         }
       `;
     } else {
@@ -389,6 +390,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         video::cue {
           transform: translateY(-20px) !important;
           background-color: rgba(0, 0, 0, 0.5) !important;
+          font-size: ${subtitleSize}% !important;
         }
       `;
     }
@@ -405,7 +407,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         styleToRemove.remove();
       }
     };
-  }, [showControls]);
+  }, [showControls, subtitleSize]);
 
   const handleMouseMove = () => {
     if (isDragging) return;
@@ -1145,6 +1147,28 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
                           data-testid={`playback-rate-${rate}`}
                         >
                           {rate}x {playbackRate === rate && "✓"}
+                        </button>
+                      ))}
+                      
+                      <div className="border-t border-white/10 my-2" />
+                      
+                      <div className="text-white/60 text-xs font-semibold uppercase tracking-wide px-4 py-2">Subtitle Size</div>
+                      {[
+                        { label: 'Small', value: 75 },
+                        { label: 'Medium', value: 100 },
+                        { label: 'Large', value: 150 }
+                      ].map((size) => (
+                        <button
+                          key={size.value}
+                          onClick={() => {
+                            setSubtitleSize(size.value);
+                            localStorage.setItem('subtitleSize', size.value.toString());
+                            setShowSettings(false);
+                          }}
+                          className={`block w-full text-left px-4 py-2.5 text-white text-sm hover:bg-white/10 transition-colors ${subtitleSize === size.value ? "bg-blue-600/20 text-blue-400" : ""}`}
+                          data-testid={`subtitle-size-${size.label.toLowerCase()}`}
+                        >
+                          {size.label} {subtitleSize === size.value && "✓"}
                         </button>
                       ))}
                     </div>

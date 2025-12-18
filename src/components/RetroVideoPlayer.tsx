@@ -701,27 +701,20 @@ export function RetroVideoPlayer({
                   </div>
                 )}
                 <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-[#FF69B4]">
-                  <button
-                    onClick={() => {
-                      const newSize = Math.max(50, subtitleSize - 10);
+                  <span>Size</span>
+                  <select
+                    value={subtitleSize}
+                    onChange={(e) => {
+                      const newSize = parseInt(e.target.value);
                       setSubtitleSize(newSize);
                       localStorage.setItem('subtitleSize', newSize.toString());
                     }}
-                    className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 hover:bg-[#FF69B4]/20"
+                    className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF69B4]"
                   >
-                    -
-                  </button>
-                  <span className="min-w-[3rem] text-center">{subtitleSize}%</span>
-                  <button
-                    onClick={() => {
-                      const newSize = Math.min(200, subtitleSize + 10);
-                      setSubtitleSize(newSize);
-                      localStorage.setItem('subtitleSize', newSize.toString());
-                    }}
-                    className="bg-black/70 border-2 border-[#FF69B4] text-[#FF69B4] px-2 py-1 hover:bg-[#FF69B4]/20"
-                  >
-                    +
-                  </button>
+                    <option value="75">Small</option>
+                    <option value="100">Medium</option>
+                    <option value="150">Large</option>
+                  </select>
                 </div>
                 <button
                   onClick={toggleFullscreen}
