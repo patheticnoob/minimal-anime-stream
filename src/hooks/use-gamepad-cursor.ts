@@ -10,6 +10,7 @@ export function useGamepadCursor() {
   const [isVisible, setIsVisible] = useState(false);
   const lastMoveTimeRef = useRef<number>(Date.now());
   const animationFrameRef = useRef<number | undefined>(undefined);
+  const lastClickTimeRef = useRef<number>(0);
 
   useEffect(() => {
     const updateCursor = () => {
@@ -31,11 +32,26 @@ export function useGamepadCursor() {
 
       const threshold = 0.15;
       const sensitivity = 8;
+      const edgeScrollThreshold = 50; // pixels from edge to trigger scroll
+      const scrollSpeed = 10;
 
       if (Math.abs(xAxis) > threshold || Math.abs(yAxis) > threshold) {
         setCursorPosition((prev) => {
           const newX = Math.max(0, Math.min(window.innerWidth, prev.x + xAxis * sensitivity));
           const newY = Math.max(0, Math.min(window.innerHeight, prev.y + yAxis * sensitivity));
+          
+          // Edge scrolling
+          if (newX < edgeScrollThreshold) {
+            window.scrollBy(-scrollSpeed, 0);
+          } else if (newX > window.innerWidth - edgeScrollThreshold) {
+            window.scrollBy(scrollSpeed, 0);
+          }
+          
+          if (newY < edgeScrollThreshold) {
+            window.scrollBy(0, -scrollSpeed);
+          } else if (newY > window.innerHeight - edgeScrollThreshold) {
+            window.scrollBy(0, scrollSpeed);
+          }
           
           // Trigger hover events
           const element = document.elementFromPoint(newX, newY);
@@ -102,6 +118,13 @@ export function useGamepadCursor() {
   }, []);
 
   const simulateClick = (button: 'left' | 'right' = 'left') => {
+    // Debounce clicks to prevent double-clicking
+    const now = Date.now();
+    if (now - lastClickTimeRef.current < 300) {
+      return;
+    }
+    lastClickTimeRef.current = now;
+
     const element = document.elementFromPoint(cursorPosition.x, cursorPosition.y);
     if (element) {
       const clickEvent = new MouseEvent('click', {

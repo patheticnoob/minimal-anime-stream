@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BroadcastInfo } from "@/types/broadcast";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 type Episode = {
   id: string;
@@ -53,6 +54,7 @@ export function InfoModal({
 }: InfoModalProps) {
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
+  const { buttonPressed } = useGamepad();
 
   // Calculate episode ranges (100 episodes per range)
   const episodeRanges = useMemo(() => {
@@ -134,6 +136,23 @@ export function InfoModal({
   useEffect(() => {
     setEpisodeRange(0);
   }, [anime?.dataId]);
+
+  // D-pad scrolling for episode list
+  useEffect(() => {
+    if (!isOpen || buttonPressed === null) return;
+
+    const episodeList = document.querySelector('.detail-episode-list');
+    if (!episodeList) return;
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        episodeList.scrollBy({ top: -200, behavior: 'smooth' });
+        break;
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        episodeList.scrollBy({ top: 200, behavior: 'smooth' });
+        break;
+    }
+  }, [buttonPressed, isOpen]);
 
   useEffect(() => {
     if (!isOpen || typeof document === "undefined") return;
