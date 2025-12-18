@@ -12,21 +12,18 @@ export function useGamepadCursor() {
   const animationFrameRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    const gamepads = navigator.getGamepads();
-    const gamepad = gamepads[0] || gamepads[1] || gamepads[2] || gamepads[3];
-    
-    if (!gamepad) {
-      setIsVisible(false);
-      return;
-    }
-
-    setIsVisible(true);
-
     const updateCursor = () => {
       const gamepads = navigator.getGamepads();
       const currentGamepad = gamepads[0] || gamepads[1] || gamepads[2] || gamepads[3];
       
-      if (!currentGamepad) return;
+      if (!currentGamepad) {
+        setIsVisible(false);
+        animationFrameRef.current = requestAnimationFrame(updateCursor);
+        return;
+      }
+
+      // Show cursor when gamepad is connected
+      setIsVisible(true);
 
       // Right stick for cursor movement (axes 2 and 3)
       const xAxis = currentGamepad.axes[2] || 0;
@@ -78,14 +75,15 @@ export function useGamepadCursor() {
 
   // Auto-hide in fullscreen after inactivity
   useEffect(() => {
-    const checkConnection = () => {
-      const gamepads = navigator.getGamepads();
-      return !!(gamepads[0] || gamepads[1] || gamepads[2] || gamepads[3]);
-    };
-    
-    if (!checkConnection()) return;
-
     const checkInactivity = setInterval(() => {
+      const gamepads = navigator.getGamepads();
+      const hasGamepad = !!(gamepads[0] || gamepads[1] || gamepads[2] || gamepads[3]);
+      
+      if (!hasGamepad) {
+        setIsVisible(false);
+        return;
+      }
+
       const isFullscreen = !!(
         document.fullscreenElement ||
         (document as any).webkitFullscreenElement ||

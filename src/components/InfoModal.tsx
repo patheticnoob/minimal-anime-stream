@@ -4,14 +4,7 @@ import { X, Play, Plus, Check, Clock3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { BroadcastInfo } from "@/types/broadcast";
-import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 type Episode = {
   id: string;
@@ -58,14 +51,8 @@ export function InfoModal({
   broadcastInfo,
   broadcastLoading,
 }: InfoModalProps) {
-  // Debug log to ensure component is rendering
-  // console.log("InfoModal rendering", { isOpen, anime });
-  
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
-  const { buttonPressed } = useGamepad();
-  const [focusedEpisodeIndex, setFocusedEpisodeIndex] = useState(0);
-  const [isNavigatingModal, setIsNavigatingModal] = useState(false);
 
   // Calculate episode ranges (100 episodes per range)
   const episodeRanges = useMemo(() => {
@@ -156,55 +143,6 @@ export function InfoModal({
       document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
-
-  // Gamepad navigation for InfoModal
-  useEffect(() => {
-    if (!isOpen || buttonPressed === null) return;
-
-    switch (buttonPressed) {
-      case GAMEPAD_BUTTONS.DPAD_UP:
-        if (isNavigatingModal) {
-          setFocusedEpisodeIndex(prev => Math.max(0, prev - 1));
-        }
-        break;
-
-      case GAMEPAD_BUTTONS.DPAD_DOWN:
-        if (isNavigatingModal) {
-          setFocusedEpisodeIndex(prev => Math.min(displayedEpisodes.length - 1, prev + 1));
-        }
-        break;
-
-      case GAMEPAD_BUTTONS.A:
-        if (isNavigatingModal && displayedEpisodes[focusedEpisodeIndex]) {
-          onPlayEpisode(displayedEpisodes[focusedEpisodeIndex]);
-        }
-        break;
-
-      case GAMEPAD_BUTTONS.B:
-        onClose();
-        break;
-
-      case GAMEPAD_BUTTONS.X:
-        setIsNavigatingModal(!isNavigatingModal);
-        break;
-
-      case GAMEPAD_BUTTONS.Y:
-        if (onToggleWatchlist) {
-          onToggleWatchlist();
-        }
-        break;
-    }
-  }, [buttonPressed, isOpen, isNavigatingModal, focusedEpisodeIndex, displayedEpisodes, onToggleWatchlist, onPlayEpisode, onClose]);
-
-  // Auto-scroll focused episode into view
-  useEffect(() => {
-    if (isNavigatingModal && focusedEpisodeIndex >= 0) {
-      const episodeElement = document.querySelector(`[data-modal-episode-index="${focusedEpisodeIndex}"]`);
-      if (episodeElement) {
-        episodeElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-    }
-  }, [focusedEpisodeIndex, isNavigatingModal]);
 
   if (!isOpen || !anime) return null;
 
@@ -366,18 +304,12 @@ export function InfoModal({
                     const progressPercentage = ep.currentTime && ep.duration 
                       ? (ep.currentTime / ep.duration) * 100 
                       : 0;
-                    const isFocused = isNavigatingModal && focusedEpisodeIndex === idx;
 
                     return (
                       <button
                         key={ep.id}
-                        data-modal-episode-index={idx}
                         onClick={() => onPlayEpisode(ep)}
-                        className={`group relative w-full text-left p-4 rounded-lg border transition-all ${
-                          isFocused
-                            ? "bg-blue-500/20 border-blue-400 ring-4 ring-blue-400 shadow-xl shadow-blue-500/60 scale-[1.02]"
-                            : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-                        }`}
+                        className="group relative w-full text-left p-4 rounded-lg border transition-all bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                       >
                         <div className="detail-episode-thumb-wrapper">
                           <div className="detail-episode-thumb placeholder relative">
