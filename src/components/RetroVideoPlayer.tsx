@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCast } from "@/hooks/use-cast";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 interface RetroVideoPlayerProps {
   source: string;
@@ -75,6 +76,9 @@ export function RetroVideoPlayer({
     animeImage,
     animeDescription
   );
+
+  const { buttonPressed } = useGamepad();
+  const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
 
   // Pause video when casting starts
   useEffect(() => {

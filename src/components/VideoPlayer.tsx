@@ -728,13 +728,15 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         break;
 
       case GAMEPAD_BUTTONS.DPAD_UP:
-        setVolume((v) => Math.min(1, v + 0.1));
-        if (videoRef.current) videoRef.current.volume = Math.min(1, volume + 0.1);
+        const newVolumeUp = Math.min(1, volume + 0.1);
+        setVolume(newVolumeUp);
+        if (videoRef.current) videoRef.current.volume = newVolumeUp;
         break;
 
       case GAMEPAD_BUTTONS.DPAD_DOWN:
-        setVolume((v) => Math.max(0, v - 0.1));
-        if (videoRef.current) videoRef.current.volume = Math.max(0, volume - 0.1);
+        const newVolumeDown = Math.max(0, volume - 0.1);
+        setVolume(newVolumeDown);
+        if (videoRef.current) videoRef.current.volume = newVolumeDown;
         break;
 
       case GAMEPAD_BUTTONS.X:
@@ -756,7 +758,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
 
     setGamepadControlsActive(true);
     setTimeout(() => setGamepadControlsActive(false), 2000);
-  }, [buttonPressed, volume, showSkipIntro, onNext, nextTitle]);
+  }, [buttonPressed, volume, showSkipIntro, onNext, nextTitle, togglePlay, toggleFullscreen, toggleMute, skip, skipIntro]);
 
   // Keyboard shortcuts
   useEffect(() => {
