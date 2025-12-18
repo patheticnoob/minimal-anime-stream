@@ -120,7 +120,7 @@ export function useGamepadCursor() {
   const simulateClick = (button: 'left' | 'right' = 'left') => {
     // Debounce clicks to prevent double-clicking
     const now = Date.now();
-    if (now - lastClickTimeRef.current < 300) {
+    if (now - lastClickTimeRef.current < 500) {
       return;
     }
     lastClickTimeRef.current = now;

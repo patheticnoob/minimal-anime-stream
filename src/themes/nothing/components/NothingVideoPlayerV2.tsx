@@ -712,9 +712,12 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     };
   }, [tracks]);
 
-  // Add gamepad controls for video player
+  // Add gamepad controls for video player - works regardless of control visibility
   useEffect(() => {
     if (buttonPressed === null) return;
+
+    // Prevent default actions and show controls briefly
+    updateControlsVisibility(true);
 
     switch (buttonPressed) {
       case GAMEPAD_BUTTONS.A:
@@ -724,10 +727,11 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         onClose();
         break;
       case GAMEPAD_BUTTONS.Y:
-        toggleFullscreen();
-        break;
       case GAMEPAD_BUTTONS.X:
-        toggleFullscreen();
+        // Use a small delay to prevent double-trigger
+        setTimeout(() => {
+          toggleFullscreen();
+        }, 100);
         break;
       case GAMEPAD_BUTTONS.DPAD_LEFT:
         skip(-10);
@@ -749,7 +753,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         else if (onNext) onNext();
         break;
     }
-  }, [buttonPressed, togglePlay, onClose, toggleFullscreen, skip, volume, handleVolumeChange, onNext, showSkipIntro, showSkipOutro, skipIntro, skipOutro]);
+  }, [buttonPressed, togglePlay, onClose, toggleFullscreen, skip, volume, handleVolumeChange, onNext, showSkipIntro, showSkipOutro, skipIntro, skipOutro, updateControlsVisibility]);
 
   // Gesture Hook
   const { gestureHandlers, overlayProps } = usePlayerGestures({

@@ -14,6 +14,7 @@ import { DateTime } from "luxon";
 import { animeCache } from "@/lib/anime-cache";
 import { useNothingTheme } from "../hooks/useNothingTheme";
 import { Moon, Sun } from "lucide-react";
+import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 
 type Episode = {
   id: string;
@@ -63,6 +64,7 @@ export default function NothingWatch() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isDarkMode, toggleTheme } = useNothingTheme();
+  const { buttonPressed } = useGamepad();
 
   // Get dark mode state from localStorage
   const [isDarkModeState, setIsDarkModeState] = useState(() => {
@@ -618,6 +620,23 @@ export default function NothingWatch() {
   const isBroadcastActive =
     broadcastInfo?.status === "airing" || broadcastInfo?.status === "upcoming";
   const shouldShowBroadcast = isBroadcastLoading || isBroadcastActive;
+
+  // D-pad scrolling for episode list
+  useEffect(() => {
+    if (buttonPressed === null) return;
+
+    const episodeList = document.querySelector('.space-y-3');
+    if (!episodeList) return;
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        episodeList.scrollBy({ top: -200, behavior: 'smooth' });
+        break;
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        episodeList.scrollBy({ top: 200, behavior: 'smooth' });
+        break;
+    }
+  }, [buttonPressed]);
 
   return (
     <div data-theme="nothing" className="min-h-screen bg-[#F5F7FB] dark:bg-[#0B0F19] text-[#050814] dark:text-white transition-colors duration-300">
