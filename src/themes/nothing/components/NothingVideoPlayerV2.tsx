@@ -727,11 +727,10 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         onClose();
         break;
       case GAMEPAD_BUTTONS.Y:
+        toggleFullscreen();
+        break;
       case GAMEPAD_BUTTONS.X:
-        // Use a small delay to prevent double-trigger
-        setTimeout(() => {
-          toggleFullscreen();
-        }, 100);
+        toggleFullscreen();
         break;
       case GAMEPAD_BUTTONS.DPAD_LEFT:
         skip(-10);

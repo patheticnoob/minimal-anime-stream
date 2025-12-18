@@ -623,20 +623,20 @@ export default function NothingWatch() {
 
   // D-pad scrolling for episode list
   useEffect(() => {
-    if (buttonPressed === null) return;
+    if (buttonPressed === null || videoSource) return; // Don't scroll when video is playing
 
-    const episodeList = document.querySelector('.space-y-3');
-    if (!episodeList) return;
+    const episodeListContainer = document.querySelector('.bg-white.dark\\:bg-\\[\\#1A1D24\\].border.border-black\\/5');
+    if (!episodeListContainer) return;
 
     switch (buttonPressed) {
       case GAMEPAD_BUTTONS.DPAD_UP:
-        episodeList.scrollBy({ top: -200, behavior: 'smooth' });
+        episodeListContainer.scrollBy({ top: -200, behavior: 'smooth' });
         break;
       case GAMEPAD_BUTTONS.DPAD_DOWN:
-        episodeList.scrollBy({ top: 200, behavior: 'smooth' });
+        episodeListContainer.scrollBy({ top: 200, behavior: 'smooth' });
         break;
     }
-  }, [buttonPressed]);
+  }, [buttonPressed, videoSource]);
 
   return (
     <div data-theme="nothing" className="min-h-screen bg-[#F5F7FB] dark:bg-[#0B0F19] text-[#050814] dark:text-white transition-colors duration-300">

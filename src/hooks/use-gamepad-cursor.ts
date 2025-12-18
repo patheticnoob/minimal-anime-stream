@@ -26,9 +26,9 @@ export function useGamepadCursor() {
       // Show cursor when gamepad is connected
       setIsVisible(true);
 
-      // Right stick for cursor movement (axes 2 and 3)
-      const xAxis = currentGamepad.axes[2] || 0;
-      const yAxis = currentGamepad.axes[3] || 0;
+      // Left stick for cursor movement (axes 0 and 1) - SWAPPED FROM RIGHT STICK
+      const xAxis = currentGamepad.axes[0] || 0;
+      const yAxis = currentGamepad.axes[1] || 0;
 
       const threshold = 0.15;
       const sensitivity = 8;
