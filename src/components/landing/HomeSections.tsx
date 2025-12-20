@@ -1,7 +1,7 @@
 import { ContentRail } from "@/components/ContentRail";
 import { AnimeItem } from "@/shared/types";
-import { Loader2 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface HomeSectionsProps {
   isAuthenticated: boolean;
@@ -32,8 +32,22 @@ interface HomeSectionsProps {
 function LoadingSkeleton() {
   const { theme } = useTheme();
   return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className={`h-8 w-8 animate-spin ${theme === "nothing" ? "text-[var(--nothing-accent)]" : "text-blue-500"}`} />
+    <div className="space-y-8">
+      {/* Section Title Skeleton */}
+      <div className="space-y-4">
+        <Skeleton className={`h-8 w-48 ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+        
+        {/* Rail Skeleton */}
+        <div className="flex gap-3 overflow-hidden">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="flex-none w-[95px] md:w-[120px] space-y-2">
+              <Skeleton className={`w-full aspect-[2/3] ${theme === "nothing" ? "bg-[var(--nothing-elevated)] rounded-[28px]" : "bg-white/10 rounded-[4px]"}`} />
+              <Skeleton className={`h-4 w-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+              <Skeleton className={`h-3 w-3/4 ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -61,7 +75,7 @@ export function HomeSections({
   const { theme } = useTheme();
   
   // Calculate rail indices accounting for hero banner (index 0)
-  let currentRailIndex = 1; // Start after hero
+  let currentRailIndex = 1;
   const getRailIndex = () => currentRailIndex++;
   
   return (
