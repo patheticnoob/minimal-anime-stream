@@ -65,7 +65,7 @@ export function useAnimeLists() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load popular content";
-        toast.error(msg);
+        console.error("Failed to load popular content:", msg);
         setPopularLoading(false);
         setLoading(false);
       });
@@ -82,7 +82,7 @@ export function useAnimeLists() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load airing content";
-        toast.error(msg);
+        console.error("Failed to load airing content:", msg);
         setAiringLoading(false);
       });
 
@@ -98,7 +98,7 @@ export function useAnimeLists() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load movies";
-        toast.error(msg);
+        console.error("Failed to load movies:", msg);
         setMoviesLoading(false);
       });
 
@@ -114,7 +114,7 @@ export function useAnimeLists() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load TV shows";
-        toast.error(msg);
+        console.error("Failed to load TV shows:", msg);
         setTVShowsLoading(false);
       });
 
@@ -157,7 +157,7 @@ export function useAnimeLists() {
         setSearchResults(searchData.results || []);
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Search failed";
-        toast.error(msg);
+        console.error("Search failed:", msg);
         setSearchResults([]);
       } finally {
         setIsSearching(false);
@@ -218,7 +218,7 @@ export function useAnimeLists() {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load more items";
-      toast.error(msg);
+      console.error("Failed to load more items:", msg);
     } finally {
       setLoadingMore(null);
     }
