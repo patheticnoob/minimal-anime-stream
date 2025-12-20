@@ -1,14 +1,20 @@
-// Add subtitle tracks
-if (tracks && tracks.length > 0) {
-  mediaInfo.tracks = tracks
-    .filter((t: any) => t.kind === 'subtitles' || t.kind === 'captions' || !t.kind)
-    .map((track: any, idx: number) => {
-      const castTrack = new cast.media.Track(idx, cast.media.TrackType.TEXT);
-      castTrack.trackContentId = track.file;
-      castTrack.trackContentType = 'text/vtt';
-      castTrack.subtype = cast.media.TextTrackType.SUBTITLES;
-      castTrack.name = track.label;
-      castTrack.language = track.label?.slice(0, 2)?.toLowerCase() || 'en';
-      return castTrack;
-    });
+// Recent Episodes
+{
+  results: [
+    {
+      id: string,          // Slug-based ID (e.g., "awkward-senpai-19918")
+      title: string,
+      image: string,
+      type: string,
+      sub: number | string,
+      dub: number | string
+    }
+  ],
+  hasNextPage: boolean
+}
+
+// Info Endpoint
+{
+  anilist_id: string,    // Numeric AniList ID
+  // Other metadata fields
 }
