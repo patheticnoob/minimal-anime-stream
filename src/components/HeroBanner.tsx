@@ -103,6 +103,13 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
     ? "PREMIERE SPOTLIGHT" 
     : "NOW STREAMING WEEKLY";
 
+  // Check if we have V2 enriched data
+  const hasEnrichedData = !!(anime as any).synopsis || !!(anime as any).genres || !!(anime as any).score;
+  const displayScore = (anime as any).score ? (anime as any).score.toFixed(1) : "4.8";
+  const displayDescription = (anime as any).synopsis 
+    ? (anime as any).synopsis.slice(0, 200) + ((anime as any).synopsis.length > 200 ? "..." : "")
+    : "Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.";
+
   // Apply the modern card hero only to the NothingOS theme
   if (theme === "nothing") {
     return (
@@ -141,9 +148,25 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
             )}
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-white text-gray-900 dark:text-gray-900 text-[10px] font-bold px-2.5 py-1 rounded border-2 border-gray-900 dark:border-white">
               <span className="text-yellow-500 text-xs">★</span>
-              <span>4.8 / 5</span>
+              <span>{displayScore} / 5</span>
             </div>
+            {(anime as any).status && (
+              <span className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
+                {(anime as any).status}
+              </span>
+            )}
           </div>
+
+          {/* Genres - V2 enriched data */}
+          {(anime as any).genres && (anime as any).genres.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {(anime as any).genres.slice(0, 4).map((genre: string, idx: number) => (
+                <span key={idx} className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-300 text-[10px] font-semibold px-2.5 py-1 rounded border border-blue-300 dark:border-blue-700">
+                  {genre}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Title */}
           <h1 className="text-5xl md:text-7xl font-black my-4 leading-none text-gray-900 dark:text-white tracking-tight">
@@ -152,8 +175,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
 
           {/* Description */}
           <p className="text-gray-600 dark:text-[#D1D5DB] max-w-xl mb-6 text-base leading-relaxed">
-            Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio
-            options available. Join the adventure today.
+            {displayDescription}
           </p>
 
           {/* Action Buttons */}
@@ -208,7 +230,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
     );
   }
 
-  // Default hero banner for retro and nothing themes
+  // Default hero banner for retro and classic themes
   return (
     <motion.section
       className="hero-banner"
@@ -227,8 +249,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
           </h1>
 
           <p className="hero-banner-description">
-            Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio
-            options available. Join the adventure today.
+            {displayDescription}
           </p>
 
           <div className="hero-banner-meta-row">
@@ -240,7 +261,24 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
                 {availableLanguages.join(" • ")}
               </span>
             )}
+            {hasEnrichedData && (
+              <span className="hero-banner-type-chip">★ {displayScore}</span>
+            )}
+            {(anime as any).status && (
+              <span className="hero-banner-language-chip">{(anime as any).status}</span>
+            )}
           </div>
+
+          {/* Genres for classic/retro themes */}
+          {(anime as any).genres && (anime as any).genres.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3 mb-2">
+              {(anime as any).genres.slice(0, 5).map((genre: string, idx: number) => (
+                <span key={idx} className="text-xs bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full border border-blue-500/30">
+                  {genre}
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="hero-banner-actions">
             <Button

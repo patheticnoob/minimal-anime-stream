@@ -165,11 +165,13 @@ export function InfoModal({
 
   if (!isOpen || !anime) return null;
 
+  // Check if we have V2 enriched data
+  const hasEnrichedData = !!(anime as any).synopsis || !!(anime as any).genres || !!(anime as any).score;
+
   return (
     <div className="detail-overlay" onClick={onClose}>
       <div className="detail-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="detail-drag-handle md:hidden" aria-hidden="true" />
-        {/* Close button */}
         <button className="detail-close" onClick={onClose}>
           <X className="h-5 w-5" />
         </button>
@@ -186,15 +188,27 @@ export function InfoModal({
             {anime.type && <div className="detail-hero-tag">{anime.type}</div>}
             <h1 className="detail-hero-title">{anime.title ?? "Untitled"}</h1>
             <div className="detail-hero-meta">
-              <span>2024</span>
-              <span className="detail-dot" />
-              <span>★ 4.8</span>
-              {episodes.length > 0 && (
+              {(anime as any).aired && <span>{(anime as any).aired}</span>}
+              {(anime as any).aired && <span className="detail-dot" />}
+              {(anime as any).score && (
                 <>
+                  <span>★ {(anime as any).score}</span>
                   <span className="detail-dot" />
-                  <span>{episodes.length} Episodes</span>
                 </>
               )}
+              {(anime as any).totalEpisodes && (
+                <>
+                  <span>{(anime as any).totalEpisodes} Episodes</span>
+                  <span className="detail-dot" />
+                </>
+              )}
+              {!hasEnrichedData && episodes.length > 0 && (
+                <>
+                  <span>{episodes.length} Episodes</span>
+                  <span className="detail-dot" />
+                </>
+              )}
+              {(anime as any).status && <span>{(anime as any).status}</span>}
               <div className="detail-language-badges">
                 {anime.language?.sub && (
                   <Badge variant="outline" className="border-gray-500 text-gray-300 bg-transparent h-5 text-[10px]">
@@ -208,6 +222,25 @@ export function InfoModal({
                 )}
               </div>
             </div>
+            
+            {/* Genres - V2 enriched data */}
+            {(anime as any).genres && (anime as any).genres.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {(anime as any).genres.slice(0, 5).map((genre: string, idx: number) => (
+                  <Badge key={idx} variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                    {genre}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {/* Studios - V2 enriched data */}
+            {(anime as any).studios && (anime as any).studios.length > 0 && (
+              <div className="mt-2 text-sm text-gray-400">
+                <span className="font-semibold">Studio:</span> {(anime as any).studios.join(", ")}
+              </div>
+            )}
+
             {shouldShowBroadcast && (
               <div className="mt-2 flex items-start gap-2 text-sm text-blue-300">
                 <Clock3 className="h-4 w-4 mt-0.5" />
@@ -230,9 +263,14 @@ export function InfoModal({
                 )}
               </div>
             )}
+            
+            {/* Synopsis - V2 enriched data or fallback */}
             <p className="detail-hero-description">
-              Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available.
+              {(anime as any).synopsis 
+                ? (anime as any).synopsis.slice(0, 250) + ((anime as any).synopsis.length > 250 ? "..." : "")
+                : "Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available."}
             </p>
+            
             <div className="detail-hero-actions">
               <Button
                 className="btn btn-primary w-full sm:w-auto justify-center"
@@ -335,7 +373,6 @@ export function InfoModal({
                             <span className="play-icon">
                               <Play className="h-4 w-4 fill-white" />
                             </span>
-                            {/* Progress bar on episode thumbnail */}
                             {progressPercentage > 0 && (
                               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/80">
                                 <div 
