@@ -4,6 +4,13 @@ import { api } from "@/convex/_generated/api";
 import { AnimeItem } from "@/shared/types";
 import { logError, logWarn, logInfo } from "@/lib/error-logger";
 
+// In-memory cache for Jikan metadata to avoid redundant API calls
+const jikanCache = new Map<string, any>();
+
+// Rate limiter: Track last request time
+let lastJikanRequest = 0;
+const JIKAN_RATE_LIMIT_MS = 1000; // 1 second between requests (Jikan allows 3 req/sec, we use 1/sec to be safe)
+
 // Retry helper function with exponential backoff
 async function retryWithBackoff<T>(
   fn: () => Promise<T>,
@@ -29,44 +36,75 @@ async function retryWithBackoff<T>(
   throw lastError;
 }
 
-// Fetch Jikan metadata by title
+// Fetch Jikan metadata by title with caching and rate limiting
 async function fetchJikanMetadata(title: string): Promise<any> {
+  // Check cache first
+  if (jikanCache.has(title)) {
+    logInfo(`Using cached Jikan data for: ${title}`, 'Jikan Cache');
+    return jikanCache.get(title);
+  }
+
   try {
+    // Rate limiting: ensure 1 second between requests
+    const now = Date.now();
+    const timeSinceLastRequest = now - lastJikanRequest;
+    if (timeSinceLastRequest < JIKAN_RATE_LIMIT_MS) {
+      const waitTime = JIKAN_RATE_LIMIT_MS - timeSinceLastRequest;
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    lastJikanRequest = Date.now();
+
     const url = new URL("https://api.jikan.moe/v4/anime");
     url.searchParams.set("q", title);
     url.searchParams.set("limit", "1");
     url.searchParams.set("sfw", "true");
 
     const response = await fetch(url.toString());
-    if (!response.ok) return null;
+    if (!response.ok) {
+      logWarn(`Jikan API returned ${response.status} for: ${title}`, 'Jikan API');
+      return null;
+    }
 
     const payload = await response.json();
     const anime = payload?.data?.[0];
     
-    if (!anime) return null;
+    if (!anime) {
+      logWarn(`No Jikan results for: ${title}`, 'Jikan API');
+      return null;
+    }
 
-    return {
+    const metadata = {
       malId: anime.mal_id,
       synopsis: anime.synopsis,
-      genres: anime.genres?.map((g: any) => g.name) || [],
+      genres: [
+        ...(anime.genres?.map((g: any) => g.name) || []),
+        ...(anime.themes?.map((t: any) => t.name) || [])
+      ],
       score: anime.score,
       episodes: anime.episodes,
       status: anime.status,
       aired: anime.aired?.string,
       studios: anime.studios?.map((s: any) => s.name) || [],
     };
+
+    // Cache the result
+    jikanCache.set(title, metadata);
+    logInfo(`Fetched and cached Jikan data for: ${title}`, 'Jikan API');
+
+    return metadata;
   } catch (error) {
     logWarn(`Failed to fetch Jikan metadata for: ${title}`, 'Jikan API');
     return null;
   }
 }
 
-// Enrich HiAnime items with Jikan metadata
-async function enrichWithJikan(items: AnimeItem[], limit: number = 5): Promise<AnimeItem[]> {
+// Enrich HiAnime items with Jikan metadata - now enriches ALL items
+async function enrichWithJikan(items: AnimeItem[]): Promise<AnimeItem[]> {
   const enrichedItems = [...items];
   
-  // Only enrich the first few items to avoid rate limiting
-  for (let i = 0; i < Math.min(limit, items.length); i++) {
+  logInfo(`Starting full Jikan enrichment for ${items.length} items`, 'Jikan Enrichment');
+  
+  for (let i = 0; i < items.length; i++) {
     const item = items[i];
     if (!item.title) continue;
 
@@ -83,14 +121,11 @@ async function enrichWithJikan(items: AnimeItem[], limit: number = 5): Promise<A
         aired: metadata.aired,
         studios: metadata.studios,
       };
-    }
-
-    // Rate limiting: wait 1 second between requests
-    if (i < Math.min(limit, items.length) - 1) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      logInfo(`Enriched ${i + 1}/${items.length}: ${item.title}`, 'Jikan Enrichment');
     }
   }
 
+  logInfo(`Completed Jikan enrichment: ${enrichedItems.filter(i => i.malId).length}/${items.length} items enriched`, 'Jikan Enrichment');
   return enrichedItems;
 }
 
@@ -129,19 +164,19 @@ export function useAnimeListsV2() {
   
   const [loadingMore, setLoadingMore] = useState<string | null>(null);
 
-  // Load content progressively with Jikan enrichment
+  // Load content progressively with FULL Jikan enrichment
   useEffect(() => {
     let mounted = true;
 
-    // Load popular first and enrich with Jikan
+    // Load popular first and enrich with Jikan (ALL items)
     logInfo('Fetching popular anime (v2 flow)', 'Initial Load');
     retryWithBackoff(() => fetchMostPopular({ page: 1 }))
       .then(async (popular) => {
         if (!mounted) return;
         const popularData = popular as { results: AnimeItem[]; hasNextPage: boolean };
         
-        // Enrich first 5 items with Jikan metadata
-        const enrichedResults = await enrichWithJikan(popularData.results || [], 5);
+        // Enrich ALL items with Jikan metadata
+        const enrichedResults = await enrichWithJikan(popularData.results || []);
         
         setPopularItems(enrichedResults);
         setPopularHasMore(popularData.hasNextPage || false);
@@ -153,7 +188,7 @@ export function useAnimeListsV2() {
         
         setPopularLoading(false);
         setLoading(false);
-        logInfo('Popular anime loaded and enriched (v2)', 'Initial Load');
+        logInfo('Popular anime loaded and fully enriched (v2)', 'Initial Load');
       })
       .catch((err) => {
         if (!mounted) return;
@@ -163,16 +198,17 @@ export function useAnimeListsV2() {
         setLoading(false);
       });
 
-    // Load airing independently
+    // Load airing independently and enrich
     logInfo('Fetching airing anime (v2 flow)', 'Initial Load');
     retryWithBackoff(() => fetchTopAiring({ page: 1 }))
-      .then((airing) => {
+      .then(async (airing) => {
         if (!mounted) return;
         const airingData = airing as { results: AnimeItem[]; hasNextPage: boolean };
-        setAiringItems(airingData.results || []);
+        const enrichedResults = await enrichWithJikan(airingData.results || []);
+        setAiringItems(enrichedResults);
         setAiringHasMore(airingData.hasNextPage || false);
         setAiringLoading(false);
-        logInfo('Airing anime loaded (v2)', 'Initial Load');
+        logInfo('Airing anime loaded and fully enriched (v2)', 'Initial Load');
       })
       .catch((err) => {
         if (!mounted) return;
@@ -181,16 +217,17 @@ export function useAnimeListsV2() {
         setAiringLoading(false);
       });
 
-    // Load movies independently
+    // Load movies independently and enrich
     logInfo('Fetching movies (v2 flow)', 'Initial Load');
     retryWithBackoff(() => fetchMovies({ page: 1 }))
-      .then((movies) => {
+      .then(async (movies) => {
         if (!mounted) return;
         const moviesData = movies as { results: AnimeItem[]; hasNextPage: boolean };
-        setMovieItems(moviesData.results || []);
+        const enrichedResults = await enrichWithJikan(moviesData.results || []);
+        setMovieItems(enrichedResults);
         setMovieHasMore(moviesData.hasNextPage || false);
         setMoviesLoading(false);
-        logInfo('Movies loaded (v2)', 'Initial Load');
+        logInfo('Movies loaded and fully enriched (v2)', 'Initial Load');
       })
       .catch((err) => {
         if (!mounted) return;
@@ -199,16 +236,17 @@ export function useAnimeListsV2() {
         setMoviesLoading(false);
       });
 
-    // Load TV shows independently
+    // Load TV shows independently and enrich
     logInfo('Fetching TV shows (v2 flow)', 'Initial Load');
     retryWithBackoff(() => fetchTVShows({ page: 1 }))
-      .then((tvShows) => {
+      .then(async (tvShows) => {
         if (!mounted) return;
         const tvShowsData = tvShows as { results: AnimeItem[]; hasNextPage: boolean };
-        setTVShowItems(tvShowsData.results || []);
+        const enrichedResults = await enrichWithJikan(tvShowsData.results || []);
+        setTVShowItems(enrichedResults);
         setTVShowHasMore(tvShowsData.hasNextPage || false);
         setTVShowsLoading(false);
-        logInfo('TV shows loaded (v2)', 'Initial Load');
+        logInfo('TV shows loaded and fully enriched (v2)', 'Initial Load');
       })
       .catch((err) => {
         if (!mounted) return;
@@ -240,7 +278,7 @@ export function useAnimeListsV2() {
     return () => clearInterval(interval);
   }, [heroAnime, popularItems]);
 
-  // Search handler
+  // Search handler with enrichment
   useEffect(() => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -254,8 +292,11 @@ export function useAnimeListsV2() {
       try {
         const results = await retryWithBackoff(() => searchAnime({ query: query.trim(), page: 1 }));
         const searchData = results as { results: AnimeItem[] };
-        setSearchResults(searchData.results || []);
-        logInfo(`Search completed: ${searchData.results?.length || 0} results (v2)`, 'Search');
+        
+        // Enrich search results (limit to first 10 for performance)
+        const enrichedResults = await enrichWithJikan((searchData.results || []).slice(0, 10));
+        setSearchResults(enrichedResults);
+        logInfo(`Search completed: ${enrichedResults.length} results enriched (v2)`, 'Search');
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Search failed";
         logError(msg, 'Search', err instanceof Error ? err : undefined);
@@ -314,10 +355,13 @@ export function useAnimeListsV2() {
         const result = await retryWithBackoff(() => fetchFunction({ page: nextPage }));
         const data = result as { results: AnimeItem[]; hasNextPage: boolean };
         
-        setItems((prev: AnimeItem[]) => [...prev, ...(data.results || [])]);
+        // Enrich new items before adding
+        const enrichedNewItems = await enrichWithJikan(data.results || []);
+        
+        setItems((prev: AnimeItem[]) => [...prev, ...enrichedNewItems]);
         setPage(nextPage);
         setHasMore(data.hasNextPage || false);
-        logInfo(`Loaded ${data.results?.length || 0} more items for ${category} (v2)`, 'Pagination');
+        logInfo(`Loaded and enriched ${enrichedNewItems.length} more items for ${category} (v2)`, 'Pagination');
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load more items";

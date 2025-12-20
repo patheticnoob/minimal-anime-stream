@@ -1,3 +1,23 @@
 {
-  "error": "An internal error occurred: Failed to fetch anime info for 52991: 404 Client Error: Not Found for url: https://hianime.to/52991"
+  "mal_id": 52299,
+  "title": "Ore dake Level Up na Ken",
+  "title_english": "Solo Leveling",
+  "type": "TV",
+  "episodes": 12,
+  "status": "Finished Airing",
+  "aired": {
+    "string": "Jan 7, 2024 to Mar 31, 2024"
+  },
+  "score": 8.21,
+  "synopsis": "Humanity was caught at a precipice a decade ago...",
+  "studios": [{"name": "A-1 Pictures"}],
+  "genres": [
+    {"name": "Action"},
+    {"name": "Adventure"},
+    {"name": "Fantasy"}
+  ],
+  "themes": [
+    {"name": "Adult Cast"},
+    {"name": "Urban Fantasy"}
+  ]
 }
