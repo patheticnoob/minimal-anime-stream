@@ -4,6 +4,32 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { AnimeItem } from "@/shared/types";
 
+// Retry helper function with exponential backoff
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  initialDelay: number = 1000
+): Promise<T> {
+  let lastError: Error | unknown;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      
+      // Don't retry on the last attempt
+      if (attempt < maxRetries - 1) {
+        const delay = initialDelay * Math.pow(2, attempt);
+        console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
 export function useAnimeLists() {
   const fetchTopAiring = useAction(api.hianime.topAiring);
   const fetchMostPopular = useAction(api.hianime.mostPopular);
@@ -41,12 +67,12 @@ export function useAnimeLists() {
   
   const [loadingMore, setLoadingMore] = useState<string | null>(null);
 
-  // Load content progressively - each section loads independently
+  // Load content progressively - each section loads independently with retry logic
   useEffect(() => {
     let mounted = true;
 
-    // Load popular first (for hero banner)
-    fetchMostPopular({ page: 1 })
+    // Load popular first (for hero banner) with retry
+    retryWithBackoff(() => fetchMostPopular({ page: 1 }))
       .then((popular) => {
         if (!mounted) return;
         const popularData = popular as { results: AnimeItem[]; hasNextPage: boolean };
@@ -65,13 +91,13 @@ export function useAnimeLists() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load popular content";
-        console.error("Failed to load popular content:", msg);
+        console.error("Failed to load popular content after retries:", msg);
         setPopularLoading(false);
         setLoading(false);
       });
 
-    // Load airing independently
-    fetchTopAiring({ page: 1 })
+    // Load airing independently with retry
+    retryWithBackoff(() => fetchTopAiring({ page: 1 }))
       .then((airing) => {
         if (!mounted) return;
         const airingData = airing as { results: AnimeItem[]; hasNextPage: boolean };
@@ -82,12 +108,12 @@ export function useAnimeLists() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load airing content";
-        console.error("Failed to load airing content:", msg);
+        console.error("Failed to load airing content after retries:", msg);
         setAiringLoading(false);
       });
 
-    // Load movies independently
-    fetchMovies({ page: 1 })
+    // Load movies independently with retry
+    retryWithBackoff(() => fetchMovies({ page: 1 }))
       .then((movies) => {
         if (!mounted) return;
         const moviesData = movies as { results: AnimeItem[]; hasNextPage: boolean };
@@ -98,12 +124,12 @@ export function useAnimeLists() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load movies";
-        console.error("Failed to load movies:", msg);
+        console.error("Failed to load movies after retries:", msg);
         setMoviesLoading(false);
       });
 
-    // Load TV shows independently
-    fetchTVShows({ page: 1 })
+    // Load TV shows independently with retry
+    retryWithBackoff(() => fetchTVShows({ page: 1 }))
       .then((tvShows) => {
         if (!mounted) return;
         const tvShowsData = tvShows as { results: AnimeItem[]; hasNextPage: boolean };
@@ -114,7 +140,7 @@ export function useAnimeLists() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load TV shows";
-        console.error("Failed to load TV shows:", msg);
+        console.error("Failed to load TV shows after retries:", msg);
         setTVShowsLoading(false);
       });
 
@@ -141,7 +167,7 @@ export function useAnimeLists() {
     return () => clearInterval(interval);
   }, [heroAnime, popularItems]);
 
-  // Search handler
+  // Search handler with retry
   useEffect(() => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -152,12 +178,12 @@ export function useAnimeLists() {
     setIsSearching(true);
     const timeoutId = setTimeout(async () => {
       try {
-        const results = await searchAnime({ query: query.trim(), page: 1 });
+        const results = await retryWithBackoff(() => searchAnime({ query: query.trim(), page: 1 }));
         const searchData = results as { results: AnimeItem[] };
         setSearchResults(searchData.results || []);
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Search failed";
-        console.error("Search failed:", msg);
+        console.error("Search failed after retries:", msg);
         setSearchResults([]);
       } finally {
         setIsSearching(false);
@@ -209,7 +235,7 @@ export function useAnimeLists() {
       }
       
       if (fetchFunction) {
-        const result = await fetchFunction({ page: nextPage });
+        const result = await retryWithBackoff(() => fetchFunction({ page: nextPage }));
         const data = result as { results: AnimeItem[]; hasNextPage: boolean };
         
         setItems((prev: AnimeItem[]) => [...prev, ...(data.results || [])]);
@@ -218,7 +244,7 @@ export function useAnimeLists() {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load more items";
-      console.error("Failed to load more items:", msg);
+      console.error("Failed to load more items after retries:", msg);
     } finally {
       setLoadingMore(null);
     }
