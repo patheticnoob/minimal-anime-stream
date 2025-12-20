@@ -3,6 +3,7 @@ import { Play } from "lucide-react";
 import { motion } from "framer-motion";
 import { memo } from "react";
 import { useTheme } from "@/hooks/use-theme";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type AnimeItem = {
   title?: string;
@@ -24,10 +25,32 @@ interface AnimeCardProps {
   onClick: () => void;
   index?: number;
   variant?: "portrait" | "landscape";
+  isLoading?: boolean;
 }
 
-function AnimeCardBase({ anime, onClick, variant = "portrait" }: AnimeCardProps) {
+function AnimeCardSkeleton({ variant = "portrait", theme }: { variant?: "portrait" | "landscape"; theme: string }) {
+  const aspectRatioClass = variant === "landscape" ? "aspect-[1.45/1]" : "aspect-[2/3]";
+  const borderRadiusClass = theme === "nothing" ? "rounded-[28px]" : "rounded-[4px]";
+
+  return (
+    <div className="anime-card flex flex-col gap-2">
+      <Skeleton className={`w-full ${aspectRatioClass} ${borderRadiusClass} ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+      <div className="px-0.5 space-y-2">
+        <Skeleton className={`h-4 w-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+        <Skeleton className={`h-4 w-3/4 ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+        <Skeleton className={`h-3 w-1/2 ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+      </div>
+    </div>
+  );
+}
+
+function AnimeCardBase({ anime, onClick, variant = "portrait", isLoading = false }: AnimeCardProps) {
   const { theme } = useTheme();
+  
+  if (isLoading) {
+    return <AnimeCardSkeleton variant={variant} theme={theme} />;
+  }
+
   const progressPercentage = anime.currentTime && anime.duration
     ? (anime.currentTime / anime.duration) * 100
     : 0;

@@ -3,6 +3,7 @@ import { Play, Info, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import { memo } from "react";
 import { useTheme } from "@/hooks/use-theme";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type AnimeItem = {
   title?: string;
@@ -20,10 +21,79 @@ interface HeroBannerProps {
   anime: AnimeItem;
   onPlay: () => void;
   onMoreInfo: () => void;
+  isLoading?: boolean;
 }
 
-function HeroBannerBase({ anime, onPlay, onMoreInfo }: HeroBannerProps) {
+function HeroBannerSkeleton({ theme }: { theme: string }) {
+  if (theme === "nothing") {
+    return (
+      <motion.section
+        className="hero-banner-modern bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="flex flex-col lg:flex-row">
+          <div className="w-full lg:w-3/5 p-8 md:p-12 flex flex-col justify-center space-y-4">
+            <Skeleton className="h-8 w-48 bg-[var(--nothing-elevated)]" />
+            <div className="flex gap-2">
+              <Skeleton className="h-6 w-16 bg-[var(--nothing-elevated)]" />
+              <Skeleton className="h-6 w-20 bg-[var(--nothing-elevated)]" />
+              <Skeleton className="h-6 w-24 bg-[var(--nothing-elevated)]" />
+            </div>
+            <Skeleton className="h-16 w-full max-w-xl bg-[var(--nothing-elevated)]" />
+            <Skeleton className="h-20 w-full max-w-xl bg-[var(--nothing-elevated)]" />
+            <div className="flex gap-3">
+              <Skeleton className="h-12 w-40 rounded-full bg-[var(--nothing-elevated)]" />
+              <Skeleton className="h-12 w-36 rounded-full bg-[var(--nothing-elevated)]" />
+              <Skeleton className="h-12 w-12 rounded-full bg-[var(--nothing-elevated)]" />
+            </div>
+          </div>
+          <div className="hidden lg:block w-2/5">
+            <Skeleton className="w-full h-full bg-[var(--nothing-elevated)]" />
+          </div>
+        </div>
+      </motion.section>
+    );
+  }
+
+  return (
+    <motion.section
+      className="hero-banner"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="hero-banner-inner">
+        <div className="hero-banner-copy space-y-4">
+          <Skeleton className="h-8 w-48 bg-white/10" />
+          <Skeleton className="h-20 w-full max-w-2xl bg-white/10" />
+          <Skeleton className="h-16 w-full max-w-xl bg-white/10" />
+          <div className="flex gap-2">
+            <Skeleton className="h-6 w-16 bg-white/10" />
+            <Skeleton className="h-6 w-20 bg-white/10" />
+          </div>
+          <div className="flex gap-3">
+            <Skeleton className="h-12 w-40 bg-white/10" />
+            <Skeleton className="h-12 w-36 bg-white/10" />
+            <Skeleton className="h-12 w-12 bg-white/10" />
+          </div>
+        </div>
+        <div className="hero-banner-art">
+          <Skeleton className="w-full h-full bg-white/10" />
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBannerProps) {
   const { theme } = useTheme();
+  
+  if (isLoading) {
+    return <HeroBannerSkeleton theme={theme} />;
+  }
+
   const availableLanguages = [
     anime.language?.sub ? "Sub" : null,
     anime.language?.dub ? "Dub" : null,

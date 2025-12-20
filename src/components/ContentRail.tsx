@@ -3,6 +3,7 @@ import { AnimeCard } from "./AnimeCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type AnimeItem = {
   title?: string;
@@ -29,6 +30,25 @@ interface ContentRailProps {
   isFocused?: boolean;
   focusedItemIndex?: number;
   isNavigatingRails?: boolean;
+  isLoading?: boolean;
+}
+
+function RailSkeleton({ variant = "portrait", theme }: { variant?: "portrait" | "landscape"; theme: string }) {
+  const itemWidth = variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]";
+  const aspectRatio = variant === "landscape" ? "aspect-[1.45/1]" : "aspect-[2/3]";
+  const borderRadius = theme === "nothing" ? "rounded-[28px]" : "rounded-[4px]";
+  
+  return (
+    <div className="flex gap-3 overflow-hidden px-4 md:px-0">
+      {Array.from({ length: 8 }).map((_, idx) => (
+        <div key={idx} className={`flex-none ${itemWidth} space-y-2`}>
+          <Skeleton className={`w-full ${aspectRatio} ${borderRadius} ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+          <Skeleton className={`h-4 w-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+          <Skeleton className={`h-3 w-3/4 ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function ContentRail({ 
@@ -43,7 +63,8 @@ export function ContentRail({
   isLoadingMore = false,
   isFocused = false,
   focusedItemIndex = 0,
-  isNavigatingRails = false
+  isNavigatingRails = false,
+  isLoading = false
 }: ContentRailProps) {
   const { theme } = useTheme();
   const [displayCount, setDisplayCount] = useState(12);
@@ -93,6 +114,19 @@ export function ContentRail({
       window.removeEventListener("resize", handleScroll);
     };
   }, [displayedItems.length, items.length, updateScrollState]);
+
+  if (isLoading) {
+    return (
+      <section className="content-rail mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="content-rail-header flex items-center justify-between mb-4 px-4 md:px-0">
+          <h2 className={`text-lg md:text-xl font-bold ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"} tracking-wide uppercase`}>
+            {title}
+          </h2>
+        </div>
+        <RailSkeleton variant={variant} theme={theme} />
+      </section>
+    );
+  }
 
   if (!items || items.length === 0) return null;
 

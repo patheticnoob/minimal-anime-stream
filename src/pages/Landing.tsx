@@ -340,11 +340,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
             />
           ) : (
             <>
-              {activeSection === "home" && heroAnime && (
+              {activeSection === "home" && (
                 <HeroBanner
-                  anime={heroAnime}
-                  onPlay={() => openAnime(heroAnime)}
-                  onMoreInfo={() => openAnime(heroAnime)}
+                  anime={heroAnime || { title: "Loading..." }}
+                  onPlay={() => heroAnime && openAnime(heroAnime)}
+                  onMoreInfo={() => heroAnime && openAnime(heroAnime)}
+                  isLoading={!heroAnime || loading}
                 />
               )}
 
