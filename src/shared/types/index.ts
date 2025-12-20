@@ -12,6 +12,15 @@ export type AnimeItem = {
   episodeNumber?: number;
   currentTime?: number;
   duration?: number;
+  // V2 enriched fields from Jikan
+  malId?: number;
+  synopsis?: string;
+  genres?: string[];
+  score?: number;
+  totalEpisodes?: number;
+  status?: string;
+  aired?: string;
+  studios?: string[];
 };
 
 export type Episode = {

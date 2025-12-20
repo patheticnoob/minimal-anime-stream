@@ -31,6 +31,7 @@ const schema = defineSchema(
 
       role: v.optional(roleValidator), // role of the user. do not remove
       theme: v.optional(v.string()), // user's selected theme
+      dataFlow: v.optional(v.string()), // user's selected data flow version (v1 or v2)
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
     // Watch progress tracking

@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/hooks/use-theme";
+import { useDataFlow } from "@/hooks/use-data-flow";
 import { AnimeCard } from "@/components/AnimeCard";
 import { ControllerStatus } from "@/components/ControllerStatus";
 import { GamepadButtonMapping } from "@/components/GamepadButtonMapping";
@@ -57,8 +58,13 @@ export function ProfileDashboard({
   onLogout,
 }: ProfileDashboardProps) {
   const { theme, setTheme } = useTheme();
+  const { dataFlow, setDataFlow } = useDataFlow();
   const safeContinueWatching = continueWatching ?? [];
   const safeWatchlist = watchlist ?? [];
+
+  const handleDataFlowChange = async (flow: "v1" | "v2") => {
+    await setDataFlow({ dataFlow: flow });
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -101,6 +107,32 @@ export function ProfileDashboard({
         </div>
         <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
           Current theme: <span className="font-semibold text-[var(--nothing-fg,white)] capitalize">{theme}</span>
+        </p>
+      </div>
+
+      {/* Data Flow Selection */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium text-white/70">Data Flow Version</h3>
+        <div className="flex gap-2">
+          <Button
+            variant={dataFlow === "v1" ? "default" : "outline"}
+            onClick={() => handleDataFlowChange("v1")}
+            className="flex-1"
+          >
+            V1 (Stable)
+          </Button>
+          <Button
+            variant={dataFlow === "v2" ? "default" : "outline"}
+            onClick={() => handleDataFlowChange("v2")}
+            className="flex-1"
+          >
+            V2 (Enriched)
+          </Button>
+        </div>
+        <p className="text-xs text-white/50">
+          {dataFlow === "v1" 
+            ? "Using stable data flow (HiAnime only)" 
+            : "Using enriched data flow (HiAnime + Jikan metadata)"}
         </p>
       </div>
 

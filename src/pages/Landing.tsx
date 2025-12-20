@@ -19,6 +19,8 @@ import { useAnimeLists } from "@/hooks/use-anime-lists";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
+import { useDataFlow } from "@/hooks/use-data-flow";
+import { useAnimeListsV2 } from "@/hooks/use-anime-lists-v2";
 
 // Force rebuild comment - fixing dynamic import error
 // Track if this is the first load
@@ -32,6 +34,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { dataFlow } = useDataFlow();
   
   const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
@@ -40,7 +43,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
   const [showInitialLoader, setShowInitialLoader] = useState(!hasLoadedBefore);
 
-  // Use custom hooks for data and player logic
+  // Use appropriate hook based on data flow version
+  const animeListsV1 = useAnimeLists();
+  const animeListsV2 = useAnimeListsV2();
+  
+  const animeData = dataFlow === "v2" ? animeListsV2 : animeListsV1;
+
   const {
     loading,
     popularItems,
@@ -59,7 +67,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     loadMoreItems,
     loadingMore,
     hasMore
-  } = useAnimeLists();
+  } = animeData;
 
   const {
     selected,
