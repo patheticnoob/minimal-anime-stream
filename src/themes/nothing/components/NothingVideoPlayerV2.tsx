@@ -69,7 +69,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     info?.description
   );
 
-  const { buttonPressed } = useGamepad();
+  const { buttonPressed } = useGamepad({ enableButtonEvents: true });
 
   const CONTROL_VISIBILITY_DURATION = 3000;
 
