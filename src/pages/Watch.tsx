@@ -8,6 +8,7 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
+import { useDataFlow } from "@/hooks/use-data-flow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
@@ -63,11 +64,17 @@ export default function Watch() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
+  const { dataFlow } = useDataFlow();
   const { buttonPressed } = useGamepad();
 
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
+  
+  // V3 Actions
+  const fetchYumaDetails = useAction(api.yumaApi.getAnimeDetails);
+  const fetchYumaSources = useAction(api.yumaApi.getEpisodeSources);
+
   const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
   const [anime, setAnime] = useState<AnimeDetail | null>(null);
@@ -120,19 +127,53 @@ export default function Watch() {
 
     // Fetch episodes
     setEpisodesLoading(true);
-    fetchEpisodes({ dataId: animeId })
-      .then((eps) => {
-        const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
-          ...ep,
-          number: normalizeEpisodeNumber(ep.number),
-        }));
-        setEpisodes(normalizedEpisodes);
-      })
-      .catch((err) => {
-        const msg = err instanceof Error ? err.message : "Failed to load episodes.";
-        toast.error(msg);
-      })
-      .finally(() => setEpisodesLoading(false));
+
+    if (dataFlow === "v3") {
+      fetchYumaDetails({ animeId })
+        .then((data) => {
+          // Update anime info from Yuma details
+          if (data) {
+            setAnime(prev => ({
+              ...prev,
+              title: data.title || prev?.title,
+              image: data.image || prev?.image,
+              type: data.type || prev?.type,
+              language: {
+                sub: data.sub ? String(data.sub) : prev?.language?.sub,
+                dub: data.dub ? String(data.dub) : prev?.language?.dub,
+              }
+            }));
+          }
+
+          const yumaEpisodes = (data.episodes || []).map((ep: any) => ({
+            id: ep.id,
+            title: ep.title,
+            number: normalizeEpisodeNumber(ep.number),
+            currentTime: 0,
+            duration: 0,
+          }));
+          setEpisodes(yumaEpisodes);
+        })
+        .catch((err) => {
+          const msg = err instanceof Error ? err.message : "Failed to load episodes from Yuma.";
+          toast.error(msg);
+        })
+        .finally(() => setEpisodesLoading(false));
+    } else {
+      fetchEpisodes({ dataId: animeId })
+        .then((eps) => {
+          const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
+            ...ep,
+            number: normalizeEpisodeNumber(ep.number),
+          }));
+          setEpisodes(normalizedEpisodes);
+        })
+        .catch((err) => {
+          const msg = err instanceof Error ? err.message : "Failed to load episodes.";
+          toast.error(msg);
+        })
+        .finally(() => setEpisodesLoading(false));
+    }
 
     // Fetch broadcast info if anime title is available
     if (storedAnime) {
@@ -181,7 +222,7 @@ export default function Watch() {
           .finally(() => setIsBroadcastLoading(false));
       }
     }
-  }, [animeId, fetchEpisodes, fetchBroadcastInfo, navigate]);
+  }, [animeId, fetchEpisodes, fetchBroadcastInfo, dataFlow, navigate]);
 
   // Enhanced Gamepad navigation for Watch page
   useEffect(() => {
@@ -296,6 +337,37 @@ export default function Watch() {
     setVideoOutro(null);
 
     toast("Loading video...");
+
+    if (dataFlow === "v3") {
+      try {
+        const sourcesData = await fetchYumaSources({ episodeId: episode.id });
+        
+        const m3u8Source = sourcesData.sources?.find((s: any) => s.quality === "default" || s.quality === "auto") || sourcesData.sources?.[0];
+        
+        if (m3u8Source) {
+          setVideoSource(m3u8Source.url);
+          setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber}`);
+          
+          const tracks = (sourcesData.subtitles || []).map((s: any) => ({
+            file: s.url,
+            label: s.lang,
+            kind: "subtitles"
+          }));
+          setVideoTracks(tracks);
+          
+          const idx = episodes.findIndex((e) => e.id === episode.id);
+          if (idx !== -1) setCurrentEpisodeIndex(idx);
+
+          toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+        } else {
+          toast.error("No video sources available");
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Failed to load video from Yuma";
+        toast.error(msg);
+      }
+      return;
+    }
 
     try {
       const servers = await fetchServers({ episodeId: episode.id });

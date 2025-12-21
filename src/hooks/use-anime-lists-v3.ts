@@ -127,7 +127,7 @@ export function useAnimeListsV3() {
   useEffect(() => {
     let mounted = true;
 
-    // Load TV shows first (use as "popular" since Yuma has no trending endpoint)
+    // Load Top Airing (use as "popular" since Yuma has no trending endpoint)
     logInfo('Fetching top airing from Yuma (v3 flow)', 'Initial Load');
     retryWithBackoff(() => fetchYumaEndpoint('top-airing', 1))
       .then((data) => {
