@@ -56,13 +56,14 @@ export function useGamepadCursor() {
           // Trigger hover events
           const element = document.elementFromPoint(newX, newY);
           if (element) {
-            const hoverEvent = new MouseEvent('mouseover', {
+            const eventInit: MouseEventInit = {
               bubbles: true,
               cancelable: true,
               clientX: newX,
               clientY: newY,
-            });
-            element.dispatchEvent(hoverEvent);
+            };
+            element.dispatchEvent(new MouseEvent('mousemove', eventInit));
+            element.dispatchEvent(new MouseEvent('mouseover', eventInit));
           }
 
           return { x: newX, y: newY };
