@@ -20,8 +20,6 @@ import { usePlayerLogic } from "@/hooks/use-player-logic";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useDataFlow } from "@/hooks/use-data-flow";
-import { useAnimeListsV2 } from "@/hooks/use-anime-lists-v2";
-import { useAnimeListsV3 } from "@/hooks/use-anime-lists-v3";
 
 // Force rebuild comment - fixing dynamic import error
 // Track if this is the first load
@@ -44,16 +42,8 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
   const [showInitialLoader, setShowInitialLoader] = useState(!hasLoadedBefore);
 
-  // Use appropriate hook based on data flow version
-  const animeListsV1 = useAnimeLists();
-  const animeListsV2 = useAnimeListsV2();
-  const animeListsV3 = useAnimeListsV3();
-  
-  const animeData = dataFlow === "v3" 
-    ? animeListsV3 
-    : dataFlow === "v2" 
-    ? animeListsV2 
-    : animeListsV1;
+  // Use only V1 hook
+  const animeData = useAnimeLists();
 
   const {
     loading,

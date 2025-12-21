@@ -23,9 +23,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
   
-  // V3 Actions
-  const fetchYumaDetails = useAction(api.yumaApi.getAnimeDetails);
-  const fetchYumaSources = useAction(api.yumaApi.getEpisodeSources);
+  // V3 Actions Removed
 
   const saveProgress = useMutation(api.watchProgress.saveProgress);
 
@@ -55,13 +53,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     if (animeCache.has(cacheKey)) return;
 
     try {
-      if (dataFlow === "v3") {
-        // V3 Prefetch
-        const sources = await fetchYumaSources({ episodeId });
-        animeCache.set(cacheKey, sources, 5);
-        return;
-      }
-
       // V1/V2 Prefetch
       // Always use HD-2 server
       const servers = await fetchServers({ episodeId });
@@ -77,7 +68,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     } catch (err) {
       console.warn('Prefetch failed for episode:', episodeId, err);
     }
-  }, [fetchServers, fetchSources, fetchYumaSources, dataFlow]);
+  }, [fetchServers, fetchSources]);
 
   useEffect(() => {
     if (!selected?.dataId) {
@@ -120,68 +111,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
 
     let cancelled = false;
     setEpisodesLoading(true);
-
-    if (dataFlow === "v3") {
-      // V3: Fetch from Yuma
-      fetchYumaDetails({ animeId: selected.dataId })
-        .then((data) => {
-          if (cancelled) return;
-          
-          // Map Yuma details to AnimeItem fields
-          const details: Partial<AnimeItem> = {
-            synopsis: data.description,
-            genres: data.genres,
-            status: data.status,
-            totalEpisodes: data.totalEpisodes,
-            aired: data.releaseDate,
-            type: data.type,
-            image: data.image,
-            title: data.title,
-            japaneseTitle: data.otherName, // Yuma often puts alt titles here
-          };
-          setAnimeDetails(details);
-
-          const yumaEpisodes = (data.episodes || []).map((ep: any) => ({
-            id: ep.id,
-            title: ep.title,
-            number: ep.number,
-            isFiller: ep.isFiller,
-          }));
-
-          const normalizedEpisodes = yumaEpisodes.map((ep: any) => ({
-            ...ep,
-            number: normalizeEpisodeNumber(ep.number),
-          }));
-          
-          setEpisodes(normalizedEpisodes);
-          setCurrentEpisodeIndex(null);
-          
-          // Cache episodes
-          animeCache.set(cacheKey, yumaEpisodes, 10);
-          
-          // Prefetch logic
-          if (normalizedEpisodes.length > 0) {
-            const targetEpisode = animeProgress?.episodeId 
-              ? normalizedEpisodes.find((ep: any) => ep.id === animeProgress.episodeId)
-              : normalizedEpisodes[0];
-            
-            if (targetEpisode) {
-              prefetchEpisodeSources(targetEpisode.id);
-            }
-          }
-        })
-        .catch((err) => {
-          if (cancelled) return;
-          const msg = err instanceof Error ? err.message : "Failed to load episodes from Yuma.";
-          toast.error(msg);
-          setEpisodes([]);
-        })
-        .finally(() => {
-          if (!cancelled) setEpisodesLoading(false);
-        });
-      
-      return () => { cancelled = true; };
-    }
 
     // V1/V2: Fetch from HiAnime
     fetchEpisodes({ dataId: selected.dataId })
@@ -229,7 +158,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     return () => {
       cancelled = true;
     };
-  }, [selected?.dataId, fetchEpisodes, fetchYumaDetails, animeProgress?.episodeId, prefetchEpisodeSources, dataFlow]);
+  }, [selected?.dataId, fetchEpisodes, animeProgress?.episodeId, prefetchEpisodeSources, dataFlow]);
 
   const playEpisode = async (episode: Episode) => {
     if (!isAuthenticated) {
@@ -268,104 +197,53 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
       // Use cached sources immediately
       const sourcesData = cachedSources;
       
-      if (dataFlow === "v3") {
-        // V3 Cache Handling
-        const m3u8Source = sourcesData.sources?.find((s: any) => s.quality === "default" || s.quality === "auto") || sourcesData.sources?.[0];
+      // V1/V2 Cache Handling
+      if (sourcesData.sources && sourcesData.sources.length > 0) {
+        setVideoHeaders(sourcesData.headers || null);
+        const m3u8Source = sourcesData.sources.find((s: any) => s.file.includes(".m3u8"));
+        const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
+
+        const raw = import.meta.env.VITE_CONVEX_URL as string;
+        let base = raw;
+        try {
+          const u = new URL(raw);
+          const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
+          base = `${u.protocol}//${hostname}`;
+        } catch {
+          base = raw.replace("convex.cloud", "convex.site");
+        }
+        base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+
+        const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
+
+        const proxiedTracks = (sourcesData.tracks || []).map((t: any) => ({
+          ...t,
+          kind: t.kind || "subtitles",
+          file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+          default: t.default || false,
+        }));
+
+        setVideoSource(proxiedUrl);
+        setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
+        setVideoTracks(proxiedTracks);
+        setVideoIntro(sourcesData.intro || null);
+        setVideoOutro(sourcesData.outro || null);
+
+        const idx = episodes.findIndex((e) => e.id === episode.id);
+        if (idx !== -1) setCurrentEpisodeIndex(idx);
+
+        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
         
-        if (m3u8Source) {
-          setVideoSource(m3u8Source.url);
-          setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
-          
-          const tracks = (sourcesData.subtitles || []).map((s: any) => ({
-            file: s.url,
-            label: s.lang,
-            kind: "subtitles"
-          }));
-          setVideoTracks(tracks);
-          
-          const idx = episodes.findIndex((e) => e.id === episode.id);
-          if (idx !== -1) setCurrentEpisodeIndex(idx);
-
-          toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
-          return;
+        // Prefetch next episode
+        if (idx !== -1 && episodes[idx + 1]) {
+          prefetchEpisodeSources(episodes[idx + 1].id);
         }
-      } else {
-        // V1/V2 Cache Handling
-        if (sourcesData.sources && sourcesData.sources.length > 0) {
-          setVideoHeaders(sourcesData.headers || null);
-          const m3u8Source = sourcesData.sources.find((s: any) => s.file.includes(".m3u8"));
-          const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
-
-          const raw = import.meta.env.VITE_CONVEX_URL as string;
-          let base = raw;
-          try {
-            const u = new URL(raw);
-            const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
-            base = `${u.protocol}//${hostname}`;
-          } catch {
-            base = raw.replace("convex.cloud", "convex.site");
-          }
-          base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
-
-          const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
-
-          const proxiedTracks = (sourcesData.tracks || []).map((t: any) => ({
-            ...t,
-            kind: t.kind || "subtitles",
-            file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
-            default: t.default || false,
-          }));
-
-          setVideoSource(proxiedUrl);
-          setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
-          setVideoTracks(proxiedTracks);
-          setVideoIntro(sourcesData.intro || null);
-          setVideoOutro(sourcesData.outro || null);
-
-          const idx = episodes.findIndex((e) => e.id === episode.id);
-          if (idx !== -1) setCurrentEpisodeIndex(idx);
-
-          toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
-          
-          // Prefetch next episode
-          if (idx !== -1 && episodes[idx + 1]) {
-            prefetchEpisodeSources(episodes[idx + 1].id);
-          }
-          
-          return;
-        }
+        
+        return;
       }
     }
     
     try {
-      if (dataFlow === "v3") {
-        // V3 Fetch Logic
-        const sourcesData = await fetchYumaSources({ episodeId: episode.id });
-        animeCache.set(cacheKey, sourcesData, 5);
-
-        const m3u8Source = sourcesData.sources?.find((s: any) => s.quality === "default" || s.quality === "auto") || sourcesData.sources?.[0];
-        
-        if (m3u8Source) {
-          setVideoSource(m3u8Source.url);
-          setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
-          
-          const tracks = (sourcesData.subtitles || []).map((s: any) => ({
-            file: s.url,
-            label: s.lang,
-            kind: "subtitles"
-          }));
-          setVideoTracks(tracks);
-          
-          const idx = episodes.findIndex((e) => e.id === episode.id);
-          if (idx !== -1) setCurrentEpisodeIndex(idx);
-
-          toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
-        } else {
-          toast.error("No video sources available");
-        }
-        return;
-      }
-
       // V1/V2 Fetch Logic
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };

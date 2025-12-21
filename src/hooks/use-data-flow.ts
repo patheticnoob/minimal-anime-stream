@@ -2,13 +2,11 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 export function useDataFlow() {
-  const dataFlow = useQuery(api.dataFlow.getUserDataFlow);
-  const setDataFlow = useMutation(api.dataFlow.setUserDataFlow);
-
+  // Force V1 flow
   return {
-    dataFlow: dataFlow || "v1",
-    setDataFlow,
-    isV1: dataFlow === "v1" || !dataFlow,
-    isV2: dataFlow === "v2",
+    dataFlow: "v1",
+    setDataFlow: async () => {},
+    isV1: true,
+    isV2: false,
   };
 }

@@ -71,9 +71,7 @@ export default function Watch() {
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
   
-  // V3 Actions
-  const fetchYumaDetails = useAction(api.yumaApi.getAnimeDetails);
-  const fetchYumaSources = useAction(api.yumaApi.getEpisodeSources);
+  // V3 Actions Removed
 
   const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
@@ -128,52 +126,20 @@ export default function Watch() {
     // Fetch episodes
     setEpisodesLoading(true);
 
-    if (dataFlow === "v3") {
-      fetchYumaDetails({ animeId })
-        .then((data) => {
-          // Update anime info from Yuma details
-          if (data) {
-            setAnime(prev => ({
-              ...prev,
-              title: data.title || prev?.title,
-              image: data.image || prev?.image,
-              type: data.type || prev?.type,
-              language: {
-                sub: data.sub ? String(data.sub) : prev?.language?.sub,
-                dub: data.dub ? String(data.dub) : prev?.language?.dub,
-              }
-            }));
-          }
-
-          const yumaEpisodes = (data.episodes || []).map((ep: any) => ({
-            id: ep.id,
-            title: ep.title,
-            number: normalizeEpisodeNumber(ep.number),
-            currentTime: 0,
-            duration: 0,
-          }));
-          setEpisodes(yumaEpisodes);
-        })
-        .catch((err) => {
-          const msg = err instanceof Error ? err.message : "Failed to load episodes from Yuma.";
-          toast.error(msg);
-        })
-        .finally(() => setEpisodesLoading(false));
-    } else {
-      fetchEpisodes({ dataId: animeId })
-        .then((eps) => {
-          const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
-            ...ep,
-            number: normalizeEpisodeNumber(ep.number),
-          }));
-          setEpisodes(normalizedEpisodes);
-        })
-        .catch((err) => {
-          const msg = err instanceof Error ? err.message : "Failed to load episodes.";
-          toast.error(msg);
-        })
-        .finally(() => setEpisodesLoading(false));
-    }
+    // Always use V1 (HiAnime)
+    fetchEpisodes({ dataId: animeId })
+      .then((eps) => {
+        const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
+          ...ep,
+          number: normalizeEpisodeNumber(ep.number),
+        }));
+        setEpisodes(normalizedEpisodes);
+      })
+      .catch((err) => {
+        const msg = err instanceof Error ? err.message : "Failed to load episodes.";
+        toast.error(msg);
+      })
+      .finally(() => setEpisodesLoading(false));
 
     // Fetch broadcast info if anime title is available
     if (storedAnime) {
@@ -338,37 +304,7 @@ export default function Watch() {
 
     toast("Loading video...");
 
-    if (dataFlow === "v3") {
-      try {
-        const sourcesData = await fetchYumaSources({ episodeId: episode.id });
-        
-        const m3u8Source = sourcesData.sources?.find((s: any) => s.quality === "default" || s.quality === "auto") || sourcesData.sources?.[0];
-        
-        if (m3u8Source) {
-          setVideoSource(m3u8Source.url);
-          setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber}`);
-          
-          const tracks = (sourcesData.subtitles || []).map((s: any) => ({
-            file: s.url,
-            label: s.lang,
-            kind: "subtitles"
-          }));
-          setVideoTracks(tracks);
-          
-          const idx = episodes.findIndex((e) => e.id === episode.id);
-          if (idx !== -1) setCurrentEpisodeIndex(idx);
-
-          toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
-        } else {
-          toast.error("No video sources available");
-        }
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "Failed to load video from Yuma";
-        toast.error(msg);
-      }
-      return;
-    }
-
+    // Always use V1/V2 logic (HiAnime)
     try {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
