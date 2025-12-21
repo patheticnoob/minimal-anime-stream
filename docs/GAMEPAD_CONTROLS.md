@@ -36,18 +36,26 @@ The virtual cursor provides mouse-like navigation using a gamepad:
 - `src/components/VideoPlayer.tsx`
 - `src/components/RetroVideoPlayer.tsx`
 
-**Controls work even when player controls are hidden:**
+**Fullscreen Mode Controls:**
 
-- **A Button**: Play/Pause
-- **B Button**: Close video player / Go back
-- **Y Button**: Toggle fullscreen
-- **X Button**: Toggle fullscreen (duplicate for convenience)
+The video player has two distinct control modes:
+
+**1. Non-Fullscreen Mode:**
+- Virtual cursor is active for navigation
+- **RB (R1)**: Enter fullscreen mode
+
+**2. Fullscreen Mode (Virtual cursor hidden):**
+- **RB (R1)**: Enter fullscreen (if not already in fullscreen)
+- **RT (R2)**: Exit fullscreen
+- **X Button**: Play/Pause
 - **D-pad Left**: Seek backward 10 seconds
 - **D-pad Right**: Seek forward 10 seconds
 - **D-pad Up**: Increase volume
 - **D-pad Down**: Decrease volume
-- **LB (Left Bumper)**: Skip intro (when available)
-- **RB (Right Bumper)**: Skip outro or next episode (when available)
+- **LB (Left Bumper)**: Skip intro (when available, Nothing theme only)
+- **RB (Right Bumper)**: Skip outro or next episode (when available, Nothing theme only)
+
+**Note**: Fullscreen-specific controls (X, D-pad, RT) only work when the video player is in fullscreen mode. Outside of fullscreen, the virtual cursor system takes over for navigation.
 
 #### Episode List Scrolling
 **Files**:

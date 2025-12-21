@@ -762,29 +762,39 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   useEffect(() => {
     if (buttonPressed === null) return;
 
+    // R1 (RB) - Toggle fullscreen (works anytime)
     if (buttonPressed === GAMEPAD_BUTTONS.RB) {
       toggleFullscreen();
+      setGamepadControlsActive(true);
+      setTimeout(() => setGamepadControlsActive(false), 2000);
       return;
     }
 
+    // Only process other controls when in fullscreen
     if (!isFullscreen) {
       return;
     }
 
+    setGamepadControlsActive(true);
+    setTimeout(() => setGamepadControlsActive(false), 2000);
+
     switch (buttonPressed) {
-      case GAMEPAD_BUTTONS.X:
+      case GAMEPAD_BUTTONS.RT: // R2 - Exit fullscreen
+        toggleFullscreen();
+        break;
+      case GAMEPAD_BUTTONS.X: // X - Play/Pause
         togglePlay();
         break;
-      case GAMEPAD_BUTTONS.DPAD_LEFT:
+      case GAMEPAD_BUTTONS.DPAD_LEFT: // Left - Seek back 10s
         skip(-10);
         break;
-      case GAMEPAD_BUTTONS.DPAD_RIGHT:
+      case GAMEPAD_BUTTONS.DPAD_RIGHT: // Right - Seek forward 10s
         skip(10);
         break;
-      case GAMEPAD_BUTTONS.DPAD_UP:
+      case GAMEPAD_BUTTONS.DPAD_UP: // Up - Volume up
         updateVolume(volume + 0.1);
         break;
-      case GAMEPAD_BUTTONS.DPAD_DOWN:
+      case GAMEPAD_BUTTONS.DPAD_DOWN: // Down - Volume down
         updateVolume(volume - 0.1);
         break;
       default:

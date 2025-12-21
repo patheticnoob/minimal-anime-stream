@@ -712,47 +712,55 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     };
   }, [tracks]);
 
-  // Add gamepad controls for video player - works regardless of control visibility
+  // Add gamepad controls for video player
   useEffect(() => {
     if (buttonPressed === null) return;
 
-    // Prevent default actions and show controls briefly
+    // R1 (RB) - Toggle fullscreen (works anytime)
+    if (buttonPressed === GAMEPAD_BUTTONS.RB) {
+      updateControlsVisibility(true);
+      toggleFullscreen();
+      return;
+    }
+
+    // Only process fullscreen-specific controls when in fullscreen
+    if (!isFullscreen) {
+      return;
+    }
+
+    // Show controls briefly when button is pressed in fullscreen
     updateControlsVisibility(true);
 
     switch (buttonPressed) {
-      case GAMEPAD_BUTTONS.A:
+      case GAMEPAD_BUTTONS.RT: // R2 - Exit fullscreen
+        toggleFullscreen();
+        break;
+      case GAMEPAD_BUTTONS.X: // X - Play/Pause
         togglePlay();
         break;
-      case GAMEPAD_BUTTONS.B:
-        onClose();
-        break;
-      case GAMEPAD_BUTTONS.Y:
-        toggleFullscreen();
-        break;
-      case GAMEPAD_BUTTONS.X:
-        toggleFullscreen();
-        break;
-      case GAMEPAD_BUTTONS.DPAD_LEFT:
+      case GAMEPAD_BUTTONS.DPAD_LEFT: // Left - Seek back 10s
         skip(-10);
         break;
-      case GAMEPAD_BUTTONS.DPAD_RIGHT:
+      case GAMEPAD_BUTTONS.DPAD_RIGHT: // Right - Seek forward 10s
         skip(10);
         break;
-      case GAMEPAD_BUTTONS.DPAD_UP:
+      case GAMEPAD_BUTTONS.DPAD_UP: // Up - Volume up
         handleVolumeChange(Math.min(1, volume + 0.1));
         break;
-      case GAMEPAD_BUTTONS.DPAD_DOWN:
+      case GAMEPAD_BUTTONS.DPAD_DOWN: // Down - Volume down
         handleVolumeChange(Math.max(0, volume - 0.1));
         break;
-      case GAMEPAD_BUTTONS.LB:
+      case GAMEPAD_BUTTONS.LB: // LB - Skip intro (if available)
         if (showSkipIntro) skipIntro();
         break;
-      case GAMEPAD_BUTTONS.RB:
+      case GAMEPAD_BUTTONS.RB: // Already handled above for fullscreen toggle
         if (showSkipOutro) skipOutro();
         else if (onNext) onNext();
         break;
+      default:
+        break;
     }
-  }, [buttonPressed, togglePlay, onClose, toggleFullscreen, skip, volume, handleVolumeChange, onNext, showSkipIntro, showSkipOutro, skipIntro, skipOutro, updateControlsVisibility]);
+  }, [buttonPressed, isFullscreen, togglePlay, toggleFullscreen, skip, volume, handleVolumeChange, onNext, showSkipIntro, showSkipOutro, skipIntro, skipOutro, updateControlsVisibility]);
 
   // Gesture Hook
   const { gestureHandlers, overlayProps } = usePlayerGestures({

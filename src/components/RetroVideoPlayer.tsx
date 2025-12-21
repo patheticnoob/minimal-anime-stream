@@ -77,7 +77,7 @@ export function RetroVideoPlayer({
     animeDescription
   );
 
-  const { buttonPressed } = useGamepad();
+  const { buttonPressed } = useGamepad({ enableButtonEvents: true });
   const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
 
   // Pause video when casting starts
