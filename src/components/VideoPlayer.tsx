@@ -546,13 +546,20 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     }
   };
 
+  const updateVolume = useCallback((value: number) => {
+    const video = videoRef.current;
+    const clamped = Math.min(1, Math.max(0, Number(value.toFixed(2))));
+    if (video) {
+      video.volume = clamped;
+    }
+    setVolume(clamped);
+    setIsMuted(clamped === 0);
+  }, []);
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
-    const video = videoRef.current;
-    if (!video) return;
-    video.volume = newVolume;
-    setVolume(newVolume);
-    setIsMuted(newVolume === 0);
+    if (!Number.isFinite(newVolume)) return;
+    updateVolume(newVolume);
   };
 
   const toggleMute = () => {
@@ -735,13 +742,11 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           break;
         case "arrowup":
           e.preventDefault();
-          setVolume((v) => Math.min(1, v + 0.1));
-          if (videoRef.current) videoRef.current.volume = Math.min(1, volume + 0.1);
+          updateVolume(volume + 0.1);
           break;
         case "arrowdown":
           e.preventDefault();
-          setVolume((v) => Math.max(0, v - 0.1));
-          if (videoRef.current) videoRef.current.volume = Math.max(0, volume - 0.1);
+          updateVolume(volume - 0.1);
           break;
         default:
           break;
@@ -752,7 +757,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [togglePlay, toggleFullscreen, volume]);
+  }, [togglePlay, toggleFullscreen, volume, updateVolume]);
 
   useEffect(() => {
     if (buttonPressed === null) return;
@@ -777,15 +782,15 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         skip(10);
         break;
       case GAMEPAD_BUTTONS.DPAD_UP:
-        handleVolumeChange(Math.min(1, Number((volume + 0.1).toFixed(2))));
+        updateVolume(volume + 0.1);
         break;
       case GAMEPAD_BUTTONS.DPAD_DOWN:
-        handleVolumeChange(Math.max(0, Number((volume - 0.1).toFixed(2))));
+        updateVolume(volume - 0.1);
         break;
       default:
         break;
     }
-  }, [buttonPressed, isFullscreen, toggleFullscreen, togglePlay, skip, handleVolumeChange, volume]);
+  }, [buttonPressed, isFullscreen, toggleFullscreen, togglePlay, skip, updateVolume, volume]);
 
   const formatTime = (time: number) => {
     if (isNaN(time)) return "0:00";
