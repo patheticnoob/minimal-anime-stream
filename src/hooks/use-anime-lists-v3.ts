@@ -128,8 +128,8 @@ export function useAnimeListsV3() {
     let mounted = true;
 
     // Load TV shows first (use as "popular" since Yuma has no trending endpoint)
-    logInfo('Fetching TV shows from Yuma (v3 flow)', 'Initial Load');
-    retryWithBackoff(() => fetchYumaEndpoint('tv', 1))
+    logInfo('Fetching top airing from Yuma (v3 flow)', 'Initial Load');
+    retryWithBackoff(() => fetchYumaEndpoint('top-airing', 1))
       .then((data) => {
         if (!mounted) return;
         setPopularItems(data.results);
@@ -142,12 +142,12 @@ export function useAnimeListsV3() {
         
         setPopularLoading(false);
         setLoading(false);
-        logInfo('TV shows loaded from Yuma (v3)', 'Initial Load');
+        logInfo('Top airing loaded from Yuma (v3)', 'Initial Load');
       })
       .catch((err) => {
         if (!mounted) return;
-        const msg = err instanceof Error ? err.message : "Failed to load TV shows";
-        logError(msg, 'Yuma TV Shows', err instanceof Error ? err : undefined);
+        const msg = err instanceof Error ? err.message : "Failed to load top airing";
+        logError(msg, 'Yuma Top Airing', err instanceof Error ? err : undefined);
         setPopularLoading(false);
         setLoading(false);
       });
@@ -267,7 +267,7 @@ export function useAnimeListsV3() {
       switch (category) {
         case 'popular':
           nextPage = popularPage + 1;
-          endpoint = 'tv';
+          endpoint = 'top-airing';
           setItems = setPopularItems;
           setPage = setPopularPage;
           setHasMore = setPopularHasMore;

@@ -42,6 +42,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
+  const [animeDetails, setAnimeDetails] = useState<Partial<AnimeItem> | null>(null);
 
   const animeProgress = useQuery(
     api.watchProgress.getProgress,
@@ -126,6 +127,20 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         .then((data) => {
           if (cancelled) return;
           
+          // Map Yuma details to AnimeItem fields
+          const details: Partial<AnimeItem> = {
+            synopsis: data.description,
+            genres: data.genres,
+            status: data.status,
+            totalEpisodes: data.totalEpisodes,
+            aired: data.releaseDate,
+            type: data.type,
+            image: data.image,
+            title: data.title,
+            japaneseTitle: data.otherName, // Yuma often puts alt titles here
+          };
+          setAnimeDetails(details);
+
           const yumaEpisodes = (data.episodes || []).map((ep: any) => ({
             id: ep.id,
             title: ep.title,
@@ -455,8 +470,17 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     setVideoHeaders(null);
     setCurrentEpisodeData(null);
     setCurrentAnimeInfo(null);
+    // Do not clear animeDetails here as we might want to keep showing info in modal
+    // But if we close modal, selected becomes null, which triggers effect to clear episodes
     if (lastSelectedAnime) setSelected(lastSelectedAnime);
   };
+
+  // Clear details when selected changes
+  useEffect(() => {
+    if (!selected) {
+      setAnimeDetails(null);
+    }
+  }, [selected]);
 
   const playNextEpisode = () => {
     if (currentEpisodeIndex === null) return;
@@ -488,6 +512,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     playNextEpisode,
     nextEpisodeTitle,
     setLastSelectedAnime,
-    lastSelectedAnime
+    lastSelectedAnime,
+    animeDetails
   };
 }

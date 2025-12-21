@@ -14,6 +14,7 @@ export const getAnimeDetails = action({
       }
       
       const data = await response.json();
+      // Return the raw data so frontend can map it
       return data;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch anime details";

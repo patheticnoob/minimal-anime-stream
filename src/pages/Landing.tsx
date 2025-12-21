@@ -94,7 +94,8 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     playNextEpisode,
     nextEpisodeTitle,
     setLastSelectedAnime,
-    lastSelectedAnime
+    lastSelectedAnime,
+    animeDetails
   } = usePlayerLogic(isAuthenticated, dataFlow);
 
   // Watch progress and watchlist
@@ -404,7 +405,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       </main>
 
       <InfoModal
-        anime={selected}
+        anime={selected ? { ...selected, ...animeDetails } : null}
         isOpen={!!selected}
         onClose={() => setSelected(null)}
         episodes={episodes.map(ep => {
