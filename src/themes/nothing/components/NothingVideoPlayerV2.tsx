@@ -70,6 +70,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   );
 
   const { buttonPressed } = useGamepad({ enableButtonEvents: true });
+  const fullscreenCooldownRef = useRef<number>(0);
 
   const CONTROL_VISIBILITY_DURATION = 3000;
 
@@ -716,8 +717,13 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   useEffect(() => {
     if (buttonPressed === null) return;
 
-    // R1 (RB) - Toggle fullscreen (works anytime)
+    // R1 (RB) - Toggle fullscreen (works anytime) with cooldown
     if (buttonPressed === GAMEPAD_BUTTONS.RB) {
+      const now = Date.now();
+      if (now - fullscreenCooldownRef.current < 500) {
+        return; // Still in cooldown period
+      }
+      fullscreenCooldownRef.current = now;
       updateControlsVisibility(true);
       toggleFullscreen();
       return;

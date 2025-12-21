@@ -78,6 +78,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [isDragging, setIsDragging] = useState(false);
   const { buttonPressed } = useGamepad({ enableButtonEvents: true });
   const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
+  const fullscreenCooldownRef = useRef<number>(0);
 
   const { isCasting, castAvailable, handleCastClick } = useCast(
     source, 
@@ -762,8 +763,13 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   useEffect(() => {
     if (buttonPressed === null) return;
 
-    // R1 (RB) - Toggle fullscreen (works anytime)
+    // R1 (RB) - Toggle fullscreen (works anytime) with cooldown
     if (buttonPressed === GAMEPAD_BUTTONS.RB) {
+      const now = Date.now();
+      if (now - fullscreenCooldownRef.current < 500) {
+        return; // Still in cooldown period
+      }
+      fullscreenCooldownRef.current = now;
       toggleFullscreen();
       setGamepadControlsActive(true);
       setTimeout(() => setGamepadControlsActive(false), 2000);

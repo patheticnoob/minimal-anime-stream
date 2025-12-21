@@ -51,6 +51,7 @@ export function RetroVideoPlayer({
   const hlsRef = useRef<any>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
   const hasRestoredProgress = useRef(false);
+  const fullscreenCooldownRef = useRef<number>(0);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -318,6 +319,49 @@ export function RetroVideoPlayer({
       }
     };
   }, [isPlaying]);
+
+  useEffect(() => {
+    if (buttonPressed === null) return;
+
+    // R1 (RB) - Toggle fullscreen with cooldown
+    if (buttonPressed === GAMEPAD_BUTTONS.RB) {
+      const now = Date.now();
+      if (now - fullscreenCooldownRef.current < 500) {
+        return; // Still in cooldown period
+      }
+      fullscreenCooldownRef.current = now;
+      toggleFullscreen();
+      return;
+    }
+
+    // Only process fullscreen-specific controls when in fullscreen
+    if (!isFullscreen) {
+      return;
+    }
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.RT: // R2 - Exit fullscreen
+        toggleFullscreen();
+        break;
+      case GAMEPAD_BUTTONS.X: // X - Play/Pause
+        togglePlay();
+        break;
+      case GAMEPAD_BUTTONS.DPAD_LEFT: // Left - Seek back 10s
+        skip(-10);
+        break;
+      case GAMEPAD_BUTTONS.DPAD_RIGHT: // Right - Seek forward 10s
+        skip(10);
+        break;
+      case GAMEPAD_BUTTONS.DPAD_UP: // Up - Volume up
+        handleVolumeChange({ target: { value: String(Math.min(1, volume + 0.1)) } } as any);
+        break;
+      case GAMEPAD_BUTTONS.DPAD_DOWN: // Down - Volume down
+        handleVolumeChange({ target: { value: String(Math.max(0, volume - 0.1)) } } as any);
+        break;
+      default:
+        break;
+    }
+  }, [buttonPressed, isFullscreen, volume]);
 
   useEffect(() => {
     const video = videoRef.current;
