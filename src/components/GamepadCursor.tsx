@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGamepadCursor } from '@/hooks/use-gamepad-cursor';
 import { useGamepad, GAMEPAD_BUTTONS } from '@/hooks/use-gamepad';
@@ -8,6 +8,35 @@ export function GamepadCursor() {
   const { cursorPosition, isVisible, simulateClick } = useGamepadCursor();
   const { buttonPressed } = useGamepad({ enableButtonEvents: true });
   const { theme } = useTheme();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const doc = document as any;
+      setIsFullscreen(
+        Boolean(
+          doc.fullscreenElement ||
+            doc.webkitFullscreenElement ||
+            doc.mozFullScreenElement ||
+            doc.msFullscreenElement,
+        ),
+      );
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    handleFullscreenChange();
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, []);
 
   const scrollAtCursor = useCallback(
     (direction: 'up' | 'down') => {
@@ -58,7 +87,7 @@ export function GamepadCursor() {
   }, []);
 
   useEffect(() => {
-    if (buttonPressed === null) return;
+    if (isFullscreen || buttonPressed === null) return;
 
     if (buttonPressed === GAMEPAD_BUTTONS.A) {
       simulateClick('left');
@@ -78,7 +107,7 @@ export function GamepadCursor() {
     if (buttonPressed === GAMEPAD_BUTTONS.B) {
       triggerBackAction();
     }
-  }, [buttonPressed, simulateClick, scrollAtCursor, triggerBackAction]);
+  }, [buttonPressed, simulateClick, scrollAtCursor, triggerBackAction, isFullscreen]);
 
   // Theme-based cursor styles
   const getCursorStyle = () => {
@@ -111,7 +140,7 @@ export function GamepadCursor() {
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {isVisible && !isFullscreen && (
         <motion.div
           className="fixed pointer-events-none z-[9999]"
           style={{

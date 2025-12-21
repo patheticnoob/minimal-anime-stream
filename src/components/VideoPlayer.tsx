@@ -76,7 +76,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const { buttonPressed } = useGamepad();
+  const { buttonPressed } = useGamepad({ enableButtonEvents: true });
   const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
 
   const { isCasting, castAvailable, handleCastClick } = useCast(
@@ -753,6 +753,39 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, [togglePlay, toggleFullscreen, volume]);
+
+  useEffect(() => {
+    if (buttonPressed === null) return;
+
+    if (buttonPressed === GAMEPAD_BUTTONS.RB) {
+      toggleFullscreen();
+      return;
+    }
+
+    if (!isFullscreen) {
+      return;
+    }
+
+    switch (buttonPressed) {
+      case GAMEPAD_BUTTONS.X:
+        togglePlay();
+        break;
+      case GAMEPAD_BUTTONS.DPAD_LEFT:
+        skip(-10);
+        break;
+      case GAMEPAD_BUTTONS.DPAD_RIGHT:
+        skip(10);
+        break;
+      case GAMEPAD_BUTTONS.DPAD_UP:
+        handleVolumeChange(Math.min(1, Number((volume + 0.1).toFixed(2))));
+        break;
+      case GAMEPAD_BUTTONS.DPAD_DOWN:
+        handleVolumeChange(Math.max(0, Number((volume - 0.1).toFixed(2))));
+        break;
+      default:
+        break;
+    }
+  }, [buttonPressed, isFullscreen, toggleFullscreen, togglePlay, skip, handleVolumeChange, volume]);
 
   const formatTime = (time: number) => {
     if (isNaN(time)) return "0:00";

@@ -16,7 +16,19 @@ export function useGamepadCursor() {
     const updateCursor = () => {
       const gamepads = navigator.getGamepads();
       const currentGamepad = gamepads[0] || gamepads[1] || gamepads[2] || gamepads[3];
-      
+
+      const fullscreenElement =
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement;
+
+      if (fullscreenElement) {
+        setIsVisible(false);
+        animationFrameRef.current = requestAnimationFrame(updateCursor);
+        return;
+      }
+
       if (!currentGamepad) {
         setIsVisible(false);
         animationFrameRef.current = requestAnimationFrame(updateCursor);
