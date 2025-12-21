@@ -3,18 +3,16 @@ import { useParams, useNavigate } from "react-router";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { ArrowLeft, Play, Plus, Check, Clock3, Image as ImageIcon, Film } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { NothingVideoPlayerV2 } from "../components/NothingVideoPlayerV2";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
 import { animeCache } from "@/lib/anime-cache";
 import { useNothingTheme } from "../hooks/useNothingTheme";
-import { Moon, Sun } from "lucide-react";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
+import { NothingWatchHeader } from "../components/NothingWatchHeader";
+import { NothingAnimeInfo } from "../components/NothingAnimeInfo";
+import { NothingEpisodeList } from "../components/NothingEpisodeList";
 
 type Episode = {
   id: string;
@@ -65,38 +63,6 @@ export default function NothingWatch() {
   const { isAuthenticated } = useAuth();
   const { isDarkMode, toggleTheme } = useNothingTheme();
   const { buttonPressed } = useGamepad();
-
-  // Get dark mode state from localStorage
-  const [isDarkModeState, setIsDarkModeState] = useState(() => {
-    const saved = localStorage.getItem("nothing-dark-mode");
-    return saved === "true";
-  });
-
-  // Sync with localStorage changes
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const saved = localStorage.getItem("nothing-dark-mode");
-      setIsDarkModeState(saved === "true");
-    };
-    
-    window.addEventListener("storage", handleStorageChange);
-    // Also check on mount and periodically
-    const interval = setInterval(handleStorageChange, 100);
-    
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      clearInterval(interval);
-    };
-  }, []);
-
-  // Apply dark class to document
-  useEffect(() => {
-    if (isDarkModeState) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkModeState]);
 
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
@@ -625,7 +591,7 @@ export default function NothingWatch() {
   useEffect(() => {
     if (buttonPressed === null || videoSource) return; // Don't scroll when video is playing
 
-    const episodeListContainer = document.querySelector('.bg-white.dark\\:bg-\\[\\#1A1D24\\].border.border-black\\/5');
+    const episodeListContainer = document.getElementById('episode-list-container');
     if (!episodeListContainer) return;
 
     switch (buttonPressed) {
@@ -640,140 +606,28 @@ export default function NothingWatch() {
 
   return (
     <div data-theme="nothing" className="min-h-screen bg-[#F5F7FB] dark:bg-[#0B0F19] text-[#050814] dark:text-white transition-colors duration-300">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#1A1D24]/95 backdrop-blur-lg border-b border-black/5 dark:border-white/10 transition-colors duration-300">
-        <div className="max-w-[2000px] mx-auto px-6 py-4 flex items-center gap-4">
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors group"
-          >
-            <div className="p-2 rounded-full bg-black/5 dark:bg-white/10 group-hover:bg-black/10 dark:group-hover:bg-white/20 transition-colors">
-              <ArrowLeft className="h-5 w-5" />
-            </div>
-            <span className="text-sm font-medium tracking-widest uppercase">Back</span>
-          </button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold truncate tracking-wide text-[#050814] dark:text-white">{anime?.title || "Loading..."}</h1>
-          </div>
-          
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="w-10 h-10 rounded-full border transition-colors flex items-center justify-center border-black/5 bg-white/90 text-[#4b5563] hover:text-black hover:border-black/20 dark:border-white/10 dark:bg-[#2A2F3A] dark:text-white dark:hover:text-white dark:hover:border-white/20"
-            aria-label="Toggle dark mode"
-          >
-            {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-
-          <Button
-            onClick={handleToggleWatchlist}
-            variant="outline"
-            size="sm"
-            className="gap-2 border-black/10 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 text-[#050814] dark:text-white bg-transparent"
-          >
-            {isInWatchlist ? (
-              <>
-                <Check className="h-4 w-4 text-[#ff4d4f]" />
-                <span className="tracking-wider">IN WATCHLIST</span>
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4" />
-                <span className="tracking-wider">ADD TO LIST</span>
-              </>
-            )}
-          </Button>
-        </div>
-      </header>
+      <NothingWatchHeader 
+        title={anime?.title}
+        isDarkMode={isDarkMode}
+        toggleTheme={toggleTheme}
+        isInWatchlist={!!isInWatchlist}
+        onToggleWatchlist={handleToggleWatchlist}
+      />
 
       {/* Main Content */}
       <main className="pt-28 md:pt-24 px-4 md:px-6 pb-10 max-w-[2000px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
           {/* Left: Anime Info and Video Player */}
           <div className="space-y-8 mt-8 md:mt-0">
-            {/* Anime Info */}
-            <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-8 relative overflow-hidden shadow-sm transition-colors duration-300">
-              <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
-                <h1 className="text-9xl font-bold tracking-tighter text-black dark:text-white">NOTHING</h1>
-              </div>
-              
-              <div className="flex flex-col md:flex-row gap-8 relative z-10">
-                {anime?.image && (
-                  <div className="shrink-0">
-                    <img
-                      src={anime.image}
-                      alt={anime.title}
-                      className="w-40 h-60 object-cover rounded-2xl shadow-lg border border-black/5 dark:border-white/5"
-                    />
-                  </div>
-                )}
-                <div className="flex-1 space-y-6">
-                  <div>
-                    <h2 className="text-4xl font-bold mb-3 tracking-tight leading-tight text-[#050814] dark:text-white">{anime?.title || "Unknown Title"}</h2>
-                    <div className="flex items-center gap-3 flex-wrap">
-                      {anime?.type && (
-                        <span className="px-3 py-1 rounded-full border border-black/10 dark:border-white/20 text-xs font-medium tracking-wider uppercase text-black/60 dark:text-white/60">
-                          {anime.type}
-                        </span>
-                      )}
-                      {anime?.language?.sub && (
-                        <span className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/10 text-xs font-medium tracking-wider uppercase text-black/80 dark:text-white/80">
-                          SUB
-                        </span>
-                      )}
-                      {anime?.language?.dub && (
-                        <span className="px-3 py-1 rounded-full bg-black/5 dark:bg-white/10 text-xs font-medium tracking-wider uppercase text-black/80 dark:text-white/80">
-                          DUB
-                        </span>
-                      )}
-                      {episodes.length > 0 && (
-                        <span className="px-3 py-1 rounded-full border border-[#ff4d4f]/30 text-[#ff4d4f] text-xs font-medium tracking-wider uppercase">
-                          {episodes.length} Episodes
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {episodes.length > 0 && (
-                    <Button
-                      onClick={() => playEpisode(episodes[0])}
-                      className="nothing-play-cta h-14 px-8 rounded-full bg-[#ff4d4f] text-white hover:bg-[#ff4d4f]/90 transition-all text-base font-bold tracking-wide shadow-lg shadow-[#ff4d4f]/20"
-                      disabled={episodes.length === 0}
-                    >
-                      <Play className="mr-2 h-5 w-5 fill-white" />
-                      START WATCHING
-                    </Button>
-                  )}
-
-                  {shouldShowBroadcast && (
-                    <div className="flex items-start gap-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 max-w-md">
-                      <div className="p-2 rounded-full bg-[#ff4d4f]/10 dark:bg-[#ff4d4f]/20 text-[#ff4d4f]">
-                        <Clock3 className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        {isBroadcastLoading ? (
-                          <span className="text-sm text-black/60 dark:text-white/60">Syncing broadcast data...</span>
-                        ) : (
-                          <div className="space-y-1">
-                            <span className="block text-xs font-bold tracking-[0.2em] text-black/40 dark:text-white/40 uppercase">
-                              Next Broadcast
-                            </span>
-                            <span className="block font-medium text-[#050814] dark:text-white">
-                              {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
-                            </span>
-                            {broadcastDetails?.countdown && (
-                              <span className="block text-sm text-[#ff4d4f]">
-                                {broadcastDetails.countdown}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <NothingAnimeInfo 
+              anime={anime}
+              episodeCount={episodes.length}
+              onPlayFirst={() => episodes.length > 0 && playEpisode(episodes[0])}
+              broadcastInfo={broadcastInfo}
+              broadcastDetails={broadcastDetails}
+              isBroadcastLoading={isBroadcastLoading}
+              shouldShowBroadcast={shouldShowBroadcast}
+            />
 
             {/* Video Player - Only shown when episode is playing */}
             {videoSource && currentEpisodeData && (
@@ -811,82 +665,12 @@ export default function NothingWatch() {
           </div>
 
           {/* Right: Episode List */}
-          <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] overflow-y-auto flex flex-col shadow-sm transition-colors duration-300">
-            <div className="flex items-center justify-between mb-6 sticky top-0 bg-white dark:bg-[#1A1D24] z-10 py-2 transition-colors duration-300">
-              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-black/40 dark:text-white/40">Episodes</h3>
-              <span className="text-xs font-mono text-black/30 dark:text-white/30">{episodes.length} TOTAL</span>
-            </div>
-            
-            {episodesLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-12 h-12 border-4 border-[#ff4d4f]/20 border-t-[#ff4d4f] rounded-full animate-spin" />
-                  <p className="text-sm text-black/40 dark:text-white/40 tracking-wider uppercase">Loading episodes...</p>
-                </div>
-              </div>
-            ) : episodesWithProgress.length > 0 ? (
-              <div className="space-y-3">
-                {episodesWithProgress.map((ep) => {
-                  const progressPercentage =
-                    ep.currentTime && ep.duration ? (ep.currentTime / ep.duration) * 100 : 0;
-                  const isCurrentEpisode = currentEpisodeData?.id === ep.id;
-
-                  return (
-                    <button
-                      key={ep.id}
-                      onClick={() => playEpisode(ep)}
-                      className={`group relative w-full text-left p-4 rounded-xl border transition-all duration-300 ${
-                        isCurrentEpisode 
-                          ? "bg-[#ff4d4f]/5 dark:bg-[#ff4d4f]/10 border-[#ff4d4f] shadow-[0_0_20px_rgba(255,77,79,0.1)]" 
-                          : "bg-black/5 dark:bg-white/5 border-transparent hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/10"
-                      }`}
-                    >
-                      <div className="flex items-center gap-4 relative z-10">
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-full font-mono text-sm font-bold ${
-                          isCurrentEpisode ? "bg-[#ff4d4f] text-white" : "bg-white dark:bg-[#2A2F3A] text-black/40 dark:text-white/40 group-hover:text-black dark:group-hover:text-white shadow-sm"
-                        }`}>
-                          {ep.number ?? "#"}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <p className={`font-medium truncate ${isCurrentEpisode ? "text-[#ff4d4f]" : "text-[#050814] dark:text-white group-hover:text-black dark:group-hover:text-white"}`}>
-                            {ep.title || `Episode ${ep.number ?? "?"}`}
-                          </p>
-                          <p className="text-xs text-black/40 dark:text-white/40 font-mono mt-0.5">
-                            EP {ep.number ?? "?"}
-                          </p>
-                        </div>
-
-                        {isCurrentEpisode ? (
-                          <div className="w-2 h-2 rounded-full bg-[#ff4d4f] animate-pulse" />
-                        ) : (
-                          <Play className="h-4 w-4 text-black/0 dark:text-white/0 group-hover:text-black/40 dark:group-hover:text-white/40 transition-all transform translate-x-2 group-hover:translate-x-0" />
-                        )}
-                      </div>
-
-                      {progressPercentage > 0 && (
-                        <div className="absolute inset-x-5 bottom-3 pointer-events-none">
-                          <div className="h-1 rounded-full bg-[#ff4d4f]/15 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-[#ff4d4f] transition-all"
-                              style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-black/20 dark:text-white/20">
-                <div className="w-12 h-12 rounded-full border border-dashed border-black/10 dark:border-white/10 flex items-center justify-center mb-4">
-                  <Film className="h-6 w-6" />
-                </div>
-                <p className="text-sm tracking-widest uppercase">No episodes found</p>
-              </div>
-            )}
-          </div>
+          <NothingEpisodeList 
+            episodes={episodesWithProgress}
+            episodesLoading={episodesLoading}
+            currentEpisodeId={currentEpisodeData?.id}
+            onPlayEpisode={playEpisode}
+          />
         </div>
       </main>
     </div>
