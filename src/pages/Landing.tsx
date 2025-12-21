@@ -95,7 +95,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     nextEpisodeTitle,
     setLastSelectedAnime,
     lastSelectedAnime
-  } = usePlayerLogic(isAuthenticated);
+  } = usePlayerLogic(isAuthenticated, dataFlow);
 
   // Watch progress and watchlist
   const continueWatching = useQuery(api.watchProgress.getContinueWatching);
