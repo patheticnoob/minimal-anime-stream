@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGamepadCursor } from '@/hooks/use-gamepad-cursor';
 import { useGamepad, GAMEPAD_BUTTONS } from '@/hooks/use-gamepad';
@@ -6,34 +6,79 @@ import { useTheme } from '@/hooks/use-theme';
 
 export function GamepadCursor() {
   const { cursorPosition, isVisible, simulateClick } = useGamepadCursor();
-  const { buttonPressed } = useGamepad();
+  const { buttonPressed } = useGamepad({ enableButtonEvents: true });
   const { theme } = useTheme();
 
-  // Handle button clicks
+  const scrollAtCursor = useCallback(
+    (direction: 'up' | 'down') => {
+      const delta = direction === 'up' ? -200 : 200;
+      const startElement = document.elementFromPoint(cursorPosition.x, cursorPosition.y);
+
+      const findScrollableParent = (node: Element | null): HTMLElement | null => {
+        let current = node instanceof HTMLElement ? node : null;
+
+        while (current) {
+          const style = window.getComputedStyle(current);
+          const canScroll =
+            /(auto|scroll)/.test(style.overflowY) &&
+            current.scrollHeight > current.clientHeight;
+
+          if (canScroll) {
+            return current;
+          }
+
+          current = current.parentElement;
+        }
+
+        return null;
+      };
+
+      const target = findScrollableParent(startElement);
+
+      if (target) {
+        target.scrollBy({ top: delta, behavior: 'smooth' });
+        return;
+      }
+
+      window.scrollBy({ top: delta, behavior: 'smooth' });
+    },
+    [cursorPosition],
+  );
+
+  const triggerBackAction = useCallback(() => {
+    const eventInit: KeyboardEventInit = {
+      key: 'b',
+      code: 'KeyB',
+      bubbles: true,
+      cancelable: true,
+    };
+
+    document.dispatchEvent(new KeyboardEvent('keydown', eventInit));
+    document.dispatchEvent(new KeyboardEvent('keyup', eventInit));
+  }, []);
+
   useEffect(() => {
     if (buttonPressed === null) return;
 
-    switch (buttonPressed) {
-      case GAMEPAD_BUTTONS.A:
-        simulateClick('left');
-        break;
-      case GAMEPAD_BUTTONS.B:
-        // Back/Cancel - simulate escape key
-        const escapeEvent = new KeyboardEvent('keydown', {
-          key: 'Escape',
-          code: 'Escape',
-          bubbles: true,
-          cancelable: true,
-        });
-        document.dispatchEvent(escapeEvent);
-        break;
-      case GAMEPAD_BUTTONS.X:
-        // Double click
-        simulateClick('left');
-        setTimeout(() => simulateClick('left'), 100);
-        break;
+    if (buttonPressed === GAMEPAD_BUTTONS.A) {
+      simulateClick('left');
+      return;
     }
-  }, [buttonPressed, simulateClick]);
+
+    if (buttonPressed === GAMEPAD_BUTTONS.X) {
+      scrollAtCursor('up');
+      return;
+    }
+
+    if (buttonPressed === GAMEPAD_BUTTONS.Y) {
+      scrollAtCursor('down');
+      return;
+    }
+
+    if (buttonPressed === GAMEPAD_BUTTONS.B) {
+      triggerBackAction();
+    }
+  }, [buttonPressed, simulateClick, scrollAtCursor, triggerBackAction]);
 
   // Theme-based cursor styles
   const getCursorStyle = () => {

@@ -6,7 +6,12 @@ export interface GamepadState {
   buttonPressed: number | null;
 }
 
-export function useGamepad() {
+interface UseGamepadOptions {
+  enableButtonEvents?: boolean;
+}
+
+export function useGamepad(options?: UseGamepadOptions) {
+  const { enableButtonEvents = false } = options ?? {};
   const [gamepadState, setGamepadState] = useState<GamepadState>({
     connected: false,
     gamepad: null,
@@ -28,47 +33,49 @@ export function useGamepad() {
     const gamepad = gamepads[0] || gamepads[1] || gamepads[2] || gamepads[3];
 
     if (gamepad) {
-      // Detect button presses (only trigger on new press, not hold)
       let pressedButton: number | null = null;
-      gamepad.buttons.forEach((button, index) => {
-        const wasPressed = lastButtonStateRef.current[index] || false;
-        const isPressed = button.pressed || button.value > 0.5;
-        
-        if (isPressed && !wasPressed) {
-          pressedButton = index;
-          console.log('🎮 Button pressed:', index);
-        }
-        lastButtonStateRef.current[index] = isPressed;
-      });
 
-      if (pressedButton === null) {
-        for (const mapping of axisMappings) {
-          const value = gamepad.axes[mapping.axis];
-          if (typeof value !== "number") {
-            continue;
+      if (enableButtonEvents) {
+        // Detect button presses (only trigger on new press, not hold)
+        gamepad.buttons.forEach((button, index) => {
+          const wasPressed = lastButtonStateRef.current[index] || false;
+          const isPressed = button.pressed || button.value > 0.5;
+          
+          if (isPressed && !wasPressed) {
+            pressedButton = index;
+            console.log('🎮 Button pressed:', index);
           }
+          lastButtonStateRef.current[index] = isPressed;
+        });
 
-          const direction: -1 | 0 | 1 =
-            value > axisThreshold ? 1 : value < -axisThreshold ? -1 : 0;
-
-          if (axisStateRef.current[mapping.axis] !== direction) {
-            axisStateRef.current[mapping.axis] = direction;
-
-            if (direction === -1) {
-              pressedButton = mapping.negative;
-              break;
+        if (pressedButton === null) {
+          for (const mapping of axisMappings) {
+            const value = gamepad.axes[mapping.axis];
+            if (typeof value !== "number") {
+              continue;
             }
 
-            if (direction === 1) {
-              pressedButton = mapping.positive;
-              break;
+            const direction: -1 | 0 | 1 =
+              value > axisThreshold ? 1 : value < -axisThreshold ? -1 : 0;
+
+            if (axisStateRef.current[mapping.axis] !== direction) {
+              axisStateRef.current[mapping.axis] = direction;
+
+              if (direction === -1) {
+                pressedButton = mapping.negative;
+                break;
+              }
+
+              if (direction === 1) {
+                pressedButton = mapping.positive;
+                break;
+              }
             }
           }
         }
       }
 
-      // Update state with proper change detection
-      if (pressedButton !== null) {
+      if (enableButtonEvents && pressedButton !== null) {
         // Clear any existing timeout
         if (buttonPressTimeoutRef.current) {
           clearTimeout(buttonPressTimeoutRef.current);
@@ -80,7 +87,6 @@ export function useGamepad() {
           buttonPressed: pressedButton,
         });
 
-        // Clear button press after a short delay to ensure React can process it
         buttonPressTimeoutRef.current = window.setTimeout(() => {
           setGamepadState((prev) => ({
             ...prev,
@@ -90,9 +96,12 @@ export function useGamepad() {
         }, 100);
       } else {
         setGamepadState((prev) => {
-          // Only update if connection state changed
-          if (!prev.connected) {
-            return { connected: true, gamepad, buttonPressed: null };
+          if (!prev.connected || prev.gamepad !== gamepad) {
+            return {
+              connected: true,
+              gamepad,
+              buttonPressed: enableButtonEvents ? prev.buttonPressed : null,
+            };
           }
           return prev;
         });
