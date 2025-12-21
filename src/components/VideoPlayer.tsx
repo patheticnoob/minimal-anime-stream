@@ -577,6 +577,12 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   };
 
   const toggleFullscreen = useCallback(() => {
+    const now = Date.now();
+    if (now - fullscreenCooldownRef.current < 800) {
+      return; // Still in cooldown period
+    }
+    fullscreenCooldownRef.current = now;
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -763,13 +769,8 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   useEffect(() => {
     if (buttonPressed === null) return;
 
-    // R1 (RB) - Toggle fullscreen (works anytime) with cooldown
+    // R1 (RB) - Toggle fullscreen (works anytime)
     if (buttonPressed === GAMEPAD_BUTTONS.RB) {
-      const now = Date.now();
-      if (now - fullscreenCooldownRef.current < 500) {
-        return; // Still in cooldown period
-      }
-      fullscreenCooldownRef.current = now;
       toggleFullscreen();
       setGamepadControlsActive(true);
       setTimeout(() => setGamepadControlsActive(false), 2000);
