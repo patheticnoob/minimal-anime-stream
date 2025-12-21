@@ -93,7 +93,7 @@ export function useGamepad(options?: UseGamepadOptions) {
             buttonPressed: null,
           }));
           buttonPressTimeoutRef.current = null;
-        }, 100);
+        }, 300);
       } else {
         setGamepadState((prev) => {
           if (!prev.connected || prev.gamepad !== gamepad) {
