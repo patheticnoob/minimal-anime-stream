@@ -1,20 +1,2 @@
-// Recent Episodes
-{
-  results: [
-    {
-      id: string,          // Slug-based ID (e.g., "awkward-senpai-19918")
-      title: string,
-      image: string,
-      type: string,
-      sub: number | string,
-      dub: number | string
-    }
-  ],
-  hasNextPage: boolean
-}
-
-// Info Endpoint
-{
-  anilist_id: string,    // Numeric AniList ID
-  // Other metadata fields
-}
+  const { buttonPressed } = useGamepad();
+  const [gamepadControlsActive, setGamepadControlsActive] = useState(false);

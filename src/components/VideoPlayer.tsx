@@ -706,60 +706,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     };
   }, [tracks]);
 
-  // Gamepad controls for video player
-  useEffect(() => {
-    if (buttonPressed === null) return;
-
-    switch (buttonPressed) {
-      case GAMEPAD_BUTTONS.A:
-        togglePlay();
-        break;
-
-      case GAMEPAD_BUTTONS.B:
-        onClose();
-        break;
-
-      case GAMEPAD_BUTTONS.DPAD_LEFT:
-        skip(-10);
-        break;
-
-      case GAMEPAD_BUTTONS.DPAD_RIGHT:
-        skip(10);
-        break;
-
-      case GAMEPAD_BUTTONS.DPAD_UP:
-        const newVolumeUp = Math.min(1, volume + 0.1);
-        setVolume(newVolumeUp);
-        if (videoRef.current) videoRef.current.volume = newVolumeUp;
-        break;
-
-      case GAMEPAD_BUTTONS.DPAD_DOWN:
-        const newVolumeDown = Math.max(0, volume - 0.1);
-        setVolume(newVolumeDown);
-        if (videoRef.current) videoRef.current.volume = newVolumeDown;
-        break;
-
-      case GAMEPAD_BUTTONS.X:
-        toggleFullscreen();
-        break;
-
-      case GAMEPAD_BUTTONS.Y:
-        toggleMute();
-        break;
-
-      case GAMEPAD_BUTTONS.LB:
-        if (showSkipIntro) skipIntro();
-        break;
-
-      case GAMEPAD_BUTTONS.RB:
-        if (onNext && nextTitle) onNext();
-        break;
-    }
-
-    setGamepadControlsActive(true);
-    setTimeout(() => setGamepadControlsActive(false), 2000);
-  }, [buttonPressed, volume, showSkipIntro, onNext, nextTitle, togglePlay, toggleFullscreen, toggleMute, skip, skipIntro]);
-
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
