@@ -21,6 +21,7 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useDataFlow } from "@/hooks/use-data-flow";
 import { useAnimeListsV2 } from "@/hooks/use-anime-lists-v2";
+import { useAnimeListsV3 } from "@/hooks/use-anime-lists-v3";
 
 // Force rebuild comment - fixing dynamic import error
 // Track if this is the first load
@@ -46,8 +47,13 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   // Use appropriate hook based on data flow version
   const animeListsV1 = useAnimeLists();
   const animeListsV2 = useAnimeListsV2();
+  const animeListsV3 = useAnimeListsV3();
   
-  const animeData = dataFlow === "v2" ? animeListsV2 : animeListsV1;
+  const animeData = dataFlow === "v3" 
+    ? animeListsV3 
+    : dataFlow === "v2" 
+    ? animeListsV2 
+    : animeListsV1;
 
   const {
     loading,

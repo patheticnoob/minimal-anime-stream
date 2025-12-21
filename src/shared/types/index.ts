@@ -21,6 +21,9 @@ export type AnimeItem = {
   status?: string;
   aired?: string;
   studios?: string[];
+  // V3 fields from Yuma
+  episodes?: number;
+  japaneseTitle?: string;
 };
 
 export type Episode = {

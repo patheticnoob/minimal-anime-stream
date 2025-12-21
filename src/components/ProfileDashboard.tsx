@@ -62,7 +62,7 @@ export function ProfileDashboard({
   const safeContinueWatching = continueWatching ?? [];
   const safeWatchlist = watchlist ?? [];
 
-  const handleDataFlowChange = async (flow: "v1" | "v2") => {
+  const handleDataFlowChange = async (flow: "v1" | "v2" | "v3") => {
     await setDataFlow({ dataFlow: flow });
   };
 
@@ -128,11 +128,20 @@ export function ProfileDashboard({
           >
             V2 (Enriched)
           </Button>
+          <Button
+            variant={dataFlow === "v3" ? "default" : "outline"}
+            onClick={() => handleDataFlowChange("v3")}
+            className="flex-1"
+          >
+            V3 (Yuma)
+          </Button>
         </div>
         <p className="text-xs text-white/50">
           {dataFlow === "v1" 
             ? "Using stable data flow (HiAnime only)" 
-            : "Using enriched data flow (HiAnime + Jikan metadata)"}
+            : dataFlow === "v2"
+            ? "Using enriched data flow (HiAnime + Jikan metadata)"
+            : "Using Yuma API exclusively"}
         </p>
       </div>
 
