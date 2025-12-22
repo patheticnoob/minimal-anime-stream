@@ -123,8 +123,14 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       return;
     }
 
-    setSelected(anime);
-    setLastSelectedAnime(anime);
+    // Preserve language data when setting selected anime
+    const animeWithLanguage = {
+      ...anime,
+      language: anime.language || { sub: null, dub: null }
+    };
+    
+    setSelected(animeWithLanguage);
+    setLastSelectedAnime(animeWithLanguage);
   };
 
   // Lazy load broadcast info after episodes are ready
@@ -398,7 +404,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       </main>
 
       <InfoModal
-        anime={selected ? { ...selected, ...animeDetails } : null}
+        anime={selected ? { ...selected, ...animeDetails, language: selected.language || animeDetails?.language } : null}
         isOpen={!!selected}
         onClose={() => setSelected(null)}
         episodes={episodes.map(ep => {

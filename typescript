@@ -1,2 +1,6 @@
-const base = VITE_CONVEX_URL.replace("convex.cloud", "convex.site")
-const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`
+{onAudioPreferenceChange && (anime.language?.sub || anime.language?.dub) && (
+  // Toggle UI
+)}
+
+<InfoModal
+  anime={selected ? { ...selected, ...animeDetails } : null}
