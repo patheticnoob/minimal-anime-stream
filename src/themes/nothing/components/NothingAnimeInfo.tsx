@@ -10,6 +10,8 @@ interface NothingAnimeInfoProps {
   broadcastDetails: any;
   isBroadcastLoading: boolean;
   shouldShowBroadcast: boolean;
+  audioPreference: "sub" | "dub";
+  onAudioPreferenceChange: (preference: "sub" | "dub") => void;
 }
 
 export function NothingAnimeInfo({
@@ -19,7 +21,9 @@ export function NothingAnimeInfo({
   broadcastInfo,
   broadcastDetails,
   isBroadcastLoading,
-  shouldShowBroadcast
+  shouldShowBroadcast,
+  audioPreference,
+  onAudioPreferenceChange
 }: NothingAnimeInfoProps) {
   return (
     <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-8 relative overflow-hidden shadow-sm transition-colors duration-300">
@@ -63,6 +67,36 @@ export function NothingAnimeInfo({
               )}
             </div>
           </div>
+
+          {(anime?.language?.sub || anime?.language?.dub) && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-black/60 dark:text-white/60">Audio:</span>
+              <div className="inline-flex rounded-full border border-black/10 dark:border-white/20 p-1 bg-black/5 dark:bg-white/5">
+                <button
+                  onClick={() => onAudioPreferenceChange("sub")}
+                  disabled={!anime?.language?.sub}
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all ${
+                    audioPreference === "sub"
+                      ? "bg-[#ff4d4f] text-white shadow-md"
+                      : "text-black/60 dark:text-white/60 hover:text-black/80 dark:hover:text-white/80"
+                  } ${!anime?.language?.sub ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                >
+                  SUB
+                </button>
+                <button
+                  onClick={() => onAudioPreferenceChange("dub")}
+                  disabled={!anime?.language?.dub}
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase transition-all ${
+                    audioPreference === "dub"
+                      ? "bg-[#ff4d4f] text-white shadow-md"
+                      : "text-black/60 dark:text-white/60 hover:text-black/80 dark:hover:text-white/80"
+                  } ${!anime?.language?.dub ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                >
+                  DUB
+                </button>
+              </div>
+            </div>
+          )}
 
           {episodeCount > 0 && (
             <Button

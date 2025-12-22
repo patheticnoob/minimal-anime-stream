@@ -83,6 +83,12 @@ export default function NothingWatch() {
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
+  
+  // Audio preference state (sub/dub)
+  const [audioPreference, setAudioPreference] = useState<"sub" | "dub">(() => {
+    const saved = localStorage.getItem("audioPreference");
+    return (saved === "sub" || saved === "dub") ? saved : "sub";
+  });
 
   const saveProgress = useMutation(api.watchProgress.saveProgress);
   const addToWatchlist = useMutation(api.watchlist.addToWatchlist);
@@ -97,6 +103,13 @@ export default function NothingWatch() {
     api.watchProgress.getProgress,
     animeId ? { animeId } : "skip"
   );
+
+  // Save audio preference to localStorage
+  const handleAudioPreferenceChange = (preference: "sub" | "dub") => {
+    setAudioPreference(preference);
+    localStorage.setItem("audioPreference", preference);
+    toast.success(`Switched to ${preference.toUpperCase()}`);
+  };
 
   // Load anime data from URL params or localStorage
   useEffect(() => {
@@ -351,7 +364,7 @@ export default function NothingWatch() {
     setVideoIntro(null);
     setVideoOutro(null);
 
-    // Auto-scroll to video player after a short delay to allow rendering
+    // Auto-scroll to video player
     setTimeout(() => {
       const playerContainer = document.getElementById('video-player-container');
       if (playerContainer) {
@@ -360,7 +373,7 @@ export default function NothingWatch() {
     }, 100);
 
     // Check cache first
-    const cacheKey = `sources_${episode.id}`;
+    const cacheKey = `sources_${episode.id}_${audioPreference}`;
     const cachedSources = animeCache.get<any>(cacheKey);
     
     if (cachedSources) {
@@ -389,7 +402,7 @@ export default function NothingWatch() {
         }));
 
         setVideoSource(proxiedUrl);
-        setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber}`);
+        setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         setVideoTracks(proxiedTracks);
         setVideoIntro(sourcesData.intro || null);
         setVideoOutro(sourcesData.outro || null);
@@ -397,18 +410,19 @@ export default function NothingWatch() {
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
-        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+        toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         
         // Prefetch next episode
         if (idx !== -1 && episodes[idx + 1]) {
           const nextEpisode = episodes[idx + 1];
-          const nextCacheKey = `sources_${nextEpisode.id}`;
+          const nextCacheKey = `sources_${nextEpisode.id}_${audioPreference}`;
           
           if (!animeCache.has(nextCacheKey)) {
             fetchServers({ episodeId: nextEpisode.id })
               .then((servers) => {
                 const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
-                const hd2Server = serverData.sub?.find(s => s.name === "HD-2") || serverData.sub?.[0];
+                const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
+                const hd2Server = targetServers?.find(s => s.name === "HD-2") || targetServers?.[0];
                 
                 if (hd2Server) {
                   return fetchSources({ serverId: hd2Server.id });
@@ -433,8 +447,15 @@ export default function NothingWatch() {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
 
-      const subServers = serverData.sub || [];
-      const hd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
+      // Select servers based on audio preference
+      const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
+      
+      if (!targetServers || targetServers.length === 0) {
+        toast.error(`No ${audioPreference.toUpperCase()} servers available for this episode`);
+        return;
+      }
+
+      const hd2Server = targetServers.find(s => s.name === "HD-2") || targetServers[0];
 
       if (!hd2Server) {
         toast.error("No streaming servers available");
@@ -449,7 +470,7 @@ export default function NothingWatch() {
         outro?: { start: number; end: number };
       };
       
-      // Cache the sources
+      // Cache the sources with audio preference
       animeCache.set(cacheKey, sourcesData, 5);
 
       if (sourcesData.sources && sourcesData.sources.length > 0) {
@@ -475,7 +496,7 @@ export default function NothingWatch() {
         }));
 
         setVideoSource(proxiedUrl);
-        setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber}`);
+        setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         setVideoTracks(proxiedTracks);
         setVideoIntro(sourcesData.intro || null);
         setVideoOutro(sourcesData.outro || null);
@@ -483,18 +504,19 @@ export default function NothingWatch() {
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
-        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+        toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         
         // Prefetch next episode
         if (idx !== -1 && episodes[idx + 1]) {
           const nextEpisode = episodes[idx + 1];
-          const nextCacheKey = `sources_${nextEpisode.id}`;
+          const nextCacheKey = `sources_${nextEpisode.id}_${audioPreference}`;
           
           if (!animeCache.has(nextCacheKey)) {
             fetchServers({ episodeId: nextEpisode.id })
               .then((servers) => {
                 const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
-                const hd2Server = serverData.sub?.find(s => s.name === "HD-2") || serverData.sub?.[0];
+                const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
+                const hd2Server = targetServers?.find(s => s.name === "HD-2") || targetServers?.[0];
                 
                 if (hd2Server) {
                   return fetchSources({ serverId: hd2Server.id });
@@ -627,6 +649,8 @@ export default function NothingWatch() {
               broadcastDetails={broadcastDetails}
               isBroadcastLoading={isBroadcastLoading}
               shouldShowBroadcast={shouldShowBroadcast}
+              audioPreference={audioPreference}
+              onAudioPreferenceChange={handleAudioPreferenceChange}
             />
 
             {/* Video Player - Only shown when episode is playing */}

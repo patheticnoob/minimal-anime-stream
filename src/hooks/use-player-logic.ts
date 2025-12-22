@@ -23,8 +23,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
   
-  // V3 Actions Removed
-
   const saveProgress = useMutation(api.watchProgress.saveProgress);
 
   const [selected, setSelected] = useState<AnimeItem | null>(null);
@@ -41,34 +39,45 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
   const [animeDetails, setAnimeDetails] = useState<Partial<AnimeItem> | null>(null);
+  
+  // Audio preference state (sub/dub)
+  const [audioPreference, setAudioPreference] = useState<"sub" | "dub">(() => {
+    const saved = localStorage.getItem("audioPreference");
+    return (saved === "sub" || saved === "dub") ? saved : "sub";
+  });
 
   const animeProgress = useQuery(
     api.watchProgress.getProgress,
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
 
+  // Save audio preference to localStorage
+  const handleAudioPreferenceChange = (preference: "sub" | "dub") => {
+    setAudioPreference(preference);
+    localStorage.setItem("audioPreference", preference);
+    toast.success(`Switched to ${preference.toUpperCase()}`);
+  };
+
   // Prefetch episode sources for faster playback
   const prefetchEpisodeSources = useCallback(async (episodeId: string) => {
-    const cacheKey = `sources_${episodeId}`;
+    const cacheKey = `sources_${episodeId}_${audioPreference}`;
     if (animeCache.has(cacheKey)) return;
 
     try {
-      // V1/V2 Prefetch
-      // Always use HD-2 server
       const servers = await fetchServers({ episodeId });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
       
-      const subServers = serverData.sub || [];
-      const hd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
+      const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
+      const hd2Server = targetServers?.find(s => s.name === "HD-2") || targetServers?.[0];
       
       if (hd2Server) {
         const sources = await fetchSources({ serverId: hd2Server.id });
-        animeCache.set(cacheKey, sources, 5); // Cache for 5 minutes
+        animeCache.set(cacheKey, sources, 5);
       }
     } catch (err) {
       console.warn('Prefetch failed for episode:', episodeId, err);
     }
-  }, [fetchServers, fetchSources]);
+  }, [fetchServers, fetchSources, audioPreference]);
 
   useEffect(() => {
     if (!selected?.dataId) {
@@ -189,15 +198,14 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     setVideoOutro(null);
     setVideoHeaders(null);
 
-    // Check cache first
-    const cacheKey = `sources_${episode.id}`;
+    // Check cache first with audio preference
+    const cacheKey = `sources_${episode.id}_${audioPreference}`;
     const cachedSources = animeCache.get<any>(cacheKey);
     
     if (cachedSources) {
       // Use cached sources immediately
       const sourcesData = cachedSources;
       
-      // V1/V2 Cache Handling
       if (sourcesData.sources && sourcesData.sources.length > 0) {
         setVideoHeaders(sourcesData.headers || null);
         const m3u8Source = sourcesData.sources.find((s: any) => s.file.includes(".m3u8"));
@@ -224,7 +232,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         }));
 
         setVideoSource(proxiedUrl);
-        setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
+        setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         setVideoTracks(proxiedTracks);
         setVideoIntro(sourcesData.intro || null);
         setVideoOutro(sourcesData.outro || null);
@@ -232,7 +240,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
-        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+        toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         
         // Prefetch next episode
         if (idx !== -1 && episodes[idx + 1]) {
@@ -244,12 +252,18 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     }
     
     try {
-      // V1/V2 Fetch Logic
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
       
-      const subServers = serverData.sub || [];
-      const hd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
+      // Select servers based on audio preference
+      const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
+      
+      if (!targetServers || targetServers.length === 0) {
+        toast.error(`No ${audioPreference.toUpperCase()} servers available for this episode`);
+        return;
+      }
+
+      const hd2Server = targetServers.find(s => s.name === "HD-2") || targetServers[0];
       
       if (!hd2Server) {
         toast.error("No streaming servers available");
@@ -265,7 +279,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         headers?: Record<string, string>;
       };
       
-      // Cache the sources
+      // Cache the sources with audio preference
       animeCache.set(cacheKey, sourcesData, 5);
       
       if (sourcesData.sources && sourcesData.sources.length > 0) {
@@ -294,7 +308,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         }));
 
         setVideoSource(proxiedUrl);
-        setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber}`);
+        setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         setVideoTracks(proxiedTracks);
         setVideoIntro(sourcesData.intro || null);
         setVideoOutro(sourcesData.outro || null);
@@ -302,7 +316,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
-        toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+        toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         
         // Prefetch next episode
         if (idx !== -1 && episodes[idx + 1]) {
@@ -391,6 +405,8 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     nextEpisodeTitle,
     setLastSelectedAnime,
     lastSelectedAnime,
-    animeDetails
+    animeDetails,
+    audioPreference,
+    handleAudioPreferenceChange,
   };
 }

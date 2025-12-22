@@ -38,6 +38,8 @@ interface InfoModalProps {
   onToggleWatchlist?: () => void;
   broadcastInfo?: BroadcastInfo | null;
   broadcastLoading?: boolean;
+  audioPreference?: "sub" | "dub";
+  onAudioPreferenceChange?: (preference: "sub" | "dub") => void;
 }
 
 export function InfoModal({
@@ -51,6 +53,8 @@ export function InfoModal({
   onToggleWatchlist,
   broadcastInfo,
   broadcastLoading,
+  audioPreference = "sub",
+  onAudioPreferenceChange,
 }: InfoModalProps) {
   const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
   const [episodeRange, setEpisodeRange] = useState(0);
@@ -238,6 +242,37 @@ export function InfoModal({
             {(anime as any).studios && (anime as any).studios.length > 0 && (
               <div className="mt-2 text-sm text-gray-400">
                 <span className="font-semibold">Studio:</span> {(anime as any).studios.join(", ")}
+              </div>
+            )}
+
+            {/* Audio Preference Toggle */}
+            {onAudioPreferenceChange && (anime.language?.sub || anime.language?.dub) && (
+              <div className="flex items-center gap-3 mt-3">
+                <span className="text-sm font-semibold text-gray-300">Audio:</span>
+                <div className="inline-flex rounded-lg border border-white/20 p-1 bg-black/30">
+                  <button
+                    onClick={() => onAudioPreferenceChange("sub")}
+                    disabled={!anime.language?.sub}
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold tracking-wider uppercase transition-all ${
+                      audioPreference === "sub"
+                        ? "bg-blue-600 text-white shadow-lg"
+                        : "text-gray-400 hover:text-gray-200"
+                    } ${!anime.language?.sub ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                  >
+                    SUB
+                  </button>
+                  <button
+                    onClick={() => onAudioPreferenceChange("dub")}
+                    disabled={!anime.language?.dub}
+                    className={`px-4 py-1.5 rounded-md text-xs font-bold tracking-wider uppercase transition-all ${
+                      audioPreference === "dub"
+                        ? "bg-blue-600 text-white shadow-lg"
+                        : "text-gray-400 hover:text-gray-200"
+                    } ${!anime.language?.dub ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                  >
+                    DUB
+                  </button>
+                </div>
               </div>
             )}
 
