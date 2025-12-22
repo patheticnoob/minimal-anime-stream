@@ -85,7 +85,9 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     nextEpisodeTitle,
     setLastSelectedAnime,
     lastSelectedAnime,
-    animeDetails
+    animeDetails,
+    audioPreference,
+    handleAudioPreferenceChange
   } = usePlayerLogic(isAuthenticated, dataFlow);
 
   // Watch progress and watchlist
@@ -419,6 +421,8 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
         onToggleWatchlist={handleToggleWatchlist}
         broadcastInfo={broadcastInfo}
         broadcastLoading={isBroadcastLoading}
+        audioPreference={audioPreference}
+        onAudioPreferenceChange={handleAudioPreferenceChange}
       />
 
       {videoSource && currentEpisodeData && (
