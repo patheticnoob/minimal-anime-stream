@@ -1,2 +1,2 @@
-  const { buttonPressed } = useGamepad();
-  const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
+const base = VITE_CONVEX_URL.replace("convex.cloud", "convex.site")
+const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`
