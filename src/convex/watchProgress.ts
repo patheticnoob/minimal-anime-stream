@@ -12,6 +12,10 @@ export const saveProgress = mutation({
     episodeNumber: v.number(),
     currentTime: v.number(),
     duration: v.number(),
+    language: v.optional(v.object({
+      sub: v.optional(v.union(v.string(), v.null())),
+      dub: v.optional(v.union(v.string(), v.null())),
+    })),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -46,6 +50,7 @@ export const saveProgress = mutation({
       episodeNumber: args.episodeNumber,
       currentTime: args.currentTime,
       duration: args.duration,
+      language: args.language,
       lastWatched: Date.now(),
     };
 

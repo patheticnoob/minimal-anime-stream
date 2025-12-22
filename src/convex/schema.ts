@@ -35,19 +35,23 @@ const schema = defineSchema(
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
     // Watch progress tracking
-    watchProgress: defineTable({
-      userId: v.id("users"),
-      animeId: v.string(),
-      animeTitle: v.string(),
-      animeImage: v.optional(v.union(v.string(), v.null())),
-      episodeId: v.string(),
-      episodeNumber: v.number(),
-      currentTime: v.number(),
-      duration: v.number(),
-      lastWatched: v.number(),
-    })
-      .index("by_user", ["userId"])
-      .index("by_user_and_anime", ["userId", "animeId"]),
+  watchProgress: defineTable({
+    userId: v.id("users"),
+    animeId: v.string(),
+    animeTitle: v.string(),
+    animeImage: v.optional(v.union(v.string(), v.null())),
+    episodeId: v.string(),
+    episodeNumber: v.number(),
+    currentTime: v.number(),
+    duration: v.number(),
+    language: v.optional(v.object({
+      sub: v.optional(v.union(v.string(), v.null())),
+      dub: v.optional(v.union(v.string(), v.null())),
+    })),
+    lastWatched: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_anime", ["userId", "animeId"]),
 
     // Watchlist
     watchlist: defineTable({

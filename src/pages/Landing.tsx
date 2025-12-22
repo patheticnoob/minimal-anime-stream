@@ -206,6 +206,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     episodeNumber: item.episodeNumber,
     currentTime: item.currentTime,
     duration: item.duration,
+    language: item.language,
     sourceCategory: "continueWatching" as const,
   }));
 

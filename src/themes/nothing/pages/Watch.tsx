@@ -557,6 +557,7 @@ export default function NothingWatch() {
         episodeNumber: episodeNumberForProgress,
         currentTime: Math.floor(currentTime),
         duration: Math.floor(duration),
+        language: currentAnimeInfo.language,
       });
     } catch (err) {
       console.error("❌ Failed to save progress:", err);

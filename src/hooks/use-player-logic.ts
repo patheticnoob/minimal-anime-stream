@@ -347,6 +347,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         episodeNumber: episodeNumberForProgress,
         currentTime: Math.floor(currentTime),
         duration: Math.floor(duration),
+        language: currentAnimeInfo.language,
       });
     } catch (err) {
       console.error("❌ Failed to save progress:", err);
