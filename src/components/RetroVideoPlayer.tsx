@@ -70,7 +70,7 @@ export function RetroVideoPlayer({
     return saved ? parseInt(saved) : 100;
   });
 
-  const { isCasting, castAvailable, handleCastClick, changeCastSubtitle } = useCast(
+  const { isCasting, castAvailable, handleCastClick, changeCastSubtitle, resyncCastSubtitles } = useCast(
     source, 
     title, 
     tracks,
@@ -288,6 +288,13 @@ export function RetroVideoPlayer({
     const handleSeeked = () => {
       if (onProgressUpdate && video.duration) {
         onProgressUpdate(video.currentTime, video.duration);
+      }
+      
+      // Resync Cast subtitles after seek to prevent desync
+      if (isCasting && resyncCastSubtitles) {
+        setTimeout(() => {
+          resyncCastSubtitles();
+        }, 500); // Small delay to let Cast device finish seeking
       }
     };
 

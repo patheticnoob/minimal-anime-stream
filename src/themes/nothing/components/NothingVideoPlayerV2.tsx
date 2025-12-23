@@ -61,7 +61,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
-  const { isCasting, castAvailable, handleCastClick, changeCastSubtitle } = useCast(
+  const { isCasting, castAvailable, handleCastClick, changeCastSubtitle, resyncCastSubtitles } = useCast(
     source, 
     title, 
     tracks,
@@ -326,6 +326,13 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const handleSeeked = () => {
       if (onProgressUpdate && video.duration) {
         onProgressUpdate(video.currentTime, video.duration);
+      }
+      
+      // Resync Cast subtitles after seek to prevent desync
+      if (isCasting && resyncCastSubtitles) {
+        setTimeout(() => {
+          resyncCastSubtitles();
+        }, 500); // Small delay to let Cast device finish seeking
       }
     };
 
