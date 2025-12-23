@@ -25,6 +25,15 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
               console.log('Cast session started');
               castSessionRef.current = session;
               setIsCasting(true);
+              
+              // Add listener for media status updates
+              session.addUpdateListener((isAlive: boolean) => {
+                if (!isAlive) {
+                  setIsCasting(false);
+                  castSessionRef.current = null;
+                }
+              });
+              
               loadMediaToCast(session);
             },
             (availability: string) => {
@@ -54,7 +63,7 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
     }
   }, []);
 
-  const loadMediaToCast = useCallback((session: any) => {
+  const loadMediaToCast = useCallback((session: any, currentTime?: number) => {
     if (!session || !source) return;
 
     castTracksMapRef.current.clear();
@@ -62,6 +71,10 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
     try {
       const cast = (window as any).chrome.cast;
       const mediaInfo = new cast.media.MediaInfo(source, 'application/x-mpegurl');
+      
+      // Set streaming protocol options for better sync
+      mediaInfo.streamType = cast.media.StreamType.BUFFERED;
+      mediaInfo.duration = null; // Let Cast determine duration
       
       mediaInfo.metadata = new cast.media.GenericMediaMetadata();
       mediaInfo.metadata.title = title;
@@ -123,14 +136,16 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
 
       const request = new cast.media.LoadRequest(mediaInfo);
       request.autoplay = true;
+      request.currentTime = currentTime || 0; // Resume from current position
       
       const textTrackStyle = new cast.media.TextTrackStyle();
       textTrackStyle.backgroundColor = '#000000CC';
       textTrackStyle.foregroundColor = '#FFFFFF';
       textTrackStyle.edgeType = cast.media.TextTrackEdgeType.DROP_SHADOW;
       textTrackStyle.fontFamily = 'SANS_SERIF';
-      textTrackStyle.fontScale = 1.2;
+      textTrackStyle.fontScale = 1.0; // Reduced from 1.2 for better sync
       textTrackStyle.fontGenericFamily = cast.media.TextTrackFontGenericFamily.SANS_SERIF;
+      textTrackStyle.windowType = cast.media.TextTrackWindowType.NONE; // Remove window for better sync
       request.textTrackStyle = textTrackStyle;
       
       // Find and enable default English subtitle track
@@ -182,9 +197,17 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
     const castTrackId = castTracksMapRef.current.get(trackFile);
     
     if (castTrackId !== undefined) {
-      const tracksInfoRequest = new cast.media.EditTracksInfoRequest([castTrackId]);
+      // Create edit request with proper text track style for sync
+      const textTrackStyle = new cast.media.TextTrackStyle();
+      textTrackStyle.backgroundColor = '#000000CC';
+      textTrackStyle.foregroundColor = '#FFFFFF';
+      textTrackStyle.edgeType = cast.media.TextTrackEdgeType.DROP_SHADOW;
+      textTrackStyle.fontScale = 1.0;
+      textTrackStyle.windowType = cast.media.TextTrackWindowType.NONE;
+      
+      const tracksInfoRequest = new cast.media.EditTracksInfoRequest([castTrackId], textTrackStyle);
       media.editTracksInfo(tracksInfoRequest, 
-        () => console.log(`✅ Cast subtitle changed to track ${castTrackId}`),
+        () => console.log(`✅ Cast subtitle changed to track ${castTrackId} with sync settings`),
         (error: any) => console.error('❌ Error changing Cast subtitle:', error)
       );
     } else {

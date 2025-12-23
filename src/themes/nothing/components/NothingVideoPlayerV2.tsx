@@ -88,10 +88,25 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     [],
   );
 
-  // Pause video when casting starts
+  // Pause video when casting starts and sync time
   useEffect(() => {
     if (isCasting && videoRef.current) {
       videoRef.current.pause();
+      console.log('📺 Video paused on mobile - casting to TV');
+      
+      // Ensure Cast device is at the same time position
+      const castSession = (window as any).chrome?.cast?.framework?.CastContext?.getInstance()?.getCurrentSession();
+      if (castSession) {
+        const media = castSession.getMediaSession();
+        if (media && videoRef.current.currentTime > 0) {
+          const seekRequest = new (window as any).chrome.cast.media.SeekRequest();
+          seekRequest.currentTime = videoRef.current.currentTime;
+          media.seek(seekRequest, 
+            () => console.log('✅ Cast synced to current time:', videoRef.current?.currentTime),
+            (error: any) => console.error('❌ Error syncing Cast time:', error)
+          );
+        }
+      }
     }
   }, [isCasting]);
 
