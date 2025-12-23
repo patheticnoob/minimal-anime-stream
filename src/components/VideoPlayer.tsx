@@ -80,7 +80,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
   const fullscreenCooldownRef = useRef<number>(0);
 
-  const { isCasting, castAvailable, handleCastClick } = useCast(
+  const { isCasting, castAvailable, handleCastClick, changeCastSubtitle } = useCast(
     source, 
     title, 
     tracks,
@@ -88,10 +88,11 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     info?.description
   );
 
-  // Pause video when casting starts
+  // Pause video when casting starts and keep it paused
   useEffect(() => {
     if (isCasting && videoRef.current) {
       videoRef.current.pause();
+      console.log('📺 Video paused on mobile - casting to TV');
     }
   }, [isCasting]);
 
@@ -643,6 +644,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     const video = videoRef.current;
     if (!video) return;
 
+    // Update local video subtitles
     for (let i = 0; i < video.textTracks.length; i++) {
       video.textTracks[i].mode = "hidden";
     }
@@ -650,8 +652,35 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     if (trackIndex >= 0 && trackIndex < video.textTracks.length) {
       video.textTracks[trackIndex].mode = "showing";
       setCurrentSubtitle(trackIndex);
+      
+      // Sync with Cast device if casting
+      if (isCasting && tracks && changeCastSubtitle) {
+        const selectedTrack = tracks.find((_, idx) => {
+          // Map video track index to tracks array
+          let subtitleCount = 0;
+          for (let i = 0; i < tracks.length; i++) {
+            if (tracks[i].kind !== 'thumbnails') {
+              if (subtitleCount === trackIndex) {
+                return i === idx;
+              }
+              subtitleCount++;
+            }
+          }
+          return false;
+        });
+        
+        if (selectedTrack) {
+          console.log('🔄 Syncing subtitle to Cast:', selectedTrack.label);
+          changeCastSubtitle(selectedTrack.file);
+        }
+      }
     } else {
       setCurrentSubtitle(-1);
+      // Turn off Cast subtitles
+      if (isCasting && changeCastSubtitle) {
+        console.log('🔄 Turning off Cast subtitles');
+        changeCastSubtitle('');
+      }
     }
     setShowSubtitles(false);
   };
@@ -676,6 +705,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
 
       let defaultTrackIndex = -1;
       
+      // First priority: Check for default track from API
       if (tracks && tracks.length > 0) {
         const defaultTrack = tracks.find(t => t.default === true && t.kind !== "thumbnails");
         if (defaultTrack) {
@@ -693,6 +723,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         }
       }
       
+      // Second priority: Find English track
       if (defaultTrackIndex === -1) {
         for (let i = 0; i < video.textTracks.length; i++) {
           const track = video.textTracks[i];
@@ -702,23 +733,55 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           
           if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
             defaultTrackIndex = i;
-            console.log("✅ English subtitles enabled as fallback");
+            console.log("✅ English subtitles enabled as default");
             break;
           }
         }
       }
 
+      // Apply default subtitle
       if (defaultTrackIndex >= 0) {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          video.textTracks[i].mode = "hidden";
+        }
         video.textTracks[defaultTrackIndex].mode = "showing";
         setCurrentSubtitle(defaultTrackIndex);
+        console.log(`✅ Subtitle track ${defaultTrackIndex} set to showing mode`);
+        
+        // Sync with Cast if casting
+        if (isCasting && tracks && changeCastSubtitle) {
+          const selectedTrack = tracks.find((_, idx) => {
+            let subtitleCount = 0;
+            for (let i = 0; i < tracks.length; i++) {
+              if (tracks[i].kind !== 'thumbnails') {
+                if (subtitleCount === defaultTrackIndex) {
+                  return i === idx;
+                }
+                subtitleCount++;
+              }
+            }
+            return false;
+          });
+          
+          if (selectedTrack) {
+            console.log('🔄 Syncing default subtitle to Cast:', selectedTrack.label);
+            changeCastSubtitle(selectedTrack.file);
+          }
+        }
       }
     };
 
     video.addEventListener("loadedmetadata", updateSubtitles);
+    
+    // Also run immediately if metadata is already loaded
+    if (video.readyState >= 1) {
+      updateSubtitles();
+    }
+    
     return () => {
       video.removeEventListener("loadedmetadata", updateSubtitles);
     };
-  }, [tracks]);
+  }, [tracks, isCasting, changeCastSubtitle]);
 
   // Keyboard shortcuts
   useEffect(() => {

@@ -70,7 +70,7 @@ export function RetroVideoPlayer({
     return saved ? parseInt(saved) : 100;
   });
 
-  const { isCasting, castAvailable, handleCastClick } = useCast(
+  const { isCasting, castAvailable, handleCastClick, changeCastSubtitle } = useCast(
     source, 
     title, 
     tracks,
@@ -81,10 +81,11 @@ export function RetroVideoPlayer({
   const { buttonPressed } = useGamepad({ enableButtonEvents: true });
   const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
 
-  // Pause video when casting starts
+  // Pause video when casting starts and keep it paused
   useEffect(() => {
     if (isCasting && videoRef.current) {
       videoRef.current.pause();
+      console.log('📺 Video paused on mobile - casting to TV');
     }
   }, [isCasting]);
 
@@ -438,7 +439,26 @@ export function RetroVideoPlayer({
   };
 
   const handleSubtitleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedSubtitle(event.target.value);
+    const newValue = event.target.value;
+    setSelectedSubtitle(newValue);
+    
+    // Sync with Cast device if casting
+    if (isCasting && changeCastSubtitle && tracks) {
+      if (newValue === "off") {
+        console.log('🔄 Turning off Cast subtitles');
+        changeCastSubtitle('');
+      } else {
+        const selectedTrack = tracks.find((track, idx) => {
+          const label = getTrackLabel(track, idx);
+          return label === newValue;
+        });
+        
+        if (selectedTrack) {
+          console.log('🔄 Syncing subtitle to Cast:', selectedTrack.label);
+          changeCastSubtitle(selectedTrack.file);
+        }
+      }
+    }
   };
 
   const toggleMute = () => {

@@ -61,7 +61,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
-  const { isCasting, castAvailable, handleCastClick, setCastSubtitle } = useCast(
+  const { isCasting, castAvailable, handleCastClick, changeCastSubtitle } = useCast(
     source, 
     title, 
     tracks,
@@ -602,7 +602,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       setCurrentSubtitle(trackIndex);
       
       // Sync with Cast if casting
-      if (isCasting && setCastSubtitle && tracks) {
+      if (isCasting && changeCastSubtitle && tracks) {
         const selectedApiTrack = tracks.find((_, idx) => {
           let subtitleIndex = 0;
           for (let i = 0; i < tracks.length; i++) {
@@ -616,7 +616,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         
         if (selectedApiTrack) {
           console.log(`📺 Syncing Cast subtitle: ${selectedApiTrack.label}`);
-          setCastSubtitle(selectedApiTrack.file);
+          changeCastSubtitle(selectedApiTrack.file);
         }
       }
     } else {
@@ -624,8 +624,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       setCurrentSubtitle(-1);
       
       // Turn off Cast subtitles
-      if (isCasting && setCastSubtitle) {
-        setCastSubtitle('');
+      if (isCasting && changeCastSubtitle) {
+        changeCastSubtitle('');
       }
     }
     setShowSubtitles(false);
