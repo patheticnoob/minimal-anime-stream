@@ -72,9 +72,10 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
       const cast = (window as any).chrome.cast;
       const mediaInfo = new cast.media.MediaInfo(source, 'application/x-mpegurl');
       
-      // Set streaming protocol options for better sync
+      // Set streaming protocol options for proper video playback
       mediaInfo.streamType = cast.media.StreamType.BUFFERED;
       mediaInfo.duration = null; // Let Cast determine duration
+      mediaInfo.contentType = 'application/x-mpegurl'; // Explicitly set content type for HLS
       
       mediaInfo.metadata = new cast.media.GenericMediaMetadata();
       mediaInfo.metadata.title = title;
@@ -138,15 +139,19 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
       request.autoplay = true;
       request.currentTime = currentTime || 0; // Resume from current position
       
+      // Configure text track style for subtitles
       const textTrackStyle = new cast.media.TextTrackStyle();
       textTrackStyle.backgroundColor = '#000000CC';
       textTrackStyle.foregroundColor = '#FFFFFF';
       textTrackStyle.edgeType = cast.media.TextTrackEdgeType.DROP_SHADOW;
       textTrackStyle.fontFamily = 'SANS_SERIF';
-      textTrackStyle.fontScale = 1.0; // Reduced from 1.2 for better sync
+      textTrackStyle.fontScale = 1.0;
       textTrackStyle.fontGenericFamily = cast.media.TextTrackFontGenericFamily.SANS_SERIF;
-      textTrackStyle.windowType = cast.media.TextTrackWindowType.NONE; // Remove window for better sync
+      textTrackStyle.windowType = cast.media.TextTrackWindowType.NONE;
       request.textTrackStyle = textTrackStyle;
+      
+      // Ensure proper media loading
+      request.media = mediaInfo;
       
       // Find and enable default English subtitle track
       const subtitleTracks = mediaInfo.tracks?.filter((t: any) => 
