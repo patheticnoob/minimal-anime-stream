@@ -169,8 +169,12 @@ export function ContentRail({
 
       <div className="content-rail-track relative">
         {/* Fade overlays - adjusted for theme */}
-        <div className={`absolute left-0 top-0 bottom-0 w-6 ${theme === "nothing" ? "bg-gradient-to-r from-[var(--nothing-bg)]/40 to-transparent" : "bg-gradient-to-r from-[#050814]/40 to-transparent"} z-10 pointer-events-none md:hidden`} />
-        <div className={`absolute right-0 top-0 bottom-0 w-6 ${theme === "nothing" ? "bg-gradient-to-r from-transparent to-[var(--nothing-bg)]/40" : "bg-gradient-to-r from-transparent to-[#050814]/40"} z-10 pointer-events-none md:hidden`} />
+        {theme !== "nothing" && (
+          <>
+            <div className={`absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#050814]/40 to-transparent z-10 pointer-events-none md:hidden`} />
+            <div className={`absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-r from-transparent to-[#050814]/40 z-10 pointer-events-none md:hidden`} />
+          </>
+        )}
 
         {canScrollLeft && (
           <button
