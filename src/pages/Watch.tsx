@@ -472,29 +472,29 @@ export default function Watch() {
         <div className="max-w-[2000px] mx-auto px-6 py-4 flex items-center gap-4">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-2 py-1"
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-2 py-1 flex-shrink-0"
           >
             <ArrowLeft className="h-5 w-5" />
             <span className="text-sm font-medium">Back</span>
           </button>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold truncate">{anime?.title || "Loading..."}</h1>
           </div>
           <Button
             onClick={handleToggleWatchlist}
             variant="outline"
             size="sm"
-            className="gap-2"
+            className="gap-2 flex-shrink-0"
           >
             {isInWatchlist ? (
               <>
                 <Check className="h-4 w-4" />
-                In Watchlist
+                <span className="hidden sm:inline">In Watchlist</span>
               </>
             ) : (
               <>
                 <Plus className="h-4 w-4" />
-                Watchlist
+                <span className="hidden sm:inline">Watchlist</span>
               </>
             )}
           </Button>
