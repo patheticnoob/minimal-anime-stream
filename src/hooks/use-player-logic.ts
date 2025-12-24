@@ -119,12 +119,15 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     }
 
     let cancelled = false;
+    let retryCount = 0;
+    const maxRetries = 3;
     setEpisodesLoading(true);
 
-    // V1/V2: Fetch from HiAnime
-    fetchEpisodes({ dataId: selected.dataId })
-      .then((eps) => {
+    const fetchWithRetry = async () => {
+      try {
+        const eps = await fetchEpisodes({ dataId: selected.dataId! });
         if (cancelled) return;
+        
         const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
           ...ep,
           number: normalizeEpisodeNumber(ep.number),
@@ -151,25 +154,39 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
             }
           }
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         if (cancelled) return;
-        const msg = err instanceof Error ? err.message : "Failed to load episodes.";
-        toast.error(msg);
+        
+        // Log detailed error to console for debugging
+        console.error('Failed to fetch episodes:', err);
+        
+        // Retry logic for connection errors
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Retrying episode fetch (${retryCount}/${maxRetries})...`);
+          const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 5000);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return fetchWithRetry();
+        }
+        
+        // Show user-friendly error after all retries exhausted
+        toast.error("Unable to load episodes. Please try again.");
         setEpisodes([]);
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) {
           setEpisodesLoading(false);
         }
-      });
+      }
+    };
+
+    fetchWithRetry();
 
     return () => {
       cancelled = true;
     };
   }, [selected?.dataId, fetchEpisodes, animeProgress?.episodeId, prefetchEpisodeSources, dataFlow]);
 
-  const playEpisode = async (episode: Episode) => {
+  const playEpisode = async (episode: Episode, retryCount = 0) => {
     if (!isAuthenticated) {
       toast.error("Please sign in to watch");
       return;
@@ -251,6 +268,8 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
       }
     }
     
+    const maxRetries = 3;
+    
     try {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
@@ -326,8 +345,19 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         toast.error("No video sources available");
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to load video";
-      toast.error(msg);
+      // Log detailed error to console for debugging
+      console.error('Failed to load video sources:', err);
+      
+      // Retry logic for connection errors
+      if (retryCount < maxRetries) {
+        console.log(`Retrying video load (${retryCount + 1}/${maxRetries})...`);
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return playEpisode(episode, retryCount + 1);
+      }
+      
+      // Show user-friendly error after all retries exhausted
+      toast.error("Unable to load video. Please try again.");
     }
   };
 
