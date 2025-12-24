@@ -77,32 +77,6 @@ export function useCast(source: string | null, title: string, tracks?: any[], an
       mediaInfo.duration = null; // Let Cast determine duration
       mediaInfo.contentType = 'application/x-mpegurl'; // Explicitly set content type for HLS
       
-      // Add media status listener to handle seek events
-      session.addMediaListener((media: any) => {
-        if (media) {
-          media.addUpdateListener((isAlive: boolean) => {
-            if (isAlive) {
-              // Re-apply subtitle styling after any media update (including seeks)
-              const activeTrackIds = media.activeTrackIds;
-              if (activeTrackIds && activeTrackIds.length > 0) {
-                const textTrackStyle = new cast.media.TextTrackStyle();
-                textTrackStyle.backgroundColor = '#000000CC';
-                textTrackStyle.foregroundColor = '#FFFFFF';
-                textTrackStyle.edgeType = cast.media.TextTrackEdgeType.DROP_SHADOW;
-                textTrackStyle.fontScale = 1.0;
-                textTrackStyle.windowType = cast.media.TextTrackWindowType.NONE;
-                
-                const tracksInfoRequest = new cast.media.EditTracksInfoRequest(activeTrackIds, textTrackStyle);
-                media.editTracksInfo(tracksInfoRequest, 
-                  () => console.log('✅ Subtitle style reapplied after media update'),
-                  (error: any) => console.warn('⚠️ Failed to reapply subtitle style:', error)
-                );
-              }
-            }
-          });
-        }
-      });
-      
       mediaInfo.metadata = new cast.media.GenericMediaMetadata();
       mediaInfo.metadata.title = title;
       
