@@ -99,7 +99,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
 
-  // Hide initial loader after 3 seconds or when content loads
+  // Hide initial loader after 3 seconds on first visit only
   useEffect(() => {
     if (!hasLoadedBefore) {
       const timer = setTimeout(() => {
@@ -278,12 +278,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
 
   const sectionContent = getSectionContent();
 
-  // Show initial loader only on first visit for max 3 seconds
+  // Show initial loader only on first visit for 3 seconds
   if (showInitialLoader) {
     return (
       <FullscreenLoader
         label="GojoStream"
-        subLabel="Loading your anime experience"
+        subLabel="Your anime streaming experience"
         maxDuration={3000}
       />
     );

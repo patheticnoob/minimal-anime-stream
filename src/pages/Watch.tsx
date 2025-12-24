@@ -464,9 +464,9 @@ export default function Watch() {
   if (episodesLoading) {
     return (
       <FullscreenLoader 
-        label="Loading anime..." 
-        subLabel="Fetching episodes"
-        maxDuration={3000}
+        label="Loading episodes..." 
+        subLabel="Please wait"
+        maxDuration={5000}
       />
     );
   }
