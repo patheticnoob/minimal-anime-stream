@@ -462,7 +462,13 @@ export default function Watch() {
   const shouldShowBroadcast = isBroadcastLoading || isBroadcastActive;
 
   if (episodesLoading) {
-    return <FullscreenLoader label="Loading anime..." subLabel="Fetching episodes" />;
+    return (
+      <FullscreenLoader 
+        label="Loading anime..." 
+        subLabel="Fetching episodes"
+        maxDuration={3000}
+      />
+    );
   }
 
   return (

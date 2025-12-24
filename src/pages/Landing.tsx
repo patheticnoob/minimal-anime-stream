@@ -21,7 +21,6 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useDataFlow } from "@/hooks/use-data-flow";
 
-// Force rebuild comment - fixing dynamic import error
 // Track if this is the first load
 const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
 
@@ -100,10 +99,21 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
 
-  // Hide initial loader after first content loads
+  // Hide initial loader after 3 seconds or when content loads
   useEffect(() => {
-    if (!loading && !hasLoadedBefore) {
-      sessionStorage.setItem('hasLoadedBefore', 'true');
+    if (!hasLoadedBefore) {
+      const timer = setTimeout(() => {
+        sessionStorage.setItem('hasLoadedBefore', 'true');
+        setShowInitialLoader(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Also hide loader when content is ready (but respect 3s minimum)
+  useEffect(() => {
+    if (!loading && hasLoadedBefore) {
       setShowInitialLoader(false);
     }
   }, [loading]);
@@ -268,12 +278,13 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
 
   const sectionContent = getSectionContent();
 
-  // Show initial loader only on first visit
-  if (showInitialLoader && (loading || authLoading)) {
+  // Show initial loader only on first visit for max 3 seconds
+  if (showInitialLoader) {
     return (
       <FullscreenLoader
-        label="Loading anime..."
-        subLabel="Summoning episodes from another world"
+        label="GojoStream"
+        subLabel="Loading your anime experience"
+        maxDuration={3000}
       />
     );
   }
