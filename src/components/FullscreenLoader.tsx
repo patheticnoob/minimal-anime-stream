@@ -55,8 +55,8 @@ export function FullscreenLoader({
           transition={{ delay: 0.2 }}
           className="text-center space-y-3"
         >
-          <h1 className="text-5xl font-bold tracking-tighter">{label}</h1>
-          <div className="flex items-center justify-center gap-3 text-xs text-white/50 tracking-[0.3em] font-mono uppercase">
+          <h1 className="text-5xl md:text-7xl dotted-matrix-text">{label}</h1>
+          <div className="flex items-center justify-center gap-3 matrix-subtext text-xs">
             <span>{subLabel}</span>
             <motion.span
               animate={{ opacity: [0, 1, 0] }}

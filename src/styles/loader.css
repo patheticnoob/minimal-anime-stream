@@ -1,2 +1,24 @@
 /* Lightweight loader styles - most styling is now inline in the component */
 /* This file can be used for any additional loader customizations if needed */
+
+.dotted-matrix-text {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.9) 1.5px, transparent 1.5px);
+  background-size: 4px 4px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* Fallback for browsers that don't support background-clip: text */
+  @supports not (background-clip: text) {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 900;
+}
+
+.matrix-subtext {
+  font-family: "Commit Mono", monospace;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
