@@ -1,82 +1,84 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface FullscreenLoaderProps {
   label?: string;
   subLabel?: string;
   maxDuration?: number; // in milliseconds
-  onComplete?: () => void;
 }
 
 export function FullscreenLoader({
-  label = "Loading...",
-  subLabel = "",
-  maxDuration = 3000,
-  onComplete,
+  label = "GOJO",
+  subLabel = "SYSTEM_INIT",
 }: FullscreenLoaderProps) {
   return (
-    <AnimatePresence mode="wait" onExitComplete={onComplete}>
-      <motion.div
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-[#0B0F19] via-[#0d1425] to-[#050a14]"
-        initial={{ opacity: 1 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+    <motion.div
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black text-white font-mono overflow-hidden"
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, filter: "blur(10px)" }}
+      transition={{ duration: 0.8, ease: "easeInOut" }}
+    >
+      {/* Background Grid Effect */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_100%)]" />
+
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Nothing-style Spinner */}
+        <div className="relative w-24 h-24 mb-12">
+           {/* Outer Ring */}
+           <motion.div 
+             className="absolute inset-0 border-2 border-dashed border-white/20 rounded-full"
+             animate={{ rotate: 360 }}
+             transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+           />
+           
+           {/* Inner Active Ring */}
+           <motion.div 
+             className="absolute inset-2 border-2 border-dotted border-white rounded-full"
+             style={{ borderTopColor: 'transparent', borderLeftColor: 'transparent' }}
+             animate={{ rotate: -360 }}
+             transition={{ duration: 3, ease: "linear", repeat: Infinity }}
+           />
+           
+           {/* Center Red Dot (Nothing signature) */}
+           <div className="absolute inset-0 flex items-center justify-center">
+             <motion.div 
+               className="w-3 h-3 bg-[#D71921] rounded-full"
+               animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
+               transition={{ duration: 2, repeat: Infinity }}
+             />
+           </div>
+        </div>
+
+        {/* Text Content */}
         <motion.div
-          className="flex flex-col items-center gap-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.4 }}
+          transition={{ delay: 0.2 }}
+          className="text-center space-y-3"
         >
-          {/* Animated logo/spinner */}
-          <motion.div className="relative w-16 h-16">
-            <motion.div
-              className="absolute inset-0 rounded-full border-4 border-blue-500/30"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+          <h1 className="text-5xl font-bold tracking-tighter">{label}</h1>
+          <div className="flex items-center justify-center gap-3 text-xs text-white/50 tracking-[0.3em] font-mono uppercase">
+            <span>{subLabel}</span>
+            <motion.span
+              animate={{ opacity: [0, 1, 0] }}
+              transition={{ duration: 1, repeat: Infinity, times: [0, 0.5, 1] }}
+              className="inline-block w-1.5 h-3 bg-[#D71921]"
             />
-            <motion.div
-              className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500"
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 1,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          </motion.div>
-
-          {label && (
-            <motion.h2
-              className="text-2xl font-bold text-white tracking-tight"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              {label}
-            </motion.h2>
-          )}
-          
-          {subLabel && (
-            <motion.p
-              className="text-sm text-gray-400"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              {subLabel}
-            </motion.p>
-          )}
+          </div>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+      </div>
+
+      {/* Corner Accents */}
+      <div className="absolute top-8 left-8 text-[10px] text-white/30 font-mono tracking-widest">
+        N(01) // SYS.BOOT
+      </div>
+      <div className="absolute bottom-8 right-8 text-[10px] text-white/30 font-mono tracking-widest">
+        V(2.0) // READY
+      </div>
+      
+      {/* Decorative Lines */}
+      <div className="absolute top-8 right-8 w-24 h-[1px] bg-white/10" />
+      <div className="absolute bottom-8 left-8 w-24 h-[1px] bg-white/10" />
+
+    </motion.div>
   );
 }

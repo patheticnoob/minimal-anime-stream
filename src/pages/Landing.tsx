@@ -20,6 +20,7 @@ import { usePlayerLogic } from "@/hooks/use-player-logic";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useDataFlow } from "@/hooks/use-data-flow";
+import { AnimatePresence } from "framer-motion";
 
 // Track if this is the first load
 const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
@@ -279,18 +280,21 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const sectionContent = getSectionContent();
 
   // Show initial loader only on first visit for 3 seconds
-  if (showInitialLoader) {
-    return (
-      <FullscreenLoader
-        label="GojoStream"
-        subLabel="Your anime streaming experience"
-        maxDuration={3000}
-      />
-    );
-  }
-
+  // We render the loader inside AnimatePresence alongside the main content
+  // This ensures content loads in background while loader is visible
+  
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-white font-sans selection:bg-blue-500/30">
+    <div className="min-h-screen bg-[#0B0F19] text-white font-sans selection:bg-blue-500/30 relative">
+      <AnimatePresence>
+        {showInitialLoader && (
+          <FullscreenLoader
+            label="GOJO"
+            subLabel="SYSTEM_INIT"
+            maxDuration={3000}
+          />
+        )}
+      </AnimatePresence>
+
       {NavBarComponent ? (
         <NavBarComponent
           activeSection={activeSection}
