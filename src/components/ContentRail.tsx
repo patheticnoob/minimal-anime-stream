@@ -197,7 +197,7 @@ export function ContentRail({
 
         <div
           ref={scrollRef}
-          className="content-rail-scroll flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory px-4 md:px-0"
+          className={`content-rail-scroll flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 md:px-0 ${theme === "nothing" ? "pb-0" : "pb-4"}`}
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {displayedItems.map((item, idx) => (
