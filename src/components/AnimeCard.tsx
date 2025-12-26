@@ -135,7 +135,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait", isLoading = false
       </div>
       
       <div className="px-0.5">
-        <h3 className={`font-medium text-sm ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-gray-100"} line-clamp-2 ${theme === "nothing" ? "group-hover:text-[var(--nothing-accent)]" : "group-hover:text-[#1977F3]"} transition-colors leading-tight`}>
+        <h3 className={`font-medium text-sm ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-gray-100"} line-clamp-2 ${theme === "nothing" ? "group-hover:text-[var(--nothing-accent)]" : "group-hover:text-[#1977F3]"} transition-colors leading-tight h-10`}>
           {anime.title ?? "Untitled"}
         </h3>
         
