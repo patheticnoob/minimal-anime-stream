@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Play } from "lucide-react";
+import { Play, Star, Trophy } from "lucide-react";
 import { motion } from "framer-motion";
 import { memo } from "react";
 import { useTheme } from "@/hooks/use-theme";
@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type AnimeItem = {
   title?: string;
+  alternativeTitle?: string;
   image?: string;
   type?: string;
   id?: string;
@@ -18,6 +19,11 @@ type AnimeItem = {
   episodeNumber?: number;
   currentTime?: number;
   duration?: number;
+  quality?: string;
+  rank?: number;
+  malScore?: number;
+  rating?: string;
+  genres?: string[];
 };
 
 interface AnimeCardProps {
@@ -114,10 +120,29 @@ function AnimeCardBase({ anime, onClick, variant = "portrait", isLoading = false
           </div>
         )}
 
-        {/* Type badge - Top Right */}
-        {anime.type && (
+        {/* Quality badge - Top Left (when no episode number) */}
+        {!anime.episodeNumber && anime.quality && (
+          <div className="absolute top-2 left-2">
+            <Badge className={`${theme === "nothing" ? "bg-green-500/90" : "bg-green-600/90"} backdrop-blur-sm text-white border-0 text-[9px] font-bold px-2 py-1 ${theme === "nothing" ? "rounded-full" : "rounded-sm"} shadow-sm`}>
+              {anime.quality}
+            </Badge>
+          </div>
+        )}
+
+        {/* Rank badge - Top Right corner (when available) */}
+        {anime.rank && anime.rank <= 10 && (
           <div className="absolute top-2 right-2">
-            <Badge className={`${theme === "nothing" ? "bg-[var(--nothing-elevated)] text-[var(--nothing-fg)] border border-[var(--nothing-border)]" : "bg-black/60 backdrop-blur-md text-white border-0"} text-[9px] font-bold uppercase tracking-wider px-2 py-1 ${theme === "nothing" ? "rounded-full" : "rounded-sm"}`}>
+            <Badge className={`${theme === "nothing" ? "bg-yellow-500/90" : "bg-yellow-600/90"} backdrop-blur-sm text-white border-0 text-[9px] font-bold px-1.5 py-1 ${theme === "nothing" ? "rounded-full" : "rounded-sm"} shadow-sm flex items-center gap-0.5`}>
+              <Trophy className="w-2.5 h-2.5" />
+              {anime.rank}
+            </Badge>
+          </div>
+        )}
+
+        {/* Type badge - Bottom Right (moved from top) */}
+        {anime.type && (
+          <div className="absolute bottom-2 right-2">
+            <Badge className={`${theme === "nothing" ? "bg-[var(--nothing-elevated)]/80 text-[var(--nothing-fg)] border border-[var(--nothing-border)]" : "bg-black/60 backdrop-blur-md text-white border-0"} text-[9px] font-bold uppercase tracking-wider px-2 py-1 ${theme === "nothing" ? "rounded-full" : "rounded-sm"}`}>
               {anime.type}
             </Badge>
           </div>
@@ -134,16 +159,51 @@ function AnimeCardBase({ anime, onClick, variant = "portrait", isLoading = false
         )}
       </div>
       
-      <div className="px-0.5">
-        <h3 className={`font-medium text-sm ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-gray-100"} line-clamp-2 ${theme === "nothing" ? "group-hover:text-[var(--nothing-accent)]" : "group-hover:text-[#1977F3]"} transition-colors leading-tight h-10`}>
+      <div className="px-0.5 space-y-1">
+        <h3 className={`font-medium text-sm ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-gray-100"} line-clamp-2 ${theme === "nothing" ? "group-hover:text-[var(--nothing-accent)]" : "group-hover:text-[#1977F3]"} transition-colors leading-tight min-h-[2.5rem]`}>
           {anime.title ?? "Untitled"}
         </h3>
-        
-        <div className={`flex gap-2 mt-1 text-[10px] font-medium ${theme === "nothing" ? "text-[var(--nothing-gray-4)]" : "text-[#8f9aa3]"}`}>
+
+        {/* MAL Score and Rating */}
+        {(anime.malScore || anime.rating) && (
+          <div className={`flex items-center gap-2 text-[10px] font-medium ${theme === "nothing" ? "text-[var(--nothing-gray-4)]" : "text-[#8f9aa3]"}`}>
+            {anime.malScore && (
+              <span className="flex items-center gap-0.5">
+                <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                {anime.malScore.toFixed(1)}
+              </span>
+            )}
+            {anime.rating && (
+              <>
+                {anime.malScore && <span>•</span>}
+                <span className={`px-1.5 py-0.5 ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"} rounded text-[9px]`}>
+                  {anime.rating}
+                </span>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Sub/Dub info */}
+        <div className={`flex gap-2 text-[10px] font-medium ${theme === "nothing" ? "text-[var(--nothing-gray-4)]" : "text-[#8f9aa3]"}`}>
           {anime.language?.sub && <span>SUB {anime.language.sub}</span>}
           {anime.language?.sub && anime.language?.dub && <span className="text-gray-600">•</span>}
           {anime.language?.dub && <span>DUB {anime.language.dub}</span>}
         </div>
+
+        {/* Genres (first 2 only) */}
+        {anime.genres && anime.genres.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {anime.genres.slice(0, 2).map((genre, idx) => (
+              <span
+                key={idx}
+                className={`text-[9px] px-1.5 py-0.5 ${theme === "nothing" ? "bg-[var(--nothing-elevated)] text-[var(--nothing-gray-4)]" : "bg-white/5 text-gray-400"} rounded`}
+              >
+                {genre}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </motion.button>
   );

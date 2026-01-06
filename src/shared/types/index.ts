@@ -12,6 +12,29 @@ export type AnimeItem = {
   episodeNumber?: number;
   currentTime?: number;
   duration?: number;
+  // V2 enriched fields from Hianime API
+  alternativeTitle?: string;
+  quality?: string; // HD, FHD, etc.
+  rank?: number;
+  rating?: string; // PG-13, R, etc.
+  is18Plus?: boolean;
+  malScore?: number;
+  synonyms?: string;
+  premiered?: string;
+  producers?: string[];
+  related?: Array<{
+    title: string;
+    alternativeTitle?: string;
+    id: string;
+    poster: string;
+    type: string;
+    episodes?: { sub: number; dub: number; eps: number };
+  }>;
+  moreSeasons?: Array<{
+    title: string;
+    id: string;
+    poster: string;
+  }>;
   // V2 enriched fields from Jikan
   malId?: number;
   synopsis?: string;
@@ -19,7 +42,7 @@ export type AnimeItem = {
   score?: number;
   totalEpisodes?: number;
   status?: string;
-  aired?: string;
+  aired?: string | { from?: string; to?: string | null };
   studios?: string[];
   // V3 fields from Yuma
   episodes?: number;

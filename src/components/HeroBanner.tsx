@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type AnimeItem = {
   title?: string;
+  alternativeTitle?: string;
   image?: string;
   type?: string;
   id?: string;
@@ -15,6 +16,15 @@ type AnimeItem = {
     sub?: string | null;
     dub?: string | null;
   };
+  synopsis?: string;
+  genres?: string[];
+  score?: number;
+  malScore?: number;
+  quality?: string;
+  rating?: string;
+  totalEpisodes?: number;
+  status?: string;
+  aired?: string | { from?: string; to?: string | null };
 };
 
 interface HeroBannerProps {
@@ -104,10 +114,10 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
     : "NOW STREAMING WEEKLY";
 
   // Check if we have V2 enriched data
-  const hasEnrichedData = !!(anime as any).synopsis || !!(anime as any).genres || !!(anime as any).score;
-  const displayScore = (anime as any).score ? (anime as any).score.toFixed(1) : "4.8";
-  const displayDescription = (anime as any).synopsis 
-    ? (anime as any).synopsis.slice(0, 200) + ((anime as any).synopsis.length > 200 ? "..." : "")
+  const hasEnrichedData = !!(anime.synopsis || anime.genres || anime.score || anime.malScore);
+  const displayScore = anime.malScore?.toFixed(1) || anime.score?.toFixed(1) || "N/A";
+  const displayDescription = anime.synopsis
+    ? anime.synopsis.slice(0, 200) + (anime.synopsis.length > 200 ? "..." : "")
     : "Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.";
 
   // Apply the modern card hero only to the NothingOS theme
@@ -150,22 +160,39 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
               <span className="text-yellow-500 text-xs">★</span>
               <span>{displayScore} / 5</span>
             </div>
-            {(anime as any).status && (
+            {anime.status && (
               <span className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
-                {(anime as any).status}
+                {anime.status}
+              </span>
+            )}
+            {anime.quality && (
+              <span className="bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-300 text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide border-2 border-green-600">
+                {anime.quality}
+              </span>
+            )}
+            {anime.rating && (
+              <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-900 dark:text-orange-300 text-[10px] font-bold px-2.5 py-1 rounded border border-orange-400">
+                {anime.rating}
               </span>
             )}
           </div>
 
           {/* Genres - V2 enriched data */}
-          {(anime as any).genres && (anime as any).genres.length > 0 && (
+          {anime.genres && anime.genres.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {(anime as any).genres.slice(0, 4).map((genre: string, idx: number) => (
+              {anime.genres.slice(0, 4).map((genre: string, idx: number) => (
                 <span key={idx} className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-300 text-[10px] font-semibold px-2.5 py-1 rounded border border-blue-300 dark:border-blue-700">
                   {genre}
                 </span>
               ))}
             </div>
+          )}
+
+          {/* Alternative Title */}
+          {anime.alternativeTitle && (
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-2 font-medium">
+              {anime.alternativeTitle}
+            </p>
           )}
 
           {/* Title */}

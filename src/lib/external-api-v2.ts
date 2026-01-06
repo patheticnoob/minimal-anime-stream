@@ -74,6 +74,7 @@ function convertToAnimeItem(item: HianimeAnimeItem | HianimeSpotlightItem, categ
     id: item.id,
     dataId: item.id,
     title: item.title,
+    alternativeTitle: item.alternativeTitle,
     image: item.poster,
     type: item.type,
     language: {
@@ -84,6 +85,8 @@ function convertToAnimeItem(item: HianimeAnimeItem | HianimeSpotlightItem, categ
     duration: item.duration ? parseFloat(item.duration) : undefined,
     synopsis: 'synopsis' in item ? item.synopsis : undefined,
     aired: 'aired' in item ? item.aired : undefined,
+    quality: 'quality' in item ? item.quality : undefined,
+    rank: item.rank,
     sourceCategory: category as any,
   };
 }
@@ -226,5 +229,96 @@ export async function fetchHianimeCategory(
   } catch (error) {
     console.error(`Hianime API v2 ${category} Error:`, error);
     return { results: [], hasNextPage: false };
+  }
+}
+
+export type HianimeAnimeDetails = {
+  title: string;
+  alternativeTitle?: string;
+  id: string;
+  poster: string;
+  episodes: {
+    sub: number;
+    dub: number;
+    eps: number;
+  };
+  rating?: string;
+  type: string;
+  is18Plus: boolean;
+  synopsis?: string;
+  synonyms?: string;
+  aired?: {
+    from?: string;
+    to?: string | null;
+  };
+  premiered?: string;
+  duration?: string;
+  status?: string;
+  MAL_score?: string;
+  genres?: string[];
+  studios?: string[];
+  producers?: string[];
+  moreSeasons?: Array<{
+    title: string;
+    id: string;
+    poster: string;
+  }>;
+  related?: Array<{
+    title: string;
+    alternativeTitle?: string;
+    id: string;
+    poster: string;
+    type: string;
+    episodes?: { sub: number; dub: number; eps: number };
+  }>;
+};
+
+/**
+ * Fetch detailed anime information
+ */
+export async function fetchHianimeAnimeDetails(animeId: string): Promise<AnimeItem | null> {
+  try {
+    const response = await fetch(`${HIANIME_API_BASE}/anime/${animeId}`);
+    if (!response.ok) {
+      return null;
+    }
+    const data: HianimeResponse<HianimeAnimeDetails> = await response.json();
+
+    if (!data.success) {
+      return null;
+    }
+
+    const anime = data.data;
+
+    return {
+      id: anime.id,
+      dataId: anime.id,
+      title: anime.title,
+      alternativeTitle: anime.alternativeTitle,
+      image: anime.poster,
+      type: anime.type,
+      language: {
+        sub: anime.episodes.sub > 0 ? String(anime.episodes.sub) : null,
+        dub: anime.episodes.dub > 0 ? String(anime.episodes.dub) : null,
+      },
+      totalEpisodes: anime.episodes.eps,
+      duration: anime.duration ? parseFloat(anime.duration) : undefined,
+      synopsis: anime.synopsis,
+      rating: anime.rating,
+      is18Plus: anime.is18Plus,
+      malScore: anime.MAL_score ? parseFloat(anime.MAL_score) : undefined,
+      genres: anime.genres,
+      studios: anime.studios,
+      producers: anime.producers,
+      status: anime.status,
+      aired: anime.aired,
+      premiered: anime.premiered,
+      synonyms: anime.synonyms,
+      related: anime.related,
+      moreSeasons: anime.moreSeasons,
+    };
+  } catch (error) {
+    console.error("Hianime API v2 Anime Details Error:", error);
+    return null;
   }
 }
