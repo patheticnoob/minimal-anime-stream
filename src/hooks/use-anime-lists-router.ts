@@ -13,16 +13,22 @@ export function useAnimeListsRouter() {
   const safeDataFlow = dataFlow || "v1";
   console.log('[Router] Current dataFlow:', safeDataFlow, '(raw:', dataFlow, ')');
 
-  // Route to the appropriate hook based on dataFlow setting
+  // Call all hooks unconditionally (required by React Rules of Hooks)
+  // Only the selected one will be used, but all must be called in the same order
+  const v1Data = useAnimeListsV1();
+  const v2Data = useAnimeListsV2();
+  const v3Data = useAnimeListsV3();
+
+  // Return the appropriate data based on dataFlow setting
   if (safeDataFlow === "v2") {
     console.log('[Router] Using v2 API hook');
-    return useAnimeListsV2();
+    return v2Data;
   } else if (safeDataFlow === "v3") {
     console.log('[Router] Using v3 API hook');
-    return useAnimeListsV3();
+    return v3Data;
   }
 
   // Default to v1
   console.log('[Router] Using v1 API hook (default)');
-  return useAnimeListsV1();
+  return v1Data;
 }
