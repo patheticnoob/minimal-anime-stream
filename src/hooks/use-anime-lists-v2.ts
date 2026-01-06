@@ -87,8 +87,15 @@ export function useAnimeListsV2() {
 
         if (data.results && data.results.length > 0) {
           const randomIndex = Math.floor(Math.random() * Math.min(5, data.results.length));
-          setHeroAnime(data.results[randomIndex]);
-          console.log('[V2 Hook] Hero anime set:', data.results[randomIndex].title);
+          const heroItem = data.results[randomIndex];
+          setHeroAnime(heroItem);
+          console.log('[V2 Hook - Spotlight] Hero anime set from SPOTLIGHT API:', {
+            title: heroItem.title,
+            synopsis: heroItem.synopsis?.substring(0, 50) + '...',
+            quality: heroItem.quality,
+            rank: heroItem.rank,
+            hasRichData: !!(heroItem.synopsis || heroItem.quality || heroItem.rank)
+          });
         }
 
         setPopularLoading(false);
