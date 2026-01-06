@@ -78,11 +78,21 @@ export function useAnimeListsV2() {
 
     // Load Spotlight (use as "popular")
     logInfo('Fetching spotlight from Hianime v2', 'Initial Load');
-    console.log('[V2 Hook] Starting to fetch spotlight...');
+    console.log('[V2 Hook] ===== FETCHING SPOTLIGHT API =====');
     retryWithBackoff(() => fetchHianimeSpotlight())
       .then((data) => {
         if (!mounted) return;
-        console.log('[V2 Hook] Spotlight data received:', data.results.length, 'items');
+        console.log('[V2 Hook] ===== SPOTLIGHT DATA RECEIVED =====');
+        console.log('[V2 Hook] Number of items:', data.results.length);
+        if (data.results[0]) {
+          console.log('[V2 Hook] First item sample:', {
+            title: data.results[0].title,
+            synopsis: data.results[0].synopsis?.substring(0, 50),
+            quality: data.results[0].quality,
+            rank: data.results[0].rank,
+            aired: data.results[0].aired
+          });
+        }
         setPopularItems(data.results);
 
         if (data.results && data.results.length > 0) {

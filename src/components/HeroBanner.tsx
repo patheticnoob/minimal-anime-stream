@@ -120,6 +120,18 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
     ? anime.synopsis.slice(0, 200) + (anime.synopsis.length > 200 ? "..." : "")
     : "Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.";
 
+  // Debug logging to see what data hero banner receives
+  console.log('[HeroBanner] Received anime data:', {
+    title: anime.title,
+    synopsis: anime.synopsis?.substring(0, 50) + '...',
+    quality: anime.quality,
+    rank: anime.rank,
+    rating: anime.rating,
+    genres: anime.genres,
+    hasEnrichedData,
+    allKeys: Object.keys(anime)
+  });
+
   // Apply the modern card hero only to the NothingOS theme
   if (theme === "nothing") {
     return (
