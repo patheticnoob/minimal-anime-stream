@@ -83,7 +83,7 @@ function convertToAnimeItem(item: HianimeAnimeItem | HianimeSpotlightItem, categ
     totalEpisodes: item.episodes.eps,
     duration: item.duration ? parseFloat(item.duration) : undefined,
     synopsis: 'synopsis' in item ? item.synopsis : undefined,
-    aired: item.aired,
+    aired: 'aired' in item ? item.aired : undefined,
     sourceCategory: category as any,
   };
 }
