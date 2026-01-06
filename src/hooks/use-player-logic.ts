@@ -219,11 +219,11 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     // Check cache first with audio preference
     const cacheKey = `sources_${episode.id}_${audioPreference}`;
     const cachedSources = animeCache.get<any>(cacheKey);
-    
+
     if (cachedSources) {
-      // Use cached sources immediately
+      // Use cached sources immediately (already has merged subtitles if dub)
       const sourcesData = cachedSources;
-      
+
       if (sourcesData.sources && sourcesData.sources.length > 0) {
         setVideoHeaders(sourcesData.headers || null);
         const m3u8Source = sourcesData.sources.find((s: any) => s.file.includes(".m3u8"));
@@ -259,12 +259,12 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
         toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
-        
+
         // Prefetch next episode
         if (idx !== -1 && episodes[idx + 1]) {
           prefetchEpisodeSources(episodes[idx + 1].id);
         }
-        
+
         return;
       }
     }
@@ -274,34 +274,57 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     try {
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
-      
+
       // Select servers based on audio preference
       const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
-      
+
       if (!targetServers || targetServers.length === 0) {
         toast.error(`No ${audioPreference.toUpperCase()} servers available for this episode`);
         return;
       }
 
       const hd2Server = targetServers.find(s => s.name === "HD-2") || targetServers[0];
-      
+
       if (!hd2Server) {
         toast.error("No streaming servers available");
         return;
       }
 
       const sources = await fetchSources({ serverId: hd2Server.id });
-      const sourcesData = sources as { 
+      const sourcesData = sources as {
         sources: Array<{ file: string; type: string }>;
         tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
         intro?: { start: number; end: number };
         outro?: { start: number; end: number };
         headers?: Record<string, string>;
       };
-      
-      // Cache the sources with audio preference
-      animeCache.set(cacheKey, sourcesData, 5);
-      
+
+      // If dub is selected, also fetch subtitles from sub server
+      let finalTracks = sourcesData.tracks || [];
+      if (audioPreference === "dub" && (!finalTracks || finalTracks.length === 0)) {
+        try {
+          const subServers = serverData.sub;
+          if (subServers && subServers.length > 0) {
+            const subHd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
+            if (subHd2Server) {
+              const subSources = await fetchSources({ serverId: subHd2Server.id });
+              const subSourcesData = subSources as {
+                tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
+              };
+              if (subSourcesData.tracks && subSourcesData.tracks.length > 0) {
+                finalTracks = subSourcesData.tracks;
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to fetch subtitles from sub server:', err);
+        }
+      }
+
+      // Cache the sources with audio preference (with merged subtitles if dub)
+      const cacheData = { ...sourcesData, tracks: finalTracks };
+      animeCache.set(cacheKey, cacheData, 5);
+
       if (sourcesData.sources && sourcesData.sources.length > 0) {
         setVideoHeaders(sourcesData.headers || null);
         const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
@@ -320,7 +343,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
 
         const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
 
-        const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
+        const proxiedTracks = finalTracks.map((t) => ({
           ...t,
           kind: t.kind || "subtitles",
           file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
@@ -337,7 +360,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         if (idx !== -1) setCurrentEpisodeIndex(idx);
 
         toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
-        
+
         // Prefetch next episode
         if (idx !== -1 && episodes[idx + 1]) {
           prefetchEpisodeSources(episodes[idx + 1].id);
