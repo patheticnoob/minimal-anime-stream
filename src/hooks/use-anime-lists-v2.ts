@@ -68,14 +68,17 @@ export function useAnimeListsV2() {
 
     // Load Spotlight (use as "popular")
     logInfo('Fetching spotlight from Hianime v2', 'Initial Load');
+    console.log('[V2 Hook] Starting to fetch spotlight...');
     retryWithBackoff(() => fetchHianimeSpotlight())
       .then((data) => {
         if (!mounted) return;
+        console.log('[V2 Hook] Spotlight data received:', data.results.length, 'items');
         setPopularItems(data.results);
 
         if (data.results && data.results.length > 0) {
           const randomIndex = Math.floor(Math.random() * Math.min(5, data.results.length));
           setHeroAnime(data.results[randomIndex]);
+          console.log('[V2 Hook] Hero anime set:', data.results[randomIndex].title);
         }
 
         setPopularLoading(false);
@@ -85,6 +88,7 @@ export function useAnimeListsV2() {
       .catch((err) => {
         if (!mounted) return;
         const msg = err instanceof Error ? err.message : "Failed to load spotlight";
+        console.error('[V2 Hook] Error loading spotlight:', err);
         logError(msg, 'Hianime Spotlight', err instanceof Error ? err : undefined);
         setPopularLoading(false);
         setLoading(false);

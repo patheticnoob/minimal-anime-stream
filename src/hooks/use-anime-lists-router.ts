@@ -9,13 +9,20 @@ import { useDataFlow } from "./use-data-flow";
 export function useAnimeListsRouter() {
   const { dataFlow } = useDataFlow();
 
+  // Ensure dataFlow is never undefined - always default to v1
+  const safeDataFlow = dataFlow || "v1";
+  console.log('[Router] Current dataFlow:', safeDataFlow, '(raw:', dataFlow, ')');
+
   // Route to the appropriate hook based on dataFlow setting
-  if (dataFlow === "v2") {
+  if (safeDataFlow === "v2") {
+    console.log('[Router] Using v2 API hook');
     return useAnimeListsV2();
-  } else if (dataFlow === "v3") {
+  } else if (safeDataFlow === "v3") {
+    console.log('[Router] Using v3 API hook');
     return useAnimeListsV3();
   }
 
   // Default to v1
+  console.log('[Router] Using v1 API hook (default)');
   return useAnimeListsV1();
 }
