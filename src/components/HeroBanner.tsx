@@ -21,6 +21,7 @@ type AnimeItem = {
   score?: number;
   malScore?: number;
   quality?: string;
+  rank?: number;
   rating?: string;
   totalEpisodes?: number;
   status?: string;
