@@ -1,0 +1,587 @@
+/* NothingOS Theme - Minimalist Design System */
+
+[data-theme="nothing"] {
+  /* Core Colors - Light Mode */
+  --nothing-bg: #f5f6fb;
+  --nothing-fg: #0a0f1f;
+  --nothing-accent: #ff3b3b;
+  --nothing-gray-1: #ffffff;
+  --nothing-gray-2: #eef1fb;
+  --nothing-gray-3: #cfd4e5;
+  --nothing-gray-4: #8a90a6;
+  --nothing-border: rgba(11, 16, 32, 0.08);
+  --nothing-elevated: #ffffff;
+  --nothing-soft-shadow: 0 25px 80px rgba(8, 10, 24, 0.12);
+  --nothing-card-shadow: 0 20px 45px rgba(10, 14, 32, 0.08);
+  --nothing-pill-shadow: 0 12px 30px rgba(255, 59, 59, 0.3);
+}
+
+.dark[data-theme="nothing"],
+.dark [data-theme="nothing"] {
+  /* Core Colors - Dark Mode - Cinematic Premium */
+  --nothing-bg: #0B0D10;
+  --nothing-fg: #F5F5F7;
+  --nothing-accent: #E50914;
+  --nothing-gray-1: #1F2933;
+  --nothing-gray-2: #151820;
+  --nothing-gray-3: #2A2F3A;
+  --nothing-gray-4: #9CA3AF;
+  --nothing-border: rgba(161, 161, 170, 0.15);
+  --nothing-elevated: #1A1D24;
+  --nothing-soft-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
+  --nothing-card-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+  --nothing-pill-shadow: 0 12px 30px rgba(229, 9, 20, 0.5);
+}
+
+/* Base Styles */
+[data-theme="nothing"] body,
+[data-theme="nothing"] .min-h-screen,
+[data-theme="nothing"] main {
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+  font-family: 'CommitMono', 'Commit Mono', monospace;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+}
+
+.dark[data-theme="nothing"] body,
+.dark[data-theme="nothing"] .min-h-screen,
+.dark[data-theme="nothing"] main {
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"]::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle, rgba(12, 18, 34, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Content Rails - NothingCN Style */
+[data-theme="nothing"] .content-rail {
+  background: var(--nothing-elevated);
+  border: 2px solid var(--nothing-border);
+  border-radius: 32px;
+  padding: 32px 28px 20px;
+  box-shadow: var(--nothing-card-shadow);
+  transition: all 0.3s ease;
+}
+
+[data-theme="nothing"] .content-rail:hover {
+  border-color: rgba(229, 9, 20, 0.3);
+  box-shadow: 0 28px 60px rgba(229, 9, 20, 0.15);
+}
+
+.dark[data-theme="nothing"] .content-rail {
+  background: var(--nothing-elevated);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  border-color: rgba(161, 161, 170, 0.15);
+}
+
+.dark[data-theme="nothing"] .content-rail:hover {
+  border-color: rgba(229, 9, 20, 0.4);
+  box-shadow: 0 28px 60px rgba(229, 9, 20, 0.25);
+}
+
+[data-theme="nothing"] .content-rail-header h2 {
+  color: var(--nothing-fg);
+  letter-spacing: 0.18em;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+[data-theme="nothing"] .content-rail-scroll {
+  gap: 0.75rem;
+  padding-bottom: 4px;
+}
+
+/* Anime Cards - NothingCN Style */
+[data-theme="nothing"] .anime-card-poster-frame {
+  border-radius: 28px;
+  border: 2px solid var(--nothing-border);
+  background: var(--nothing-gray-2);
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+[data-theme="nothing"] .anime-card:hover .anime-card-poster-frame {
+  border-color: rgba(229, 9, 20, 0.4);
+  box-shadow: 0 8px 24px rgba(229, 9, 20, 0.2), 0 0 20px rgba(229, 9, 20, 0.15);
+  transform: translateY(-2px);
+}
+
+.dark[data-theme="nothing"] .anime-card-poster-frame {
+  background: var(--nothing-gray-1);
+  border-color: rgba(161, 161, 170, 0.15);
+}
+
+.dark[data-theme="nothing"] .anime-card:hover .anime-card-poster-frame {
+  border-color: rgba(229, 9, 20, 0.5);
+  box-shadow: 0 12px 32px rgba(229, 9, 20, 0.3), 0 0 25px rgba(229, 9, 20, 0.2);
+}
+
+[data-theme="nothing"] .anime-card h3 {
+  color: var(--nothing-fg);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+[data-theme="nothing"] .anime-card:hover h3 {
+  color: var(--nothing-accent);
+}
+
+/* Badges - NothingCN Style */
+[data-theme="nothing"] .badge {
+  border-radius: 999px;
+  background: rgba(10, 14, 32, 0.06);
+  color: var(--nothing-fg);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.625rem;
+  padding: 4px 12px;
+  border: 1px solid var(--nothing-border);
+}
+
+[data-theme="nothing"] .badge-accent {
+  background: var(--nothing-accent);
+  color: #fff;
+  border-color: var(--nothing-accent);
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+}
+
+.dark[data-theme="nothing"] .badge {
+  background: var(--nothing-gray-1);
+  border-color: rgba(161, 161, 170, 0.2);
+}
+
+.dark[data-theme="nothing"] .badge-accent {
+  background: var(--nothing-accent);
+  box-shadow: 0 6px 16px rgba(229, 9, 20, 0.4);
+}
+
+/* Buttons - NothingCN Style */
+[data-theme="nothing"] button,
+[data-theme="nothing"] .button {
+  font-family: 'CommitMono', 'Commit Mono', monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+}
+
+[data-theme="nothing"] .button-primary {
+  background: var(--nothing-accent);
+  color: #FFFFFF;
+  border: 2px solid var(--nothing-accent);
+  box-shadow: var(--nothing-pill-shadow);
+}
+
+[data-theme="nothing"] .button-primary:hover {
+  background: #C4070F;
+  box-shadow: 0 16px 40px rgba(229, 9, 20, 0.5), 0 0 30px rgba(229, 9, 20, 0.3);
+}
+
+[data-theme="nothing"] .button-secondary {
+  background: transparent;
+  color: var(--nothing-fg);
+  border: 2px solid var(--nothing-border);
+}
+
+[data-theme="nothing"] .button-secondary:hover {
+  background: var(--nothing-gray-1);
+  color: var(--nothing-fg);
+  border-color: rgba(229, 9, 20, 0.3);
+}
+
+.dark[data-theme="nothing"] .button-secondary {
+  background: var(--nothing-gray-1);
+  border-color: rgba(161, 161, 170, 0.2);
+}
+
+.dark[data-theme="nothing"] .button-secondary:hover {
+  background: var(--nothing-gray-3);
+  border-color: rgba(229, 9, 20, 0.4);
+  box-shadow: 0 8px 20px rgba(229, 9, 20, 0.15);
+}
+
+/* Hero Banner - NothingCN Modern Style */
+[data-theme="nothing"] .hero-banner-modern {
+  border-radius: 32px;
+  border: 2px solid var(--nothing-border);
+  box-shadow: var(--nothing-soft-shadow);
+  overflow: hidden;
+  background: white;
+}
+
+.dark[data-theme="nothing"] .hero-banner-modern {
+  background: #1A1D24;
+  border-color: rgba(161, 161, 170, 0.2);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
+}
+
+/* Hero Banner Image Overlay for Dark Mode */
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(11,13,16,0.55), rgba(11,13,16,0.85));
+  pointer-events: none;
+}
+
+/* Hero Banner Text Contrast */
+.dark[data-theme="nothing"] .hero-banner-modern h1 {
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.dark[data-theme="nothing"] .hero-banner-modern p {
+  color: #D1D5DB !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Hero Banner Badges */
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-pill,
+.dark[data-theme="nothing"] .hero-banner-modern span[class*="border"] {
+  background: #E50914 !important;
+  color: #FFFFFF !important;
+  border-color: #E50914 !important;
+  text-shadow: none;
+}
+
+/* Hero Banner Buttons - Critical Fix */
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-primary-btn,
+.dark[data-theme="nothing"] .hero-banner-modern button[class*="bg-[#FF3333]"] {
+  background: #E50914 !important;
+  color: #FFFFFF !important;
+  border-color: #E50914 !important;
+  box-shadow: 0 12px 30px rgba(229, 9, 20, 0.35) !important;
+  text-shadow: none;
+}
+
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-secondary-btn,
+.dark[data-theme="nothing"] .hero-banner-modern button[class*="border-2"][class*="border-gray-900"] {
+  background: #1C212C !important;
+  color: #F5F5F7 !important;
+  border-color: rgba(161, 161, 170, 0.3) !important;
+  text-shadow: none;
+}
+
+.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-secondary-btn:hover {
+  background: #2A2F3A !important;
+  border-color: rgba(229, 9, 20, 0.4) !important;
+}
+
+/* Modal/Sheet - NothingCN Style */
+[data-theme="nothing"] .detail-sheet {
+  background: var(--nothing-bg);
+  border: 2px solid var(--nothing-border);
+  border-radius: 32px;
+  box-shadow: var(--nothing-soft-shadow);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-close {
+  background: var(--nothing-bg);
+  border: 2px solid var(--nothing-border);
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  color: var(--nothing-fg);
+  transition: all 0.3s ease;
+}
+
+[data-theme="nothing"] .detail-close:hover {
+  background: var(--nothing-accent);
+  border-color: var(--nothing-accent);
+  color: #FFFFFF;
+}
+
+/* Episode Cards */
+[data-theme="nothing"] .detail-episode {
+  border: 2px solid var(--nothing-border);
+  border-radius: 24px;
+  background: var(--nothing-bg);
+  transition: all 0.3s ease;
+}
+
+[data-theme="nothing"] .detail-episode:hover {
+  background: var(--nothing-gray-1);
+  border-color: var(--nothing-accent);
+  box-shadow: 0 12px 30px rgba(255, 59, 59, 0.15);
+}
+
+/* Tabs */
+[data-theme="nothing"] .detail-tab {
+  border: 2px solid var(--nothing-border);
+  border-radius: 999px;
+  background: var(--nothing-gray-1);
+  color: var(--nothing-gray-4);
+  padding: 12px 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+}
+
+[data-theme="nothing"] .detail-tab:hover {
+  background: var(--nothing-gray-2);
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .detail-tab.is-active {
+  background: var(--nothing-accent);
+  border-color: var(--nothing-accent);
+  color: #fff;
+  box-shadow: var(--nothing-pill-shadow);
+}
+
+/* Video Player Styles */
+[data-theme="nothing"] .nothing-player-shell {
+  width: 100%;
+  position: relative;
+}
+
+[data-theme="nothing"] .nothing-player-surface {
+  background: #000;
+  box-shadow: var(--nothing-card-shadow);
+  position: relative;
+  isolation: isolate;
+}
+
+[data-theme="nothing"] .nothing-player-surface video {
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="nothing"] .nothing-player-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
+  padding: 1.5rem 1.5rem 1rem;
+  border-radius: 0 0 32px 32px;
+}
+
+[data-theme="nothing"] .nothing-player-slider {
+  position: relative;
+  height: 6px;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+}
+
+[data-theme="nothing"] .nothing-player-slider input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+[data-theme="nothing"] .nothing-player-btn {
+  padding: 0.5rem;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="nothing"] .nothing-player-btn:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.3);
+}
+
+[data-theme="nothing"] .nothing-player-btn-primary {
+  background: var(--nothing-accent);
+  border-color: var(--nothing-accent);
+}
+
+[data-theme="nothing"] .nothing-player-btn-primary:hover {
+  background: #ff2020;
+  border-color: #ff2020;
+}
+
+[data-theme="nothing"] .nothing-volume-slider {
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+[data-theme="nothing"] .nothing-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+[data-theme="nothing"] .nothing-chip {
+  padding: 0.5rem 1rem;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 999px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+[data-theme="nothing"] .nothing-chip:hover {
+  background: rgba(0,0,0,0.9);
+  border-color: rgba(255,255,255,0.3);
+}
+
+[data-theme="nothing"] .nothing-chip-accent {
+  background: var(--nothing-accent);
+  border-color: var(--nothing-accent);
+}
+
+[data-theme="nothing"] .nothing-chip-accent:hover {
+  background: #ff2020;
+  border-color: #ff2020;
+}
+
+[data-theme="nothing"] .nothing-brand-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--nothing-accent);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+[data-theme="nothing"] .nothing-player-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  z-index: 2;
+  pointer-events: none;
+}
+
+[data-theme="nothing"] .nothing-dropdown {
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 0.5rem;
+  min-width: 150px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+[data-theme="nothing"] .nothing-dropdown-item {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  color: white;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+[data-theme="nothing"] .nothing-dropdown-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+[data-theme="nothing"] .nothing-next-banner {
+  margin-top: 1rem;
+  padding: 1rem 1.5rem;
+  background: white;
+  border: 2px solid var(--nothing-border);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  [data-theme="nothing"]::before {
+    background-size: 16px 16px;
+    opacity: 0.08;
+  }
+  
+  [data-theme="nothing"] .content-rail {
+    border-radius: 24px;
+    padding: 24px 20px 20px;
+  }
+  
+  [data-theme="nothing"] .anime-card-poster-frame {
+    border-radius: 20px;
+  }
+
+  [data-theme="nothing"] .nothing-player-surface {
+    border-radius: 24px;
+  }
+
+  [data-theme="nothing"] .nothing-player-controls {
+    padding: 1rem 0.75rem 0.75rem;
+    border-radius: 0 0 24px 24px;
+  }
+
+  [data-theme="nothing"] .nothing-player-btn {
+    padding: 0.4rem;
+  }
+
+  [data-theme="nothing"] .nothing-chip {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Override default dark theme colors */
+[data-theme="nothing"] .text-white,
+[data-theme="nothing"] .text-gray-100,
+[data-theme="nothing"] .text-gray-200 {
+  color: var(--nothing-fg) !important;
+}
+
+[data-theme="nothing"] .text-gray-400,
+[data-theme="nothing"] .text-gray-500,
+[data-theme="nothing"] .text-gray-600 {
+  color: var(--nothing-gray-4) !important;
+}
+
+[data-theme="nothing"] .bg-\[#0B0F19\],
+[data-theme="nothing"] .bg-\[#050814\],
+[data-theme="nothing"] .bg-black\/60 {
+  background: var(--nothing-bg) !important;
+  color: var(--nothing-fg);
+}
+
+[data-theme="nothing"] .border-white\/10,
+[data-theme="nothing"] .border-white\/20 {
+  border-color: var(--nothing-border) !important;
+}
+
+/* Dark mode cinematic enhancements */
+.dark[data-theme="nothing"] body,
+.dark[data-theme="nothing"] .min-h-screen,
+.dark[data-theme="nothing"] main {
+  background: var(--nothing-bg);
+  color: var(--nothing-fg);
+}
+
+.dark[data-theme="nothing"]::before {
+  background-image: radial-gradient(circle, rgba(229, 9, 20, 0.03) 1px, transparent 1px);
+  opacity: 0.15;
+}
