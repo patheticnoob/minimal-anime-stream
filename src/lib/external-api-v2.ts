@@ -70,7 +70,7 @@ export type HianimeSearchResult = {
 
 // Convert Hianime API item to our internal AnimeItem format
 function convertToAnimeItem(item: HianimeAnimeItem | HianimeSpotlightItem, category?: string): AnimeItem {
-  return {
+  const converted = {
     id: item.id,
     dataId: item.id,
     title: item.title,
@@ -89,6 +89,18 @@ function convertToAnimeItem(item: HianimeAnimeItem | HianimeSpotlightItem, categ
     rank: item.rank,
     sourceCategory: category as any,
   };
+
+  // Log for debugging
+  if (converted.quality || converted.rank) {
+    console.log('[V2 API] Converted item:', {
+      title: converted.title,
+      quality: converted.quality,
+      rank: converted.rank,
+      hasSynopsis: !!converted.synopsis
+    });
+  }
+
+  return converted;
 }
 
 /**
