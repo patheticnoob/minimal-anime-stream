@@ -159,7 +159,7 @@ export function useAnimeListsV2() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [_dummyAction2, _dummyAction1, _dummyAction3, _dummyAction4]);
 
   // Auto-rotate hero banner
   useEffect(() => {
@@ -204,7 +204,7 @@ export function useAnimeListsV2() {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, _dummyAction5]);
 
   const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows') => {
     setLoadingMore(category);
