@@ -35,7 +35,7 @@ async function retryWithBackoff<T>(
   throw lastError;
 }
 
-export function useAnimeListsV2() {
+export function useAnimeListsV2(isActive: boolean = true) {
   // Add dummy hook calls to match v1's hook structure (to avoid React Hooks Rules violation)
   // V1 has 5 useAction calls, so we add 5 matching useAction calls here (unused but necessary for hook order)
   const _dummyAction1 = useAction(api.hianime.topAiring);
@@ -44,7 +44,7 @@ export function useAnimeListsV2() {
   const _dummyAction4 = useAction(api.hianime.tvShows);
   const _dummyAction5 = useAction(api.hianime.search);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!isActive); // Start as not loading if inactive
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
   const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
@@ -74,6 +74,11 @@ export function useAnimeListsV2() {
 
   // Load content from Hianime API v2
   useEffect(() => {
+    if (!isActive) {
+      console.log('[V2 Hook] Skipping fetch - hook is inactive');
+      return;
+    }
+
     let mounted = true;
 
     // Load Spotlight (use as "popular")
@@ -177,7 +182,7 @@ export function useAnimeListsV2() {
       mounted = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isActive]);
 
   // Auto-rotate hero banner
   useEffect(() => {

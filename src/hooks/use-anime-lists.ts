@@ -30,14 +30,14 @@ async function retryWithBackoff<T>(
   throw lastError;
 }
 
-export function useAnimeLists() {
+export function useAnimeLists(isActive: boolean = true) {
   const fetchTopAiring = useAction(api.hianime.topAiring);
   const fetchMostPopular = useAction(api.hianime.mostPopular);
   const fetchMovies = useAction(api.hianime.movies);
   const fetchTVShows = useAction(api.hianime.tvShows);
   const searchAnime = useAction(api.hianime.search);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!isActive); // Start as not loading if inactive
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
   const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
@@ -69,6 +69,11 @@ export function useAnimeLists() {
 
   // Load content progressively - each section loads independently with retry logic
   useEffect(() => {
+    if (!isActive) {
+      console.log('[V1 Hook] Skipping fetch - hook is inactive');
+      return;
+    }
+
     let mounted = true;
 
     // Load popular first (for hero banner) with retry
@@ -155,7 +160,7 @@ export function useAnimeLists() {
     return () => {
       mounted = false;
     };
-  }, [fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows]);
+  }, [isActive, fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows]);
 
   // Auto-rotate hero banner
   useEffect(() => {

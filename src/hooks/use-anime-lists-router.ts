@@ -13,17 +13,22 @@ export function useAnimeListsRouter() {
   const safeDataFlow = dataFlow || "v1";
   console.log('[Router] Current dataFlow:', safeDataFlow, '(raw:', dataFlow, ')');
 
+  // Determine which hook should be active
+  const isV1Active = safeDataFlow === "v1";
+  const isV2Active = safeDataFlow === "v2";
+  const isV3Active = safeDataFlow === "v3";
+
   // Call all hooks unconditionally (required by React Rules of Hooks)
-  // Only the selected one will be used, but all must be called in the same order
-  const v1Data = useAnimeListsV1();
-  const v2Data = useAnimeListsV2();
-  const v3Data = useAnimeListsV3();
+  // Pass active flag so each hook can skip fetching if not active
+  const v1Data = useAnimeListsV1(isV1Active);
+  const v2Data = useAnimeListsV2(isV2Active);
+  const v3Data = useAnimeListsV3(isV3Active);
 
   // Return the appropriate data based on dataFlow setting
-  if (safeDataFlow === "v2") {
+  if (isV2Active) {
     console.log('[Router] Using v2 API hook');
     return v2Data;
-  } else if (safeDataFlow === "v3") {
+  } else if (isV3Active) {
     console.log('[Router] Using v3 API hook');
     return v3Data;
   }
