@@ -176,7 +176,8 @@ export function useAnimeListsV2() {
     return () => {
       mounted = false;
     };
-  }, [_dummyAction2, _dummyAction1, _dummyAction3, _dummyAction4]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-rotate hero banner
   useEffect(() => {
@@ -221,7 +222,8 @@ export function useAnimeListsV2() {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [query, _dummyAction5]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
   const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows') => {
     setLoadingMore(category);
