@@ -95,6 +95,14 @@ async function searchYuma(query: string): Promise<AnimeItem[]> {
 }
 
 export function useAnimeListsV3() {
+  // Add dummy hook calls to match v1's hook structure (to avoid React Hooks Rules violation)
+  // V1 has 5 useAction calls, so we add 5 dummy useState calls here
+  const [_dummy1] = useState(null);
+  const [_dummy2] = useState(null);
+  const [_dummy3] = useState(null);
+  const [_dummy4] = useState(null);
+  const [_dummy5] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
