@@ -14,6 +14,7 @@ import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 import { NothingWatchHeader } from "../components/NothingWatchHeader";
 import { NothingAnimeInfo } from "../components/NothingAnimeInfo";
 import { NothingEpisodeList } from "../components/NothingEpisodeList";
+import { fetchHianimeAnimeDetails } from "@/lib/external-api-v2";
 
 type Episode = {
   id: string;
@@ -126,14 +127,37 @@ export default function NothingWatch() {
         const animeData = JSON.parse(storedAnime);
         setAnime(animeData);
 
-        // Rich v2 data is already included in animeData from landing page
-        // No need to fetch again as it was already fetched when listing
         console.log('[Watch] Loaded anime data:', {
           id: animeData.id,
           title: animeData.title,
           hasV2Data: !!(animeData.genres || animeData.synopsis || animeData.malScore),
           dataFlow
         });
+
+        // If v2 is selected and we don't have rich data, fetch from Hianime API
+        if (dataFlow === "v2" && !animeData.genres && !animeData.synopsis) {
+          console.log('[Watch] Fetching rich v2 anime details from Hianime API');
+          fetchHianimeAnimeDetails(animeId)
+            .then((richData) => {
+              if (richData) {
+                const mergedData = { ...animeData, ...richData };
+                setAnime(mergedData);
+                // Update localStorage with rich data
+                localStorage.setItem(`anime_${animeId}`, JSON.stringify(mergedData));
+                console.log('[Watch] Updated anime with v2 rich data:', {
+                  genres: richData.genres,
+                  synopsis: richData.synopsis?.substring(0, 50),
+                  malScore: richData.malScore,
+                  rating: richData.rating,
+                  studios: richData.studios,
+                  producers: richData.producers
+                });
+              }
+            })
+            .catch((err) => {
+              console.warn('[Watch] Failed to fetch v2 anime details:', err);
+            });
+        }
       } catch (err) {
         console.error("Failed to parse stored anime data:", err);
       }
