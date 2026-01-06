@@ -15,7 +15,7 @@ import { SearchSection } from "@/components/SearchSection";
 import { useTheme } from "@/hooks/use-theme";
 import { HomeSections } from "@/components/landing/HomeSections";
 import { AnimeItem } from "@/shared/types";
-import { useAnimeLists } from "@/hooks/use-anime-lists";
+import { useAnimeListsRouter } from "@/hooks/use-anime-lists-router";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
@@ -47,8 +47,8 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
   const [showInitialLoader, setShowInitialLoader] = useState(!hasLoadedBefore);
 
-  // Use only V1 hook
-  const animeData = useAnimeLists();
+  // Use router hook that switches between v1, v2, and v3 based on user preference
+  const animeData = useAnimeListsRouter();
 
   const {
     loading,

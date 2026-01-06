@@ -58,7 +58,7 @@ export function ProfileDashboard({
   onLogout,
 }: ProfileDashboardProps) {
   const { theme, setTheme } = useTheme();
-  // const { dataFlow, setDataFlow } = useDataFlow(); // Removed
+  const { dataFlow, setDataFlow } = useDataFlow();
   const safeContinueWatching = continueWatching ?? [];
   const safeWatchlist = watchlist ?? [];
 
@@ -103,6 +103,34 @@ export function ProfileDashboard({
         </div>
         <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
           Current theme: <span className="font-semibold text-[var(--nothing-fg,white)] capitalize">{theme}</span>
+        </p>
+      </div>
+
+      {/* API Version Switcher */}
+      <div className="bg-[var(--nothing-elevated,white/5)] border border-[var(--nothing-border,white/10)] rounded-lg p-6">
+        <h2 className="text-xl font-bold mb-4 text-[var(--nothing-fg,white)]">API Version Settings</h2>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            variant={dataFlow === "v1" ? "default" : "outline"}
+            onClick={() => setDataFlow("v1")}
+            className={dataFlow === "v1" ? "bg-green-600 hover:bg-green-700" : ""}
+          >
+            API v1 (Yuma - Current)
+          </Button>
+          <Button
+            variant={dataFlow === "v2" ? "default" : "outline"}
+            onClick={() => setDataFlow("v2")}
+            className={dataFlow === "v2" ? "bg-orange-600 hover:bg-orange-700" : ""}
+          >
+            API v2 (Hianime - New)
+          </Button>
+        </div>
+        <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
+          Current API: <span className="font-semibold text-[var(--nothing-fg,white)] uppercase">{dataFlow}</span>
+        </p>
+        <p className="text-xs text-[var(--nothing-gray-5,gray-500)] mt-2">
+          {dataFlow === "v1" && "Using Yuma API - Current stable version with all features"}
+          {dataFlow === "v2" && "Using Hianime API - New API with enhanced content and better search"}
         </p>
       </div>
 
