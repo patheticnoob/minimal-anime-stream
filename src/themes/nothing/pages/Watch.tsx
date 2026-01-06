@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, useLocation } from "react-router";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -360,17 +360,20 @@ export default function NothingWatch() {
     setCurrentAnimeInfo(animeInfo);
     setCurrentEpisodeData(normalizedEpisode);
 
-    setVideoSource(null);
+    // DON'T set videoSource to null - keep player mounted for seamless transitions
+    // Only clear intro/outro to prepare for new episode
     setVideoIntro(null);
     setVideoOutro(null);
 
-    // Auto-scroll to video player
-    setTimeout(() => {
-      const playerContainer = document.getElementById('video-player-container');
-      if (playerContainer) {
-        playerContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
+    // Auto-scroll to video player on first play only
+    if (!videoSource) {
+      setTimeout(() => {
+        const playerContainer = document.getElementById('video-player-container');
+        if (playerContainer) {
+          playerContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
 
     // Check cache first
     const cacheKey = `sources_${episode.id}_${audioPreference}`;
@@ -658,6 +661,7 @@ export default function NothingWatch() {
             {videoSource && currentEpisodeData && (
               <div id="video-player-container">
                 <NothingVideoPlayerV2
+                  key="nothing-player-persistent"
                   source={videoSource}
                   title={videoTitle}
                   tracks={videoTracks}

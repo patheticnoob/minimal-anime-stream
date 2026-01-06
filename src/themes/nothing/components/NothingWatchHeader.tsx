@@ -1,6 +1,6 @@
 import { ArrowLeft, Moon, Sun, Check, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 interface NothingWatchHeaderProps {
   title?: string;
@@ -10,20 +10,33 @@ interface NothingWatchHeaderProps {
   onToggleWatchlist: () => void;
 }
 
-export function NothingWatchHeader({ 
-  title, 
-  isDarkMode, 
-  toggleTheme, 
-  isInWatchlist, 
-  onToggleWatchlist 
+export function NothingWatchHeader({
+  title,
+  isDarkMode,
+  toggleTheme,
+  isInWatchlist,
+  onToggleWatchlist
 }: NothingWatchHeaderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBack = () => {
+    // If we have a previous location in state, navigate to it
+    // This preserves search results and other navigation context
+    const fromPath = (location.state as any)?.from;
+    if (fromPath) {
+      navigate(fromPath);
+    } else {
+      // Fallback to browser back
+      navigate(-1);
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#1A1D24]/95 backdrop-blur-lg border-b border-black/5 dark:border-white/10 transition-colors duration-300">
       <div className="max-w-[2000px] mx-auto px-6 py-4 flex items-center gap-4">
         <button
-          onClick={() => navigate("/")}
+          onClick={handleBack}
           className="flex items-center gap-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors group"
         >
           <div className="p-2 rounded-full bg-black/5 dark:bg-white/10 group-hover:bg-black/10 dark:group-hover:bg-white/20 transition-colors">

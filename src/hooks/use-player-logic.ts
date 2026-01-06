@@ -210,7 +210,8 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     setCurrentAnimeInfo(animeInfo);
     setCurrentEpisodeData(normalizedEpisode);
 
-    setVideoSource(null);
+    // DON'T set videoSource to null - keep player mounted for seamless transitions
+    // Only clear intro/outro/headers to prepare for new episode
     setVideoIntro(null);
     setVideoOutro(null);
     setVideoHeaders(null);

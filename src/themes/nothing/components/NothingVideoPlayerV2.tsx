@@ -709,7 +709,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         for (let i = 0; i < video.textTracks.length; i++) {
           const track = video.textTracks[i];
           if (track.kind === "metadata") continue;
-          
+
           if (i === defaultTrackIndex) {
             track.mode = "showing";
             console.log(`✅ Subtitle track ${i} (${track.label}) set to SHOWING`);
@@ -732,14 +732,33 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     video.textTracks.addEventListener?.("removetrack", handleTrackChange);
     video.textTracks.addEventListener?.("change", handleTrackChange);
 
+    // CRITICAL: Run immediately when tracks change, even after idle
+    // This ensures subtitles load after long idle periods
+    const initTimeout = setTimeout(() => {
+      if (video.textTracks.length > 0) {
+        updateSubtitles();
+      }
+    }, 100);
+
+    // Also run when video becomes ready after idle
+    const handleCanPlayThrough = () => {
+      if (video.textTracks.length > 0) {
+        updateSubtitles();
+      }
+    };
+
+    video.addEventListener("canplaythrough", handleCanPlayThrough);
+
     return () => {
       video.removeEventListener("loadedmetadata", updateSubtitles);
       video.removeEventListener("loadeddata", updateSubtitles);
+      video.removeEventListener("canplaythrough", handleCanPlayThrough);
       video.textTracks.removeEventListener?.("addtrack", handleTrackChange);
       video.textTracks.removeEventListener?.("removetrack", handleTrackChange);
       video.textTracks.removeEventListener?.("change", handleTrackChange);
+      clearTimeout(initTimeout);
     };
-  }, [tracks]);
+  }, [tracks, source]);
 
   // Add gamepad controls for video player
   useEffect(() => {

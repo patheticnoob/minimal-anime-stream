@@ -174,9 +174,26 @@ export function RetroVideoPlayer({
     }
   }, [source, resumeFrom]);
 
+  // Force subtitle reinitialization when source or tracks change (handles idle state)
   useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Reset subtitle selection when source changes
     if (tracks && tracks.length > 0) {
-      setSelectedSubtitle(getTrackLabel(tracks[0], 0));
+      // Wait for tracks to be loaded
+      const initSubtitles = () => {
+        if (video.textTracks.length > 0) {
+          setSelectedSubtitle(getTrackLabel(tracks[0], 0));
+        }
+      };
+
+      // Try immediately
+      initSubtitles();
+
+      // Also try after a short delay to handle async track loading
+      const timer = setTimeout(initSubtitles, 200);
+      return () => clearTimeout(timer);
     } else {
       setSelectedSubtitle("off");
     }
@@ -188,6 +205,26 @@ export function RetroVideoPlayer({
 
     const syncTracks = () => {
       const textTracks = video.textTracks;
+
+      // Initialize default subtitle on first load if selectedSubtitle is "off"
+      if (selectedSubtitle === "off" && tracks && tracks.length > 0) {
+        // Find English track or default track
+        for (let i = 0; i < textTracks.length; i += 1) {
+          const track = textTracks[i];
+          if (track.kind === "metadata") continue;
+
+          const label = (track.label || "").toLowerCase();
+          const lang = (track.language || "").toLowerCase();
+
+          if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
+            const derivedLabel = tracks && tracks[i] ? getTrackLabel(tracks[i], i) : track.label || `Track ${i + 1}`;
+            setSelectedSubtitle(derivedLabel);
+            console.log("✅ Auto-selected English subtitle:", derivedLabel);
+            return;
+          }
+        }
+      }
+
       for (let i = 0; i < textTracks.length; i += 1) {
         const derivedLabel =
           tracks && tracks[i]
@@ -200,10 +237,47 @@ export function RetroVideoPlayer({
       }
     };
 
-    syncTracks();
     video.addEventListener("loadeddata", syncTracks);
+    video.addEventListener("loadedmetadata", syncTracks);
+
+    // CRITICAL: Run immediately when tracks change, even after idle
+    // Multiple attempts to ensure subtitles load after idle state
+    const initTimeout1 = setTimeout(() => {
+      if (video.textTracks.length > 0) {
+        syncTracks();
+      }
+    }, 100);
+
+    const initTimeout2 = setTimeout(() => {
+      if (video.textTracks.length > 0) {
+        syncTracks();
+      }
+    }, 500);
+
+    // Also run when video becomes ready after idle
+    const handleCanPlayThrough = () => {
+      if (video.textTracks.length > 0) {
+        syncTracks();
+      }
+    };
+
+    const handlePlay = () => {
+      // Ensure subtitles are enabled when playback starts (handles idle wake-up)
+      if (video.textTracks.length > 0) {
+        syncTracks();
+      }
+    };
+
+    video.addEventListener("canplaythrough", handleCanPlayThrough);
+    video.addEventListener("play", handlePlay);
+
     return () => {
       video.removeEventListener("loadeddata", syncTracks);
+      video.removeEventListener("loadedmetadata", syncTracks);
+      video.removeEventListener("canplaythrough", handleCanPlayThrough);
+      video.removeEventListener("play", handlePlay);
+      clearTimeout(initTimeout1);
+      clearTimeout(initTimeout2);
     };
   }, [selectedSubtitle, tracks, source]);
 

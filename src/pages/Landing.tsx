@@ -6,7 +6,7 @@ import { HeroBanner } from "@/components/HeroBanner";
 import { Sidebar } from "@/components/Sidebar";
 import { AnimeCard } from "@/components/AnimeCard";
 import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { InfoModal } from "@/components/InfoModal";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { ProfileDashboard } from "@/components/ProfileDashboard";
@@ -34,10 +34,15 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { dataFlow } = useDataFlow();
-  
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
-  const [activeSection, setActiveSection] = useState("home");
+  // Initialize activeSection from URL params or default to "home"
+  const [activeSection, setActiveSection] = useState(() => {
+    const section = searchParams.get("section");
+    return section || "home";
+  });
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
   const [showInitialLoader, setShowInitialLoader] = useState(!hasLoadedBefore);
@@ -56,14 +61,25 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     airingLoading,
     moviesLoading,
     tvShowsLoading,
-    query,
-    setQuery,
+    query: animeDataQuery,
+    setQuery: setAnimeDataQuery,
     searchResults,
     isSearching,
     loadMoreItems,
     loadingMore,
     hasMore
   } = animeData;
+
+  // Sync query with URL params
+  const query = searchParams.get("q") || animeDataQuery;
+  const setQuery = (newQuery: string) => {
+    setAnimeDataQuery(newQuery);
+    if (newQuery) {
+      setSearchParams({ section: "search", q: newQuery });
+    } else if (activeSection === "search") {
+      setSearchParams({ section: "search" });
+    }
+  };
 
   const {
     selected,
@@ -100,6 +116,17 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     selected?.dataId ? { animeId: selected.dataId } : "skip"
   );
 
+  // Initialize query from URL params on mount
+  useEffect(() => {
+    const section = searchParams.get("section");
+    const urlQuery = searchParams.get("q");
+
+    if (section === "search" && urlQuery) {
+      setActiveSection("search");
+      setAnimeDataQuery(urlQuery);
+    }
+  }, []); // Only run once on mount
+
   // Hide initial loader after 3 seconds on first visit only
   useEffect(() => {
     if (!hasLoadedBefore) {
@@ -128,9 +155,13 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     if (theme === "nothing") {
       // Pass anime data through localStorage
       localStorage.setItem(`anime_${anime.dataId}`, JSON.stringify(anime));
-      
-      // Navigate immediately - Watch page will use cached data or fetch
-      navigate(`/watch/${anime.dataId}`);
+
+      // Navigate and preserve the current URL state for back navigation
+      // This allows users to return to search results with the query preserved
+      const currentPath = window.location.pathname + window.location.search;
+      navigate(`/watch/${anime.dataId}`, {
+        state: { from: currentPath }
+      });
       return;
     }
 
@@ -139,7 +170,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       ...anime,
       language: anime.language || { sub: null, dub: null }
     };
-    
+
     setSelected(animeWithLanguage);
     setLastSelectedAnime(animeWithLanguage);
   };
@@ -308,8 +339,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
               navigate("/auth");
               return;
             }
-            if (section === "search") setQuery("");
             setActiveSection(section);
+            if (section === "search") {
+              setSearchParams({ section: "search" });
+            } else {
+              setSearchParams({});
+            }
           }}
           isAuthenticated={isAuthenticated}
           onLogout={async () => {
@@ -331,8 +366,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
               navigate("/auth");
               return;
             }
-            if (section === "search") setQuery("");
             setActiveSection(section);
+            if (section === "search") {
+              setSearchParams({ section: "search" });
+            } else {
+              setSearchParams({});
+            }
           }}
         />
       )}
@@ -451,6 +490,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
         <>
           {theme === "retro" ? (
             <RetroVideoPlayer
+              key="retro-player-persistent"
               source={videoSource}
               title={videoTitle}
               tracks={videoTracks}
@@ -459,10 +499,10 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
               onClose={closePlayer}
               onProgressUpdate={handleProgressUpdate}
               resumeFrom={
-                animeProgress && 
+                animeProgress &&
                 currentEpisodeData &&
-                animeProgress.episodeId === currentEpisodeData.id && 
-                animeProgress.currentTime > 0 && 
+                animeProgress.episodeId === currentEpisodeData.id &&
+                animeProgress.currentTime > 0 &&
                 animeProgress.duration > 0
                   ? animeProgress.currentTime
                   : 0
@@ -474,6 +514,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
             />
           ) : (
             <VideoPlayer
+              key="classic-player-persistent"
               source={videoSource}
               title={videoTitle}
               tracks={videoTracks}
@@ -483,10 +524,10 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
               onClose={closePlayer}
               onProgressUpdate={handleProgressUpdate}
               resumeFrom={
-                animeProgress && 
+                animeProgress &&
                 currentEpisodeData &&
-                animeProgress.episodeId === currentEpisodeData.id && 
-                animeProgress.currentTime > 0 && 
+                animeProgress.episodeId === currentEpisodeData.id &&
+                animeProgress.currentTime > 0 &&
                 animeProgress.duration > 0
                   ? animeProgress.currentTime
                   : 0

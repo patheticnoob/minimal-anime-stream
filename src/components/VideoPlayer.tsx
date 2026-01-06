@@ -715,7 +715,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
       for (let i = 0; i < video.textTracks.length; i++) {
         const track = video.textTracks[i];
         if (track.kind === "metadata") continue;
-        
+
         tracksList.push({
           index: i,
           label: track.label || track.language || `Track ${i + 1}`,
@@ -725,7 +725,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
       setSubtitles(tracksList);
 
       let defaultTrackIndex = -1;
-      
+
       // First priority: Check for default track from API
       if (tracks && tracks.length > 0) {
         const defaultTrack = tracks.find(t => t.default === true && t.kind !== "thumbnails");
@@ -743,7 +743,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           }
         }
       }
-      
+
       // Second priority: Find English track
       if (defaultTrackIndex === -1) {
         for (let i = 0; i < video.textTracks.length; i++) {
@@ -751,7 +751,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           if (track.kind === "metadata") continue;
           const label = (track.label || "").toLowerCase();
           const lang = (track.language || "").toLowerCase();
-          
+
           if (label.includes("english") || lang === "en" || lang === "eng" || lang.startsWith("en-")) {
             defaultTrackIndex = i;
             console.log("✅ English subtitles enabled as default");
@@ -767,8 +767,9 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         }
         video.textTracks[defaultTrackIndex].mode = "showing";
         setCurrentSubtitle(defaultTrackIndex);
+        setShowSubtitles(true);
         console.log(`✅ Subtitle track ${defaultTrackIndex} set to showing mode`);
-        
+
         // Sync with Cast if casting
         if (isCasting && tracks && changeCastSubtitle) {
           const selectedTrack = tracks.find((_, idx) => {
@@ -783,7 +784,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
             }
             return false;
           });
-          
+
           if (selectedTrack) {
             console.log('🔄 Syncing default subtitle to Cast:', selectedTrack.label);
             changeCastSubtitle(selectedTrack.file);
@@ -793,16 +794,48 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     };
 
     video.addEventListener("loadedmetadata", updateSubtitles);
-    
-    // Also run immediately if metadata is already loaded
-    if (video.readyState >= 1) {
-      updateSubtitles();
-    }
-    
+    video.addEventListener("loadeddata", updateSubtitles);
+
+    // CRITICAL: Run immediately when tracks change, even after idle
+    // Multiple attempts to ensure subtitles load after idle state
+    const initTimeout1 = setTimeout(() => {
+      if (video.textTracks.length > 0) {
+        updateSubtitles();
+      }
+    }, 100);
+
+    const initTimeout2 = setTimeout(() => {
+      if (video.textTracks.length > 0) {
+        updateSubtitles();
+      }
+    }, 500);
+
+    // Also run when video becomes ready after idle
+    const handleCanPlayThrough = () => {
+      if (video.textTracks.length > 0) {
+        updateSubtitles();
+      }
+    };
+
+    const handlePlay = () => {
+      // Ensure subtitles are enabled when playback starts (handles idle wake-up)
+      if (video.textTracks.length > 0) {
+        updateSubtitles();
+      }
+    };
+
+    video.addEventListener("canplaythrough", handleCanPlayThrough);
+    video.addEventListener("play", handlePlay);
+
     return () => {
       video.removeEventListener("loadedmetadata", updateSubtitles);
+      video.removeEventListener("loadeddata", updateSubtitles);
+      video.removeEventListener("canplaythrough", handleCanPlayThrough);
+      video.removeEventListener("play", handlePlay);
+      clearTimeout(initTimeout1);
+      clearTimeout(initTimeout2);
     };
-  }, [tracks, isCasting, changeCastSubtitle]);
+  }, [tracks, source, isCasting, changeCastSubtitle]);
 
   // Keyboard shortcuts
   useEffect(() => {
