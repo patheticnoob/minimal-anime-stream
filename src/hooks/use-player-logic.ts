@@ -299,9 +299,9 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         headers?: Record<string, string>;
       };
 
-      // If dub is selected, also fetch subtitles from sub server
+      // If dub is selected, always fetch subtitles from sub server (dub never has subtitles)
       let finalTracks = sourcesData.tracks || [];
-      if (audioPreference === "dub" && (!finalTracks || finalTracks.length === 0)) {
+      if (audioPreference === "dub") {
         try {
           const subServers = serverData.sub;
           if (subServers && subServers.length > 0) {

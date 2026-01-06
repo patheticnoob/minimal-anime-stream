@@ -474,9 +474,9 @@ export default function NothingWatch() {
         outro?: { start: number; end: number };
       };
 
-      // If dub is selected, also fetch subtitles from sub server
+      // If dub is selected, always fetch subtitles from sub server (dub never has subtitles)
       let finalTracks = sourcesData.tracks || [];
-      if (audioPreference === "dub" && (!finalTracks || finalTracks.length === 0)) {
+      if (audioPreference === "dub") {
         try {
           const subServers = serverData.sub;
           if (subServers && subServers.length > 0) {
