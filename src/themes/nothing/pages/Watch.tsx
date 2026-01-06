@@ -4,6 +4,8 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
+import { useDataFlow } from "@/hooks/use-data-flow";
+import { fetchHianimeAnimeDetails } from "@/lib/external-api-v2";
 import { NothingVideoPlayerV2 } from "../components/NothingVideoPlayerV2";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
@@ -62,6 +64,7 @@ export default function NothingWatch() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isDarkMode, toggleTheme } = useNothingTheme();
+  const { dataFlow } = useDataFlow();
   const { buttonPressed } = useGamepad();
 
   const fetchEpisodes = useAction(api.hianime.episodes);
@@ -123,6 +126,25 @@ export default function NothingWatch() {
       try {
         const animeData = JSON.parse(storedAnime);
         setAnime(animeData);
+
+        // If using v2 API, fetch rich anime details
+        if (dataFlow === "v2") {
+          console.log('[Watch v2] Fetching rich anime details for:', animeId);
+          fetchHianimeAnimeDetails(animeId)
+            .then((richData) => {
+              if (richData) {
+                console.log('[Watch v2] Rich data received:', richData);
+                // Merge rich data with existing anime data
+                setAnime(prev => ({
+                  ...prev,
+                  ...richData
+                }));
+              }
+            })
+            .catch((err) => {
+              console.error('[Watch v2] Failed to fetch rich data:', err);
+            });
+        }
       } catch (err) {
         console.error("Failed to parse stored anime data:", err);
       }
@@ -193,7 +215,7 @@ export default function NothingWatch() {
         }, 500);
       }
     }
-  }, [animeId, fetchEpisodes, navigate]);
+  }, [animeId, fetchEpisodes, navigate, dataFlow]);
 
   // Helper function to prefetch episode sources
   const prefetchEpisodeSources = async (normalizedEpisodes: Episode[], animeData: any) => {

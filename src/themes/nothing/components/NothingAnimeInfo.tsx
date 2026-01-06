@@ -1,4 +1,4 @@
-import { Play, Clock3 } from "lucide-react";
+import { Play, Clock3, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type BroadcastInfo } from "@/types/broadcast";
 
@@ -44,6 +44,12 @@ export function NothingAnimeInfo({
         <div className="flex-1 space-y-6">
           <div>
             <h2 className="text-4xl font-bold mb-3 tracking-tight leading-tight text-[#050814] dark:text-white">{anime?.title || "Unknown Title"}</h2>
+
+            {/* Alternative Title */}
+            {anime?.alternativeTitle && (
+              <p className="text-sm text-black/50 dark:text-white/50 mb-3 italic">{anime.alternativeTitle}</p>
+            )}
+
             <div className="flex items-center gap-3 flex-wrap">
               {anime?.type && (
                 <span className="px-3 py-1 rounded-full border border-black/10 dark:border-white/20 text-xs font-medium tracking-wider uppercase text-black/60 dark:text-white/60">
@@ -65,7 +71,76 @@ export function NothingAnimeInfo({
                   {episodeCount} Episodes
                 </span>
               )}
+              {anime?.quality && (
+                <span className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 text-xs font-bold tracking-wider uppercase">
+                  {anime.quality}
+                </span>
+              )}
+              {anime?.rating && (
+                <span className="px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-600 dark:text-orange-400 text-xs font-bold tracking-wider uppercase">
+                  {anime.rating}
+                </span>
+              )}
+              {anime?.status && (
+                <span className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-400 text-xs font-medium tracking-wider uppercase">
+                  {anime.status}
+                </span>
+              )}
+              {anime?.malScore && (
+                <span className="px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-700 dark:text-yellow-400 text-xs font-bold tracking-wider uppercase flex items-center gap-1">
+                  <Star className="w-3 h-3 fill-current" />
+                  {anime.malScore}
+                </span>
+              )}
             </div>
+
+            {/* Genres */}
+            {anime?.genres && anime.genres.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {anime.genres.map((genre: string, idx: number) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-xs font-medium text-black/70 dark:text-white/70"
+                  >
+                    {genre}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Synopsis */}
+            {anime?.synopsis && (
+              <div className="mt-4 p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10">
+                <h3 className="text-xs font-bold tracking-[0.2em] text-black/40 dark:text-white/40 uppercase mb-2">Synopsis</h3>
+                <p className="text-sm text-black/70 dark:text-white/70 leading-relaxed">
+                  {anime.synopsis}
+                </p>
+              </div>
+            )}
+
+            {/* Additional Info (Premiered, Studios, Producers) */}
+            {(anime?.premiered || anime?.studios || anime?.producers) && (
+              <div className="mt-4 space-y-2">
+                {anime.premiered && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-semibold text-black/60 dark:text-white/60">Premiered:</span>
+                    <span className="text-black/80 dark:text-white/80">{anime.premiered}</span>
+                  </div>
+                )}
+                {anime.studios && anime.studios.length > 0 && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-semibold text-black/60 dark:text-white/60">Studios:</span>
+                    <span className="text-black/80 dark:text-white/80">{anime.studios.join(", ")}</span>
+                  </div>
+                )}
+                {anime.producers && anime.producers.length > 0 && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-semibold text-black/60 dark:text-white/60">Producers:</span>
+                    <span className="text-black/80 dark:text-white/80">{anime.producers.join(", ")}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {(anime?.language?.sub || anime?.language?.dub) && (
