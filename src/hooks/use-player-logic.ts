@@ -66,13 +66,45 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     try {
       const servers = await fetchServers({ episodeId });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
-      
+
       const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
       const hd2Server = targetServers?.find(s => s.name === "HD-2") || targetServers?.[0];
-      
+
       if (hd2Server) {
         const sources = await fetchSources({ serverId: hd2Server.id });
-        animeCache.set(cacheKey, sources, 5);
+        const sourcesData = sources as {
+          sources: Array<{ file: string; type: string }>;
+          tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
+          intro?: { start: number; end: number };
+          outro?: { start: number; end: number };
+          headers?: Record<string, string>;
+        };
+
+        // If dub is selected, also fetch subtitles from sub server
+        let finalTracks = sourcesData.tracks || [];
+        if (audioPreference === "dub") {
+          try {
+            const subServers = serverData.sub;
+            if (subServers && subServers.length > 0) {
+              const subHd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
+              if (subHd2Server) {
+                const subSources = await fetchSources({ serverId: subHd2Server.id });
+                const subSourcesData = subSources as {
+                  tracks?: Array<{ file: string; label: string; kind?: string; default?: boolean }>;
+                };
+                if (subSourcesData.tracks && subSourcesData.tracks.length > 0) {
+                  finalTracks = subSourcesData.tracks;
+                }
+              }
+            }
+          } catch (err) {
+            console.warn('Failed to fetch subtitles from sub server during prefetch:', err);
+          }
+        }
+
+        // Cache with merged subtitles if dub
+        const cacheData = { ...sourcesData, tracks: finalTracks };
+        animeCache.set(cacheKey, cacheData, 5);
       }
     } catch (err) {
       console.warn('Prefetch failed for episode:', episodeId, err);

@@ -198,40 +198,102 @@ export default function NothingWatch() {
   // Helper function to prefetch episode sources
   const prefetchEpisodeSources = async (normalizedEpisodes: Episode[], animeData: any) => {
     // Determine which episode to prefetch (last watched or first)
-    const targetEpisode = animeProgress?.episodeId 
+    const targetEpisode = animeProgress?.episodeId
       ? normalizedEpisodes.find(ep => ep.id === animeProgress.episodeId)
       : normalizedEpisodes[0];
-    
+
     if (!targetEpisode) return;
-    
-    const cacheKey = `sources_${targetEpisode.id}`;
+
+    const cacheKey = `sources_${targetEpisode.id}_${audioPreference}`;
     if (animeCache.has(cacheKey)) return;
 
     try {
       const servers = await fetchServers({ episodeId: targetEpisode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
-      
-      const subServers = serverData.sub || [];
-      const hd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
-      
+
+      const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
+      const hd2Server = targetServers?.find(s => s.name === "HD-2") || targetServers?.[0];
+
       if (hd2Server) {
         const sources = await fetchSources({ serverId: hd2Server.id });
-        animeCache.set(cacheKey, sources, 5);
-        
+        const sourcesData = sources as {
+          sources: Array<{ file: string; type: string }>;
+          tracks?: Array<{ file: string; label: string; kind?: string }>;
+          intro?: { start: number; end: number };
+          outro?: { start: number; end: number };
+        };
+
+        // If dub is selected, also fetch subtitles from sub server
+        let finalTracks = sourcesData.tracks || [];
+        if (audioPreference === "dub") {
+          try {
+            const subServers = serverData.sub;
+            if (subServers && subServers.length > 0) {
+              const subHd2Server = subServers.find(s => s.name === "HD-2") || subServers[0];
+              if (subHd2Server) {
+                const subSources = await fetchSources({ serverId: subHd2Server.id });
+                const subSourcesData = subSources as {
+                  tracks?: Array<{ file: string; label: string; kind?: string }>;
+                };
+                if (subSourcesData.tracks && subSourcesData.tracks.length > 0) {
+                  finalTracks = subSourcesData.tracks;
+                }
+              }
+            }
+          } catch (err) {
+            console.warn('Failed to fetch subtitles from sub server during prefetch:', err);
+          }
+        }
+
+        // Cache with merged subtitles if dub
+        const cacheData = { ...sourcesData, tracks: finalTracks };
+        animeCache.set(cacheKey, cacheData, 5);
+
         // Also prefetch next episode
         const targetIndex = normalizedEpisodes.findIndex(ep => ep.id === targetEpisode.id);
         if (targetIndex !== -1 && normalizedEpisodes[targetIndex + 1]) {
           const nextEpisode = normalizedEpisodes[targetIndex + 1];
-          const nextCacheKey = `sources_${nextEpisode.id}`;
-          
+          const nextCacheKey = `sources_${nextEpisode.id}_${audioPreference}`;
+
           if (!animeCache.has(nextCacheKey)) {
             const nextServers = await fetchServers({ episodeId: nextEpisode.id });
             const nextServerData = nextServers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
-            const nextHd2Server = nextServerData.sub?.find(s => s.name === "HD-2") || nextServerData.sub?.[0];
-            
+            const nextTargetServers = audioPreference === "sub" ? nextServerData.sub : nextServerData.dub;
+            const nextHd2Server = nextTargetServers?.find(s => s.name === "HD-2") || nextTargetServers?.[0];
+
             if (nextHd2Server) {
               const nextSources = await fetchSources({ serverId: nextHd2Server.id });
-              animeCache.set(nextCacheKey, nextSources, 5);
+              const nextSourcesData = nextSources as {
+                sources: Array<{ file: string; type: string }>;
+                tracks?: Array<{ file: string; label: string; kind?: string }>;
+                intro?: { start: number; end: number };
+                outro?: { start: number; end: number };
+              };
+
+              // If dub is selected, also fetch subtitles from sub server for next episode
+              let nextFinalTracks = nextSourcesData.tracks || [];
+              if (audioPreference === "dub") {
+                try {
+                  const nextSubServers = nextServerData.sub;
+                  if (nextSubServers && nextSubServers.length > 0) {
+                    const nextSubHd2Server = nextSubServers.find(s => s.name === "HD-2") || nextSubServers[0];
+                    if (nextSubHd2Server) {
+                      const nextSubSources = await fetchSources({ serverId: nextSubHd2Server.id });
+                      const nextSubSourcesData = nextSubSources as {
+                        tracks?: Array<{ file: string; label: string; kind?: string }>;
+                      };
+                      if (nextSubSourcesData.tracks && nextSubSourcesData.tracks.length > 0) {
+                        nextFinalTracks = nextSubSourcesData.tracks;
+                      }
+                    }
+                  }
+                } catch (err) {
+                  console.warn('Failed to fetch subtitles from sub server during next episode prefetch:', err);
+                }
+              }
+
+              const nextCacheData = { ...nextSourcesData, tracks: nextFinalTracks };
+              animeCache.set(nextCacheKey, nextCacheData, 5);
             }
           }
         }
