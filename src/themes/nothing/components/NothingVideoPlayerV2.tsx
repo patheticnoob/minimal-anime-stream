@@ -740,6 +740,19 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       }
     }, 100);
 
+    // Delayed reload after 3 seconds of playback to ensure subtitles are loaded
+    // This fixes cases where initial load attempts failed or tracks weren't ready
+    let playbackTimeout: number | null = null;
+    const handlePlayForDelayedReload = () => {
+      if (playbackTimeout) clearTimeout(playbackTimeout);
+      playbackTimeout = window.setTimeout(() => {
+        if (video.textTracks.length > 0 && !video.paused) {
+          console.log("🔄 Reloading subtitles 3s after playback start");
+          updateSubtitles();
+        }
+      }, 3000);
+    };
+
     // Also run when video becomes ready after idle
     const handleCanPlayThrough = () => {
       if (video.textTracks.length > 0) {
@@ -747,16 +760,27 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       }
     };
 
+    const handlePlay = () => {
+      if (video.textTracks.length > 0) {
+        updateSubtitles();
+      }
+      // Schedule delayed reload
+      handlePlayForDelayedReload();
+    };
+
     video.addEventListener("canplaythrough", handleCanPlayThrough);
+    video.addEventListener("play", handlePlay);
 
     return () => {
       video.removeEventListener("loadedmetadata", updateSubtitles);
       video.removeEventListener("loadeddata", updateSubtitles);
       video.removeEventListener("canplaythrough", handleCanPlayThrough);
+      video.removeEventListener("play", handlePlay);
       video.textTracks.removeEventListener?.("addtrack", handleTrackChange);
       video.textTracks.removeEventListener?.("removetrack", handleTrackChange);
       video.textTracks.removeEventListener?.("change", handleTrackChange);
       clearTimeout(initTimeout);
+      if (playbackTimeout) clearTimeout(playbackTimeout);
     };
   }, [tracks, source]);
 
