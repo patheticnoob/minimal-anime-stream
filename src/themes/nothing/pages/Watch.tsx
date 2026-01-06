@@ -5,7 +5,6 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useDataFlow } from "@/hooks/use-data-flow";
-import { fetchHianimeAnimeDetails } from "@/lib/external-api-v2";
 import { NothingVideoPlayerV2 } from "../components/NothingVideoPlayerV2";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
@@ -127,24 +126,14 @@ export default function NothingWatch() {
         const animeData = JSON.parse(storedAnime);
         setAnime(animeData);
 
-        // If using v2 API, fetch rich anime details
-        if (dataFlow === "v2") {
-          console.log('[Watch v2] Fetching rich anime details for:', animeId);
-          fetchHianimeAnimeDetails(animeId)
-            .then((richData) => {
-              if (richData) {
-                console.log('[Watch v2] Rich data received:', richData);
-                // Merge rich data with existing anime data
-                setAnime(prev => ({
-                  ...prev,
-                  ...richData
-                }));
-              }
-            })
-            .catch((err) => {
-              console.error('[Watch v2] Failed to fetch rich data:', err);
-            });
-        }
+        // Rich v2 data is already included in animeData from landing page
+        // No need to fetch again as it was already fetched when listing
+        console.log('[Watch] Loaded anime data:', {
+          id: animeData.id,
+          title: animeData.title,
+          hasV2Data: !!(animeData.genres || animeData.synopsis || animeData.malScore),
+          dataFlow
+        });
       } catch (err) {
         console.error("Failed to parse stored anime data:", err);
       }
