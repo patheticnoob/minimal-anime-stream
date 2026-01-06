@@ -60,6 +60,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [showSkipOutro, setShowSkipOutro] = useState(false);
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const isManualSubtitleChange = useRef(false);
 
   const { isCasting, castAvailable, handleCastClick, changeCastSubtitle, resyncCastSubtitles } = useCast(
     source, 
@@ -607,6 +608,9 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
     console.log(`🎬 Changing subtitle to track ${trackIndex}`);
 
+    // Set flag to prevent auto-update from overriding our manual change
+    isManualSubtitleChange.current = true;
+
     // First, disable/hide all text tracks
     for (let i = 0; i < video.textTracks.length; i++) {
       const track = video.textTracks[i];
@@ -650,6 +654,12 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         changeCastSubtitle('');
       }
     }
+
+    // Reset flag after a short delay to allow for future auto-updates
+    setTimeout(() => {
+      isManualSubtitleChange.current = false;
+    }, 500);
+
     setShowSubtitles(false);
   };
 
@@ -723,6 +733,11 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     };
 
     const handleTrackChange = () => {
+      // Don't auto-update if this is a manual subtitle change
+      if (isManualSubtitleChange.current) {
+        console.log('⏭️ Skipping auto-update (manual change in progress)');
+        return;
+      }
       requestAnimationFrame(updateSubtitles);
     };
 
