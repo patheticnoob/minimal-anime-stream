@@ -607,14 +607,14 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
     console.log(`🎬 Changing subtitle to track ${trackIndex}`);
 
-    // Disable all text tracks first
+    // First, disable/hide all text tracks
     for (let i = 0; i < video.textTracks.length; i++) {
       const track = video.textTracks[i];
       if (track.kind === "metadata") continue;
-      track.mode = "disabled";
+      track.mode = "hidden";
     }
 
-    // Enable the selected track
+    // Enable the selected track or disable all if -1
     if (trackIndex >= 0 && trackIndex < video.textTracks.length) {
       const selectedTrack = video.textTracks[trackIndex];
       if (selectedTrack.kind !== "metadata") {
@@ -622,7 +622,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         console.log(`✅ Enabled subtitle track ${trackIndex}: ${selectedTrack.label}`);
       }
       setCurrentSubtitle(trackIndex);
-      
+
       // Sync with Cast if casting
       if (isCasting && changeCastSubtitle && tracks) {
         const selectedApiTrack = tracks.find((_, idx) => {
@@ -635,7 +635,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           }
           return false;
         });
-        
+
         if (selectedApiTrack) {
           console.log(`📺 Syncing Cast subtitle: ${selectedApiTrack.label}`);
           changeCastSubtitle(selectedApiTrack.file);
@@ -644,7 +644,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     } else {
       console.log(`❌ Disabled all subtitles`);
       setCurrentSubtitle(-1);
-      
+
       // Turn off Cast subtitles
       if (isCasting && changeCastSubtitle) {
         changeCastSubtitle('');
