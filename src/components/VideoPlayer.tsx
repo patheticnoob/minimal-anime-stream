@@ -173,6 +173,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     const video = videoRef.current;
     if (!video || !source) return;
 
+    // Reset the progress restoration flag when source changes (new episode)
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
 
@@ -267,7 +268,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         });
       });
     }
-  }, [source, resumeFrom]);
+  }, [source]);
 
   // Update progress - save every 5 seconds and on key events
   useEffect(() => {

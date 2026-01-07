@@ -86,6 +86,7 @@ export default function Watch() {
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState<number | null>(null);
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
+  const [initialResumeTime, setInitialResumeTime] = useState<number>(0);
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
   const [focusedEpisodeIndex, setFocusedEpisodeIndex] = useState(0);
@@ -312,6 +313,23 @@ export default function Watch() {
     setCurrentAnimeInfo(animeInfo);
     setCurrentEpisodeData(normalizedEpisode);
 
+    // Calculate and store the initial resume time for this episode ONCE
+    const shouldResume =
+      animeProgress &&
+      animeProgress.episodeId === episode.id &&
+      animeProgress.currentTime > 0 &&
+      animeProgress.duration > 0;
+
+    const resumeTime = shouldResume ? animeProgress.currentTime : 0;
+    setInitialResumeTime(resumeTime);
+
+    console.log('🎬 Loading episode:', {
+      episodeId: episode.id,
+      savedEpisodeId: animeProgress?.episodeId,
+      shouldResume,
+      resumeTime
+    });
+
     setVideoSource(null);
     setVideoIntro(null);
     setVideoOutro(null);
@@ -515,24 +533,6 @@ export default function Watch() {
             {videoSource && currentEpisodeData ? (
               (() => {
                 const PlayerComponent = theme === "retro" ? RetroVideoPlayer : VideoPlayer;
-                // Calculate resumeFrom ONLY for the current episode being played
-                const shouldResume =
-                  animeProgress &&
-                  currentEpisodeData &&
-                  animeProgress.episodeId === currentEpisodeData.id &&
-                  animeProgress.currentTime > 0 &&
-                  animeProgress.duration > 0;
-
-                const resumeTime = shouldResume ? animeProgress.currentTime : 0;
-
-                console.log('🎬 VideoPlayer render:', {
-                  currentEpisodeId: currentEpisodeData.id,
-                  savedEpisodeId: animeProgress?.episodeId,
-                  shouldResume,
-                  resumeTime,
-                  intro: videoIntro,
-                  outro: videoOutro
-                });
 
                 return (
                   <PlayerComponent
@@ -542,7 +542,7 @@ export default function Watch() {
                     tracks={videoTracks}
                     intro={videoIntro}
                     outro={videoOutro}
-                    resumeFrom={resumeTime}
+                    resumeFrom={initialResumeTime}
                     onProgressUpdate={handleProgressUpdate}
                     onNext={() => {
                       if (currentEpisodeIndex === null) return;
@@ -562,6 +562,7 @@ export default function Watch() {
                       setVideoOutro(null);
                       setCurrentEpisodeData(null);
                       setCurrentAnimeInfo(null);
+                      setInitialResumeTime(0);
                     }}
                   />
                 );

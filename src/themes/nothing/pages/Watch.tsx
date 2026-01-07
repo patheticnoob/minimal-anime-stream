@@ -84,9 +84,10 @@ export default function NothingWatch() {
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState<number | null>(null);
   const [currentEpisodeData, setCurrentEpisodeData] = useState<Episode | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
+  const [initialResumeTime, setInitialResumeTime] = useState<number>(0);
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
-  
+
   // Audio preference state (sub/dub)
   const [audioPreference, setAudioPreference] = useState<"sub" | "dub">(() => {
     const saved = localStorage.getItem("audioPreference");
@@ -471,6 +472,23 @@ export default function NothingWatch() {
     setCurrentAnimeInfo(animeInfo);
     setCurrentEpisodeData(normalizedEpisode);
 
+    // Calculate and store the initial resume time for this episode ONCE
+    const shouldResume =
+      animeProgress &&
+      animeProgress.episodeId === episode.id &&
+      animeProgress.currentTime > 0 &&
+      animeProgress.duration > 0;
+
+    const resumeTime = shouldResume ? animeProgress.currentTime : 0;
+    setInitialResumeTime(resumeTime);
+
+    console.log('🎬 Loading episode:', {
+      episodeId: episode.id,
+      savedEpisodeId: animeProgress?.episodeId,
+      shouldResume,
+      resumeTime
+    });
+
     // DON'T set videoSource to null - keep player mounted for seamless transitions
     // Only clear intro/outro to prepare for new episode
     setVideoIntro(null);
@@ -793,52 +811,34 @@ export default function NothingWatch() {
             />
 
             {/* Video Player - Only shown when episode is playing */}
-            {videoSource && currentEpisodeData && (() => {
-              // Calculate resumeFrom ONLY for the current episode being played
-              const shouldResume =
-                animeProgress &&
-                currentEpisodeData &&
-                animeProgress.episodeId === currentEpisodeData.id &&
-                animeProgress.currentTime > 0 &&
-                animeProgress.duration > 0;
-
-              const resumeTime = shouldResume ? animeProgress.currentTime : 0;
-
-              console.log('🎬 NothingVideoPlayer render:', {
-                currentEpisodeId: currentEpisodeData.id,
-                savedEpisodeId: animeProgress?.episodeId,
-                shouldResume,
-                resumeTime,
-                intro: videoIntro,
-                outro: videoOutro
-              });
-
-              return (
-                <div id="video-player-container">
-                  <NothingVideoPlayerV2
-                    key={currentEpisodeData.id}
-                    source={videoSource}
-                    title={videoTitle}
-                    tracks={videoTracks}
-                    intro={videoIntro}
-                    outro={videoOutro}
-                    onClose={() => setVideoSource(null)}
-                    resumeFrom={resumeTime}
-                    onProgressUpdate={handleProgressUpdate}
-                    onNext={() => {
-                      if (currentEpisodeIndex === null) return;
-                      const next = episodes[currentEpisodeIndex + 1];
-                      if (next) playEpisode(next);
-                    }}
-                    nextTitle={
-                      currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
-                        ? `${anime?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
-                        : undefined
-                    }
-                  />
-                </div>
-              );
-            })()}
+            {videoSource && currentEpisodeData && (
+              <div id="video-player-container">
+                <NothingVideoPlayerV2
+                  key={currentEpisodeData.id}
+                  source={videoSource}
+                  title={videoTitle}
+                  tracks={videoTracks}
+                  intro={videoIntro}
+                  outro={videoOutro}
+                  onClose={() => {
+                    setVideoSource(null);
+                    setInitialResumeTime(0);
+                  }}
+                  resumeFrom={initialResumeTime}
+                  onProgressUpdate={handleProgressUpdate}
+                  onNext={() => {
+                    if (currentEpisodeIndex === null) return;
+                    const next = episodes[currentEpisodeIndex + 1];
+                    if (next) playEpisode(next);
+                  }}
+                  nextTitle={
+                    currentEpisodeIndex !== null && episodes[currentEpisodeIndex + 1]
+                      ? `${anime?.title} • Ep ${episodes[currentEpisodeIndex + 1].number ?? "?"}`
+                      : undefined
+                  }
+                />
+              </div>
+            )}
           </div>
 
           {/* Right: Episode List */}
