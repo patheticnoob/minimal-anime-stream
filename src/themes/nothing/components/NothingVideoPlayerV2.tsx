@@ -179,7 +179,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const video = videoRef.current;
     if (!video || !source) return;
 
-    // Reset progress restoration flag when source changes
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
 
@@ -225,7 +224,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
               hasRestoredProgress.current = true;
             } else {
               console.log("▶️ Starting from beginning");
-              video.currentTime = 0;
             }
             video.play().catch((err) => {
               console.log("Autoplay prevented:", err);
@@ -254,7 +252,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
               hasRestoredProgress.current = true;
             } else {
               console.log("▶️ Starting from beginning");
-              video.currentTime = 0;
             }
             video.play().catch((err) => {
               console.log("Autoplay prevented:", err);
@@ -269,8 +266,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           video.currentTime = resumeFrom;
           hasRestoredProgress.current = true;
           console.log("Resuming from:", resumeFrom);
-        } else {
-          video.currentTime = 0;
         }
         video.play().catch((err) => {
           console.log("Autoplay prevented:", err);

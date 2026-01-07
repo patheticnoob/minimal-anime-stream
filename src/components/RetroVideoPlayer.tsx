@@ -137,8 +137,6 @@ export function RetroVideoPlayer({
             if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
               video.currentTime = resumeFrom;
               hasRestoredProgress.current = true;
-            } else {
-              video.currentTime = 0;
             }
             video.play().catch(() => {});
           });
@@ -159,8 +157,6 @@ export function RetroVideoPlayer({
             if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
               video.currentTime = resumeFrom;
               hasRestoredProgress.current = true;
-            } else {
-              video.currentTime = 0;
             }
             video.play().catch(() => {});
           });
@@ -172,13 +168,11 @@ export function RetroVideoPlayer({
         if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
           video.currentTime = resumeFrom;
           hasRestoredProgress.current = true;
-        } else {
-          video.currentTime = 0;
         }
         video.play().catch(() => {});
       });
     }
-  }, [source]);
+  }, [source, resumeFrom]);
 
   // Force subtitle reinitialization when source or tracks change (handles idle state)
   useEffect(() => {
