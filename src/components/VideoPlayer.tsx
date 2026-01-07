@@ -272,7 +272,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
         });
       });
     }
-  }, [source, resumeFrom]);
+  }, [source]);
 
   // Update progress - save every 5 seconds and on key events
   useEffect(() => {

@@ -277,7 +277,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         });
       });
     }
-  }, [source, resumeFrom]);
+  }, [source]);
 
   // Update progress - save every 5 seconds and on key events
   useEffect(() => {

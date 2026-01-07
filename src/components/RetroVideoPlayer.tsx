@@ -178,7 +178,7 @@ export function RetroVideoPlayer({
         video.play().catch(() => {});
       });
     }
-  }, [source, resumeFrom]);
+  }, [source]);
 
   // Force subtitle reinitialization when source or tracks change (handles idle state)
   useEffect(() => {
