@@ -272,7 +272,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         });
       });
     }
-  }, [source]);
+  }, [source, resumeFrom]);
 
   // Update progress - save every 5 seconds and on key events
   useEffect(() => {
@@ -297,14 +297,24 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         lastSavedTime = video.currentTime;
       }
 
-      if (intro && video.currentTime >= intro.start && video.currentTime < intro.end) {
-        setShowSkipIntro(true);
+      // Check skip intro
+      if (intro && intro.start > 0 && intro.end > intro.start) {
+        if (video.currentTime >= intro.start && video.currentTime < intro.end) {
+          setShowSkipIntro(true);
+        } else {
+          setShowSkipIntro(false);
+        }
       } else {
         setShowSkipIntro(false);
       }
 
-      if (outro && video.currentTime >= outro.start && video.currentTime < outro.end) {
-        setShowSkipOutro(true);
+      // Check skip outro
+      if (outro && outro.start > 0 && outro.end > outro.start) {
+        if (video.currentTime >= outro.start && video.currentTime < outro.end) {
+          setShowSkipOutro(true);
+        } else {
+          setShowSkipOutro(false);
+        }
       } else {
         setShowSkipOutro(false);
       }
@@ -365,7 +375,13 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       video.removeEventListener("canplay", handleCanPlay);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
-  }, [onProgressUpdate]);
+  }, [onProgressUpdate, intro, outro]);
+
+  // Reset skip intro/outro button visibility when intro/outro props change
+  useEffect(() => {
+    setShowSkipIntro(false);
+    setShowSkipOutro(false);
+  }, [intro, outro, source]);
 
   useEffect(() => {
     // Clear any existing timeout
