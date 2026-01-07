@@ -334,3 +334,35 @@ export async function fetchHianimeAnimeDetails(animeId: string): Promise<AnimeIt
     return null;
   }
 }
+
+/**
+ * Fetch episodes list for an anime
+ */
+export type HianimeEpisode = {
+  title: string;
+  alternativeTitle?: string;
+  id: string;
+  isFiller: boolean;
+  episodeNumber: number;
+};
+
+export async function fetchHianimeEpisodes(animeId: string): Promise<HianimeEpisode[]> {
+  try {
+    const response = await fetch(`${HIANIME_API_BASE}/episodes/${animeId}`);
+    if (!response.ok) {
+      console.error(`Hianime episodes API returned ${response.status}`);
+      return [];
+    }
+    const data: HianimeResponse<HianimeEpisode[]> = await response.json();
+
+    if (!data.success) {
+      return [];
+    }
+
+    console.log(`[V2 API] Fetched ${data.data.length} episodes for ${animeId}`);
+    return data.data;
+  } catch (error) {
+    console.error("Hianime API v2 Episodes Error:", error);
+    return [];
+  }
+}

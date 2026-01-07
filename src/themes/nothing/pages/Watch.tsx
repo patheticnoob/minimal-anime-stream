@@ -14,7 +14,7 @@ import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 import { NothingWatchHeader } from "../components/NothingWatchHeader";
 import { NothingAnimeInfo } from "../components/NothingAnimeInfo";
 import { NothingEpisodeList } from "../components/NothingEpisodeList";
-import { fetchHianimeAnimeDetails } from "@/lib/external-api-v2";
+import { fetchHianimeAnimeDetails, fetchHianimeEpisodes } from "@/lib/external-api-v2";
 
 type Episode = {
   id: string;
@@ -196,17 +196,30 @@ export default function NothingWatch() {
 
     // Only fetch if not in cache
     setEpisodesLoading(true);
-    fetchEpisodes({ dataId: animeId })
+
+    // Use v2 API if dataFlow is v2, otherwise use v1 Convex API
+    const fetchPromise = dataFlow === "v2"
+      ? fetchHianimeEpisodes(animeId).then((hianimeEps) => {
+          // Convert Hianime episodes to our Episode format
+          return hianimeEps.map((ep) => ({
+            id: ep.id,
+            title: ep.title,
+            number: ep.episodeNumber,
+          }));
+        })
+      : fetchEpisodes({ dataId: animeId }).then((eps) => eps as Episode[]);
+
+    fetchPromise
       .then((eps) => {
-        const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
+        const normalizedEpisodes = eps.map((ep) => ({
           ...ep,
           number: normalizeEpisodeNumber(ep.number),
         }));
         setEpisodes(normalizedEpisodes);
-        
+
         // Cache episodes for 10 minutes
         animeCache.set(cacheKey, eps, 10);
-        
+
         // Prefetch first or last watched episode
         if (normalizedEpisodes.length > 0 && storedAnime) {
           const animeData = JSON.parse(storedAnime);
@@ -216,6 +229,7 @@ export default function NothingWatch() {
       .catch((err) => {
         const msg = err instanceof Error ? err.message : "Failed to load episodes.";
         toast.error(msg);
+        console.error('[Watch] Error loading episodes:', err);
       })
       .finally(() => setEpisodesLoading(false));
 
