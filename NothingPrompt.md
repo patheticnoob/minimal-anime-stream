@@ -1270,6 +1270,501 @@ const rowVirtualizer = useVirtualizer({
 
 ---
 
+## 🧭 **NAVIGATION DESIGN**
+
+### Top Navigation Bar
+
+```
+STRUCTURE (Fixed Position):
+┌────────────────────────────────────────────────────────────┐
+│  [⚫ LOGO]    HOME  MOVIES  SERIES  ANIME    [🔍] [👤]    │
+└────────────────────────────────────────────────────────────┘
+
+STYLING:
+- Height: 64px
+- Background: rgba(0, 0, 0, 0.95) with backdrop-blur
+- Border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+- Position: Fixed, top: 0, z-index: 300
+
+LOGO:
+- Three dot glyph (⚫ ⚫ ⚫) + site name
+- Dot matrix font, 18px
+- White color, red on hover
+
+MENU ITEMS:
+- Font: 14px, uppercase, monospace
+- Spacing: 32px between items
+- Hover: Red underline, 2px thick
+- Active: Red text color
+
+ICONS (Search, Profile):
+- Size: 24px
+- White color, red on hover
+- Click to open overlay/menu
+```
+
+### Mobile Navigation (Hamburger)
+
+```
+HAMBURGER ICON (Top-left on mobile):
+━━━
+━━━
+━━━
+
+MOBILE MENU (Slide from left):
+┌─────────────────────────┐
+│  ⚫ ⚫ ⚫  SITE NAME      │
+│  ━━━━━━━━━━━━━━━━━━━━  │
+│                          │
+│  HOME                    │
+│  MOVIES                  │
+│  SERIES                  │
+│  ANIME                   │
+│  MY LIST                 │
+│  SETTINGS                │
+│                          │
+│  ━━━━━━━━━━━━━━━━━━━━  │
+│                          │
+│  [LOGOUT]                │
+└─────────────────────────┘
+
+STYLING:
+- Full height, 320px width
+- Background: Pure black
+- Border-right: 1px solid white 15%
+- Menu items: 20px vertical padding
+- Active item: Red left border 3px
+- Animation: Slide in 300ms
+```
+
+### Sidebar Navigation (Optional, Desktop)
+
+```
+LEFT SIDEBAR (Fixed):
+┌──────────────┐
+│  ⚫ ⚫ ⚫      │
+│              │
+│  [⌂] Home    │
+│  [▶] Movies  │
+│  [≣] Series  │
+│  [✦] Anime   │
+│  [❤] My List │
+│              │
+│  ━━━━━━━━━  │
+│              │
+│  [⚙] Settings│
+│  [?] Help    │
+└──────────────┘
+
+DIMENSIONS:
+- Width: 240px
+- Full height, fixed position
+- Collapsible to 64px (icons only)
+
+STYLING:
+- Background: rgba(10, 10, 10, 0.98)
+- Border-right: 1px solid rgba(255, 255, 255, 0.1)
+- Icons: 20px, white
+- Text: 14px, gray-300
+- Hover: Red icon + white text
+- Active: Red background 10% opacity
+```
+
+---
+
+## 🎞️ **GENRE & CATEGORY PAGES**
+
+### Browse Page Layout
+
+```
+STRUCTURE:
+┌──────────────────────────────────────────────┐
+│  [FILTERS ≡]     MOVIES • ACTION        [⚙]  │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                               │
+│  Showing 247 results                          │
+│                                               │
+│  [Card] [Card] [Card] [Card] [Card] [Card]   │
+│  [Card] [Card] [Card] [Card] [Card] [Card]   │
+│  [Card] [Card] [Card] [Card] [Card] [Card]   │
+│  [Card] [Card] [Card] [Card] [Card] [Card]   │
+│                                               │
+│  [← PREV]  1 2 3 ... 25  [NEXT →]            │
+└──────────────────────────────────────────────┘
+
+GRID:
+- Responsive: 2-6 columns depending on viewport
+- Gap: 24px horizontal, 32px vertical
+- Cards: Same as home page cards
+- Pagination: Bottom, monospace font
+
+FILTERS BAR:
+- Sticky below navigation
+- Background: gray-900
+- Border: 1px solid white 10%
+- Quick filters: Genre, Year, Rating, Sort
+- Click to open sidebar with advanced filters
+```
+
+### Sort & Filter Options
+
+```
+SORT DROPDOWN:
+┌─────────────────────┐
+│  SORT BY            │
+│  ━━━━━━━━━━━━━━━  │
+│  • Latest          │
+│  ○ Rating          │
+│  ○ Trending        │
+│  ○ A-Z             │
+│  ○ Release Year    │
+└─────────────────────┘
+
+FILTER TAGS (Active filters):
+[ACTION ✕] [2024 ✕] [8.0+ ✕]
+
+STYLING:
+- Tags: gray-800 background, white text
+- Border: 1px solid white 20%
+- Close icon: Red on hover
+- Padding: 8px 12px
+- Gap: 8px between tags
+```
+
+---
+
+## 👤 **USER PROFILE & MY LIST**
+
+### Profile Dropdown
+
+```
+DROPDOWN (Top-right):
+┌──────────────────────────┐
+│  [Avatar] Username       │
+│  ━━━━━━━━━━━━━━━━━━━━  │
+│  My List                 │
+│  Watch History           │
+│  Settings                │
+│  ━━━━━━━━━━━━━━━━━━━━  │
+│  Logout                  │
+└──────────────────────────┘
+
+STYLING:
+- Width: 240px
+- Background: gray-900, 98% opacity
+- Border: 1px solid white 15%
+- Items: 14px, 16px vertical padding
+- Hover: gray-800 background
+- Logout: Red text color
+```
+
+### My List Page
+
+```
+LAYOUT:
+┌──────────────────────────────────────────────┐
+│  MY LIST                                      │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                               │
+│  127 items • Last updated today               │
+│                                               │
+│  [▶ PLAY ALL]  [SORT ▾]  [FILTER ≡]         │
+│                                               │
+│  [Card] [Card] [Card] [Card] [Card] [Card]   │
+│  [Card] [Card] [Card] [Card] [Card] [Card]   │
+│                                               │
+└──────────────────────────────────────────────┘
+
+FEATURES:
+- Remove button on hover (X icon, red)
+- Sort: Date added, A-Z, Rating
+- Filter: Movies, Series, Anime
+- Empty state with add content prompt
+```
+
+---
+
+## 🔒 **AUTH & ONBOARDING**
+
+### Login/Signup Page
+
+```
+CENTERED MODAL (400px width):
+┌──────────────────────────────────────┐
+│                                       │
+│         ⚫ ⚫ ⚫                       │
+│         SITE NAME                     │
+│                                       │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                       │
+│  Email                                │
+│  [________________]                   │
+│                                       │
+│  Password                             │
+│  [________________]                   │
+│                                       │
+│  [SIGN IN]                            │
+│                                       │
+│  Don't have an account? Sign up       │
+│                                       │
+└──────────────────────────────────────┘
+
+STYLING:
+- Background: Pure black with subtle border
+- Inputs: gray-800 background, white text
+- Input focus: Red border, 2px
+- Button: White border, red on hover/focus
+- Links: gray-400, white on hover
+- Form validation: Red error messages below inputs
+```
+
+### Welcome/Onboarding Screen
+
+```
+FULLSCREEN:
+┌──────────────────────────────────────────────┐
+│                                               │
+│         ⚫ ⚫ ⚫  WELCOME                      │
+│                                               │
+│         Choose your favorite genres           │
+│                                               │
+│   [ACTION]   [ANIME]   [COMEDY]   [DRAMA]    │
+│   [HORROR]   [SCI-FI]  [ROMANCE]  [THRILLER] │
+│                                               │
+│         [← BACK]           [CONTINUE →]       │
+│                                               │
+└──────────────────────────────────────────────┘
+
+GENRE CHIPS:
+- Size: 120px × 80px
+- Border: 1px solid white 20%
+- Selected: Red border 2px, white background 5%
+- Multi-select allowed
+- Hover: Scale 1.05, border white 40%
+```
+
+---
+
+## ⚙️ **SETTINGS PAGE**
+
+### Settings Layout
+
+```
+TWO-COLUMN LAYOUT:
+┌────────────┬─────────────────────────────────┐
+│  PROFILE   │  ACCOUNT INFORMATION            │
+│  PLAYBACK  │                                  │
+│  DISPLAY   │  Username:  [John Doe]          │
+│  PRIVACY   │  Email:     [john@email.com]    │
+│  ABOUT     │                                  │
+│            │  [CHANGE PASSWORD]               │
+│            │                                  │
+│            │  ━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│            │                                  │
+│            │  DANGER ZONE                     │
+│            │  [DELETE ACCOUNT]                │
+└────────────┴─────────────────────────────────┘
+
+LEFT SIDEBAR (Settings Menu):
+- Width: 200px
+- Items: 16px vertical padding
+- Active: Red left border 3px
+- Font: 14px, uppercase
+
+RIGHT CONTENT:
+- Padding: 32px
+- Forms: Stacked vertically
+- Input spacing: 24px
+- Section dividers: 1px solid white 5%
+```
+
+### Settings Options
+
+```
+PLAYBACK SETTINGS:
+• Auto-play next episode: [Toggle]
+• Skip intro automatically: [Toggle]
+• Default quality: [Dropdown: Auto, 1080p, 720p, 480p]
+• Subtitles language: [Dropdown]
+• Audio language: [Dropdown]
+
+DISPLAY SETTINGS:
+• Theme: [Light / Dark] (Nothing OS is dark by default)
+• Font size: [Slider: Small - Medium - Large]
+• Reduce animations: [Toggle]
+• Show gamepad hints: [Toggle]
+
+TOGGLE STYLE:
+━━━━━━  ⚫   (OFF - gray)
+  ⚫  ━━━━━━  (ON - red)
+```
+
+---
+
+## 📱 **MOBILE-SPECIFIC DESIGNS**
+
+### Mobile Watch Page
+
+```
+STACKED LAYOUT:
+┌────────────────────────┐
+│   VIDEO PLAYER (16:9)  │
+│   [Rotate for fullscreen] │
+├────────────────────────┤
+│  ← Back                │
+│                        │
+│  ⚫ Episode Title      │
+│  S01 E12 • 24min      │
+│  ━━━━━━━━━━━━━━━━━  │
+│                        │
+│  [EPISODES] [DETAILS]  │
+│                        │
+│  Episodes (Scrollable):│
+│  [1] [2] [3] [4] [5]  │
+│  [6] [7] [8] [9] [10] │
+│                        │
+└────────────────────────┘
+
+MOBILE PLAYER CONTROLS:
+- Tap to show/hide controls
+- Double-tap left/right to seek ±10s
+- Swipe up for volume
+- Swipe down to exit fullscreen
+- Pinch to zoom (optional)
+```
+
+### Mobile Card Layout
+
+```
+SMALLER CARDS:
+┌─────────┐
+│         │
+│ POSTER  │
+│         │
+├─────────┤
+│ Title   │
+│ Year    │
+└─────────┘
+
+DIMENSIONS:
+- Width: 140px (mobile)
+- Height: 210px
+- Font: 12px
+- Reduced spacing: 12px gaps
+```
+
+---
+
+## 🎨 **ADDITIONAL UI ELEMENTS**
+
+### Badges & Labels
+
+```
+NEW BADGE:
+[NEW] - Red background, white text, 8px padding
+
+QUALITY BADGE:
+[4K] [HD] [SD] - Gray background, white text
+
+EPISODE COUNT:
+[12 Episodes] - White border, transparent bg
+
+STYLING:
+- Font: 10px, uppercase, monospace
+- Padding: 4px 8px
+- Position: Top-left on cards
+- Multiple badges: Stack vertically, 4px gap
+```
+
+### Context Menu (Right-click)
+
+```
+MENU:
+┌──────────────────────┐
+│  ▶ Play              │
+│  + Add to My List    │
+│  ℹ More Info         │
+│  ━━━━━━━━━━━━━━━━  │
+│  ✓ Mark as Watched   │
+│  ✕ Not Interested    │
+└──────────────────────┘
+
+STYLING:
+- Background: gray-900, 98% opacity
+- Border: 1px solid white 15%
+- Shadow: 0 10px 40px rgba(0,0,0,0.8)
+- Items: 14px, 12px vertical padding
+- Icons: 16px, left-aligned
+- Hover: gray-800 background
+- Divider: 1px solid white 5%
+```
+
+### Empty States
+
+```
+NO CONTENT:
+┌──────────────────────────────────┐
+│                                   │
+│            ⚫                     │
+│                                   │
+│        No content found           │
+│                                   │
+│     Try adjusting your filters    │
+│                                   │
+│        [RESET FILTERS]            │
+│                                   │
+└──────────────────────────────────┘
+
+STYLING:
+- Centered vertically and horizontally
+- Glyph: 48px, gray-600
+- Text: 16px, gray-400
+- Button: Outlined, white border
+```
+
+### Error States
+
+```
+ERROR MESSAGE:
+┌──────────────────────────────────┐
+│            ⚫                     │
+│                                   │
+│     Something went wrong          │
+│                                   │
+│  We couldn't load this content.   │
+│  Please try again later.          │
+│                                   │
+│  [TRY AGAIN]    [GO HOME]         │
+└──────────────────────────────────┘
+
+STYLING:
+- Red glyph pulsing
+- White text, 14px
+- Buttons: Outlined white border
+- Centered on page
+- Background: black
+```
+
+### Loading Spinner
+
+```
+NOTHING OS SPINNER:
+    ⚫
+  ⚫   ⚫
+⚫       ⚫
+  ⚫   ⚫
+    ⚫
+
+ANIMATION:
+- 8 dots rotating in circle
+- Sequential fade (opacity 1 → 0.3)
+- 1s rotation speed
+- Size: 48px diameter
+- Center on loading area
+```
+
+---
+
 ## 🎯 **SUMMARY CHECKLIST**
 
 ### Core UI Components
@@ -1365,3 +1860,864 @@ This Nothing OS theme emphasizes:
 8. **High Contrast**: Always maintain WCAG AA contrast ratios minimum.
 
 Remember: **Less is more**. The Nothing OS aesthetic is about removing unnecessary elements and focusing on pure functionality with distinctive style.
+
+---
+
+## 🎮 **BUTTON & INPUT STYLES**
+
+### Primary Buttons
+
+```css
+.button-primary {
+  /* Outlined style */
+  background: transparent;
+  border: 2px solid var(--nothing-white);
+  color: var(--nothing-white);
+  padding: 12px 32px;
+  font: 14px var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s var(--easing);
+}
+
+.button-primary:hover {
+  background: var(--nothing-white);
+  color: var(--nothing-black);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.button-primary:active {
+  transform: translateY(0);
+}
+
+/* Red accent variant */
+.button-accent {
+  border-color: var(--nothing-red);
+  color: var(--nothing-red);
+}
+
+.button-accent:hover {
+  background: var(--nothing-red);
+  color: var(--nothing-white);
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+/* Icon buttons */
+.button-icon {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+}
+```
+
+### Input Fields
+
+```css
+.input-field {
+  background: var(--nothing-gray-800);
+  border: 1px solid var(--nothing-border);
+  color: var(--nothing-white);
+  padding: 14px 16px;
+  font: 14px var(--font-modern);
+  width: 100%;
+  transition: all 0.2s var(--easing);
+}
+
+.input-field:focus {
+  outline: none;
+  border: 2px solid var(--nothing-red);
+  background: var(--nothing-gray-900);
+}
+
+.input-field::placeholder {
+  color: var(--nothing-gray-400);
+  font-style: italic;
+}
+
+/* Input with icon */
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  /* Icon styles */
+}
+
+.input-wrapper input {
+  padding-left: 48px;
+}
+```
+
+### Checkboxes & Radio Buttons
+
+```css
+/* Custom checkbox */
+.checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--nothing-white);
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.checkbox:checked {
+  background: var(--nothing-red);
+  border-color: var(--nothing-red);
+}
+
+.checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Radio button - use filled dot instead */
+.radio {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--nothing-white);
+  border-radius: 50%; /* Only element with radius */
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.radio:checked::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--nothing-red);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+```
+
+### Sliders
+
+```css
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--nothing-gray-700);
+  outline: none;
+  border: 1px solid var(--nothing-border);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--nothing-white);
+  border: 2px solid var(--nothing-red);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: var(--nothing-red);
+  transform: scale(1.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--nothing-white);
+  border: 2px solid var(--nothing-red);
+  cursor: pointer;
+}
+```
+
+---
+
+## 🔄 **SCROLL BEHAVIORS**
+
+### Custom Scrollbar
+
+```css
+/* WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--nothing-gray-900);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nothing-gray-600);
+  border: 1px solid var(--nothing-gray-700);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nothing-red);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--nothing-gray-600) var(--nothing-gray-900);
+}
+```
+
+### Horizontal Scroll Indicators
+
+```css
+/* Add fade indicators on horizontal scroll */
+.scroll-container {
+  position: relative;
+}
+
+.scroll-container::before,
+.scroll-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scroll-container::before {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    var(--nothing-black),
+    transparent
+  );
+}
+
+.scroll-container::after {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    var(--nothing-black),
+    transparent
+  );
+}
+```
+
+### Smooth Scrolling
+
+```css
+html {
+  scroll-behavior: smooth;
+}
+
+/* Disable for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+---
+
+## 📏 **LAYOUT UTILITIES**
+
+### Container
+
+```css
+.container {
+  width: 100%;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 var(--space-7);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 var(--space-5);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 var(--space-4);
+  }
+}
+```
+
+### Grid System
+
+```css
+.grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* Responsive grid columns */
+.grid-auto {
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(280px, 1fr)
+  );
+}
+
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-5 { grid-template-columns: repeat(5, 1fr); }
+.grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+@media (max-width: 1280px) {
+  .grid-6 { grid-template-columns: repeat(5, 1fr); }
+  .grid-5 { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 1024px) {
+  .grid-6, .grid-5 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid-6, .grid-5, .grid-4, .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-6, .grid-5, .grid-4, .grid-3, .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+### Flex Utilities
+
+```css
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.flex-wrap { flex-wrap: wrap; }
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-5 { gap: var(--space-5); }
+```
+
+---
+
+## 🎭 **ADVANCED GAMEPAD FEATURES**
+
+### Gamepad Vibration Feedback
+
+```typescript
+// Haptic feedback for actions
+export const useGamepadVibration = () => {
+  const vibrate = (
+    duration: number = 200,
+    weakMagnitude: number = 0.5,
+    strongMagnitude: number = 0.5
+  ) => {
+    const gamepad = navigator.getGamepads()[0];
+    if (gamepad?.vibrationActuator) {
+      gamepad.vibrationActuator.playEffect('dual-rumble', {
+        duration,
+        weakMagnitude,
+        strongMagnitude
+      });
+    }
+  };
+
+  return {
+    // Light tap for navigation
+    tapFeedback: () => vibrate(50, 0.2, 0.1),
+    // Medium for selection
+    selectFeedback: () => vibrate(100, 0.4, 0.3),
+    // Strong for errors
+    errorFeedback: () => vibrate(300, 0.8, 0.8),
+    // Success pulse
+    successFeedback: () => {
+      vibrate(100, 0.5, 0.3);
+      setTimeout(() => vibrate(100, 0.3, 0.5), 150);
+    }
+  };
+};
+```
+
+### Gamepad Button Combos
+
+```typescript
+// Advanced button combinations
+export const useGamepadCombos = () => {
+  const [pressedButtons, setPressedButtons] = useState<Set<number>>(new Set());
+
+  const checkCombo = (buttons: number[]) => {
+    return buttons.every(btn => pressedButtons.has(btn));
+  };
+
+  useEffect(() => {
+    const pollGamepad = () => {
+      const gp = navigator.getGamepads()[0];
+      if (!gp) return;
+
+      const pressed = new Set<number>();
+      gp.buttons.forEach((button, index) => {
+        if (button.pressed) pressed.add(index);
+      });
+
+      setPressedButtons(pressed);
+
+      // Check combos
+      if (checkCombo([4, 5])) { // LB + RB
+        // Open quick menu
+      }
+      if (checkCombo([8, 9])) { // Select + Start
+        // Open settings
+      }
+      if (checkCombo([0, 3])) { // A + Y
+        // Quick add to list
+      }
+    };
+
+    const interval = setInterval(pollGamepad, 50);
+    return () => clearInterval(interval);
+  }, [pressedButtons]);
+};
+```
+
+### Analog Stick Zones
+
+```typescript
+// Different actions based on stick pressure
+export const getAnalogZone = (value: number): 'idle' | 'walk' | 'run' => {
+  const abs = Math.abs(value);
+  if (abs < 0.2) return 'idle';
+  if (abs < 0.6) return 'walk';
+  return 'run';
+};
+
+// Usage example
+const scrollSpeed = (value: number) => {
+  const zone = getAnalogZone(value);
+  switch (zone) {
+    case 'idle': return 0;
+    case 'walk': return value * 5;  // Slow scroll
+    case 'run': return value * 15;   // Fast scroll
+  }
+};
+```
+
+---
+
+## 🔊 **SOUND EFFECTS (OPTIONAL)**
+
+### UI Sound System
+
+```typescript
+// Subtle sound feedback for Nothing OS
+export const useSoundEffects = () => {
+  const playSound = (type: 'hover' | 'select' | 'back' | 'error') => {
+    // Use Web Audio API for subtle clicks
+    const audioContext = new AudioContext();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    switch (type) {
+      case 'hover':
+        oscillator.frequency.value = 800;
+        gainNode.gain.value = 0.05;
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.05);
+        break;
+      case 'select':
+        oscillator.frequency.value = 1200;
+        gainNode.gain.value = 0.1;
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.08);
+        break;
+      case 'back':
+        oscillator.frequency.value = 600;
+        gainNode.gain.value = 0.08;
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.1);
+        break;
+      case 'error':
+        oscillator.frequency.value = 200;
+        gainNode.gain.value = 0.15;
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.2);
+        break;
+    }
+  };
+
+  return { playSound };
+};
+```
+
+---
+
+## 📦 **DATA STRUCTURES**
+
+### Content Types
+
+```typescript
+// Movie/Anime data structure
+interface Content {
+  id: string;
+  type: 'movie' | 'series' | 'anime';
+  title: string;
+  originalTitle?: string;
+  year: number;
+  genres: string[];
+  rating: number; // 0-10
+  duration?: number; // minutes (for movies)
+  totalEpisodes?: number; // for series
+  synopsis: string;
+  poster: {
+    small: string;   // 400x600
+    medium: string;  // 800x1200
+    large: string;   // 1200x1800
+  };
+  backdrop: {
+    small: string;   // 1280x720
+    large: string;   // 1920x1080
+  };
+  trailer?: string;
+  releaseDate: Date;
+  studio?: string;
+  cast?: Cast[];
+  crew?: Crew[];
+  status: 'upcoming' | 'ongoing' | 'completed';
+}
+
+// Episode data structure
+interface Episode {
+  id: string;
+  contentId: string;
+  seasonNumber: number;
+  episodeNumber: number;
+  title: string;
+  synopsis?: string;
+  duration: number; // minutes
+  thumbnail: string;
+  videoUrl: string;
+  releaseDate: Date;
+  watched?: boolean;
+  watchProgress?: number; // 0-100
+}
+
+// User watch history
+interface WatchHistory {
+  contentId: string;
+  episodeId?: string;
+  progress: number; // seconds
+  totalDuration: number; // seconds
+  lastWatched: Date;
+  completed: boolean;
+}
+
+// User list
+interface UserList {
+  userId: string;
+  items: {
+    contentId: string;
+    addedAt: Date;
+  }[];
+}
+```
+
+---
+
+## 🎬 **CONTENT STATES**
+
+### Watch Progress Indicator
+
+```typescript
+// Calculate and display watch progress
+export const getProgressState = (
+  progress: number,
+  duration: number
+): 'unwatched' | 'started' | 'almost-done' | 'completed' => {
+  const percentage = (progress / duration) * 100;
+
+  if (percentage === 0) return 'unwatched';
+  if (percentage < 10) return 'started';
+  if (percentage >= 90) return 'completed';
+  return 'almost-done';
+};
+
+// Visual representation
+const ProgressBadge = ({ progress, duration }) => {
+  const state = getProgressState(progress, duration);
+
+  switch (state) {
+    case 'completed':
+      return <Glyph type="check" color="white" />;
+    case 'almost-done':
+      return <ProgressBar value={progress} max={duration} color="red" />;
+    case 'started':
+      return <ProgressBar value={progress} max={duration} color="white" />;
+    default:
+      return null;
+  }
+};
+```
+
+---
+
+## 🎯 **COMPREHENSIVE IMPLEMENTATION CHECKLIST**
+
+### Phase 1: Foundation
+- [ ] Set up project structure (React + Vite/Next.js)
+- [ ] Install dependencies (Framer Motion, Radix UI, etc.)
+- [ ] Configure Tailwind CSS with Nothing OS theme
+- [ ] Set up CSS custom properties
+- [ ] Implement typography system (Ndot font)
+- [ ] Create base layout components
+- [ ] Set up routing system
+
+### Phase 2: Core UI Components
+- [ ] Navigation bar (desktop + mobile)
+- [ ] Hero section with featured content
+- [ ] Content card components (vertical + horizontal)
+- [ ] Content rows with horizontal scrolling
+- [ ] Skeleton loaders
+- [ ] Preloader animation
+- [ ] Modal system (info, search, filters)
+- [ ] Toast notifications
+- [ ] Progress bars and indicators
+- [ ] Glyph indicators system
+
+### Phase 3: Pages
+- [ ] Home page with hero + rows
+- [ ] Watch page with player area
+- [ ] Episode grid for series
+- [ ] Browse/Genre pages with filtering
+- [ ] Search page with results
+- [ ] My List page
+- [ ] Settings page
+- [ ] Profile/Account pages
+- [ ] Auth pages (login/signup)
+- [ ] Onboarding flow
+
+### Phase 4: Gamepad Integration
+- [ ] Gamepad detection system
+- [ ] Button mapping configuration
+- [ ] Navigation focus manager
+- [ ] Grid navigation logic
+- [ ] Row/section navigation
+- [ ] Context-specific controls
+- [ ] Visual focus feedback
+- [ ] Gamepad hints overlay
+- [ ] Vibration feedback (optional)
+- [ ] Button combos (optional)
+- [ ] Analog stick zones
+
+### Phase 5: Interactions & Animations
+- [ ] Page transitions
+- [ ] Card hover effects
+- [ ] Staggered animations
+- [ ] Scroll behaviors
+- [ ] Loading states
+- [ ] Glyph pulse animations
+- [ ] Red glow effects
+- [ ] Smooth scrolling
+- [ ] Skeleton shimmer
+
+### Phase 6: Performance Optimization
+- [ ] Lazy load images
+- [ ] Intersection Observer implementation
+- [ ] Virtual scrolling for large lists
+- [ ] Code splitting
+- [ ] Debounced search
+- [ ] Optimized image formats (WebP)
+- [ ] Responsive image srcsets
+- [ ] Bundle size optimization
+
+### Phase 7: Accessibility & Polish
+- [ ] Keyboard navigation
+- [ ] Screen reader support
+- [ ] ARIA labels throughout
+- [ ] Focus indicators
+- [ ] Skip links
+- [ ] Color contrast verification
+- [ ] Reduced motion support
+- [ ] Error boundaries
+- [ ] 404 page
+
+### Phase 8: Responsive Design
+- [ ] Mobile navigation (hamburger)
+- [ ] Touch-optimized buttons
+- [ ] Responsive grids (all breakpoints)
+- [ ] Mobile watch page layout
+- [ ] Tablet optimization
+- [ ] Mobile player controls
+- [ ] Test on all screen sizes
+
+### Phase 9: Additional Features
+- [ ] Context menus (right-click)
+- [ ] Sorting and filtering
+- [ ] Empty states
+- [ ] Error states
+- [ ] Loading spinners
+- [ ] Badges and labels
+- [ ] User preferences persistence
+- [ ] Watch history tracking
+- [ ] Continue watching row
+
+### Phase 10: Testing & Refinement
+- [ ] Cross-browser testing
+- [ ] Gamepad testing (multiple controllers)
+- [ ] Mobile device testing
+- [ ] Performance profiling
+- [ ] Accessibility audit
+- [ ] User testing
+- [ ] Bug fixes
+- [ ] Final polish
+
+---
+
+## 🚀 **DEPLOYMENT RECOMMENDATIONS**
+
+### Build Optimizations
+
+```json
+// package.json scripts
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "analyze": "vite-bundle-analyzer"
+  }
+}
+```
+
+### Environment Variables
+
+```env
+# .env.example
+VITE_API_BASE_URL=https://api.yoursite.com
+VITE_IMAGE_CDN=https://cdn.yoursite.com
+VITE_ANALYTICS_ID=UA-XXXXXXXXX-X
+VITE_ENABLE_GAMEPAD=true
+VITE_ENABLE_SOUNDS=false
+```
+
+### Performance Targets
+
+```
+CORE WEB VITALS:
+- Largest Contentful Paint (LCP): < 2.5s
+- First Input Delay (FID): < 100ms
+- Cumulative Layout Shift (CLS): < 0.1
+
+LIGHTHOUSE SCORES (TARGET):
+- Performance: > 90
+- Accessibility: > 95
+- Best Practices: > 90
+- SEO: > 90
+```
+
+---
+
+## 📚 **RESOURCES & REFERENCES**
+
+### Design Inspiration
+- Nothing Phone UI
+- Console gaming interfaces (PlayStation, Xbox)
+- Brutalist web design
+- Terminal/CLI aesthetics
+
+### Fonts
+- **Ndot** - Primary dot matrix font (Nothing OS signature)
+- **Inter** - Modern sans-serif fallback
+- **JetBrains Mono** - Monospace for metadata
+
+### Libraries Used
+```json
+{
+  "react": "^18.2.0",
+  "react-router": "^6.20.0",
+  "framer-motion": "^10.16.0",
+  "react-intersection-observer": "^9.5.0",
+  "@radix-ui/react-dialog": "^1.0.5",
+  "@radix-ui/react-select": "^2.0.0",
+  "@radix-ui/react-slider": "^1.1.2",
+  "@tanstack/react-virtual": "^3.0.0"
+}
+```
+
+### Browser Support
+```
+MINIMUM SUPPORT:
+- Chrome/Edge: Last 2 versions
+- Firefox: Last 2 versions
+- Safari: Last 2 versions
+- Mobile Safari: Last 2 versions
+- Chrome Android: Last 2 versions
+
+GAMEPAD API:
+- Chrome 21+
+- Firefox 29+
+- Safari 10.1+
+- Edge 12+
+```
+
+---
+
+## ✨ **FINAL THOUGHTS**
+
+This Nothing OS themed streaming platform emphasizes:
+
+1. **Minimalist Brutalism** - Sharp edges, no unnecessary flourishes
+2. **Monochrome + Red Accent** - High contrast, strategic color use
+3. **Glyph Language** - LED-style indicators as design signature
+4. **Gamepad-First UX** - Console-like experience with full controller support
+5. **Performance** - Smooth 60fps animations, lazy loading, optimization
+6. **Accessibility** - Keyboard navigation, screen readers, WCAG compliance
+7. **Responsive** - Mobile-first approach, works on all devices
+8. **Nothing OS DNA** - Dot matrix typography, minimalist aesthetic, functional design
+
+**Key Principle**: Every element serves a purpose. Remove anything that doesn't contribute to functionality or the distinctive Nothing OS aesthetic.
+
+Good luck building your streaming platform! 🎬
