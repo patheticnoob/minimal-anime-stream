@@ -179,17 +179,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     const video = videoRef.current;
     if (!video || !source) return;
 
-    // Destroy existing HLS instance before creating new one
-    if (hlsRef.current) {
-      console.log("🧹 Destroying old HLS instance");
-      hlsRef.current.destroy();
-      hlsRef.current = null;
-    }
-
-    // Clear video source to prevent double loading
-    video.removeAttribute('src');
-    video.load();
-
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
 
@@ -235,48 +224,10 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
               hasRestoredProgress.current = true;
             } else {
               console.log("▶️ Starting from beginning");
-              video.currentTime = 0;
             }
             video.play().catch((err) => {
               console.log("Autoplay prevented:", err);
             });
-          });
-
-          // Force subtitle tracks to load immediately after HLS loads them
-          hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, () => {
-            console.log("📝 Subtitle tracks updated by HLS");
-            // Wait a tick for tracks to be ready
-            setTimeout(() => {
-              if (video.textTracks.length > 0) {
-                // Find English track or first available
-                let defaultIdx = -1;
-                for (let i = 0; i < video.textTracks.length; i++) {
-                  const track = video.textTracks[i];
-                  if (track.kind === "metadata") continue;
-                  const label = track.label?.toLowerCase() || '';
-                  const lang = track.language?.toLowerCase() || '';
-                  if (label.includes('english') || lang === 'en' || lang === 'eng') {
-                    defaultIdx = i;
-                    break;
-                  }
-                }
-                if (defaultIdx === -1) {
-                  for (let i = 0; i < video.textTracks.length; i++) {
-                    if (video.textTracks[i].kind !== "metadata") {
-                      defaultIdx = i;
-                      break;
-                    }
-                  }
-                }
-                // Enable the track
-                if (defaultIdx >= 0) {
-                  for (let i = 0; i < video.textTracks.length; i++) {
-                    video.textTracks[i].mode = i === defaultIdx ? "showing" : "hidden";
-                  }
-                  console.log(`✅ Force-enabled subtitle track ${defaultIdx} on HLS load`);
-                }
-              }
-            }, 50);
           });
 
           hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
@@ -289,10 +240,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           hlsRef.current = hls;
 
           return () => {
-            if (hlsRef.current) {
-              hlsRef.current.destroy();
-              hlsRef.current = null;
-            }
+            hls.destroy();
           };
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
           video.src = source;
@@ -304,7 +252,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
               hasRestoredProgress.current = true;
             } else {
               console.log("▶️ Starting from beginning");
-              video.currentTime = 0;
             }
             video.play().catch((err) => {
               console.log("Autoplay prevented:", err);
@@ -319,8 +266,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           video.currentTime = resumeFrom;
           hasRestoredProgress.current = true;
           console.log("Resuming from:", resumeFrom);
-        } else {
-          video.currentTime = 0;
         }
         video.play().catch((err) => {
           console.log("Autoplay prevented:", err);
@@ -781,44 +726,21 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       }
 
       if (defaultTrackIndex === -1 && tracksList.length > 0) {
-        // Find English track as priority
-        for (let i = 0; i < tracksList.length; i++) {
-          const track = video.textTracks[tracksList[i].index];
-          const label = track.label?.toLowerCase() || '';
-          const lang = track.language?.toLowerCase() || '';
-          if (label.includes('english') || lang === 'en' || lang === 'eng') {
-            defaultTrackIndex = tracksList[i].index;
-            console.log("✅ English subtitle track found:", track.label);
-            break;
-          }
-        }
-
-        // If no English found, use first track
-        if (defaultTrackIndex === -1) {
-          defaultTrackIndex = tracksList[0].index;
-          console.log("✅ First available subtitle track enabled as fallback");
-        }
+        defaultTrackIndex = tracksList[0].index;
+        console.log("✅ First available subtitle track enabled as fallback");
       }
 
       // Force enable the default track and ensure others are hidden
       if (video.textTracks && video.textTracks.length > 0) {
-        // First disable all tracks
         for (let i = 0; i < video.textTracks.length; i++) {
           const track = video.textTracks[i];
           if (track.kind === "metadata") continue;
-          track.mode = "hidden";
-        }
 
-        // Then enable the selected track with a small delay to ensure it's applied
-        if (defaultTrackIndex >= 0 && defaultTrackIndex < video.textTracks.length) {
-          const selectedTrack = video.textTracks[defaultTrackIndex];
-          if (selectedTrack.kind !== "metadata") {
-            // Force mode change multiple times to ensure it sticks
-            selectedTrack.mode = "showing";
-            requestAnimationFrame(() => {
-              selectedTrack.mode = "showing";
-              console.log(`✅ Subtitle track ${defaultTrackIndex} (${selectedTrack.label}) set to SHOWING`);
-            });
+          if (i === defaultTrackIndex) {
+            track.mode = "showing";
+            console.log(`✅ Subtitle track ${i} (${track.label}) set to SHOWING`);
+          } else {
+            track.mode = "hidden";
           }
         }
       }
