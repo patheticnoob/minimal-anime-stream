@@ -173,6 +173,17 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     const video = videoRef.current;
     if (!video || !source) return;
 
+    // Destroy existing HLS instance before creating new one
+    if (hlsRef.current) {
+      console.log("🧹 Destroying old HLS instance");
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    // Clear video source to prevent double loading
+    video.removeAttribute('src');
+    video.load();
+
     // Reset the progress restoration flag when source changes (new episode)
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
@@ -220,6 +231,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
               hasRestoredProgress.current = true;
             } else {
               console.log("▶️ Starting from beginning");
+              video.currentTime = 0;
             }
             video.play().catch((err) => {
               console.log("Autoplay prevented:", err);
@@ -236,7 +248,10 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           hlsRef.current = hls;
 
           return () => {
-            hls.destroy();
+            if (hlsRef.current) {
+              hlsRef.current.destroy();
+              hlsRef.current = null;
+            }
           };
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
           video.src = source;
@@ -248,6 +263,7 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
               hasRestoredProgress.current = true;
             } else {
               console.log("▶️ Starting from beginning");
+              video.currentTime = 0;
             }
             video.play().catch((err) => {
               console.log("Autoplay prevented:", err);
@@ -262,6 +278,8 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
           video.currentTime = resumeFrom;
           hasRestoredProgress.current = true;
           console.log("Resuming from:", resumeFrom);
+        } else {
+          video.currentTime = 0;
         }
         video.play().catch((err) => {
           console.log("Autoplay prevented:", err);

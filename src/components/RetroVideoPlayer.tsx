@@ -108,6 +108,17 @@ export function RetroVideoPlayer({
     const video = videoRef.current;
     if (!video || !source) return;
 
+    // Destroy existing HLS instance before creating new one
+    if (hlsRef.current) {
+      console.log("🧹 Destroying old HLS instance");
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
+    // Clear video source to prevent double loading
+    video.removeAttribute('src');
+    video.load();
+
     hasRestoredProgress.current = false;
     const isHlsLike = source.includes(".m3u8") || source.includes("/proxy?url=");
 
@@ -137,6 +148,8 @@ export function RetroVideoPlayer({
             if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
               video.currentTime = resumeFrom;
               hasRestoredProgress.current = true;
+            } else {
+              video.currentTime = 0;
             }
             video.play().catch(() => {});
           });
@@ -149,7 +162,12 @@ export function RetroVideoPlayer({
           });
 
           hlsRef.current = hls;
-          return () => hls.destroy();
+          return () => {
+            if (hlsRef.current) {
+              hlsRef.current.destroy();
+              hlsRef.current = null;
+            }
+          };
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
           video.src = source;
           video.addEventListener("loadedmetadata", () => {
@@ -157,6 +175,8 @@ export function RetroVideoPlayer({
             if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
               video.currentTime = resumeFrom;
               hasRestoredProgress.current = true;
+            } else {
+              video.currentTime = 0;
             }
             video.play().catch(() => {});
           });
@@ -168,6 +188,8 @@ export function RetroVideoPlayer({
         if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
           video.currentTime = resumeFrom;
           hasRestoredProgress.current = true;
+        } else {
+          video.currentTime = 0;
         }
         video.play().catch(() => {});
       });
