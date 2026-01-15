@@ -1,6 +1,7 @@
 import { useAnimeLists as useAnimeListsV1 } from "./use-anime-lists";
 import { useAnimeListsV2 } from "./use-anime-lists-v2";
 import { useAnimeListsV3 } from "./use-anime-lists-v3";
+import { useAnimeListsV4 } from "./use-anime-lists-v4";
 import { useDataFlow } from "./use-data-flow";
 
 /**
@@ -17,12 +18,14 @@ export function useAnimeListsRouter() {
   const isV1Active = safeDataFlow === "v1";
   const isV2Active = safeDataFlow === "v2";
   const isV3Active = safeDataFlow === "v3";
+  const isV4Active = safeDataFlow === "v4";
 
   // Call all hooks unconditionally (required by React Rules of Hooks)
   // Pass active flag so each hook can skip fetching if not active
   const v1Data = useAnimeListsV1(isV1Active);
   const v2Data = useAnimeListsV2(isV2Active);
   const v3Data = useAnimeListsV3(isV3Active);
+  const v4Data = useAnimeListsV4(isV4Active);
 
   // Return the appropriate data based on dataFlow setting
   if (isV2Active) {
@@ -31,6 +34,9 @@ export function useAnimeListsRouter() {
   } else if (isV3Active) {
     console.log('[Router] Using v3 API hook');
     return v3Data;
+  } else if (isV4Active) {
+    console.log('[Router] 🚀 Using v4 HYBRID API hook (Yuma home + Hianime streaming)');
+    return v4Data;
   }
 
   // Default to v1

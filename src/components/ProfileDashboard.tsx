@@ -115,22 +115,38 @@ export function ProfileDashboard({
             onClick={() => setDataFlow("v1")}
             className={dataFlow === "v1" ? "bg-green-600 hover:bg-green-700" : ""}
           >
-            API v1 (Yuma - Current)
+            API v1 (Hianime)
           </Button>
           <Button
             variant={dataFlow === "v2" ? "default" : "outline"}
             onClick={() => setDataFlow("v2")}
             className={dataFlow === "v2" ? "bg-orange-600 hover:bg-orange-700" : ""}
           >
-            API v2 (Hianime - New)
+            API v2 (Hianime v2)
+          </Button>
+          <Button
+            variant={dataFlow === "v3" ? "default" : "outline"}
+            onClick={() => setDataFlow("v3")}
+            className={dataFlow === "v3" ? "bg-blue-600 hover:bg-blue-700" : ""}
+          >
+            API v3 (Yuma)
+          </Button>
+          <Button
+            variant={dataFlow === "v4" ? "default" : "outline"}
+            onClick={() => setDataFlow("v4")}
+            className={dataFlow === "v4" ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" : ""}
+          >
+            API v4 (Hybrid) ⚡
           </Button>
         </div>
         <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
           Current API: <span className="font-semibold text-[var(--nothing-fg,white)] uppercase">{dataFlow}</span>
         </p>
         <p className="text-xs text-[var(--nothing-gray-5,gray-500)] mt-2">
-          {dataFlow === "v1" && "Using Yuma API - Current stable version with all features"}
-          {dataFlow === "v2" && "Using Hianime API - New API with enhanced content and better search"}
+          {dataFlow === "v1" && "Using Hianime package - Original stable API with proven streaming"}
+          {dataFlow === "v2" && "Using Hianime v2 - Enhanced version with better metadata"}
+          {dataFlow === "v3" && "Using Yuma API - Direct API calls with spotlight features"}
+          {dataFlow === "v4" && "🚀 Best of Both Worlds - Yuma for home page (spotlight, descriptions) + Hianime for reliable streaming"}
         </p>
       </div>
 

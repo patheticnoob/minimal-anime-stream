@@ -32,7 +32,7 @@ export const setUserDataFlow = mutation({
     }
 
     // Validate data flow version
-    const validFlows = ["v1", "v2", "v3"];
+    const validFlows = ["v1", "v2", "v3", "v4"];
     if (!validFlows.includes(args.dataFlow)) {
       throw new Error("Invalid data flow version");
     }
