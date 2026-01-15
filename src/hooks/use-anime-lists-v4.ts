@@ -29,6 +29,23 @@ async function retryWithBackoff<T>(
   throw lastError;
 }
 
+// Helper function to extract numeric dataId from Yuma's full ID
+// Yuma returns: "one-piece-100" → Extract: "100"
+// This is needed because Hianime package expects just the numeric ID
+function extractDataId(yumaId: string): string {
+  const parts = yumaId.split('-');
+  const lastPart = parts[parts.length - 1];
+
+  // If last part is numeric, use it as dataId
+  if (/^\d+$/.test(lastPart)) {
+    return lastPart;
+  }
+
+  // Fallback: return full ID (will likely fail but at least we tried)
+  logWarn(`Could not extract numeric dataId from: ${yumaId}, using full ID`, 'V4 DataId Extraction');
+  return yumaId;
+}
+
 // Fetch from Yuma API
 async function fetchYumaEndpoint(endpoint: string, page: number = 1): Promise<{ results: AnimeItem[]; hasNextPage: boolean }> {
   try {
@@ -42,7 +59,7 @@ async function fetchYumaEndpoint(endpoint: string, page: number = 1): Promise<{ 
 
     const results = (data.results || []).map((item: any) => ({
       id: item.id,
-      dataId: item.id,
+      dataId: extractDataId(item.id), // 🔧 FIX: Extract numeric ID for Hianime compatibility
       title: item.title,
       image: item.image,
       type: item.type,
@@ -80,7 +97,7 @@ async function fetchSpotlight(): Promise<AnimeItem[]> {
     // The spotlight endpoint returns an array directly
     return (Array.isArray(data) ? data : []).map((item: any) => ({
       id: item.id,
-      dataId: item.id,
+      dataId: extractDataId(item.id), // 🔧 FIX: Extract numeric ID for Hianime compatibility
       title: item.title,
       image: item.image,
       type: item.type,
@@ -115,7 +132,7 @@ async function searchYuma(query: string): Promise<AnimeItem[]> {
 
     return (data.results || []).map((item: any) => ({
       id: item.id,
-      dataId: item.id,
+      dataId: extractDataId(item.id), // 🔧 FIX: Extract numeric ID for Hianime compatibility
       title: item.title,
       image: item.image,
       type: item.type,
