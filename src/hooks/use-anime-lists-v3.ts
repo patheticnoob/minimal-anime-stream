@@ -66,6 +66,43 @@ async function fetchYumaEndpoint(endpoint: string, page: number = 1): Promise<{ 
   }
 }
 
+// Fetch spotlight anime for hero banner
+async function fetchSpotlight(): Promise<AnimeItem[]> {
+  try {
+    const response = await fetch('https://yumaapi.vercel.app/spotlight');
+    if (!response.ok) {
+      logWarn(`Yuma Spotlight API returned ${response.status}`, 'Yuma API');
+      return [];
+    }
+
+    const data = await response.json();
+
+    // The spotlight endpoint returns an array directly
+    return (Array.isArray(data) ? data : []).map((item: any) => ({
+      id: item.id,
+      dataId: item.id,
+      title: item.title,
+      image: item.image,
+      type: item.type,
+      language: {
+        sub: item.sub ? String(item.sub) : null,
+        dub: item.dub ? String(item.dub) : null,
+      },
+      duration: item.duration,
+      episodes: item.episodes,
+      japaneseTitle: item.japanese_title,
+      // Additional spotlight-specific data
+      description: item.other_data?.description,
+      rank: item.other_data?.rank,
+      releaseDate: item.other_data?.releaseDate,
+      nsfw: item.nsfw,
+    }));
+  } catch (error) {
+    logError('Yuma Spotlight API failed', 'Yuma API', error instanceof Error ? error : undefined);
+    return [];
+  }
+}
+
 // Search Yuma API
 async function searchYuma(query: string): Promise<AnimeItem[]> {
   try {
@@ -73,9 +110,9 @@ async function searchYuma(query: string): Promise<AnimeItem[]> {
     if (!response.ok) {
       return [];
     }
-    
+
     const data = await response.json();
-    
+
     return (data.results || []).map((item: any) => ({
       id: item.id,
       dataId: item.id,
@@ -110,6 +147,7 @@ export function useAnimeListsV3(isActive: boolean = true) {
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
   const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
+  const [spotlightItems, setSpotlightItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
   
   const [popularLoading, setPopularLoading] = useState(true);
@@ -142,6 +180,28 @@ export function useAnimeListsV3(isActive: boolean = true) {
 
     let mounted = true;
 
+    // Load Spotlight items for hero banner
+    logInfo('Fetching spotlight from Yuma (v3 flow)', 'Initial Load');
+    retryWithBackoff(() => fetchSpotlight())
+      .then((spotlightData) => {
+        if (!mounted) return;
+        setSpotlightItems(spotlightData);
+
+        // Set the first spotlight item as the initial hero
+        if (spotlightData && spotlightData.length > 0) {
+          setHeroAnime(spotlightData[0]);
+        }
+
+        setLoading(false);
+        logInfo(`Spotlight loaded from Yuma (v3) - ${spotlightData.length} items`, 'Initial Load');
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        const msg = err instanceof Error ? err.message : "Failed to load spotlight";
+        logError(msg, 'Yuma Spotlight', err instanceof Error ? err : undefined);
+        setLoading(false);
+      });
+
     // Load Top Airing (use as "popular" since Yuma has no trending endpoint)
     logInfo('Fetching top airing from Yuma (v3 flow)', 'Initial Load');
     retryWithBackoff(() => fetchYumaEndpoint('top-airing', 1))
@@ -149,14 +209,7 @@ export function useAnimeListsV3(isActive: boolean = true) {
         if (!mounted) return;
         setPopularItems(data.results);
         setPopularHasMore(data.hasNextPage);
-        
-        if (data.results && data.results.length > 0) {
-          const randomIndex = Math.floor(Math.random() * Math.min(5, data.results.length));
-          setHeroAnime(data.results[randomIndex]);
-        }
-        
         setPopularLoading(false);
-        setLoading(false);
         logInfo('Top airing loaded from Yuma (v3)', 'Initial Load');
       })
       .catch((err) => {
@@ -164,7 +217,6 @@ export function useAnimeListsV3(isActive: boolean = true) {
         const msg = err instanceof Error ? err.message : "Failed to load top airing";
         logError(msg, 'Yuma Top Airing', err instanceof Error ? err : undefined);
         setPopularLoading(false);
-        setLoading(false);
       });
 
     // Load recent episodes (use as "airing")
@@ -224,23 +276,20 @@ export function useAnimeListsV3(isActive: boolean = true) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive]);
 
-  // Auto-rotate hero banner
+  // Auto-rotate hero banner through spotlight items
   useEffect(() => {
-    if (!heroAnime || popularItems.length === 0) return;
-
-    const heroPool = popularItems.slice(0, 5);
-    if (heroPool.length === 0) return;
+    if (!heroAnime || spotlightItems.length === 0) return;
 
     const interval = setInterval(() => {
       setHeroAnime((prev) => {
-        const currentIndex = heroPool.findIndex(item => item.id === prev?.id);
-        const nextIndex = (currentIndex + 1) % heroPool.length;
-        return heroPool[nextIndex];
+        const currentIndex = spotlightItems.findIndex(item => item.id === prev?.id);
+        const nextIndex = (currentIndex + 1) % spotlightItems.length;
+        return spotlightItems[nextIndex];
       });
-    }, 4000);
+    }, 5000); // Rotate every 5 seconds
 
     return () => clearInterval(interval);
-  }, [heroAnime, popularItems]);
+  }, [heroAnime, spotlightItems]);
 
   // Search handler
   useEffect(() => {

@@ -47,6 +47,10 @@ export type AnimeItem = {
   // V3 fields from Yuma
   episodes?: number;
   japaneseTitle?: string;
+  // V3 Spotlight-specific fields
+  description?: string;
+  releaseDate?: string;
+  nsfw?: boolean;
 };
 
 export type Episode = {
