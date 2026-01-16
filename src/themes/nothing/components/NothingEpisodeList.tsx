@@ -44,6 +44,45 @@ export function NothingEpisodeList({
     }
   };
 
+  const handleRangeClick = (startEpisode: number) => {
+    const targetEpisode = episodes.find(ep => ep.number === startEpisode);
+    if (!targetEpisode) {
+      const closestEpisode = episodes.find(ep => (ep.number ?? 0) >= startEpisode);
+      if (closestEpisode) {
+        const targetIndex = episodes.findIndex(ep => ep.id === closestEpisode.id);
+        if (targetIndex !== -1 && episodeListRef.current) {
+          const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
+          if (episodeElement) {
+            episodeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+      }
+      return;
+    }
+
+    const targetIndex = episodes.findIndex(ep => ep.number === startEpisode);
+    if (targetIndex !== -1 && episodeListRef.current) {
+      const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
+      if (episodeElement) {
+        episodeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
+  const getEpisodeRanges = () => {
+    const totalEpisodes = episodes.length;
+    if (totalEpisodes <= 100) return [];
+
+    const ranges = [];
+    for (let i = 1; i <= totalEpisodes; i += 100) {
+      const end = Math.min(i + 99, totalEpisodes);
+      ranges.push({ start: i, end, label: `${i}-${end}` });
+    }
+    return ranges;
+  };
+
+  const episodeRanges = getEpisodeRanges();
+
   return (
     <div id="episode-list-container" className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col shadow-sm transition-colors duration-300">
       <div className="sticky top-0 bg-white dark:bg-[#1A1D24] z-10 pb-4 transition-colors duration-300">
@@ -53,7 +92,7 @@ export function NothingEpisodeList({
         </div>
 
         {/* Jump to Episode */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-3">
           <Input
             type="number"
             placeholder="Jump to episode..."
@@ -75,6 +114,23 @@ export function NothingEpisodeList({
             Go
           </Button>
         </div>
+
+        {/* Episode Range Buttons */}
+        {episodeRanges.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {episodeRanges.map((range) => (
+              <Button
+                key={range.start}
+                onClick={() => handleRangeClick(range.start)}
+                variant="outline"
+                size="sm"
+                className="text-xs bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-[#ff4d4f] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white rounded-xl"
+              >
+                {range.label}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
       
       {episodesLoading ? (

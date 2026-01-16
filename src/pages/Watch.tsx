@@ -461,6 +461,47 @@ export default function Watch() {
     }
   };
 
+  const handleRangeClick = (startEpisode: number) => {
+    const targetEpisode = episodes.find(ep => ep.number === startEpisode);
+    if (!targetEpisode) {
+      const closestEpisode = episodes.find(ep => (ep.number ?? 0) >= startEpisode);
+      if (closestEpisode) {
+        const targetIndex = episodes.findIndex(ep => ep.id === closestEpisode.id);
+        if (targetIndex !== -1 && episodeListRef.current) {
+          const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
+          if (episodeElement) {
+            episodeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+            setFocusedEpisodeIndex(targetIndex);
+          }
+        }
+      }
+      return;
+    }
+
+    const targetIndex = episodes.findIndex(ep => ep.number === startEpisode);
+    if (targetIndex !== -1 && episodeListRef.current) {
+      const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
+      if (episodeElement) {
+        episodeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+        setFocusedEpisodeIndex(targetIndex);
+      }
+    }
+  };
+
+  const getEpisodeRanges = () => {
+    const totalEpisodes = episodes.length;
+    if (totalEpisodes <= 100) return [];
+
+    const ranges = [];
+    for (let i = 1; i <= totalEpisodes; i += 100) {
+      const end = Math.min(i + 99, totalEpisodes);
+      ranges.push({ start: i, end, label: `${i}-${end}` });
+    }
+    return ranges;
+  };
+
+  const episodeRanges = getEpisodeRanges();
+
   const broadcastDetails = (() => {
     if (!broadcastInfo?.day || !broadcastInfo?.time || !broadcastInfo?.timezone) {
       return null;
@@ -681,7 +722,7 @@ export default function Watch() {
               </h3>
 
               {/* Jump to Episode */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 mb-3">
                 <Input
                   type="number"
                   placeholder="Jump to episode..."
@@ -703,6 +744,23 @@ export default function Watch() {
                   Go
                 </Button>
               </div>
+
+              {/* Episode Range Buttons */}
+              {episodeRanges.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {episodeRanges.map((range) => (
+                    <Button
+                      key={range.start}
+                      onClick={() => handleRangeClick(range.start)}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs bg-white/5 border-white/10 hover:bg-white/10 hover:border-blue-400 text-gray-300 hover:text-white"
+                    >
+                      {range.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {episodes.length > 0 ? (
