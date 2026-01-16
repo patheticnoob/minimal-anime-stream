@@ -1033,6 +1033,36 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           isLocked={isLocked}
           onToggleLock={toggleLock}
         />
+
+        {/* Floating lock button - always visible when locked */}
+        {isLocked && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleLock();
+            }}
+            className="absolute top-5 right-5 p-3 bg-[#ff4d4f]/90 backdrop-blur-xl rounded-full shadow-2xl border border-white/10 hover:bg-[#ff4d4f] transition-all z-50"
+            title="Unlock Controls"
+            data-testid="floating-lock-button"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+            </svg>
+          </motion.button>
+        )}
       </motion.div>
     </AnimatePresence>
   );

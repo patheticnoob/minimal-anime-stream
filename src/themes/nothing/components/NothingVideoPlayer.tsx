@@ -562,12 +562,52 @@ export function NothingVideoPlayer({
               )}
             </div>
 
+            <button onClick={toggleLock} className={`nothing-player-btn ${isLocked ? 'bg-[#ff4d4f]/90 text-white' : ''}`} aria-label={isLocked ? "Unlock Controls" : "Lock Controls"}>
+              {isLocked ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                </svg>
+              )}
+            </button>
+
             <button onClick={toggleFullscreen} className="nothing-player-btn ml-auto" aria-label="Fullscreen">
               <Maximize className="h-5 w-5" />
             </button>
           </div>
         </div>
       </div>
+
+      {/* Floating lock button - always visible when locked */}
+      {isLocked && (
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleLock();
+          }}
+          className="absolute top-5 right-5 p-3 bg-[#ff4d4f]/90 backdrop-blur-xl rounded-full shadow-2xl border border-white/10 hover:bg-[#ff4d4f] transition-all cursor-pointer z-50"
+          title="Unlock Controls"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+          </svg>
+        </div>
+      )}
 
       {/* Next episode banner - hide in fullscreen */}
       {nextTitle && onNext && !isFullscreen && (
