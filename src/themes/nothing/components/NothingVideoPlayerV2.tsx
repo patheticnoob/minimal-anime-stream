@@ -37,6 +37,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
+  const lockButtonTimeoutRef = useRef<number | null>(null);
   const clickTimeoutRef = useRef<number | null>(null);
   const hasRestoredProgress = useRef(false);
   const wakeLockRef = useRef<any>(null);
@@ -50,6 +51,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [isLocked, setIsLocked] = useState(false);
+  const [showLockButton, setShowLockButton] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showSubtitles, setShowSubtitles] = useState(false);
@@ -476,6 +478,19 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const handleMouseMove = () => {
     if (isDragging) return;
     updateControlsVisibility(true);
+
+    // Show lock button on interaction when locked
+    if (isLocked) {
+      setShowLockButton(true);
+      // Reset the hide timeout
+      if (lockButtonTimeoutRef.current) {
+        window.clearTimeout(lockButtonTimeoutRef.current);
+      }
+      lockButtonTimeoutRef.current = window.setTimeout(() => {
+        setShowLockButton(false);
+        lockButtonTimeoutRef.current = null;
+      }, 3000);
+    }
   };
 
   const togglePlay = useCallback(() => {
@@ -595,15 +610,29 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     setIsLocked(newLockedState);
 
     if (newLockedState) {
-      // When locking, hide controls immediately
+      // When locking, hide controls immediately and show lock button
       setShowControls(false);
+      setShowLockButton(true);
       if (controlsTimeoutRef.current) {
         window.clearTimeout(controlsTimeoutRef.current);
         controlsTimeoutRef.current = null;
       }
+      // Hide lock button after 3 seconds
+      if (lockButtonTimeoutRef.current) {
+        window.clearTimeout(lockButtonTimeoutRef.current);
+      }
+      lockButtonTimeoutRef.current = window.setTimeout(() => {
+        setShowLockButton(false);
+        lockButtonTimeoutRef.current = null;
+      }, 3000);
     } else {
-      // When unlocking, show controls
+      // When unlocking, show controls and hide lock button
       setShowControls(true);
+      setShowLockButton(false);
+      if (lockButtonTimeoutRef.current) {
+        window.clearTimeout(lockButtonTimeoutRef.current);
+        lockButtonTimeoutRef.current = null;
+      }
     }
   }, [isLocked]);
 
@@ -1034,8 +1063,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           onToggleLock={toggleLock}
         />
 
-        {/* Floating lock button - always visible when locked */}
-        {isLocked && (
+        {/* Floating lock button - visible on interaction when locked */}
+        {isLocked && showLockButton && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}

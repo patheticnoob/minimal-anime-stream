@@ -44,6 +44,7 @@ export function NothingVideoPlayer({
   const lastSavedRef = useRef(0);
   const hasResumedRef = useRef(false);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lockButtonTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(true);
@@ -55,6 +56,7 @@ export function NothingVideoPlayer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [isLocked, setIsLocked] = useState(false);
+  const [showLockButton, setShowLockButton] = useState(false);
   const [subtitles, setSubtitles] = useState<Array<{ index: number; label: string }>>([]);
   const [currentSubtitle, setCurrentSubtitle] = useState(-1);
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
@@ -345,14 +347,26 @@ export function NothingVideoPlayer({
     setIsLocked(newLockedState);
 
     if (newLockedState) {
-      // When locking, hide controls immediately
+      // When locking, hide controls immediately and show lock button
       setShowControls(false);
+      setShowLockButton(true);
       if (controlsTimeoutRef.current) {
         clearTimeout(controlsTimeoutRef.current);
       }
+      // Hide lock button after 3 seconds
+      if (lockButtonTimeoutRef.current) {
+        clearTimeout(lockButtonTimeoutRef.current);
+      }
+      lockButtonTimeoutRef.current = setTimeout(() => {
+        setShowLockButton(false);
+      }, 3000);
     } else {
-      // When unlocking, show controls
+      // When unlocking, show controls and hide lock button
       setShowControls(true);
+      setShowLockButton(false);
+      if (lockButtonTimeoutRef.current) {
+        clearTimeout(lockButtonTimeoutRef.current);
+      }
       resetControlsTimeout();
     }
   };
@@ -370,6 +384,18 @@ export function NothingVideoPlayer({
 
   const handleContainerInteraction = () => {
     resetControlsTimeout();
+
+    // Show lock button on interaction when locked
+    if (isLocked) {
+      setShowLockButton(true);
+      // Reset the hide timeout
+      if (lockButtonTimeoutRef.current) {
+        clearTimeout(lockButtonTimeoutRef.current);
+      }
+      lockButtonTimeoutRef.current = setTimeout(() => {
+        setShowLockButton(false);
+      }, 3000);
+    }
   };
 
   const handleVideoClick = () => {
@@ -583,14 +609,14 @@ export function NothingVideoPlayer({
         </div>
       </div>
 
-      {/* Floating lock button - always visible when locked */}
-      {isLocked && (
+      {/* Floating lock button - visible on interaction when locked */}
+      {isLocked && showLockButton && (
         <div
           onClick={(e) => {
             e.stopPropagation();
             toggleLock();
           }}
-          className="absolute top-5 right-5 p-3 bg-[#ff4d4f]/90 backdrop-blur-xl rounded-full shadow-2xl border border-white/10 hover:bg-[#ff4d4f] transition-all cursor-pointer z-50"
+          className="absolute top-5 right-5 p-3 bg-[#ff4d4f]/90 backdrop-blur-xl rounded-full shadow-2xl border border-white/10 hover:bg-[#ff4d4f] transition-all cursor-pointer z-50 animate-in fade-in duration-200"
           title="Unlock Controls"
         >
           <svg
