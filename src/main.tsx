@@ -8,8 +8,12 @@ import NotFound from "./pages/NotFound";
 import "./index.css";
 import { Toaster } from "sonner";
 import { GamepadCursor } from "./components/GamepadCursor";
+import { initVideoPlayerPreload } from "./lib/video-player-preload";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+
+// Initialize video player preload in the background
+initVideoPlayerPreload();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

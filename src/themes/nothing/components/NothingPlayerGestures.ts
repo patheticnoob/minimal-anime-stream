@@ -179,9 +179,13 @@ export function usePlayerGestures({
       // Handle Single Tap (Potential)
       if (zone === 'center') {
         // Center Tap: Play/Pause + Show Controls (with auto-hide)
+        // Check actual video state for accurate animation
+        const video = videoRef.current;
+        const willBePlaying = video ? video.paused : !isPlaying;
+
         togglePlay();
         toggleControls(true); // Always show controls on center tap
-        setCenterAction({ type: isPlaying ? 'pause' : 'play' });
+        setCenterAction({ type: willBePlaying ? 'play' : 'pause' });
         setTimeout(() => setCenterAction(null), 600);
       } else {
         // Side Tap: Show controls with auto-hide (or hide if already visible)
