@@ -23,6 +23,7 @@ import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
+import { pageCache } from "@/lib/page-cache";
 
 type Episode = {
   id: string;
@@ -215,6 +216,30 @@ export default function Watch() {
       }
     }
   }, [animeId, fetchEpisodes, fetchBroadcastInfo, dataFlow, navigate]);
+
+  // Save scroll position for episode list
+  useEffect(() => {
+    const handleScroll = () => {
+      if (animeId) {
+        pageCache.cacheScrollPosition(`watch_${animeId}`, window.scrollY);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [animeId]);
+
+  // Restore scroll position when returning to watch page
+  useEffect(() => {
+    if (animeId) {
+      const cachedScrollPosition = pageCache.getCachedScrollPosition(`watch_${animeId}`);
+      if (cachedScrollPosition !== null) {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, cachedScrollPosition);
+        });
+      }
+    }
+  }, [animeId]);
 
   // Enhanced Gamepad navigation for Watch page
   useEffect(() => {

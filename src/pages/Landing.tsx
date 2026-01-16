@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useDataFlow } from "@/hooks/use-data-flow";
 import { AnimatePresence } from "framer-motion";
+import { pageCache } from "@/lib/page-cache";
 
 // Track if this is the first load
 const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
@@ -45,7 +46,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   });
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
-  const [showInitialLoader, setShowInitialLoader] = useState(!hasLoadedBefore);
+  const [showInitialLoader, setShowInitialLoader] = useState(() => {
+    // Check if we have cached data - if so, skip loader
+    const hasCachedData = pageCache.has('landing_page');
+    return !hasLoadedBefore && !hasCachedData;
+  });
+  const scrollPositionRef = useRef(0);
 
   // Use router hook that switches between v1, v2, and v3 based on user preference
   const animeData = useAnimeListsRouter();
@@ -145,6 +151,41 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       setShowInitialLoader(false);
     }
   }, [loading]);
+
+  // Cache landing page data when it's loaded
+  useEffect(() => {
+    if (!loading && popularItems.length > 0) {
+      pageCache.cacheLandingPage({
+        popularItems,
+        airingItems,
+        movieItems,
+        tvShowItems,
+        heroAnime,
+      });
+    }
+  }, [loading, popularItems, airingItems, movieItems, tvShowItems, heroAnime]);
+
+  // Save scroll position before navigating away
+  useEffect(() => {
+    const handleScroll = () => {
+      scrollPositionRef.current = window.scrollY;
+      pageCache.cacheScrollPosition('landing', window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Restore scroll position when returning to page
+  useEffect(() => {
+    const cachedScrollPosition = pageCache.getCachedScrollPosition('landing');
+    if (cachedScrollPosition !== null && hasLoadedBefore) {
+      // Wait for content to render before scrolling
+      requestAnimationFrame(() => {
+        window.scrollTo(0, cachedScrollPosition);
+      });
+    }
+  }, []);
 
   const openAnime = (anime: AnimeItem) => {
     if (!anime?.dataId) {
