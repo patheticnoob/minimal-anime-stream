@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -11,6 +11,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useDataFlow } from "@/hooks/use-data-flow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
@@ -91,6 +92,8 @@ export default function Watch() {
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
   const [focusedEpisodeIndex, setFocusedEpisodeIndex] = useState(0);
   const [isNavigatingEpisodes, setIsNavigatingEpisodes] = useState(false);
+  const [jumpToEpisode, setJumpToEpisode] = useState("");
+  const episodeListRef = useRef<HTMLDivElement>(null);
 
   const saveProgress = useMutation(api.watchProgress.saveProgress);
   const addToWatchlist = useMutation(api.watchlist.addToWatchlist);
@@ -433,6 +436,31 @@ export default function Watch() {
     }
   }, [isAuthenticated, currentEpisodeData, currentAnimeInfo, saveProgress]);
 
+  const handleJumpToEpisode = () => {
+    const episodeNum = parseInt(jumpToEpisode);
+    if (isNaN(episodeNum) || episodeNum < 1) {
+      toast.error("Please enter a valid episode number");
+      return;
+    }
+
+    const targetEpisode = episodes.find(ep => ep.number === episodeNum);
+    if (!targetEpisode) {
+      toast.error(`Episode ${episodeNum} not found`);
+      return;
+    }
+
+    const targetIndex = episodes.findIndex(ep => ep.number === episodeNum);
+    if (targetIndex !== -1 && episodeListRef.current) {
+      const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
+      if (episodeElement) {
+        episodeElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        setFocusedEpisodeIndex(targetIndex);
+        toast.success(`Scrolled to Episode ${episodeNum}`);
+        setJumpToEpisode("");
+      }
+    }
+  };
+
   const broadcastDetails = (() => {
     if (!broadcastInfo?.day || !broadcastInfo?.time || !broadcastInfo?.timezone) {
       return null;
@@ -643,15 +671,42 @@ export default function Watch() {
           </div>
 
           {/* Right: Episode List */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-fit max-h-[calc(100vh-120px)] overflow-y-auto">
-            <h3 className="text-lg font-bold mb-4 uppercase tracking-wider">
-              Episodes
-              {isNavigatingEpisodes && (
-                <span className="text-xs text-blue-400 ml-2">(Gamepad Active)</span>
-              )}
-            </h3>
+          <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col">
+            <div className="mb-4">
+              <h3 className="text-lg font-bold uppercase tracking-wider mb-3">
+                Episodes
+                {isNavigatingEpisodes && (
+                  <span className="text-xs text-blue-400 ml-2">(Gamepad Active)</span>
+                )}
+              </h3>
+
+              {/* Jump to Episode */}
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="Jump to episode..."
+                  value={jumpToEpisode}
+                  onChange={(e) => setJumpToEpisode(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleJumpToEpisode();
+                    }
+                  }}
+                  className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                  min="1"
+                />
+                <Button
+                  onClick={handleJumpToEpisode}
+                  size="sm"
+                  className="px-4"
+                >
+                  Go
+                </Button>
+              </div>
+            </div>
+
             {episodes.length > 0 ? (
-              <div className="space-y-2">
+              <div ref={episodeListRef} className="space-y-2 overflow-y-auto flex-1">
                 {episodes.map((ep, idx) => {
                   const progressPercentage = ep.currentTime && ep.duration
                     ? (ep.currentTime / ep.duration) * 100

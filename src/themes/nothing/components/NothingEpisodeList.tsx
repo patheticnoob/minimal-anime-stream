@@ -1,4 +1,8 @@
 import { Play, Film } from "lucide-react";
+import { useState, useRef } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface NothingEpisodeListProps {
   episodes: any[];
@@ -13,11 +17,64 @@ export function NothingEpisodeList({
   currentEpisodeId,
   onPlayEpisode
 }: NothingEpisodeListProps) {
+  const [jumpToEpisode, setJumpToEpisode] = useState("");
+  const episodeListRef = useRef<HTMLDivElement>(null);
+
+  const handleJumpToEpisode = () => {
+    const episodeNum = parseInt(jumpToEpisode);
+    if (isNaN(episodeNum) || episodeNum < 1) {
+      toast.error("Please enter a valid episode number");
+      return;
+    }
+
+    const targetEpisode = episodes.find(ep => ep.number === episodeNum);
+    if (!targetEpisode) {
+      toast.error(`Episode ${episodeNum} not found`);
+      return;
+    }
+
+    const targetIndex = episodes.findIndex(ep => ep.number === episodeNum);
+    if (targetIndex !== -1 && episodeListRef.current) {
+      const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
+      if (episodeElement) {
+        episodeElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        toast.success(`Scrolled to Episode ${episodeNum}`);
+        setJumpToEpisode("");
+      }
+    }
+  };
+
   return (
-    <div id="episode-list-container" className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] overflow-y-auto flex flex-col shadow-sm transition-colors duration-300">
-      <div className="flex items-center justify-between mb-6 sticky top-0 bg-white dark:bg-[#1A1D24] z-10 py-2 transition-colors duration-300">
-        <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-black/40 dark:text-white/40">Episodes</h3>
-        <span className="text-xs font-mono text-black/30 dark:text-white/30">{episodes.length} TOTAL</span>
+    <div id="episode-list-container" className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col shadow-sm transition-colors duration-300">
+      <div className="sticky top-0 bg-white dark:bg-[#1A1D24] z-10 pb-4 transition-colors duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-black/40 dark:text-white/40">Episodes</h3>
+          <span className="text-xs font-mono text-black/30 dark:text-white/30">{episodes.length} TOTAL</span>
+        </div>
+
+        {/* Jump to Episode */}
+        <div className="flex gap-2">
+          <Input
+            type="number"
+            placeholder="Jump to episode..."
+            value={jumpToEpisode}
+            onChange={(e) => setJumpToEpisode(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleJumpToEpisode();
+              }
+            }}
+            className="flex-1 bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 rounded-xl"
+            min="1"
+          />
+          <Button
+            onClick={handleJumpToEpisode}
+            size="sm"
+            className="px-4 bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white rounded-xl"
+          >
+            Go
+          </Button>
+        </div>
       </div>
       
       {episodesLoading ? (
@@ -28,8 +85,8 @@ export function NothingEpisodeList({
           </div>
         </div>
       ) : episodes.length > 0 ? (
-        <div className="space-y-3">
-          {episodes.map((ep) => {
+        <div ref={episodeListRef} className="space-y-3 overflow-y-auto flex-1">
+          {episodes.map((ep, idx) => {
             const progressPercentage =
               ep.currentTime && ep.duration ? (ep.currentTime / ep.duration) * 100 : 0;
             const isCurrentEpisode = currentEpisodeId === ep.id;
@@ -37,10 +94,11 @@ export function NothingEpisodeList({
             return (
               <button
                 key={ep.id}
+                data-episode-index={idx}
                 onClick={() => onPlayEpisode(ep)}
                 className={`group relative w-full text-left p-4 rounded-xl border transition-all duration-300 ${
-                  isCurrentEpisode 
-                    ? "bg-[#ff4d4f]/5 dark:bg-[#ff4d4f]/10 border-[#ff4d4f] shadow-[0_0_20px_rgba(255,77,79,0.1)]" 
+                  isCurrentEpisode
+                    ? "bg-[#ff4d4f]/5 dark:bg-[#ff4d4f]/10 border-[#ff4d4f] shadow-[0_0_20px_rgba(255,77,79,0.1)]"
                     : "bg-black/5 dark:bg-white/5 border-transparent hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/10"
                 }`}
               >
