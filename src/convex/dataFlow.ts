@@ -6,13 +6,13 @@ export const getUserDataFlow = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    
+
     if (!userId) {
-      return "v1"; // Default flow for non-authenticated users
+      return "v4"; // Default flow for non-authenticated users
     }
 
     const user = await ctx.db.get(userId);
-    return user?.dataFlow || "v1"; // Default to v1 if not set
+    return user?.dataFlow || "v4"; // Default to v4 if not set
   },
 });
 

@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 export function useDataFlow() {
-  const dataFlow = useQuery(api.dataFlow.getUserDataFlow) || "v1";
+  const dataFlow = useQuery(api.dataFlow.getUserDataFlow) || "v4";
   const setDataFlowMutation = useMutation(api.dataFlow.setUserDataFlow);
 
   const setDataFlow = async (flow: string) => {

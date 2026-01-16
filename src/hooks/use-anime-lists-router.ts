@@ -10,8 +10,8 @@ import { useDataFlow } from "./use-data-flow";
 export function useAnimeListsRouter() {
   const { dataFlow } = useDataFlow();
 
-  // Ensure dataFlow is never undefined - always default to v1
-  const safeDataFlow = dataFlow || "v1";
+  // Ensure dataFlow is never undefined - always default to v4
+  const safeDataFlow = dataFlow || "v4";
   console.log('[Router] Current dataFlow:', safeDataFlow, '(raw:', dataFlow, ')');
 
   // Determine which hook should be active
@@ -28,18 +28,18 @@ export function useAnimeListsRouter() {
   const v4Data = useAnimeListsV4(isV4Active);
 
   // Return the appropriate data based on dataFlow setting
-  if (isV2Active) {
+  if (isV1Active) {
+    console.log('[Router] Using v1 API hook');
+    return v1Data;
+  } else if (isV2Active) {
     console.log('[Router] Using v2 API hook');
     return v2Data;
   } else if (isV3Active) {
     console.log('[Router] Using v3 API hook');
     return v3Data;
-  } else if (isV4Active) {
-    console.log('[Router] 🚀 Using v4 HYBRID API hook (Yuma home + Hianime streaming)');
-    return v4Data;
   }
 
-  // Default to v1
-  console.log('[Router] Using v1 API hook (default)');
-  return v1Data;
+  // Default to v4
+  console.log('[Router] 🚀 Using v4 HYBRID API hook (Yuma home + Hianime streaming) [DEFAULT]');
+  return v4Data;
 }
