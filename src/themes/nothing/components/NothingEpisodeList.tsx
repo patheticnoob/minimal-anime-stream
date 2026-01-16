@@ -28,6 +28,16 @@ export function NothingEpisodeList({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const episodeListRef = useRef<HTMLDivElement>(null);
 
+  const sortedEpisodes = [...episodes].sort((a, b) => {
+    const aNum = a.number ?? 0;
+    const bNum = b.number ?? 0;
+    return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
+  });
+
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === "asc" ? "desc" : "asc");
+  };
+
   const handleJumpToEpisode = () => {
     const episodeNum = parseInt(jumpToEpisode);
     if (isNaN(episodeNum) || episodeNum < 1) {
@@ -35,13 +45,13 @@ export function NothingEpisodeList({
       return;
     }
 
-    const targetEpisode = episodes.find(ep => ep.number === episodeNum);
+    const targetEpisode = sortedEpisodes.find(ep => ep.number === episodeNum);
     if (!targetEpisode) {
       toast.error(`Episode ${episodeNum} not found`);
       return;
     }
 
-    const targetIndex = episodes.findIndex(ep => ep.number === episodeNum);
+    const targetIndex = sortedEpisodes.findIndex(ep => ep.number === episodeNum);
     if (targetIndex !== -1 && episodeListRef.current) {
       const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
       if (episodeElement) {
@@ -53,11 +63,11 @@ export function NothingEpisodeList({
   };
 
   const handleRangeClick = (startEpisode: number) => {
-    const targetEpisode = episodes.find(ep => ep.number === startEpisode);
+    const targetEpisode = sortedEpisodes.find(ep => ep.number === startEpisode);
     if (!targetEpisode) {
-      const closestEpisode = episodes.find(ep => (ep.number ?? 0) >= startEpisode);
+      const closestEpisode = sortedEpisodes.find(ep => (ep.number ?? 0) >= startEpisode);
       if (closestEpisode) {
-        const targetIndex = episodes.findIndex(ep => ep.id === closestEpisode.id);
+        const targetIndex = sortedEpisodes.findIndex(ep => ep.id === closestEpisode.id);
         if (targetIndex !== -1 && episodeListRef.current) {
           const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
           if (episodeElement) {
@@ -68,7 +78,7 @@ export function NothingEpisodeList({
       return;
     }
 
-    const targetIndex = episodes.findIndex(ep => ep.number === startEpisode);
+    const targetIndex = sortedEpisodes.findIndex(ep => ep.number === startEpisode);
     if (targetIndex !== -1 && episodeListRef.current) {
       const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
       if (episodeElement) {
@@ -90,16 +100,6 @@ export function NothingEpisodeList({
   };
 
   const episodeRanges = getEpisodeRanges();
-
-  const sortedEpisodes = [...episodes].sort((a, b) => {
-    const aNum = a.number ?? 0;
-    const bNum = b.number ?? 0;
-    return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
-  });
-
-  const toggleSortOrder = () => {
-    setSortOrder(prev => prev === "asc" ? "desc" : "asc");
-  };
 
   return (
     <div id="episode-list-container" className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col shadow-sm transition-colors duration-300">
