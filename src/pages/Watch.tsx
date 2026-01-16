@@ -580,35 +580,37 @@ export default function Watch() {
     <div className="min-h-screen bg-[#0B0F19] text-white">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#050814]/95 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-[2000px] mx-auto px-6 py-4 flex items-center gap-4">
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-2 py-1 flex-shrink-0"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="text-sm font-medium">Back</span>
-          </button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold truncate">{anime?.title || "Loading..."}</h1>
+        <div className="max-w-[2000px] mx-auto px-4 py-3 md:px-6 md:py-4">
+          <div className="flex items-center gap-2 md:gap-4">
+            <button
+              onClick={() => navigate("/")}
+              className="flex items-center gap-1 md:gap-2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-1 md:px-2 py-1 flex-shrink-0"
+            >
+              <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
+              <span className="text-xs md:text-sm font-medium hidden xs:inline">Back</span>
+            </button>
+            <div className="flex-1 min-w-0 mr-2">
+              <h1 className="text-sm md:text-xl font-bold truncate leading-tight">{anime?.title || "Loading..."}</h1>
+            </div>
+            <Button
+              onClick={handleToggleWatchlist}
+              variant="outline"
+              size="sm"
+              className="gap-1 md:gap-2 flex-shrink-0 text-xs md:text-sm px-2 md:px-3 h-8 md:h-9"
+            >
+              {isInWatchlist ? (
+                <>
+                  <Check className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">In Watchlist</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">Watchlist</span>
+                </>
+              )}
+            </Button>
           </div>
-          <Button
-            onClick={handleToggleWatchlist}
-            variant="outline"
-            size="sm"
-            className="gap-2 flex-shrink-0"
-          >
-            {isInWatchlist ? (
-              <>
-                <Check className="h-4 w-4" />
-                <span className="hidden sm:inline">In Watchlist</span>
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Watchlist</span>
-              </>
-            )}
-          </Button>
         </div>
       </header>
 
