@@ -24,7 +24,7 @@ type ProfileAnime = {
   id?: string;
   episodeNumber?: number;
   currentTime?: number;
-  duration?: number;
+  duration?: number | string; // number (progress) or string (V4: "24m")
 };
 
 interface ProfileDashboardProps {

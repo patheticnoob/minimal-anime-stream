@@ -11,11 +11,11 @@ export type AnimeItem = {
   sourceCategory?: "continueWatching" | "watchlist" | "recentEpisodes";
   episodeNumber?: number;
   currentTime?: number;
-  duration?: number;
+  duration?: number | string; // number (progress seconds) or string (V4: "24m")
   // V2 enriched fields from Hianime API
   alternativeTitle?: string;
   quality?: string; // HD, FHD, etc.
-  rank?: number;
+  rank?: number | string; // number (rank) or string (V4: "#1 Spotlight")
   rating?: string; // PG-13, R, etc.
   is18Plus?: boolean;
   malScore?: number;

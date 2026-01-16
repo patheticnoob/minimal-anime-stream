@@ -21,11 +21,16 @@ type AnimeItem = {
   score?: number;
   malScore?: number;
   quality?: string;
-  rank?: number;
+  rank?: number | string; // V4: Can be string like "#1 Spotlight"
   rating?: string;
   totalEpisodes?: number;
   status?: string;
   aired?: string | { from?: string; to?: string | null };
+  // V4 Spotlight-specific fields
+  description?: string;
+  releaseDate?: string;
+  duration?: number | string; // number (progress) or string (V4: "24m")
+  japaneseTitle?: string;
 };
 
 interface HeroBannerProps {
@@ -114,11 +119,14 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
     ? "PREMIERE SPOTLIGHT" 
     : "NOW STREAMING WEEKLY";
 
-  // Check if we have V2 enriched data
-  const hasEnrichedData = !!(anime.synopsis || anime.genres || anime.score || anime.malScore);
+  // Check if we have V2/V4 enriched data
+  const hasEnrichedData = !!(anime.synopsis || anime.description || anime.genres || anime.score || anime.malScore);
   const displayScore = anime.malScore?.toFixed(1) || anime.score?.toFixed(1) || "N/A";
-  const displayDescription = anime.synopsis
-    ? anime.synopsis.slice(0, 200) + (anime.synopsis.length > 200 ? "..." : "")
+
+  // V4 spotlight has 'description', V2 has 'synopsis'
+  const rawDescription = anime.description || anime.synopsis;
+  const displayDescription = rawDescription
+    ? rawDescription.slice(0, 280) + (rawDescription.length > 280 ? "..." : "")
     : "Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available. Join the adventure today.";
 
   // Debug logging to see what data hero banner receives
@@ -159,9 +167,21 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
 
           {/* Compact Meta Info - Small inline tags */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
+            {/* V4 Spotlight Rank */}
+            {anime.rank && (
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-[10px] font-black px-2.5 py-1 uppercase tracking-wide rounded border-2 border-yellow-600">
+                {anime.rank}
+              </span>
+            )}
             {anime.type && (
               <span className="bg-[#E50914] text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide rounded">
                 {anime.type}
+              </span>
+            )}
+            {/* V4 Duration */}
+            {anime.duration && (
+              <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-300 text-[10px] font-bold px-2.5 py-1 rounded border border-purple-400">
+                {anime.duration}
               </span>
             )}
             {availableLanguages.length > 0 && (
@@ -176,6 +196,12 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
             {anime.status && (
               <span className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
                 {anime.status}
+              </span>
+            )}
+            {/* V4 Release Date */}
+            {anime.releaseDate && (
+              <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-300 text-[10px] font-bold px-2.5 py-1 rounded border border-blue-400">
+                📅 {anime.releaseDate}
               </span>
             )}
             {anime.quality && (
@@ -201,10 +227,10 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
             </div>
           )}
 
-          {/* Alternative Title */}
-          {anime.alternativeTitle && (
+          {/* Alternative Title or Japanese Title (V4) */}
+          {(anime.alternativeTitle || anime.japaneseTitle) && (
             <p className="text-gray-500 dark:text-gray-400 text-sm mb-2 font-medium">
-              {anime.alternativeTitle}
+              {anime.alternativeTitle || anime.japaneseTitle}
             </p>
           )}
 

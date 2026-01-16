@@ -18,9 +18,9 @@ type AnimeItem = {
   };
   episodeNumber?: number;
   currentTime?: number;
-  duration?: number;
+  duration?: number | string; // number (progress) or string (V4: "24m")
   quality?: string;
-  rank?: number;
+  rank?: number | string; // number or string (V4: "#1 Spotlight")
   malScore?: number;
   rating?: string;
   genres?: string[];
@@ -57,7 +57,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait", isLoading = false
     return <AnimeCardSkeleton variant={variant} theme={theme} />;
   }
 
-  const progressPercentage = anime.currentTime && anime.duration
+  const progressPercentage = anime.currentTime && anime.duration && typeof anime.duration === 'number'
     ? (anime.currentTime / anime.duration) * 100
     : 0;
 
@@ -130,7 +130,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait", isLoading = false
         )}
 
         {/* Rank badge - Top Right corner (when available) */}
-        {anime.rank && anime.rank <= 10 && (
+        {anime.rank && typeof anime.rank === 'number' && anime.rank <= 10 && (
           <div className="absolute top-2 right-2">
             <Badge className={`${theme === "nothing" ? "bg-yellow-500/90" : "bg-yellow-600/90"} backdrop-blur-sm text-white border-0 text-[9px] font-bold px-1.5 py-1 ${theme === "nothing" ? "rounded-full" : "rounded-sm"} shadow-sm flex items-center gap-0.5`}>
               <Trophy className="w-2.5 h-2.5" />
