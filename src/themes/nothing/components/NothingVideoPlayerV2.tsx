@@ -49,6 +49,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showSubtitles, setShowSubtitles] = useState(false);
@@ -77,6 +78,10 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
   const updateControlsVisibility = useCallback(
     (nextVisible: boolean | ((prevVisible: boolean) => boolean)) => {
+      // Don't update controls visibility if locked
+      if (isLocked) {
+        return;
+      }
       setShowControls((prevVisible) => {
         const resolvedVisible =
           typeof nextVisible === "function"
@@ -86,7 +91,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         return resolvedVisible;
       });
     },
-    [],
+    [isLocked],
   );
 
   // Pause video when casting starts and sync time
@@ -576,7 +581,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
     document.addEventListener("mozfullscreenchange", handleFullscreenChange);
     document.addEventListener("MSFullscreenChange", handleFullscreenChange);
-    
+
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
@@ -584,6 +589,23 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
     };
   }, []);
+
+  const toggleLock = useCallback(() => {
+    const newLockedState = !isLocked;
+    setIsLocked(newLockedState);
+
+    if (newLockedState) {
+      // When locking, hide controls immediately
+      setShowControls(false);
+      if (controlsTimeoutRef.current) {
+        window.clearTimeout(controlsTimeoutRef.current);
+        controlsTimeoutRef.current = null;
+      }
+    } else {
+      // When unlocking, show controls
+      setShowControls(true);
+    }
+  }, [isLocked]);
 
   const skip = (seconds: number) => {
     const video = videoRef.current;
@@ -1008,6 +1030,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           castAvailable={castAvailable}
           isCasting={isCasting}
           onCastClick={handleCastClick}
+          isLocked={isLocked}
+          onToggleLock={toggleLock}
         />
       </motion.div>
     </AnimatePresence>

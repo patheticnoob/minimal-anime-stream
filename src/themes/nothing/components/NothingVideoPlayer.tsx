@@ -54,6 +54,7 @@ export function NothingVideoPlayer({
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
   const [subtitles, setSubtitles] = useState<Array<{ index: number; label: string }>>([]);
   const [currentSubtitle, setCurrentSubtitle] = useState(-1);
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
@@ -79,6 +80,10 @@ export function NothingVideoPlayer({
 
   // Auto-hide controls after 3 seconds of inactivity
   const resetControlsTimeout = useCallback(() => {
+    // Don't show or hide controls if locked
+    if (isLocked) {
+      return;
+    }
     setShowControls(true);
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
@@ -88,7 +93,7 @@ export function NothingVideoPlayer({
         setShowControls(false);
       }, 3000);
     }
-  }, [isPlaying, isFullscreen]);
+  }, [isPlaying, isFullscreen, isLocked]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -332,6 +337,23 @@ export function NothingVideoPlayer({
       document.exitFullscreen().catch(() => {});
     } else {
       container.requestFullscreen().catch(() => {});
+    }
+  };
+
+  const toggleLock = () => {
+    const newLockedState = !isLocked;
+    setIsLocked(newLockedState);
+
+    if (newLockedState) {
+      // When locking, hide controls immediately
+      setShowControls(false);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    } else {
+      // When unlocking, show controls
+      setShowControls(true);
+      resetControlsTimeout();
     }
   };
 

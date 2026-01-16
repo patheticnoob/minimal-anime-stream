@@ -11,6 +11,8 @@ import {
   SkipForward,
   SkipBack,
   Subtitles,
+  Lock,
+  Unlock,
 } from "lucide-react";
 import { formatTime } from "./NothingPlayerUtils";
 import { findThumbnailForTime, type ThumbnailCue } from "@/lib/vttParser";
@@ -46,6 +48,8 @@ interface NothingPlayerControlsProps {
   castAvailable?: boolean;
   isCasting?: boolean;
   onCastClick?: () => void;
+  isLocked?: boolean;
+  onToggleLock?: () => void;
 }
 
 export function NothingPlayerControls({
@@ -79,6 +83,8 @@ export function NothingPlayerControls({
   castAvailable,
   isCasting,
   onCastClick,
+  isLocked = false,
+  onToggleLock,
 }: NothingPlayerControlsProps) {
   const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number; width: number; height: number; spriteX: number; spriteY: number } | null>(null);
 
@@ -335,26 +341,41 @@ export function NothingPlayerControls({
             </div>
 
             {castAvailable && onCastClick && (
-              <button 
-                onClick={onCastClick} 
+              <button
+                onClick={onCastClick}
                 className={`${buttonClass} ${isCasting ? activeButtonClass : ""}`}
                 data-testid="cast-button"
                 title={isCasting ? "Stop Casting" : "Cast to Device"}
               >
-                <svg 
-                  width="20" 
-                  height="20" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
                   strokeLinejoin="round"
                   className={isCasting ? "text-white" : "text-[#0a0a0a]"}
                 >
                   <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6" />
                   {isCasting && <circle cx="12" cy="12" r="2" fill="currentColor" />}
                 </svg>
+              </button>
+            )}
+
+            {onToggleLock && (
+              <button
+                onClick={onToggleLock}
+                className={`${buttonClass} ${isLocked ? activeButtonClass : ""}`}
+                data-testid="lock-button"
+                title={isLocked ? "Unlock Controls" : "Lock Controls"}
+              >
+                {isLocked ? (
+                  <Lock size={20} className="text-white" />
+                ) : (
+                  <Unlock size={20} className="text-[#0a0a0a]" />
+                )}
               </button>
             )}
 
