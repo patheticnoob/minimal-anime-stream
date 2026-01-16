@@ -60,12 +60,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     loading,
     popularItems,
     airingItems,
-    movieItems,
+    recentEpisodeItems,
     tvShowItems,
     heroAnime,
     popularLoading,
     airingLoading,
-    moviesLoading,
+    recentEpisodesLoading,
     tvShowsLoading,
     query: animeDataQuery,
     setQuery: setAnimeDataQuery,
@@ -158,12 +158,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       pageCache.cacheLandingPage({
         popularItems,
         airingItems,
-        movieItems,
+        recentEpisodeItems,
         tvShowItems,
         heroAnime,
       });
     }
-  }, [loading, popularItems, airingItems, movieItems, tvShowItems, heroAnime]);
+  }, [loading, popularItems, airingItems, recentEpisodeItems, tvShowItems, heroAnime]);
 
   // Save scroll position before navigating away
   useEffect(() => {
@@ -342,7 +342,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const getSectionContent = () => {
     switch (activeSection) {
       case "tv": return tvShowItems;
-      case "movies": return movieItems;
+      case "movies": return recentEpisodeItems;
       case "popular": return popularItems;
       case "recent": return airingItems;
       default: return null;
@@ -481,11 +481,11 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                   watchlistItems={watchlistItems}
                   popularItems={popularItems}
                   airingItems={airingItems}
-                  movieItems={movieItems}
+                  recentEpisodeItems={recentEpisodeItems}
                   tvShowItems={tvShowItems}
                   popularLoading={popularLoading}
                   airingLoading={airingLoading}
-                  moviesLoading={moviesLoading}
+                  recentEpisodesLoading={recentEpisodesLoading}
                   tvShowsLoading={tvShowsLoading}
                   onOpenAnime={openAnime}
                   onLoadMore={loadMoreItems}

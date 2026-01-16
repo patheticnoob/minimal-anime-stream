@@ -47,13 +47,13 @@ export function useAnimeListsV2(isActive: boolean = true) {
   const [loading, setLoading] = useState(!isActive); // Start as not loading if inactive
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
-  const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
+  const [recentEpisodeItems, setRecentEpisodeItems] = useState<AnimeItem[]>([]);
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
 
   const [popularLoading, setPopularLoading] = useState(true);
   const [airingLoading, setAiringLoading] = useState(true);
-  const [moviesLoading, setMoviesLoading] = useState(true);
+  const [recentEpisodesLoading, setRecentEpisodesLoading] = useState(true);
   const [tvShowsLoading, setTVShowsLoading] = useState(true);
 
   const [query, setQuery] = useState("");
@@ -62,12 +62,12 @@ export function useAnimeListsV2(isActive: boolean = true) {
 
   const [popularPage] = useState(1);
   const [airingPage] = useState(1);
-  const [moviePage] = useState(1);
+  const [recentEpisodesPage] = useState(1);
   const [tvShowPage] = useState(1);
 
   const [popularHasMore] = useState(false); // V2 doesn't support pagination yet
   const [airingHasMore] = useState(false);
-  const [movieHasMore] = useState(false);
+  const [recentEpisodesHasMore] = useState(false);
   const [tvShowHasMore] = useState(false);
 
   const [loadingMore, setLoadingMore] = useState<string | null>(null);
@@ -142,22 +142,20 @@ export function useAnimeListsV2(isActive: boolean = true) {
         setAiringLoading(false);
       });
 
-    // Load Most Popular (filter for movies)
-    logInfo('Fetching most popular from Hianime v2', 'Initial Load');
-    retryWithBackoff(() => fetchHianimeCategory('mostPopular'))
+    // Load Recent Episodes
+    logInfo('Fetching recent episodes from Hianime v2', 'Initial Load');
+    retryWithBackoff(() => fetchHianimeCategory('newAdded'))
       .then((data) => {
         if (!mounted) return;
-        // Filter for movies
-        const movies = data.results.filter(item => item.type?.toLowerCase() === 'movie');
-        setMovieItems(movies);
-        setMoviesLoading(false);
-        logInfo('Movies loaded from Hianime v2', 'Initial Load');
+        setRecentEpisodeItems(data.results);
+        setRecentEpisodesLoading(false);
+        logInfo('Recent episodes loaded from Hianime v2', 'Initial Load');
       })
       .catch((err) => {
         if (!mounted) return;
-        const msg = err instanceof Error ? err.message : "Failed to load movies";
-        logError(msg, 'Hianime Movies', err instanceof Error ? err : undefined);
-        setMoviesLoading(false);
+        const msg = err instanceof Error ? err.message : "Failed to load recent episodes";
+        logError(msg, 'Hianime Recent Episodes', err instanceof Error ? err : undefined);
+        setRecentEpisodesLoading(false);
       });
 
     // Load Top Airing (filter for TV shows)
@@ -230,7 +228,7 @@ export function useAnimeListsV2(isActive: boolean = true) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows') => {
+  const loadMoreItems = async (category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => {
     setLoadingMore(category);
     logInfo(`Load more not supported in v2 for: ${category}`, 'Pagination');
     setLoadingMore(null);
@@ -241,12 +239,12 @@ export function useAnimeListsV2(isActive: boolean = true) {
     loading,
     popularItems,
     airingItems,
-    movieItems,
+    recentEpisodeItems,
     tvShowItems,
     heroAnime,
     popularLoading,
     airingLoading,
-    moviesLoading,
+    recentEpisodesLoading,
     tvShowsLoading,
     query,
     setQuery,
@@ -257,7 +255,7 @@ export function useAnimeListsV2(isActive: boolean = true) {
     hasMore: {
       popular: popularHasMore,
       airing: airingHasMore,
-      movies: movieHasMore,
+      recentEpisodes: recentEpisodesHasMore,
       tvShows: tvShowHasMore,
     }
   };

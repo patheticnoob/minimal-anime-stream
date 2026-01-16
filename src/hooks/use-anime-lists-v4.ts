@@ -170,14 +170,14 @@ export function useAnimeListsV4(isActive: boolean = true) {
   const [loading, setLoading] = useState(!isActive);
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
-  const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
+  const [recentEpisodeItems, setRecentEpisodeItems] = useState<AnimeItem[]>([]);
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
   const [spotlightItems, setSpotlightItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
 
   const [popularLoading, setPopularLoading] = useState(true);
   const [airingLoading, setAiringLoading] = useState(true);
-  const [moviesLoading, setMoviesLoading] = useState(true);
+  const [recentEpisodesLoading, setRecentEpisodesLoading] = useState(true);
   const [tvShowsLoading, setTVShowsLoading] = useState(true);
 
   const [query, setQuery] = useState("");
@@ -186,12 +186,12 @@ export function useAnimeListsV4(isActive: boolean = true) {
 
   const [popularPage, setPopularPage] = useState(1);
   const [airingPage, setAiringPage] = useState(1);
-  const [moviePage, setMoviePage] = useState(1);
+  const [recentEpisodesPage, setRecentEpisodesPage] = useState(1);
   const [tvShowPage, setTVShowPage] = useState(1);
 
   const [popularHasMore, setPopularHasMore] = useState(false);
   const [airingHasMore, setAiringHasMore] = useState(false);
-  const [movieHasMore, setMovieHasMore] = useState(false);
+  const [recentEpisodesHasMore, setRecentEpisodesHasMore] = useState(false);
   const [tvShowHasMore, setTVShowHasMore] = useState(false);
 
   const [loadingMore, setLoadingMore] = useState<string | null>(null);
@@ -261,21 +261,21 @@ export function useAnimeListsV4(isActive: boolean = true) {
         setAiringLoading(false);
       });
 
-    // Load movies
-    logInfo('Fetching movies from Yuma (v4 hybrid flow)', 'Initial Load');
-    retryWithBackoff(() => fetchYumaEndpoint('movies', 1))
+    // Load recent episodes
+    logInfo('Fetching recent episodes from Yuma (v4 hybrid flow)', 'Initial Load');
+    retryWithBackoff(() => fetchYumaEndpoint('recent-episodes', 1))
       .then((data) => {
         if (!mounted) return;
-        setMovieItems(data.results);
-        setMovieHasMore(data.hasNextPage);
-        setMoviesLoading(false);
-        logInfo('✅ V4 Movies loaded from Yuma', 'Initial Load');
+        setRecentEpisodeItems(data.results);
+        setRecentEpisodesHasMore(data.hasNextPage);
+        setRecentEpisodesLoading(false);
+        logInfo('✅ V4 Recent episodes loaded from Yuma', 'Initial Load');
       })
       .catch((err) => {
         if (!mounted) return;
-        const msg = err instanceof Error ? err.message : "Failed to load movies";
-        logError(msg, 'Yuma Movies', err instanceof Error ? err : undefined);
-        setMoviesLoading(false);
+        const msg = err instanceof Error ? err.message : "Failed to load recent episodes";
+        logError(msg, 'Yuma Recent Episodes', err instanceof Error ? err : undefined);
+        setRecentEpisodesLoading(false);
       });
 
     // Load TV shows
@@ -344,7 +344,7 @@ export function useAnimeListsV4(isActive: boolean = true) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows') => {
+  const loadMoreItems = async (category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => {
     setLoadingMore(category);
     logInfo(`Loading more items for: ${category} (v4 hybrid flow)`, 'Pagination');
 
@@ -370,12 +370,12 @@ export function useAnimeListsV4(isActive: boolean = true) {
           setPage = setAiringPage;
           setHasMore = setAiringHasMore;
           break;
-        case 'movies':
-          nextPage = moviePage + 1;
-          endpoint = 'movies';
-          setItems = setMovieItems;
-          setPage = setMoviePage;
-          setHasMore = setMovieHasMore;
+        case 'recentEpisodes':
+          nextPage = recentEpisodesPage + 1;
+          endpoint = 'recent-episodes';
+          setItems = setRecentEpisodeItems;
+          setPage = setRecentEpisodesPage;
+          setHasMore = setRecentEpisodesHasMore;
           break;
         case 'tvShows':
           nextPage = tvShowPage + 1;
@@ -404,12 +404,12 @@ export function useAnimeListsV4(isActive: boolean = true) {
     loading,
     popularItems,
     airingItems,
-    movieItems,
+    recentEpisodeItems,
     tvShowItems,
     heroAnime,
     popularLoading,
     airingLoading,
-    moviesLoading,
+    recentEpisodesLoading,
     tvShowsLoading,
     query,
     setQuery,
@@ -420,7 +420,7 @@ export function useAnimeListsV4(isActive: boolean = true) {
     hasMore: {
       popular: popularHasMore,
       airing: airingHasMore,
-      movies: movieHasMore,
+      recentEpisodes: recentEpisodesHasMore,
       tvShows: tvShowHasMore,
     }
   };

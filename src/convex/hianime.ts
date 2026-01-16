@@ -113,6 +113,22 @@ export const tvShows = action({
   },
 });
 
+// Get recent episodes
+export const recentEpisodes = action({
+  args: { page: v.optional(v.number()) },
+  handler: async (_, args) => {
+    try {
+      const client = await getClient();
+      const page = args.page ?? 1;
+      const res = await client.getRecentEpisodes(page);
+      return res;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch recent episodes";
+      throw new Error(`Unable to load recent episodes: ${message}`);
+    }
+  },
+});
+
 // Get episodes for an anime (by dataId)
 export const episodes = action({
   args: { dataId: v.string() },

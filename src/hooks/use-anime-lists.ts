@@ -33,23 +33,23 @@ async function retryWithBackoff<T>(
 export function useAnimeLists(isActive: boolean = true) {
   const fetchTopAiring = useAction(api.hianime.topAiring);
   const fetchMostPopular = useAction(api.hianime.mostPopular);
-  const fetchMovies = useAction(api.hianime.movies);
+  const fetchRecentEpisodes = useAction(api.hianime.recentEpisodes);
   const fetchTVShows = useAction(api.hianime.tvShows);
   const searchAnime = useAction(api.hianime.search);
 
   const [loading, setLoading] = useState(!isActive); // Start as not loading if inactive
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
-  const [movieItems, setMovieItems] = useState<AnimeItem[]>([]);
+  const [recentEpisodeItems, setRecentEpisodeItems] = useState<AnimeItem[]>([]);
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
-  
+
   // Individual loading states for progressive loading
   const [popularLoading, setPopularLoading] = useState(true);
   const [airingLoading, setAiringLoading] = useState(true);
-  const [moviesLoading, setMoviesLoading] = useState(true);
+  const [recentEpisodesLoading, setRecentEpisodesLoading] = useState(true);
   const [tvShowsLoading, setTVShowsLoading] = useState(true);
-  
+
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<AnimeItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -57,14 +57,14 @@ export function useAnimeLists(isActive: boolean = true) {
   // Pagination state
   const [popularPage, setPopularPage] = useState(1);
   const [airingPage, setAiringPage] = useState(1);
-  const [moviePage, setMoviePage] = useState(1);
+  const [recentEpisodesPage, setRecentEpisodesPage] = useState(1);
   const [tvShowPage, setTVShowPage] = useState(1);
-  
+
   const [popularHasMore, setPopularHasMore] = useState(false);
   const [airingHasMore, setAiringHasMore] = useState(false);
-  const [movieHasMore, setMovieHasMore] = useState(false);
+  const [recentEpisodesHasMore, setRecentEpisodesHasMore] = useState(false);
   const [tvShowHasMore, setTVShowHasMore] = useState(false);
-  
+
   const [loadingMore, setLoadingMore] = useState<string | null>(null);
 
   // Load content progressively - each section loads independently with retry logic
@@ -121,22 +121,22 @@ export function useAnimeLists(isActive: boolean = true) {
         setAiringLoading(false);
       });
 
-    // Load movies independently with retry
-    logInfo('Fetching movies', 'Initial Load');
-    retryWithBackoff(() => fetchMovies({ page: 1 }))
-      .then((movies) => {
+    // Load recent episodes independently with retry
+    logInfo('Fetching recent episodes', 'Initial Load');
+    retryWithBackoff(() => fetchRecentEpisodes({ page: 1 }))
+      .then((recentEps) => {
         if (!mounted) return;
-        const moviesData = movies as { results: AnimeItem[]; hasNextPage: boolean };
-        setMovieItems(moviesData.results || []);
-        setMovieHasMore(moviesData.hasNextPage || false);
-        setMoviesLoading(false);
-        logInfo('Movies loaded successfully', 'Initial Load');
+        const recentEpisodesData = recentEps as { results: AnimeItem[]; hasNextPage: boolean };
+        setRecentEpisodeItems(recentEpisodesData.results || []);
+        setRecentEpisodesHasMore(recentEpisodesData.hasNextPage || false);
+        setRecentEpisodesLoading(false);
+        logInfo('Recent episodes loaded successfully', 'Initial Load');
       })
       .catch((err) => {
         if (!mounted) return;
-        const msg = err instanceof Error ? err.message : "Failed to load movies";
-        logError(msg, 'Movies', err instanceof Error ? err : undefined);
-        setMoviesLoading(false);
+        const msg = err instanceof Error ? err.message : "Failed to load recent episodes";
+        logError(msg, 'Recent Episodes', err instanceof Error ? err : undefined);
+        setRecentEpisodesLoading(false);
       });
 
     // Load TV shows independently with retry
@@ -160,7 +160,7 @@ export function useAnimeLists(isActive: boolean = true) {
     return () => {
       mounted = false;
     };
-  }, [isActive, fetchMostPopular, fetchTopAiring, fetchMovies, fetchTVShows]);
+  }, [isActive, fetchMostPopular, fetchTopAiring, fetchRecentEpisodes, fetchTVShows]);
 
   // Auto-rotate hero banner
   useEffect(() => {
@@ -208,7 +208,7 @@ export function useAnimeLists(isActive: boolean = true) {
     return () => clearTimeout(timeoutId);
   }, [query, searchAnime]);
 
-  const loadMoreItems = async (category: 'popular' | 'airing' | 'movies' | 'tvShows') => {
+  const loadMoreItems = async (category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => {
     setLoadingMore(category);
     logInfo(`Loading more items for: ${category}`, 'Pagination');
     
@@ -234,12 +234,12 @@ export function useAnimeLists(isActive: boolean = true) {
           setPage = setAiringPage;
           setHasMore = setAiringHasMore;
           break;
-        case 'movies':
-          nextPage = moviePage + 1;
-          fetchFunction = fetchMovies;
-          setItems = setMovieItems;
-          setPage = setMoviePage;
-          setHasMore = setMovieHasMore;
+        case 'recentEpisodes':
+          nextPage = recentEpisodesPage + 1;
+          fetchFunction = fetchRecentEpisodes;
+          setItems = setRecentEpisodeItems;
+          setPage = setRecentEpisodesPage;
+          setHasMore = setRecentEpisodesHasMore;
           break;
         case 'tvShows':
           nextPage = tvShowPage + 1;
@@ -271,12 +271,12 @@ export function useAnimeLists(isActive: boolean = true) {
     loading,
     popularItems,
     airingItems,
-    movieItems,
+    recentEpisodeItems,
     tvShowItems,
     heroAnime,
     popularLoading,
     airingLoading,
-    moviesLoading,
+    recentEpisodesLoading,
     tvShowsLoading,
     query,
     setQuery,
@@ -287,7 +287,7 @@ export function useAnimeLists(isActive: boolean = true) {
     hasMore: {
       popular: popularHasMore,
       airing: airingHasMore,
-      movies: movieHasMore,
+      recentEpisodes: recentEpisodesHasMore,
       tvShows: tvShowHasMore,
     }
   };

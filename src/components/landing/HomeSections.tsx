@@ -9,19 +9,19 @@ interface HomeSectionsProps {
   watchlistItems: AnimeItem[];
   popularItems: AnimeItem[];
   airingItems: AnimeItem[];
-  movieItems: AnimeItem[];
+  recentEpisodeItems: AnimeItem[];
   tvShowItems: AnimeItem[];
   popularLoading: boolean;
   airingLoading: boolean;
-  moviesLoading: boolean;
+  recentEpisodesLoading: boolean;
   tvShowsLoading: boolean;
   onOpenAnime: (anime: AnimeItem) => void;
-  onLoadMore: (category: 'popular' | 'airing' | 'movies' | 'tvShows') => void;
+  onLoadMore: (category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => void;
   loadingMore: string | null;
   hasMore: {
     popular: boolean;
     airing: boolean;
-    movies: boolean;
+    recentEpisodes: boolean;
     tvShows: boolean;
   };
   focusedRailIndex?: number;
@@ -58,11 +58,11 @@ export function HomeSections({
   watchlistItems,
   popularItems,
   airingItems,
-  movieItems,
+  recentEpisodeItems,
   tvShowItems,
   popularLoading,
   airingLoading,
-  moviesLoading,
+  recentEpisodesLoading,
   tvShowsLoading,
   onOpenAnime,
   onLoadMore,
@@ -146,21 +146,21 @@ export function HomeSections({
         />
       )}
 
-      {/* Popular Movies */}
-      {moviesLoading ? (
+      {/* Recent Episodes */}
+      {recentEpisodesLoading ? (
         <div>
-          <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Popular Movies</h2>
+          <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Recent Episodes</h2>
           <LoadingSkeleton />
         </div>
       ) : (
         <ContentRail
-          title="Popular Movies"
-          items={movieItems}
+          title="Recent Episodes"
+          items={recentEpisodeItems}
           onItemClick={onOpenAnime}
           enableInfiniteScroll
-          onLoadMore={() => onLoadMore('movies')}
-          hasMore={hasMore.movies}
-          isLoadingMore={loadingMore === 'movies'}
+          onLoadMore={() => onLoadMore('recentEpisodes')}
+          hasMore={hasMore.recentEpisodes}
+          isLoadingMore={loadingMore === 'recentEpisodes'}
           isFocused={focusedRailIndex === getRailIndex() - 1}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}

@@ -106,7 +106,7 @@ export class PageCache {
   cacheLandingPage(data: {
     popularItems: any[];
     airingItems: any[];
-    movieItems: any[];
+    recentEpisodeItems: any[];
     tvShowItems: any[];
     heroAnime: any;
   }): void {
