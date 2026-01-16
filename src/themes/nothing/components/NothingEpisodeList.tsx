@@ -1,7 +1,14 @@
-import { Play, Film } from "lucide-react";
+import { Play, Film, ArrowUpDown } from "lucide-react";
 import { useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface NothingEpisodeListProps {
@@ -18,6 +25,7 @@ export function NothingEpisodeList({
   onPlayEpisode
 }: NothingEpisodeListProps) {
   const [jumpToEpisode, setJumpToEpisode] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const episodeListRef = useRef<HTMLDivElement>(null);
 
   const handleJumpToEpisode = () => {
@@ -83,6 +91,16 @@ export function NothingEpisodeList({
 
   const episodeRanges = getEpisodeRanges();
 
+  const sortedEpisodes = [...episodes].sort((a, b) => {
+    const aNum = a.number ?? 0;
+    const bNum = b.number ?? 0;
+    return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
+  });
+
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === "asc" ? "desc" : "asc");
+  };
+
   return (
     <div id="episode-list-container" className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col shadow-sm transition-colors duration-300">
       <div className="sticky top-0 bg-white dark:bg-[#1A1D24] z-10 pb-4 transition-colors duration-300">
@@ -115,22 +133,32 @@ export function NothingEpisodeList({
           </Button>
         </div>
 
-        {/* Episode Range Buttons */}
-        {episodeRanges.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {episodeRanges.map((range) => (
-              <Button
-                key={range.start}
-                onClick={() => handleRangeClick(range.start)}
-                variant="outline"
-                size="sm"
-                className="text-xs bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-[#ff4d4f] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white rounded-xl"
-              >
-                {range.label}
-              </Button>
-            ))}
-          </div>
-        )}
+        {/* Range Dropdown and Sort Button */}
+        <div className="flex gap-2 mb-3">
+          {episodeRanges.length > 0 && (
+            <Select onValueChange={(value) => handleRangeClick(parseInt(value))}>
+              <SelectTrigger size="sm" className="flex-1 bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-black dark:text-white rounded-xl">
+                <SelectValue placeholder="Select range" />
+              </SelectTrigger>
+              <SelectContent>
+                {episodeRanges.map((range) => (
+                  <SelectItem key={range.start} value={range.start.toString()}>
+                    {range.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Button
+            onClick={toggleSortOrder}
+            size="sm"
+            variant="outline"
+            className={`bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-[#ff4d4f] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white rounded-xl ${episodeRanges.length === 0 ? 'ml-auto' : ''}`}
+          >
+            <ArrowUpDown className="h-4 w-4 mr-2" />
+            {sortOrder === "asc" ? "Oldest" : "Latest"}
+          </Button>
+        </div>
       </div>
       
       {episodesLoading ? (
@@ -140,9 +168,9 @@ export function NothingEpisodeList({
             <p className="text-sm text-black/40 dark:text-white/40 tracking-wider uppercase">Loading episodes...</p>
           </div>
         </div>
-      ) : episodes.length > 0 ? (
+      ) : sortedEpisodes.length > 0 ? (
         <div ref={episodeListRef} className="space-y-3 overflow-y-auto flex-1">
-          {episodes.map((ep, idx) => {
+          {sortedEpisodes.map((ep, idx) => {
             const progressPercentage =
               ep.currentTime && ep.duration ? (ep.currentTime / ep.duration) * 100 : 0;
             const isCurrentEpisode = currentEpisodeId === ep.id;

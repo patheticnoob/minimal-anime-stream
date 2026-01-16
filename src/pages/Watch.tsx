@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { ArrowLeft, Play, Plus, Check, Clock3 } from "lucide-react";
+import { ArrowLeft, Play, Plus, Check, Clock3, ArrowUpDown } from "lucide-react";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useAuth } from "@/hooks/use-auth";
@@ -12,6 +12,13 @@ import { useDataFlow } from "@/hooks/use-data-flow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
@@ -93,6 +100,7 @@ export default function Watch() {
   const [focusedEpisodeIndex, setFocusedEpisodeIndex] = useState(0);
   const [isNavigatingEpisodes, setIsNavigatingEpisodes] = useState(false);
   const [jumpToEpisode, setJumpToEpisode] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const episodeListRef = useRef<HTMLDivElement>(null);
 
   const saveProgress = useMutation(api.watchProgress.saveProgress);
@@ -502,6 +510,16 @@ export default function Watch() {
 
   const episodeRanges = getEpisodeRanges();
 
+  const sortedEpisodes = [...episodes].sort((a, b) => {
+    const aNum = a.number ?? 0;
+    const bNum = b.number ?? 0;
+    return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
+  });
+
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === "asc" ? "desc" : "asc");
+  };
+
   const broadcastDetails = (() => {
     if (!broadcastInfo?.day || !broadcastInfo?.time || !broadcastInfo?.timezone) {
       return null;
@@ -721,7 +739,7 @@ export default function Watch() {
                 )}
               </h3>
 
-              {/* Jump to Episode */}
+              {/* Controls Row */}
               <div className="flex gap-2 mb-3">
                 <Input
                   type="number"
@@ -745,27 +763,37 @@ export default function Watch() {
                 </Button>
               </div>
 
-              {/* Episode Range Buttons */}
-              {episodeRanges.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {episodeRanges.map((range) => (
-                    <Button
-                      key={range.start}
-                      onClick={() => handleRangeClick(range.start)}
-                      variant="outline"
-                      size="sm"
-                      className="text-xs bg-white/5 border-white/10 hover:bg-white/10 hover:border-blue-400 text-gray-300 hover:text-white"
-                    >
-                      {range.label}
-                    </Button>
-                  ))}
-                </div>
-              )}
+              {/* Range Dropdown and Sort Button */}
+              <div className="flex gap-2 mb-3">
+                {episodeRanges.length > 0 && (
+                  <Select onValueChange={(value) => handleRangeClick(parseInt(value))}>
+                    <SelectTrigger size="sm" className="flex-1 bg-white/5 border-white/10 text-white">
+                      <SelectValue placeholder="Select range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {episodeRanges.map((range) => (
+                        <SelectItem key={range.start} value={range.start.toString()}>
+                          {range.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                <Button
+                  onClick={toggleSortOrder}
+                  size="sm"
+                  variant="outline"
+                  className={`bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 hover:text-white ${episodeRanges.length === 0 ? 'ml-auto' : ''}`}
+                >
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  {sortOrder === "asc" ? "Oldest" : "Latest"}
+                </Button>
+              </div>
             </div>
 
-            {episodes.length > 0 ? (
+            {sortedEpisodes.length > 0 ? (
               <div ref={episodeListRef} className="space-y-2 overflow-y-auto flex-1">
-                {episodes.map((ep, idx) => {
+                {sortedEpisodes.map((ep, idx) => {
                   const progressPercentage = ep.currentTime && ep.duration
                     ? (ep.currentTime / ep.duration) * 100
                     : 0;
