@@ -22,6 +22,7 @@ import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useDataFlow } from "@/hooks/use-data-flow";
 import { AnimatePresence } from "framer-motion";
 import { pageCache } from "@/lib/page-cache";
+import { preloadOnHomepage } from "@/lib/video-player-preload";
 
 // Track if this is the first load
 const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
@@ -151,6 +152,14 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       setShowInitialLoader(false);
     }
   }, [loading]);
+
+  // Preload video player when landing page is ready
+  useEffect(() => {
+    if (!loading && popularItems.length > 0) {
+      // Trigger video player preload after content is loaded
+      preloadOnHomepage();
+    }
+  }, [loading, popularItems.length]);
 
   // Cache landing page data when it's loaded
   useEffect(() => {
