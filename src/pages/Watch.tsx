@@ -641,7 +641,7 @@ export default function Watch() {
 
       {/* Main Content */}
       <main className="pt-20 px-6 pb-10 max-w-[2000px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-6">
           {/* Left: Video Player */}
           <div className="space-y-6">
             {videoSource && currentEpisodeData ? (
@@ -697,7 +697,10 @@ export default function Watch() {
                 </div>
               </div>
             )}
+          </div>
 
+          {/* Right: Info & Episodes */}
+          <div className="space-y-6">
             {/* Anime Info */}
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <div className="flex gap-4">
@@ -754,115 +757,115 @@ export default function Watch() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right: Episode List */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col">
-            <div className="mb-4">
-              <h3 className="text-lg font-bold uppercase tracking-wider mb-3">
-                Episodes
-                {isNavigatingEpisodes && (
-                  <span className="text-xs text-blue-400 ml-2">(Gamepad Active)</span>
-                )}
-              </h3>
+            {/* Episode List */}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-fit max-h-[calc(100vh-400px)] flex flex-col">
+              <div className="mb-4">
+                <h3 className="text-lg font-bold uppercase tracking-wider mb-3">
+                  Episodes
+                  {isNavigatingEpisodes && (
+                    <span className="text-xs text-blue-400 ml-2">(Gamepad Active)</span>
+                  )}
+                </h3>
 
-              {/* Controls Row */}
-              <div className="flex gap-2 mb-3">
-                <Input
-                  type="number"
-                  placeholder="Jump to episode..."
-                  value={jumpToEpisode}
-                  onChange={(e) => setJumpToEpisode(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleJumpToEpisode();
-                    }
-                  }}
-                  className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
-                  min="1"
-                />
-                <Button
-                  onClick={handleJumpToEpisode}
-                  size="sm"
-                  className="px-4"
-                >
-                  Go
-                </Button>
+                {/* Controls Row */}
+                <div className="flex gap-2 mb-3">
+                  <Input
+                    type="number"
+                    placeholder="Jump to episode..."
+                    value={jumpToEpisode}
+                    onChange={(e) => setJumpToEpisode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleJumpToEpisode();
+                      }
+                    }}
+                    className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                    min="1"
+                  />
+                  <Button
+                    onClick={handleJumpToEpisode}
+                    size="sm"
+                    className="px-4"
+                  >
+                    Go
+                  </Button>
+                </div>
+
+                {/* Range Dropdown and Sort Button */}
+                <div className="flex gap-2 mb-3">
+                  {episodeRanges.length > 0 && (
+                    <Select onValueChange={(value) => handleRangeClick(parseInt(value))}>
+                      <SelectTrigger size="sm" className="flex-1 bg-white/5 border-white/10 text-white">
+                        <SelectValue placeholder="Select range" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {episodeRanges.map((range) => (
+                          <SelectItem key={range.start} value={range.start.toString()}>
+                            {range.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <Button
+                    onClick={toggleSortOrder}
+                    size="sm"
+                    variant="outline"
+                    className={`bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 hover:text-white ${episodeRanges.length === 0 ? 'ml-auto' : ''}`}
+                  >
+                    <ArrowUpDown className="h-4 w-4 mr-2" />
+                    {sortOrder === "asc" ? "Oldest" : "Latest"}
+                  </Button>
+                </div>
               </div>
 
-              {/* Range Dropdown and Sort Button */}
-              <div className="flex gap-2 mb-3">
-                {episodeRanges.length > 0 && (
-                  <Select onValueChange={(value) => handleRangeClick(parseInt(value))}>
-                    <SelectTrigger size="sm" className="flex-1 bg-white/5 border-white/10 text-white">
-                      <SelectValue placeholder="Select range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {episodeRanges.map((range) => (
-                        <SelectItem key={range.start} value={range.start.toString()}>
-                          {range.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-                <Button
-                  onClick={toggleSortOrder}
-                  size="sm"
-                  variant="outline"
-                  className={`bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 hover:text-white ${episodeRanges.length === 0 ? 'ml-auto' : ''}`}
-                >
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  {sortOrder === "asc" ? "Oldest" : "Latest"}
-                </Button>
-              </div>
-            </div>
+              {sortedEpisodes.length > 0 ? (
+                <div ref={episodeListRef} className="space-y-2 overflow-y-auto flex-1">
+                  {sortedEpisodes.map((ep, idx) => {
+                    const progressPercentage = ep.currentTime && ep.duration
+                      ? (ep.currentTime / ep.duration) * 100
+                      : 0;
+                    const isCurrentEpisode = currentEpisodeData?.id === ep.id;
+                    const isFocused = isNavigatingEpisodes && focusedEpisodeIndex === idx;
 
-            {sortedEpisodes.length > 0 ? (
-              <div ref={episodeListRef} className="space-y-2 overflow-y-auto flex-1">
-                {sortedEpisodes.map((ep, idx) => {
-                  const progressPercentage = ep.currentTime && ep.duration
-                    ? (ep.currentTime / ep.duration) * 100
-                    : 0;
-                  const isCurrentEpisode = currentEpisodeData?.id === ep.id;
-                  const isFocused = isNavigatingEpisodes && focusedEpisodeIndex === idx;
-
-                  return (
-                    <button
-                      key={ep.id}
-                      data-episode-index={idx}
-                      onClick={() => playEpisode(ep)}
-                      className={`w-full text-left p-3 rounded-lg border transition-all ${
-                        isCurrentEpisode
-                          ? "bg-blue-500/20 border-blue-500 ring-2 ring-blue-400/50"
-                          : isFocused
-                          ? "bg-blue-500/10 border-blue-400 ring-4 ring-blue-400 shadow-xl shadow-blue-500/60 scale-[1.02]"
-                          : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-semibold">
-                          {ep.title || `Episode ${ep.number ?? "?"}`}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          EP {ep.number ?? "?"}
-                        </span>
-                      </div>
-                      {progressPercentage > 0 && (
-                        <div className="mt-2 h-1 bg-gray-800 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-blue-500 transition-all"
-                            style={{ width: `${progressPercentage}%` }}
-                          />
+                    return (
+                      <button
+                        key={ep.id}
+                        data-episode-index={idx}
+                        onClick={() => playEpisode(ep)}
+                        className={`w-full text-left p-3 rounded-lg border transition-all ${
+                          isCurrentEpisode
+                            ? "bg-blue-500/20 border-blue-500 ring-2 ring-blue-400/50"
+                            : isFocused
+                            ? "bg-blue-500/10 border-blue-400 ring-4 ring-blue-400 shadow-xl shadow-blue-500/60 scale-[1.02]"
+                            : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-semibold">
+                            {ep.title || `Episode ${ep.number ?? "?"}`}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            EP {ep.number ?? "?"}
+                          </span>
                         </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-center text-gray-400 py-8">No episodes available</p>
-            )}
+                        {progressPercentage > 0 && (
+                          <div className="mt-2 h-1 bg-gray-800 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-blue-500 transition-all"
+                              style={{ width: `${progressPercentage}%` }}
+                            />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-center text-gray-400 py-8">No episodes available</p>
+              )}
+            </div>
           </div>
         </div>
       </main>
