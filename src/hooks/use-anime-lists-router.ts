@@ -10,36 +10,17 @@ import { useDataFlow } from "./use-data-flow";
 export function useAnimeListsRouter() {
   const { dataFlow } = useDataFlow();
 
-  // Ensure dataFlow is never undefined - always default to v4
-  const safeDataFlow = dataFlow || "v4";
-  console.log('[Router] Current dataFlow:', safeDataFlow, '(raw:', dataFlow, ')');
-
-  // Determine which hook should be active
-  const isV1Active = safeDataFlow === "v1";
-  const isV2Active = safeDataFlow === "v2";
-  const isV3Active = safeDataFlow === "v3";
-  const isV4Active = safeDataFlow === "v4";
+  // EMERGENCY: Force v1 due to Yumaapi outage (overrides user preference)
+  console.log('[Router] 🚨 FORCED v1 API (Yumaapi outage) - User preference:', dataFlow, 'ignored');
 
   // Call all hooks unconditionally (required by React Rules of Hooks)
-  // Pass active flag so each hook can skip fetching if not active
-  const v1Data = useAnimeListsV1(isV1Active);
-  const v2Data = useAnimeListsV2(isV2Active);
-  const v3Data = useAnimeListsV3(isV3Active);
-  const v4Data = useAnimeListsV4(isV4Active);
+  // Only v1 is active, all others are inactive
+  const v1Data = useAnimeListsV1(true);  // Force active
+  const v2Data = useAnimeListsV2(false);
+  const v3Data = useAnimeListsV3(false);
+  const v4Data = useAnimeListsV4(false);
 
-  // Return the appropriate data based on dataFlow setting
-  if (isV1Active) {
-    console.log('[Router] Using v1 API hook');
-    return v1Data;
-  } else if (isV2Active) {
-    console.log('[Router] Using v2 API hook');
-    return v2Data;
-  } else if (isV3Active) {
-    console.log('[Router] Using v3 API hook');
-    return v3Data;
-  }
-
-  // Default to v4
-  console.log('[Router] 🚀 Using v4 HYBRID API hook (Yuma home + Hianime streaming) [DEFAULT]');
-  return v4Data;
+  // Always return v1 data during Yumaapi outage
+  console.log('[Router] Using v1 API hook (Hianime) - forced due to Yumaapi outage');
+  return v1Data;
 }
