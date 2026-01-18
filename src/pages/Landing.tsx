@@ -2,7 +2,10 @@ import { useEffect, useState, useRef } from "react";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
-import { HeroBanner } from "@/components/HeroBanner";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { useAction, useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
 import { Sidebar } from "@/components/Sidebar";
 import { AnimeCard } from "@/components/AnimeCard";
 import { useAuth } from "@/hooks/use-auth";
@@ -13,7 +16,8 @@ import { ProfileDashboard } from "@/components/ProfileDashboard";
 import { FullscreenLoader } from "@/components/FullscreenLoader";
 import { SearchSection } from "@/components/SearchSection";
 import { useTheme } from "@/hooks/use-theme";
-import { HomeSections } from "@/components/landing/HomeSections";
+
+import { AllAnimeGrid } from "@/components/landing/AllAnimeGrid";
 import { AnimeItem } from "@/shared/types";
 import { useAnimeListsRouter } from "@/hooks/use-anime-lists-router";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
@@ -360,6 +364,17 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
 
   const sectionContent = getSectionContent();
 
+  const allAnime = useMemo(() => {
+    const combined = [
+      ...popularItems,
+      ...airingItems,
+      ...recentEpisodeItems,
+      ...tvShowItems,
+    ];
+    const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+    return unique;
+  }, [popularItems, airingItems, recentEpisodeItems, tvShowItems]);
+
   // Show initial loader only on first visit for 3 seconds
   // We render the loader inside AnimatePresence alongside the main content
   // This ensures content loads in background while loader is visible
@@ -458,15 +473,6 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
             />
           ) : (
             <>
-              {activeSection === "home" && (
-                <HeroBanner
-                  anime={heroAnime || { title: "Loading..." }}
-                  onPlay={() => heroAnime && openAnime(heroAnime)}
-                  onMoreInfo={() => heroAnime && openAnime(heroAnime)}
-                  isLoading={!heroAnime || loading}
-                />
-              )}
-
               {sectionContent ? (
                 <div className="mt-8">
                   <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">
@@ -484,23 +490,10 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                   </div>
                 </div>
               ) : (
-                <HomeSections
-                  isAuthenticated={isAuthenticated}
-                  continueWatchingItems={continueWatchingItems}
-                  watchlistItems={watchlistItems}
-                  popularItems={popularItems}
-                  airingItems={airingItems}
-                  recentEpisodeItems={recentEpisodeItems}
-                  tvShowItems={tvShowItems}
-                  popularLoading={popularLoading}
-                  airingLoading={airingLoading}
-                  recentEpisodesLoading={recentEpisodesLoading}
-                  tvShowsLoading={tvShowsLoading}
-                  onOpenAnime={openAnime}
-                  onLoadMore={loadMoreItems}
-                  loadingMore={loadingMore}
-                  hasMore={hasMore}
-                />
+                <div className="mt-8">
+                  <h2 className="text-3xl font-bold mb-6 tracking-tight">All Anime</h2>
+                  <AllAnimeGrid items={allAnime} onOpenAnime={openAnime} />
+                </div>
               )}
             </>
           )}
