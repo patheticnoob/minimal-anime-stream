@@ -603,35 +603,35 @@ export default function Watch() {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white">
-      {/* Header */}
+      {/* Compact Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#050814]/95 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-[2000px] mx-auto px-4 py-3 md:px-6 md:py-4">
-          <div className="flex items-center gap-2 md:gap-4">
+        <div className="max-w-[2000px] mx-auto px-3 py-2 md:px-4 md:py-2.5">
+          <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-1 md:gap-2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-1 md:px-2 py-1 flex-shrink-0"
+              className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1.5 py-1 flex-shrink-0"
             >
-              <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="text-xs md:text-sm font-medium hidden xs:inline">Back</span>
+              <ArrowLeft className="h-4 w-4" />
+              <span className="text-xs font-medium hidden xs:inline">Back</span>
             </button>
             <div className="flex-1 min-w-0 mr-2">
-              <h1 className="text-sm md:text-xl font-bold truncate leading-tight">{anime?.title || "Loading..."}</h1>
+              <h1 className="text-xs md:text-base font-bold truncate leading-tight">{anime?.title || "Loading..."}</h1>
             </div>
             <Button
               onClick={handleToggleWatchlist}
               variant="outline"
               size="sm"
-              className="gap-1 md:gap-2 flex-shrink-0 text-xs md:text-sm px-2 md:px-3 h-8 md:h-9"
+              className="gap-1 flex-shrink-0 text-xs px-2 h-7"
             >
               {isInWatchlist ? (
                 <>
-                  <Check className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">In Watchlist</span>
+                  <Check className="h-3 w-3" />
+                  <span className="hidden sm:inline">Watchlist</span>
                 </>
               ) : (
                 <>
-                  <Plus className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">Watchlist</span>
+                  <Plus className="h-3 w-3" />
+                  <span className="hidden sm:inline">Add</span>
                 </>
               )}
             </Button>
@@ -639,11 +639,11 @@ export default function Watch() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="pt-20 px-6 pb-10 max-w-[2000px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+      {/* Main Content - Compact Layout */}
+      <main className="pt-14 px-3 pb-6 max-w-[2000px] mx-auto md:px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-3 md:gap-4">
           {/* Left: Video Player */}
-          <div className="space-y-6">
+          <div className="space-y-3">
             {videoSource && currentEpisodeData ? (
               (() => {
                 const PlayerComponent = theme === "retro" ? RetroVideoPlayer : VideoPlayer;
@@ -683,9 +683,9 @@ export default function Watch() {
               })()
             ) : (
               <div className="aspect-video bg-white/5 border border-white/10 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <Play className="h-16 w-16 mx-auto mb-4 text-gray-600" />
-                  <p className="text-gray-400">Select an episode to start watching</p>
+                <div className="text-center px-4">
+                  <Play className="h-12 w-12 mx-auto mb-3 text-gray-600" />
+                  <p className="text-sm text-gray-400">Select an episode to start watching</p>
                   <p className="text-xs text-gray-500 mt-2">
                     Press X to {isNavigatingEpisodes ? "disable" : "enable"} gamepad navigation
                   </p>
@@ -698,52 +698,52 @@ export default function Watch() {
               </div>
             )}
 
-            {/* Anime Info */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <div className="flex gap-4">
+            {/* Compact Anime Info */}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-3 md:p-4">
+              <div className="flex gap-3">
                 {anime?.image && (
                   <img
                     src={anime.image}
                     alt={anime.title}
-                    className="w-32 h-48 object-cover rounded-lg"
+                    className="w-16 h-24 md:w-20 md:h-28 object-cover rounded flex-shrink-0"
                   />
                 )}
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold mb-2">{anime?.title || "Unknown Title"}</h2>
-                  <div className="flex items-center gap-2 flex-wrap mb-4">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-sm md:text-base font-bold mb-1.5 truncate">{anime?.title || "Unknown Title"}</h2>
+                  <div className="flex items-center gap-1.5 flex-wrap mb-2">
                     {anime?.type && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-[10px] h-5 px-1.5">
                         {anime.type}
                       </Badge>
                     )}
                     {anime?.language?.sub && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-[10px] h-5 px-1.5">
                         SUB
                       </Badge>
                     )}
                     {anime?.language?.dub && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-[10px] h-5 px-1.5">
                         DUB
                       </Badge>
                     )}
                     {episodes.length > 0 && (
-                      <Badge variant="outline" className="text-xs">
-                        {episodes.length} Episodes
+                      <Badge variant="outline" className="text-[10px] h-5 px-1.5">
+                        {episodes.length} Eps
                       </Badge>
                     )}
                   </div>
                   {shouldShowBroadcast && (
-                    <div className="flex items-start gap-2 text-sm text-blue-300">
-                      <Clock3 className="h-4 w-4 mt-0.5" />
+                    <div className="flex items-start gap-1.5 text-xs text-blue-300">
+                      <Clock3 className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                       {isBroadcastLoading ? (
-                        <span>Fetching upcoming schedule...</span>
+                        <span>Loading schedule...</span>
                       ) : (
-                        <div className="space-y-1">
+                        <div className="space-y-0.5">
                           <span className="block font-semibold text-white">
-                            Next broadcast: {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
+                            {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
                           </span>
                           {broadcastDetails?.countdown && (
-                            <span className="block text-xs text-blue-200">
+                            <span className="block text-[10px] text-blue-200">
                               {broadcastDetails.countdown}
                             </span>
                           )}
@@ -756,21 +756,21 @@ export default function Watch() {
             </div>
           </div>
 
-          {/* Right: Episode List */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col">
-            <div className="mb-4">
-              <h3 className="text-lg font-bold uppercase tracking-wider mb-3">
-                Episodes
+          {/* Right: Compact Episode List */}
+          <div className="bg-white/5 border border-white/10 rounded-lg p-3 md:p-4 h-fit max-h-[calc(100vh-80px)] flex flex-col">
+            <div className="mb-3">
+              <h3 className="text-sm font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
+                <span>Episodes</span>
                 {isNavigatingEpisodes && (
-                  <span className="text-xs text-blue-400 ml-2">(Gamepad Active)</span>
+                  <span className="text-[10px] text-blue-400 normal-case font-normal">(Gamepad)</span>
                 )}
               </h3>
 
-              {/* Controls Row */}
-              <div className="flex gap-2 mb-3">
+              {/* Compact Controls */}
+              <div className="flex gap-1.5 mb-2">
                 <Input
                   type="number"
-                  placeholder="Jump to episode..."
+                  placeholder="Jump..."
                   value={jumpToEpisode}
                   onChange={(e) => setJumpToEpisode(e.target.value)}
                   onKeyDown={(e) => {
@@ -778,24 +778,24 @@ export default function Watch() {
                       handleJumpToEpisode();
                     }
                   }}
-                  className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                  className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-gray-500 text-xs h-7 px-2"
                   min="1"
                 />
                 <Button
                   onClick={handleJumpToEpisode}
                   size="sm"
-                  className="px-4"
+                  className="px-3 h-7 text-xs"
                 >
                   Go
                 </Button>
               </div>
 
-              {/* Range Dropdown and Sort Button */}
-              <div className="flex gap-2 mb-3">
+              {/* Range and Sort */}
+              <div className="flex gap-1.5">
                 {episodeRanges.length > 0 && (
                   <Select onValueChange={(value) => handleRangeClick(parseInt(value))}>
-                    <SelectTrigger size="sm" className="flex-1 bg-white/5 border-white/10 text-white">
-                      <SelectValue placeholder="Select range" />
+                    <SelectTrigger className="flex-1 bg-white/5 border-white/10 text-white h-7 text-xs">
+                      <SelectValue placeholder="Range" />
                     </SelectTrigger>
                     <SelectContent>
                       {episodeRanges.map((range) => (
@@ -810,16 +810,16 @@ export default function Watch() {
                   onClick={toggleSortOrder}
                   size="sm"
                   variant="outline"
-                  className={`bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 hover:text-white ${episodeRanges.length === 0 ? 'ml-auto' : ''}`}
+                  className={`bg-white/5 border-white/10 hover:bg-white/10 text-gray-300 hover:text-white h-7 px-2 text-xs ${episodeRanges.length === 0 ? 'ml-auto' : ''}`}
                 >
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  {sortOrder === "asc" ? "Oldest" : "Latest"}
+                  <ArrowUpDown className="h-3 w-3 mr-1" />
+                  {sortOrder === "asc" ? "Old" : "New"}
                 </Button>
               </div>
             </div>
 
             {sortedEpisodes.length > 0 ? (
-              <div ref={episodeListRef} className="space-y-2 overflow-y-auto flex-1">
+              <div ref={episodeListRef} className="space-y-1.5 overflow-y-auto flex-1 pr-1">
                 {sortedEpisodes.map((ep, idx) => {
                   const progressPercentage = ep.currentTime && ep.duration
                     ? (ep.currentTime / ep.duration) * 100
@@ -832,24 +832,24 @@ export default function Watch() {
                       key={ep.id}
                       data-episode-index={idx}
                       onClick={() => playEpisode(ep)}
-                      className={`w-full text-left p-3 rounded-lg border transition-all ${
+                      className={`w-full text-left p-2 rounded border transition-all ${
                         isCurrentEpisode
-                          ? "bg-blue-500/20 border-blue-500 ring-2 ring-blue-400/50"
+                          ? "bg-blue-500/20 border-blue-500 ring-1 ring-blue-400/50"
                           : isFocused
-                          ? "bg-blue-500/10 border-blue-400 ring-4 ring-blue-400 shadow-xl shadow-blue-500/60 scale-[1.02]"
+                          ? "bg-blue-500/10 border-blue-400 ring-2 ring-blue-400 shadow-lg shadow-blue-500/40"
                           : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-semibold">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-xs truncate pr-2">
                           {ep.title || `Episode ${ep.number ?? "?"}`}
                         </span>
-                        <span className="text-xs text-gray-400">
-                          EP {ep.number ?? "?"}
+                        <span className="text-[10px] text-gray-400 flex-shrink-0">
+                          {ep.number ?? "?"}
                         </span>
                       </div>
                       {progressPercentage > 0 && (
-                        <div className="mt-2 h-1 bg-gray-800 rounded-full overflow-hidden">
+                        <div className="mt-1.5 h-0.5 bg-gray-800 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-blue-500 transition-all"
                             style={{ width: `${progressPercentage}%` }}
@@ -861,7 +861,7 @@ export default function Watch() {
                 })}
               </div>
             ) : (
-              <p className="text-center text-gray-400 py-8">No episodes available</p>
+              <p className="text-center text-gray-400 text-xs py-6">No episodes available</p>
             )}
           </div>
         </div>
