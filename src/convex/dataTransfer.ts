@@ -9,11 +9,15 @@ export const exportUserData = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    if (!userId) {
+      return null;
+    }
 
     // Get user info
     const user = await ctx.db.get(userId);
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      return null;
+    }
 
     // Get watchlist
     const watchlist = await ctx.db

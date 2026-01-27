@@ -78,26 +78,30 @@ export function ProfileDashboard({
   const [importFile, setImportFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const exportData = useQuery(api.dataTransfer.exportUserData);
+  const exportDataQuery = useQuery(api.dataTransfer.exportUserData);
   const importUserData = useMutation(api.dataTransfer.importUserData);
 
-  const handleExportData = () => {
-    if (!exportData) {
-      toast.error("No data to export");
-      return;
-    }
+  const handleExportData = async () => {
+    try {
+      if (!exportDataQuery) {
+        toast.error("Loading data...");
+        return;
+      }
 
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `gojostream-export-${new Date().toISOString().split("T")[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    toast.success("Data exported successfully!");
+      const dataStr = JSON.stringify(exportDataQuery, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `gojostream-export-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("Data exported successfully!");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to export data");
+    }
   };
 
   const handleImportClick = () => {
