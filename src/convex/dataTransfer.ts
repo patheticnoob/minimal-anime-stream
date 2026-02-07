@@ -19,17 +19,17 @@ export const exportUserData = query({
       return null;
     }
 
-    // Get watchlist
+    // Get watchlist (limit to 1000 items for safety)
     const watchlist = await ctx.db
       .query("watchlist")
       .withIndex("by_user", (q) => q.eq("userId", userId))
-      .collect();
+      .take(1000);
 
-    // Get watch progress
+    // Get watch progress (limit to 1000 items for safety)
     const watchProgress = await ctx.db
       .query("watchProgress")
       .withIndex("by_user", (q) => q.eq("userId", userId))
-      .collect();
+      .take(1000);
 
     // Create export data object
     const exportData = {
@@ -94,27 +94,29 @@ export const importUserData = mutation({
       throw new Error("Invalid export file format");
     }
 
-    // If replace mode, delete existing data
+    // If replace mode, delete existing data (batch operations for safety)
     if (args.mode === "replace") {
-      // Delete existing watchlist
+      // Delete existing watchlist (limit to 500 items per batch)
       const existingWatchlist = await ctx.db
         .query("watchlist")
         .withIndex("by_user", (q) => q.eq("userId", userId))
-        .collect();
+        .take(500);
 
-      for (const item of existingWatchlist) {
-        await ctx.db.delete(item._id);
-      }
+      const deleteWatchlistOps = existingWatchlist.map((item) =>
+        ctx.db.delete(item._id)
+      );
+      await Promise.all(deleteWatchlistOps);
 
-      // Delete existing watch progress
+      // Delete existing watch progress (limit to 500 items per batch)
       const existingProgress = await ctx.db
         .query("watchProgress")
         .withIndex("by_user", (q) => q.eq("userId", userId))
-        .collect();
+        .take(500);
 
-      for (const item of existingProgress) {
-        await ctx.db.delete(item._id);
-      }
+      const deleteProgressOps = existingProgress.map((item) =>
+        ctx.db.delete(item._id)
+      );
+      await Promise.all(deleteProgressOps);
     }
 
     let importedWatchlist = 0;
@@ -122,8 +124,12 @@ export const importUserData = mutation({
     let skippedWatchlist = 0;
     let skippedProgress = 0;
 
+    // Limit import to 500 items to prevent excessive operations
+    const watchlistToImport = importData.watchlist.slice(0, 500);
+    const progressToImport = importData.watchProgress.slice(0, 500);
+
     // Import watchlist
-    for (const item of importData.watchlist) {
+    for (const item of watchlistToImport) {
       // Check if already exists (for merge mode)
       const existing = await ctx.db
         .query("watchlist")
@@ -149,7 +155,7 @@ export const importUserData = mutation({
     }
 
     // Import watch progress
-    for (const item of importData.watchProgress) {
+    for (const item of progressToImport) {
       // Check if already exists
       const existing = await ctx.db
         .query("watchProgress")
