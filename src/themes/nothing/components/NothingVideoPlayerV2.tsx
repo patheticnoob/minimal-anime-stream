@@ -32,7 +32,7 @@ interface NothingVideoPlayerV2Props {
   resumeFrom?: number;
 }
 
-export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, headers, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onSelectEpisode, onNext, nextTitle }: NothingVideoPlayerV2Props) {
+export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, headers, onProgressUpdate, resumeFrom, info, onNext, nextTitle }: NothingVideoPlayerV2Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -46,7 +46,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
-  const [brightness, setBrightness] = useState(1);
+  const [brightness] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
@@ -918,19 +918,15 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
   // Gesture Hook
   const { gestureHandlers, overlayProps } = usePlayerGestures({
-    videoRef,
+    videoRef: videoRef as React.RefObject<HTMLVideoElement>,
     isPlaying,
-    togglePlay,
-    seek: handleSeek,
+    onPlayPause: togglePlay,
+    onSeek: handleSeek,
     duration,
     currentTime,
     volume,
-    setVolume: handleVolumeChange,
-    brightness,
-    setBrightness,
-    toggleControls: (force) =>
-      updateControlsVisibility(force !== undefined ? force : (prev) => !prev),
-    areControlsVisible: showControls,
+    onVolumeChange: handleVolumeChange,
+    onToggleFullscreen: toggleFullscreen,
   });
 
   useEffect(() => {

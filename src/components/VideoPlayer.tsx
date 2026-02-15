@@ -44,7 +44,20 @@ interface VideoPlayerProps {
   resumeFrom?: number;
 }
 
-export function VideoPlayer({ source, title, tracks, intro, outro, headers, onClose, onProgressUpdate, resumeFrom, info, episodes, currentEpisode, onNext, nextTitle }: VideoPlayerProps) {
+export default function VideoPlayer({
+  source,
+  title,
+  tracks = [],
+  intro,
+  outro,
+  headers,
+  onClose,
+  resumeFrom = 0,
+  onProgressUpdate,
+  onNext,
+  nextTitle,
+  info,
+}: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -74,7 +87,6 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
   const [showSkipOutro, setShowSkipOutro] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<{ url: string; x: number } | null>(null);
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
-  const [thumbnailSprite, setThumbnailSprite] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const { buttonPressed } = useGamepad({ enableButtonEvents: true });
   const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
@@ -151,16 +163,12 @@ export function VideoPlayer({ source, title, tracks, intro, outro, headers, onCl
     const thumbnailTrack = tracks?.find(t => t.kind === "thumbnails");
     if (!thumbnailTrack) {
       setThumbnailCues([]);
-      setThumbnailSprite(null);
       return;
     }
 
     parseVTTThumbnails(thumbnailTrack.file)
       .then((cues) => {
         setThumbnailCues(cues);
-        if (cues.length > 0 && cues[0].url) {
-          setThumbnailSprite(cues[0].url);
-        }
       })
       .catch((err) => {
         console.error('Failed to load thumbnail cues:', err);

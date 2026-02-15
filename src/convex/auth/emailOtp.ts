@@ -9,7 +9,7 @@ export const emailOtp = Email({
   generateVerificationToken() {
     return generateRandomString(6, alphabet("0-9"));
   },
-  async sendVerificationRequest({ identifier: email, provider, token }) {
+  async sendVerificationRequest({ identifier: email, token }) {
     // 1. Use Resend if configured (Allows custom sender name)
     if (process.env.RESEND_API_KEY) {
       const appName = process.env.VLY_APP_NAME || "Minimal Anime Stream";

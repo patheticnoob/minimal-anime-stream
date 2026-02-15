@@ -4,7 +4,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const getUserDataFlow = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async () => {
     // EMERGENCY: Force v1 API due to Yumaapi outage
     // Yumaapi is down, so v3 and v4 (which depend on it) won't work
     return "v1"; // Force Hianime API for all users

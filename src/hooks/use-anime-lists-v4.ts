@@ -161,11 +161,11 @@ async function searchYuma(query: string): Promise<AnimeItem[]> {
 export function useAnimeListsV4(isActive: boolean = true) {
   // Add dummy hook calls to match v1's hook structure (to avoid React Hooks Rules violation)
   // V1 has 5 useAction calls, so we add 5 matching useAction calls here (unused but necessary for hook order)
-  const _dummyAction1 = useAction(api.hianime.topAiring);
-  const _dummyAction2 = useAction(api.hianime.mostPopular);
-  const _dummyAction3 = useAction(api.hianime.movies);
-  const _dummyAction4 = useAction(api.hianime.tvShows);
-  const _dummyAction5 = useAction(api.hianime.search);
+  useAction(api.hianime.topAiring);
+  useAction(api.hianime.mostPopular);
+  useAction(api.hianime.movies);
+  useAction(api.hianime.tvShows);
+  useAction(api.hianime.search);
 
   const [loading, setLoading] = useState(!isActive);
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);

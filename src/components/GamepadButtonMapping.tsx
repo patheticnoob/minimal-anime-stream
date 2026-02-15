@@ -51,7 +51,6 @@ const BUTTON_NAMES: Record<number, string> = {
 
 export function GamepadButtonMapping() {
   const [mappings, setMappings] = useState<ButtonMapping[]>(DEFAULT_MAPPINGS);
-  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('gamepadButtonMappings');

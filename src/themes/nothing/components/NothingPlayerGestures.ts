@@ -1,18 +1,15 @@
-import { useState, useRef, useEffect, type TouchEvent, type RefObject } from "react";
+import { useState, useRef, useEffect, type TouchEvent } from "react";
 
-interface UsePlayerGesturesProps {
-  videoRef: RefObject<HTMLVideoElement | null>;
+export interface UsePlayerGesturesProps {
+  videoRef: React.RefObject<HTMLVideoElement>;
   isPlaying: boolean;
-  togglePlay: () => void;
-  seek: (time: number) => void;
-  duration: number;
-  currentTime: number;
   volume: number;
-  setVolume: (vol: number) => void;
-  brightness: number;
-  setBrightness: (val: number) => void;
-  toggleControls: (force?: boolean) => void;
-  areControlsVisible: boolean;
+  currentTime: number;
+  duration: number;
+  onPlayPause: () => void;
+  onVolumeChange: (volume: number) => void;
+  onSeek: (time: number) => void;
+  onToggleFullscreen: () => void;
 }
 
 const DOUBLE_TAP_WINDOW = 300;
@@ -22,16 +19,12 @@ const SINGLE_TAP_DELAY = 300;
 export function usePlayerGestures({
   videoRef,
   isPlaying,
-  togglePlay,
-  seek,
-  duration,
-  currentTime,
   volume,
-  setVolume,
-  brightness,
-  setBrightness,
-  toggleControls,
-  areControlsVisible,
+  currentTime,
+  onPlayPause,
+  onVolumeChange,
+  onSeek,
+  onToggleFullscreen,
 }: UsePlayerGesturesProps) {
   // State for visual feedback
   const [doubleTapAction, setDoubleTapAction] = useState<{ side: 'left' | 'right'; seconds: number } | null>(null);
@@ -47,11 +40,11 @@ export function usePlayerGestures({
   const isSwipingRef = useRef(false);
   const swipeDirectionRef = useRef<'vertical' | 'horizontal' | null>(null);
   const initialValueRef = useRef<number>(0); // Stores initial volume/brightness on swipe start
-  const controlsVisibleRef = useRef(areControlsVisible);
+  const controlsVisibleRef = useRef(false);
 
   useEffect(() => {
-    controlsVisibleRef.current = areControlsVisible;
-  }, [areControlsVisible]);
+    controlsVisibleRef.current = false;
+  }, []);
 
   const handleTouchStart = (e: TouchEvent) => {
     const touch = e.touches[0];
@@ -69,7 +62,7 @@ export function usePlayerGestures({
     const width = rect.width;
     
     if (x < width / 3) {
-      initialValueRef.current = brightness;
+      initialValueRef.current = volume;
     } else if (x > (width * 2) / 3) {
       initialValueRef.current = volume;
     }
@@ -105,12 +98,12 @@ export function usePlayerGestures({
       if (startX < width / 3) {
         // Left Side: Brightness
         const newVal = Math.max(0, Math.min(1, initialValueRef.current + change));
-        setBrightness(newVal);
-        setSwipeAction({ type: 'brightness', value: newVal });
+        onVolumeChange(newVal);
+        setSwipeAction({ type: 'volume', value: newVal });
       } else if (startX > (width * 2) / 3) {
         // Right Side: Volume
         const newVal = Math.max(0, Math.min(1, initialValueRef.current + change));
-        setVolume(newVal);
+        onVolumeChange(newVal);
         setSwipeAction({ type: 'volume', value: newVal });
       }
     }
@@ -167,7 +160,7 @@ export function usePlayerGestures({
 
       // Schedule the seek
       doubleTapTimerRef.current = window.setTimeout(() => {
-        seek(currentTime + seekAccumulatorRef.current);
+        onSeek(currentTime + seekAccumulatorRef.current);
         seekAccumulatorRef.current = 0;
         setDoubleTapAction(null);
         doubleTapTimerRef.current = null;
@@ -183,8 +176,8 @@ export function usePlayerGestures({
         const video = videoRef.current;
         const willBePlaying = video ? video.paused : !isPlaying;
 
-        togglePlay();
-        toggleControls(true); // Always show controls on center tap
+        onPlayPause();
+        onToggleFullscreen();
         setCenterAction({ type: willBePlaying ? 'play' : 'pause' });
         setTimeout(() => setCenterAction(null), 600);
       } else {
@@ -196,7 +189,7 @@ export function usePlayerGestures({
         
         singleTapTimerRef.current = window.setTimeout(() => {
           // Always show controls and reset the auto-hide timer
-          toggleControls(true);
+          onToggleFullscreen();
           singleTapTimerRef.current = null;
         }, SINGLE_TAP_DELAY);
       }

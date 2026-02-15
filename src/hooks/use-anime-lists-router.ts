@@ -16,9 +16,9 @@ export function useAnimeListsRouter() {
   // Call all hooks unconditionally (required by React Rules of Hooks)
   // Only v1 is active, all others are inactive
   const v1Data = useAnimeListsV1(true);  // Force active
-  const v2Data = useAnimeListsV2(false);
-  const v3Data = useAnimeListsV3(false);
-  const v4Data = useAnimeListsV4(false);
+  useAnimeListsV2(false);
+  useAnimeListsV3(false);
+  useAnimeListsV4(false);
 
   // Always return v1 data during Yumaapi outage
   console.log('[Router] Using v1 API hook (Hianime) - forced due to Yumaapi outage');

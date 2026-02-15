@@ -26,7 +26,6 @@ export function NothingPlayerOverlay({
   onSkipIntro,
   onSkipOutro,
   onNext,
-  nextTitle,
   onTogglePlay,
 }: NothingPlayerOverlayProps) {
   return (

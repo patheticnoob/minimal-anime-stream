@@ -17,7 +17,7 @@ import { HomeSections } from "@/components/landing/HomeSections";
 import { AnimeItem } from "@/shared/types";
 import { useAnimeListsRouter } from "@/hooks/use-anime-lists-router";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
-import { VideoPlayer } from "@/components/VideoPlayer";
+import VideoPlayer from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useDataFlow } from "@/hooks/use-data-flow";
 import { AnimatePresence } from "framer-motion";
@@ -39,7 +39,7 @@ interface LandingProps {
 }
 
 export default function Landing({ NavBarComponent }: LandingProps = {}) {
-  const { isAuthenticated, isLoading: authLoading, user, signOut } = useAuth();
+  const { isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
   const { dataFlow } = useDataFlow();
@@ -77,8 +77,6 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     tvShowsLoading,
     query: animeDataQuery,
     setQuery: setAnimeDataQuery,
-    searchResults,
-    isSearching,
     loadMoreItems,
     loadingMore,
     hasMore

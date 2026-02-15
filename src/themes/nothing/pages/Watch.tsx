@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams, useNavigate, useLocation } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -125,23 +125,23 @@ export default function NothingWatch() {
     const storedAnime = localStorage.getItem(`anime_${animeId}`);
     if (storedAnime) {
       try {
-        const animeData = JSON.parse(storedAnime);
-        setAnime(animeData);
+        const parsedAnime = JSON.parse(storedAnime);
+        setAnime(parsedAnime);
 
         console.log('[Watch] Loaded anime data:', {
-          id: animeData.id,
-          title: animeData.title,
-          hasV2Data: !!(animeData.genres || animeData.synopsis || animeData.malScore),
+          id: parsedAnime.id,
+          title: parsedAnime.title,
+          hasV2Data: !!(parsedAnime.genres || parsedAnime.synopsis || parsedAnime.malScore),
           dataFlow
         });
 
         // If v2 is selected and we don't have rich data, fetch from Hianime API
-        if (dataFlow === "v2" && !animeData.genres && !animeData.synopsis) {
+        if (dataFlow === "v2" && !parsedAnime.genres && !parsedAnime.synopsis && animeId) {
           console.log('[Watch] Fetching rich v2 anime details from Hianime API');
           fetchHianimeAnimeDetails(animeId)
             .then((richData) => {
               if (richData) {
-                const mergedData = { ...animeData, ...richData };
+                const mergedData = { ...parsedAnime, ...richData };
                 setAnime(mergedData);
                 // Update localStorage with rich data
                 localStorage.setItem(`anime_${animeId}`, JSON.stringify(mergedData));
@@ -176,10 +176,10 @@ export default function NothingWatch() {
       setEpisodes(normalizedEpisodes);
       setEpisodesLoading(false);
       
-      // Prefetch first or last watched episode immediately
-      if (normalizedEpisodes.length > 0 && storedAnime) {
-        const animeData = JSON.parse(storedAnime);
-        prefetchEpisodeSources(normalizedEpisodes, animeData);
+        // Prefetch first or last watched episode immediately
+        if (normalizedEpisodes.length > 0 && storedAnime) {
+          const _parsedAnime = JSON.parse(storedAnime);
+          prefetchEpisodeSources(normalizedEpisodes, _parsedAnime);
       }
       
       // Lazy load broadcast info after episodes are ready (non-critical)
@@ -223,8 +223,8 @@ export default function NothingWatch() {
 
         // Prefetch first or last watched episode
         if (normalizedEpisodes.length > 0 && storedAnime) {
-          const animeData = JSON.parse(storedAnime);
-          prefetchEpisodeSources(normalizedEpisodes, animeData);
+          const parsedAnime = JSON.parse(storedAnime);
+          prefetchEpisodeSources(normalizedEpisodes, parsedAnime);
         }
       })
       .catch((err) => {

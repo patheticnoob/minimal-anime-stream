@@ -4,7 +4,6 @@ import { api } from "@/convex/_generated/api";
 import { AnimeItem } from "@/shared/types";
 import { logError, logWarn, logInfo } from "@/lib/error-logger";
 import {
-  fetchHianimeHome,
   fetchHianimeSpotlight,
   fetchHianimeCategory,
   searchHianime,
@@ -38,11 +37,11 @@ async function retryWithBackoff<T>(
 export function useAnimeListsV2(isActive: boolean = true) {
   // Add dummy hook calls to match v1's hook structure (to avoid React Hooks Rules violation)
   // V1 has 5 useAction calls, so we add 5 matching useAction calls here (unused but necessary for hook order)
-  const _dummyAction1 = useAction(api.hianime.topAiring);
-  const _dummyAction2 = useAction(api.hianime.mostPopular);
-  const _dummyAction3 = useAction(api.hianime.movies);
-  const _dummyAction4 = useAction(api.hianime.tvShows);
-  const _dummyAction5 = useAction(api.hianime.search);
+  useAction(api.hianime.topAiring);
+  useAction(api.hianime.mostPopular);
+  useAction(api.hianime.movies);
+  useAction(api.hianime.tvShows);
+  useAction(api.hianime.search);
 
   const [loading, setLoading] = useState(!isActive); // Start as not loading if inactive
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
@@ -59,11 +58,6 @@ export function useAnimeListsV2(isActive: boolean = true) {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<AnimeItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-
-  const [popularPage] = useState(1);
-  const [airingPage] = useState(1);
-  const [recentEpisodesPage] = useState(1);
-  const [tvShowPage] = useState(1);
 
   const [popularHasMore] = useState(false); // V2 doesn't support pagination yet
   const [airingHasMore] = useState(false);

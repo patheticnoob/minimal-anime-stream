@@ -55,7 +55,13 @@ export default function WatchHistory() {
         if (section === "home") navigate("/");
         else if (section === "history") navigate("/history");
       }} />
-      <TopBar searchQuery={query} onSearchChange={setQuery} />
+      <TopBar 
+        searchQuery={query} 
+        onSearchChange={setQuery}
+        isDarkMode={false}
+        toggleTheme={() => {}}
+        onProfileClick={() => {}}
+      />
 
       <main className="ml-20 pt-20 transition-all duration-300">
         <div className="px-6 md:px-10 pb-10 max-w-[2000px] mx-auto">

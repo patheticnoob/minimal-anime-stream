@@ -79,7 +79,6 @@ export function RetroVideoPlayer({
   );
 
   const { buttonPressed } = useGamepad({ enableButtonEvents: true });
-  const [gamepadControlsActive, setGamepadControlsActive] = useState(false);
 
   // Pause video when casting starts and sync time
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { Home, Tv, Film, Sparkles, History, User, Search, Menu, X, Settings } from "lucide-react";
+import { Home, Clock, Bookmark, User, Moon, Sun, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 import { GamepadSettings } from "@/components/GamepadSettings";
@@ -46,7 +46,7 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
 
           {/* Navigation */}
           <nav className="sidebar-nav">
-            {navItems.map((item, idx) => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeSection === item.id;
               

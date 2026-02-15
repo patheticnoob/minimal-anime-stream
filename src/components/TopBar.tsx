@@ -1,8 +1,10 @@
 import { Search, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface TopBarProps {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+  onProfileClick: () => void;
   onSearch?: () => void;
   onProfile?: () => void;
   activeSection?: string;
@@ -12,12 +14,15 @@ interface TopBarProps {
 }
 
 export function TopBar({ 
+  isDarkMode: _isDarkMode, 
+  toggleTheme: _toggleTheme,
+  onProfileClick,
   onSearch, 
-  onProfile, 
+  onProfile: _onProfile, 
   activeSection = "home", 
   onSectionChange,
-  searchQuery,
-  onSearchChange 
+  searchQuery: _searchQuery,
+  onSearchChange: _onSearchChange 
 }: TopBarProps) {
   const navItems = [
     { id: "home", label: "HOME" },
@@ -67,7 +72,7 @@ export function TopBar({
               <Search className="h-5 w-5" />
             </button>
             <button
-              onClick={onProfile}
+              onClick={onProfileClick}
               className="w-9 h-9 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors flex items-center justify-center"
             >
               <User className="h-5 w-5 text-gray-700" />

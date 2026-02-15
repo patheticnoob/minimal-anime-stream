@@ -18,7 +18,6 @@ interface VideoPlayerControlsProps {
   currentAudio: number;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   onTogglePlay: () => void;
-  onToggleMute: () => void;
   onToggleFullscreen: () => void;
   onVolumeChange: (value: number[]) => void;
   onSetVolume: (show: boolean) => void;
@@ -31,13 +30,13 @@ interface VideoPlayerControlsProps {
   formatTime: (seconds: number) => string;
 }
 
-export function VideoPlayerControls({
+export default function VideoPlayerControls({
   isPlaying,
   isMuted,
-  isFullscreen,
   volume,
   currentTime,
   duration,
+  isFullscreen,
   showVolume,
   playbackRate,
   currentSubtitle,
@@ -45,7 +44,6 @@ export function VideoPlayerControls({
   currentAudio,
   videoRef,
   onTogglePlay,
-  onToggleMute,
   onToggleFullscreen,
   onVolumeChange,
   onSetVolume,

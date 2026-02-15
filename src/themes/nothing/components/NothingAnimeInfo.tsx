@@ -1,4 +1,4 @@
-import { Play, Clock3, Star } from "lucide-react";
+import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type BroadcastInfo } from "@/types/broadcast";
 

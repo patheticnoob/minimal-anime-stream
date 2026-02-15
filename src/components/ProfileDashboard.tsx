@@ -1,13 +1,5 @@
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { LogOut, Palette, Download, Upload, FileJson } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { LogOut, Download, Upload, FileJson } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -21,8 +13,7 @@ import { useDataFlow } from "@/hooks/use-data-flow";
 import { AnimeCard } from "@/components/AnimeCard";
 import { ControllerStatus } from "@/components/ControllerStatus";
 import { GamepadButtonMapping } from "@/components/GamepadButtonMapping";
-import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -35,22 +26,19 @@ type ProfileAnime = {
   id?: string;
   episodeNumber?: number;
   currentTime?: number;
-  duration?: number | string; // number (progress) or string (V4: "24m")
+  duration?: number | string;
 };
 
+type AnimeItem = ProfileAnime;
+
 interface ProfileDashboardProps {
-  userName?: string | null;
-  userEmail?: string | null;
-  continueWatching: ProfileAnime[];
-  watchlist: ProfileAnime[];
-  onSelectAnime: (anime: ProfileAnime) => void;
-  onLogout?: () => void;
+  userName?: string;
+  userEmail?: string;
+  continueWatching: AnimeItem[];
+  watchlist: AnimeItem[];
+  onSelectAnime: (anime: AnimeItem) => void;
+  onLogout: () => Promise<void>;
 }
-
-const shimmerHighlight =
-  "relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent before:-translate-x-full hover:before:translate-x-full before:transition before:duration-[1200ms]";
-
-const emptyIllustration = "/assets/7e7b9501-d78c-4eb0-b98c-b49fdb807c8d.png";
 
 const themeOptions = [
   { value: "classic", label: "Classic", accentClass: "bg-blue-600 hover:bg-blue-700" },
@@ -58,10 +46,7 @@ const themeOptions = [
   { value: "nothing", label: "NothingOS", accentClass: "bg-red-600 hover:bg-red-700" },
 ] as const;
 
-type FocusSection = "continue" | "watchlist" | "theme" | "signout";
-
 export function ProfileDashboard({
-  userName,
   userEmail,
   continueWatching,
   watchlist,
@@ -151,7 +136,7 @@ export function ProfileDashboard({
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[var(--nothing-fg,white)]">My Profile</h1>
-          <p className="text-[var(--nothing-gray-4,#8a90a6)] mt-1">{userEmail}</p>
+          <p className="text-[var(--nothing-nothing-gray-4,#8a90a6)] mt-1">{userEmail}</p>
         </div>
         <Button
           variant="outline"
