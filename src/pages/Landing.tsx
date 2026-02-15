@@ -25,7 +25,14 @@ import { pageCache } from "@/lib/page-cache";
 import { preloadOnHomepage } from "@/lib/video-player-preload";
 
 // Track if this is the first load
-const hasLoadedBefore = sessionStorage.getItem('hasLoadedBefore') === 'true';
+const getHasLoadedBefore = () => {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem("hasLoadedBefore") === "true";
+  } catch {
+    return false;
+  }
+};
 
 interface LandingProps {
   NavBarComponent?: React.ComponentType<any>;
@@ -37,6 +44,11 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   const { theme } = useTheme();
   const { dataFlow } = useDataFlow();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [hasLoadedBefore, setHasLoadedBefore] = useState(getHasLoadedBefore);
+  const [showInitialLoader, setShowInitialLoader] = useState(() => {
+    const hasCachedData = pageCache.has("landing_page");
+    return !getHasLoadedBefore() && !hasCachedData;
+  });
 
   const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
@@ -47,11 +59,6 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   });
   const [broadcastInfo, setBroadcastInfo] = useState<BroadcastInfo | null>(null);
   const [isBroadcastLoading, setIsBroadcastLoading] = useState(false);
-  const [showInitialLoader, setShowInitialLoader] = useState(() => {
-    // Check if we have cached data - if so, skip loader
-    const hasCachedData = pageCache.has('landing_page');
-    return !hasLoadedBefore && !hasCachedData;
-  });
   const scrollPositionRef = useRef(0);
 
   // Use router hook that switches between v1, v2, and v3 based on user preference
@@ -138,13 +145,18 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
   useEffect(() => {
     if (!hasLoadedBefore) {
       const timer = setTimeout(() => {
-        sessionStorage.setItem('hasLoadedBefore', 'true');
+        try {
+          sessionStorage.setItem("hasLoadedBefore", "true");
+        } catch {
+          // ignore storage errors
+        }
+        setHasLoadedBefore(true);
         setShowInitialLoader(false);
       }, 3000);
 
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [hasLoadedBefore]);
 
   // Also hide loader when content is ready (but respect 3s minimum)
   useEffect(() => {
