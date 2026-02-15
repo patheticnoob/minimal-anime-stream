@@ -177,9 +177,8 @@ export default function NothingWatch() {
       setEpisodesLoading(false);
       
         // Prefetch first or last watched episode immediately
-        if (normalizedEpisodes.length > 0 && storedAnime) {
-          const parsedAnime = JSON.parse(storedAnime);
-          prefetchEpisodeSources(normalizedEpisodes, parsedAnime);
+        if (normalizedEpisodes.length > 0) {
+          prefetchEpisodeSources(normalizedEpisodes);
       }
       
       // Lazy load broadcast info after episodes are ready (non-critical)
@@ -226,9 +225,8 @@ export default function NothingWatch() {
         animeCache.set(cacheKey, eps, 10);
 
         // Prefetch first or last watched episode
-        if (normalizedEpisodes.length > 0 && storedAnime) {
-          const parsedAnime = JSON.parse(storedAnime);
-          prefetchEpisodeSources(normalizedEpisodes, parsedAnime);
+        if (normalizedEpisodes.length > 0) {
+          prefetchEpisodeSources(normalizedEpisodes);
         }
       })
       .catch((err) => {
@@ -254,7 +252,7 @@ export default function NothingWatch() {
   }, [animeId, fetchEpisodes, navigate, dataFlow]);
 
   // Helper function to prefetch episode sources
-  const prefetchEpisodeSources = async (normalizedEpisodes: Episode[], animeData: any) => {
+  const prefetchEpisodeSources = async (normalizedEpisodes: Episode[]) => {
     // Determine which episode to prefetch (last watched or first)
     const targetEpisode = animeProgress?.episodeId
       ? normalizedEpisodes.find(ep => ep.id === animeProgress.episodeId)
