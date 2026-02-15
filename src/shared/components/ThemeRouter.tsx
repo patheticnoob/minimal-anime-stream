@@ -1,67 +1,50 @@
 import { useTheme } from "@/hooks/use-theme";
-import { lazy, Suspense, useEffect } from "react";
-import { FullscreenLoader } from "@/components/FullscreenLoader";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
-
-const ClassicLanding = lazy(() => import("@/themes/classic/pages/Landing"));
-const RetroLanding = lazy(() => import("@/themes/retro/pages/Landing"));
-const NothingLanding = lazy(() => import("@/themes/nothing/pages/Landing"));
-
-const ClassicAuth = lazy(() => import("@/themes/classic/pages/Auth"));
-const RetroAuth = lazy(() => import("@/themes/retro/pages/Auth"));
-const NothingAuth = lazy(() => import("@/themes/nothing/pages/Auth"));
-
-const ClassicWatchHistory = lazy(() => import("@/themes/classic/pages/WatchHistory"));
-const RetroWatchHistory = lazy(() => import("@/themes/retro/pages/WatchHistory"));
-const NothingWatchHistory = lazy(() => import("@/themes/nothing/pages/WatchHistory"));
-
-const NothingWatch = lazy(() => import("@/themes/nothing/pages/Watch"));
+import ClassicLanding from "@/themes/classic/pages/Landing";
+import RetroLanding from "@/themes/retro/pages/Landing";
+import NothingLanding from "@/themes/nothing/pages/Landing";
+import ClassicAuth from "@/themes/classic/pages/Auth";
+import RetroAuth from "@/themes/retro/pages/Auth";
+import NothingAuth from "@/themes/nothing/pages/Auth";
+import ClassicWatchHistory from "@/themes/classic/pages/WatchHistory";
+import RetroWatchHistory from "@/themes/retro/pages/WatchHistory";
+import NothingWatchHistory from "@/themes/nothing/pages/WatchHistory";
+import NothingWatch from "@/themes/nothing/pages/Watch";
 
 export function ThemedLanding() {
   const { theme } = useTheme();
   
-  return (
-    <Suspense fallback={<FullscreenLoader label="Loading..." />}>
-      {theme === "retro" ? (
-        <RetroLanding />
-      ) : theme === "nothing" ? (
-        <NothingLanding />
-      ) : (
-        <ClassicLanding />
-      )}
-    </Suspense>
+  return theme === "retro" ? (
+    <RetroLanding />
+  ) : theme === "nothing" ? (
+    <NothingLanding />
+  ) : (
+    <ClassicLanding />
   );
 }
 
 export function ThemedAuth(props: { redirectAfterAuth: string }) {
   const { theme } = useTheme();
   
-  return (
-    <Suspense fallback={<FullscreenLoader label="Loading..." />}>
-      {theme === "retro" ? (
-        <RetroAuth {...props} />
-      ) : theme === "nothing" ? (
-        <NothingAuth {...props} />
-      ) : (
-        <ClassicAuth {...props} />
-      )}
-    </Suspense>
+  return theme === "retro" ? (
+    <RetroAuth {...props} />
+  ) : theme === "nothing" ? (
+    <NothingAuth {...props} />
+  ) : (
+    <ClassicAuth {...props} />
   );
 }
 
 export function ThemedWatchHistory() {
   const { theme } = useTheme();
   
-  return (
-    <Suspense fallback={<FullscreenLoader label="Loading..." />}>
-      {theme === "retro" ? (
-        <RetroWatchHistory />
-      ) : theme === "nothing" ? (
-        <NothingWatchHistory />
-      ) : (
-        <ClassicWatchHistory />
-      )}
-    </Suspense>
+  return theme === "retro" ? (
+    <RetroWatchHistory />
+  ) : theme === "nothing" ? (
+    <NothingWatchHistory />
+  ) : (
+    <ClassicWatchHistory />
   );
 }
 
@@ -76,11 +59,5 @@ export function ThemedWatch() {
     }
   }, [theme, navigate]);
   
-  return (
-    <Suspense fallback={<FullscreenLoader label="Loading..." />}>
-      {theme === "nothing" ? (
-        <NothingWatch />
-      ) : null}
-    </Suspense>
-  );
+  return theme === "nothing" ? <NothingWatch /> : null;
 }
