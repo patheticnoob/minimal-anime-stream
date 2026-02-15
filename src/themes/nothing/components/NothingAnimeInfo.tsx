@@ -27,17 +27,17 @@ export function NothingAnimeInfo({
 }: NothingAnimeInfoProps) {
   return (
     <div className="space-y-4">
-      {/* Main Info Card - Centered and Compact */}
+      {/* Main Info Card - Horizontal Layout */}
       <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 relative overflow-hidden shadow-sm transition-colors duration-300">
         <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
           <h1 className="text-9xl font-bold tracking-tighter text-black dark:text-white">NOTHING</h1>
         </div>
         
-        {/* Centered Layout */}
-        <div className="flex flex-col items-center text-center space-y-4 relative z-10">
-          {/* Poster - Larger and Centered */}
+        {/* Horizontal Layout: Poster + Content */}
+        <div className="flex flex-col sm:flex-row gap-6 items-start relative z-10">
+          {/* Poster */}
           {anime?.image && (
-            <div className="shrink-0 w-[200px] sm:w-[240px] aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-black/5 dark:border-white/5">
+            <div className="shrink-0 w-[160px] sm:w-[200px] aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-black/5 dark:border-white/5">
               <img
                 src={anime.image}
                 alt={anime.title}
@@ -46,52 +46,50 @@ export function NothingAnimeInfo({
             </div>
           )}
 
-          {/* Title */}
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-[#050814] dark:text-white max-w-xl">
-            {anime?.title || "Unknown Title"}
-          </h2>
+          {/* Content Next to Poster */}
+          <div className="flex-1 flex flex-col justify-between gap-4 min-h-[300px]">
+            {/* Title */}
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-[#050814] dark:text-white">
+              {anime?.title || "Unknown Title"}
+            </h2>
 
-          {/* Badges Row - Compact */}
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            {anime?.type && (
-              <span className="px-3 py-1.5 rounded-full border border-black/10 dark:border-white/20 text-xs font-medium tracking-wider uppercase text-black/60 dark:text-white/60">
-                {anime.type}
-              </span>
-            )}
-            {anime?.language?.sub && (
-              <span className="px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/10 text-xs font-medium tracking-wider uppercase text-black/80 dark:text-white/80">
-                SUB
-              </span>
-            )}
-            {anime?.language?.dub && (
-              <span className="px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/10 text-xs font-medium tracking-wider uppercase text-black/80 dark:text-white/80">
-                DUB
-              </span>
-            )}
+            {/* Badges Row */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {anime?.language?.sub && (
+                <span className="px-3 py-1.5 rounded-full bg-black/10 dark:bg-white/10 text-xs font-medium tracking-wider uppercase text-black/80 dark:text-white/80">
+                  SUB
+                </span>
+              )}
+              {anime?.language?.dub && (
+                <span className="px-3 py-1.5 rounded-full bg-black/10 dark:bg-white/10 text-xs font-medium tracking-wider uppercase text-black/80 dark:text-white/80">
+                  DUB
+                </span>
+              )}
+              {episodeCount > 0 && (
+                <span className="px-3 py-1.5 rounded-full border border-[#ff4d4f]/30 text-[#ff4d4f] text-xs font-bold tracking-wider uppercase">
+                  {episodeCount} EPISODES
+                </span>
+              )}
+            </div>
+
+            {/* Play Button */}
             {episodeCount > 0 && (
-              <span className="px-3 py-1.5 rounded-full border border-[#ff4d4f]/30 text-[#ff4d4f] text-xs font-bold tracking-wider uppercase">
-                {episodeCount} EPISODES
-              </span>
+              <Button
+                onClick={onPlayFirst}
+                className="w-full h-14 px-8 rounded-full bg-[#ff4d4f] text-white hover:bg-[#ff4d4f]/90 transition-all text-base font-bold tracking-wide shadow-lg shadow-[#ff4d4f]/20 hover:scale-105 active:scale-95"
+                disabled={episodeCount === 0}
+              >
+                <Play className="mr-2 h-5 w-5 fill-white" />
+                START WATCHING
+              </Button>
             )}
           </div>
-
-          {/* Play Button - Full Width */}
-          {episodeCount > 0 && (
-            <Button
-              onClick={onPlayFirst}
-              className="w-full max-w-md h-14 px-8 rounded-full bg-[#ff4d4f] text-white hover:bg-[#ff4d4f]/90 transition-all text-base font-bold tracking-wide shadow-lg shadow-[#ff4d4f]/20 hover:scale-105 active:scale-95"
-              disabled={episodeCount === 0}
-            >
-              <Play className="mr-2 h-5 w-5 fill-white" />
-              START WATCHING
-            </Button>
-          )}
         </div>
       </div>
 
-      {/* Broadcast & Audio Section - Compact Single Card */}
+      {/* Broadcast & Audio Section */}
       {(shouldShowBroadcast || anime?.language?.sub || anime?.language?.dub) && (
-        <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-5 flex flex-col sm:flex-row gap-4 items-center justify-center shadow-sm transition-colors duration-300">
+        <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-5 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm transition-colors duration-300">
           {/* Audio Toggle */}
           {(anime?.language?.sub || anime?.language?.dub) && (
             <div className="flex items-center gap-3">
@@ -129,7 +127,7 @@ export function NothingAnimeInfo({
               {(anime?.language?.sub || anime?.language?.dub) && (
                 <div className="hidden sm:block w-px h-10 bg-black/10 dark:bg-white/10" />
               )}
-              <div className="flex flex-col items-center text-center">
+              <div className="flex flex-col items-center sm:items-end text-center sm:text-right">
                 <span className="text-[10px] font-bold tracking-[0.2em] text-black/40 dark:text-white/40 uppercase mb-1">
                   Next Broadcast
                 </span>
