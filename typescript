@@ -1,6 +1,1 @@
-{onAudioPreferenceChange && (anime.language?.sub || anime.language?.dub) && (
-  // Toggle UI
-)}
-
-<InfoModal
-  anime={selected ? { ...selected, ...animeDetails } : null}
+domain: process.env.CONVEX_SITE_URL
