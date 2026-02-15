@@ -111,12 +111,12 @@ export function NothingEpisodeList({
           <span className="text-xs font-mono text-black/30 dark:text-white/30">{episodes.length} TOTAL</span>
         </div>
 
-        {/* Controls Container */}
-        <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-3 space-y-3 border border-black/5 dark:border-white/10">
-          {/* Jump Row */}
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/20 dark:text-white/20" />
+        {/* Compact Controls - All in One Row */}
+        <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-3 border border-black/5 dark:border-white/10">
+          <div className="flex flex-col sm:flex-row gap-2">
+            {/* Jump to Episode */}
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/20 dark:text-white/20 pointer-events-none" />
               <Input
                 type="number"
                 placeholder="Jump to episode..."
@@ -127,45 +127,42 @@ export function NothingEpisodeList({
                 min="1"
               />
             </div>
+
+            {/* GO Button */}
             <Button
               onClick={handleJumpToEpisode}
-              className="bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white rounded-xl px-6 font-bold h-10"
+              className="bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white rounded-xl px-6 font-bold h-10 shrink-0"
             >
               GO
             </Button>
-          </div>
 
-          {/* Filter Row */}
-          <div className="flex gap-2">
+            {/* Range Selector */}
             {episodeRanges.length > 0 ? (
               <Select
                 value={String(episodeRange)}
                 onValueChange={(value) => setEpisodeRange(Number(value))}
               >
-                <SelectTrigger className="flex-1 bg-black/10 dark:bg-black/20 border-black/10 dark:border-white/5 text-black/80 dark:text-white/80 rounded-xl h-10">
+                <SelectTrigger className="w-full sm:w-[160px] bg-black/10 dark:bg-black/20 border-black/10 dark:border-white/5 text-black/80 dark:text-white/80 rounded-xl h-10 shrink-0">
                   <SelectValue placeholder="Select Range" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-[#0B0F19] border-black/10 dark:border-white/10 text-black dark:text-white">
                   {episodeRanges.map((range, idx) => (
                     <SelectItem key={range.label} value={String(idx)}>
-                      Episodes {range.label}
+                      {range.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            ) : (
-              <div className="flex-1 bg-black/10 dark:bg-black/20 border border-black/10 dark:border-white/5 rounded-xl h-10 flex items-center px-3 text-sm text-black/40 dark:text-white/40 cursor-not-allowed">
-                All Episodes
-              </div>
-            )}
+            ) : null}
 
+            {/* Sort Button */}
             <Button
               onClick={toggleSortOrder}
               variant="outline"
-              className="bg-black/10 dark:bg-black/20 border-black/10 dark:border-white/5 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/20 dark:hover:bg-white/10 rounded-xl h-10 px-4"
+              className="bg-black/10 dark:bg-black/20 border-black/10 dark:border-white/5 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/20 dark:hover:bg-white/10 rounded-xl h-10 px-4 shrink-0"
             >
-              <ArrowUpDown className="h-4 w-4 mr-2" />
-              {sortOrder === "asc" ? "Oldest" : "Latest"}
+              <ArrowUpDown className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">{sortOrder === "asc" ? "Oldest" : "Latest"}</span>
             </Button>
           </div>
         </div>
