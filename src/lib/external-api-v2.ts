@@ -40,6 +40,9 @@ export type HianimeAnimeItem = {
   type: string;
   duration?: string;
   rank?: number;
+  quality?: string;
+  aired?: string;
+  synopsis?: string;
 };
 
 export type HianimeHomeData = {
@@ -83,9 +86,9 @@ function convertToAnimeItem(item: HianimeAnimeItem | HianimeSpotlightItem, categ
     },
     totalEpisodes: item.episodes.eps,
     duration: item.duration ? parseFloat(item.duration) : undefined,
-    synopsis: 'synopsis' in item ? item.synopsis : undefined,
-    aired: 'aired' in item ? item.aired : undefined,
-    quality: 'quality' in item ? item.quality : undefined,
+    synopsis: item.synopsis,
+    aired: item.aired,
+    quality: item.quality,
     rank: item.rank,
     sourceCategory: category as any,
   };
