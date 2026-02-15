@@ -1,17 +1,15 @@
-import { useState, useMemo, useEffect } from "react";
-import { DateTime } from "luxon";
-import { X, Play, Plus, Check, Clock3 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEffect } from "react";
+import { X } from "lucide-react";
 import { BroadcastInfo } from "@/types/broadcast";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
+import { InfoModalHeader } from "./info-modal/InfoModalHeader";
+import { InfoModalBroadcast } from "./info-modal/InfoModalBroadcast";
+import { InfoModalEpisodes } from "./info-modal/InfoModalEpisodes";
 
 type Episode = {
   id: string;
   title?: string;
   number?: number;
-  // Progress tracking
   currentTime?: number;
   duration?: number;
 };
@@ -21,6 +19,7 @@ type AnimeDetail = {
   image?: string;
   type?: string;
   dataId?: string;
+  synopsis?: string;
   language?: {
     sub?: string | null;
     dub?: string | null;
@@ -49,103 +48,18 @@ export function InfoModal({
   episodes,
   episodesLoading,
   onPlayEpisode,
-  isInWatchlist,
-  onToggleWatchlist,
   broadcastInfo,
   broadcastLoading,
   audioPreference = "sub",
   onAudioPreferenceChange,
 }: InfoModalProps) {
-  const [activeTab, setActiveTab] = useState<"episodes" | "more" | "trailers">("episodes");
-  const [episodeRange, setEpisodeRange] = useState(0);
   const { buttonPressed } = useGamepad();
-
-  // Calculate episode ranges (100 episodes per range)
-  const episodeRanges = useMemo(() => {
-    if (episodes.length <= 100) return [];
-    
-    const ranges: Array<{ label: string; start: number; end: number }> = [];
-    for (let i = 0; i < episodes.length; i += 100) {
-      const start = i + 1;
-      const end = Math.min(i + 100, episodes.length);
-      ranges.push({
-        label: `${start}-${end}`,
-        start: i,
-        end: Math.min(i + 100, episodes.length),
-      });
-    }
-    return ranges;
-  }, [episodes.length]);
-
-  // Filter episodes based on selected range
-  const displayedEpisodes = useMemo(() => {
-    if (episodeRanges.length === 0) return episodes;
-    
-    // Safety check: ensure episodeRange is valid
-    const currentIndex = episodeRange >= episodeRanges.length ? 0 : episodeRange;
-    const range = episodeRanges[currentIndex];
-    
-    if (!range) return episodes;
-    
-    return episodes.slice(range.start, range.end);
-  }, [episodes, episodeRange, episodeRanges]);
-
-  const broadcastDetails = useMemo(() => {
-    if (!broadcastInfo?.day || !broadcastInfo?.time || !broadcastInfo?.timezone) {
-      return null;
-    }
-    const normalizedDay = broadcastInfo.day.toLowerCase().replace(/s$/, "");
-    const dayMap: Record<string, number> = {
-      monday: 1,
-      tuesday: 2,
-      wednesday: 3,
-      thursday: 4,
-      friday: 5,
-      saturday: 6,
-      sunday: 7,
-    };
-    const targetWeekday = dayMap[normalizedDay];
-    if (!targetWeekday) return null;
-    const [hourStr, minuteStr = "0"] = broadcastInfo.time.split(":");
-    const hour = Number(hourStr);
-    const minute = Number(minuteStr);
-    if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
-    const zone = broadcastInfo.timezone || "UTC";
-    const nowInZone = DateTime.now().setZone(zone);
-    if (!nowInZone.isValid) return null;
-    let next = nowInZone
-      .startOf("day")
-      .plus({ days: (targetWeekday - nowInZone.weekday + 7) % 7 })
-      .set({ hour, minute, second: 0, millisecond: 0 });
-    if (next <= nowInZone) {
-      next = next.plus({ weeks: 1 });
-    }
-    const nextInIST = next.setZone("Asia/Kolkata");
-    if (!nextInIST.isValid) return null;
-    const nowInIST = DateTime.now().setZone("Asia/Kolkata");
-    const diff = nextInIST.diff(nowInIST, ["days", "hours"]).shiftTo("days", "hours");
-    const remainingDays = Math.max(0, Math.floor(diff.days ?? 0));
-    const remainingHours = Math.max(0, Math.floor(diff.hours ?? 0));
-    return {
-      istLabel: `${nextInIST.weekdayLong} at ${nextInIST.toFormat("hh:mm a")} IST`,
-      countdown: `${remainingDays} day${remainingDays === 1 ? "" : "s"} ${remainingHours} hour${remainingHours === 1 ? "" : "s"} remaining`,
-    };
-  }, [broadcastInfo]);
-
-  const isBroadcastActive =
-    broadcastInfo?.status === "airing" || broadcastInfo?.status === "upcoming";
-  const shouldShowBroadcast = broadcastLoading || isBroadcastActive;
-
-  // Reset episode range when anime changes
-  useEffect(() => {
-    setEpisodeRange(0);
-  }, [anime?.dataId]);
 
   // D-pad scrolling for episode list
   useEffect(() => {
     if (!isOpen || buttonPressed === null) return;
 
-    const episodeList = document.querySelector('.detail-episode-list');
+    const episodeList = document.querySelector('.custom-scrollbar');
     if (!episodeList) return;
 
     switch (buttonPressed) {
@@ -169,290 +83,45 @@ export function InfoModal({
 
   if (!isOpen || !anime) return null;
 
-  // Check if we have V2 enriched data
-  const hasEnrichedData = !!(anime as any).synopsis || !!(anime as any).genres || !!(anime as any).score;
-
   return (
     <div className="detail-overlay" onClick={onClose}>
-      <div className="detail-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="detail-drag-handle md:hidden" aria-hidden="true" />
-        <button className="detail-close" onClick={onClose}>
+      <div 
+        className="detail-sheet bg-[#0B0F19] text-white max-w-2xl mx-auto max-h-[90vh] overflow-hidden flex flex-col rounded-t-2xl md:rounded-2xl shadow-2xl border border-white/10" 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="detail-drag-handle md:hidden bg-white/20" aria-hidden="true" />
+        
+        <button 
+          className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white/60 hover:text-white hover:bg-black/80 transition-all backdrop-blur-sm" 
+          onClick={onClose}
+        >
           <X className="h-5 w-5" />
         </button>
 
-        {/* TOP HERO AREA */}
-        <div className="detail-hero">
-          {anime.image ? (
-            <img src={anime.image} alt={anime.title ?? "Anime"} className="detail-hero-bg" />
-          ) : (
-            <div className="detail-hero-bg bg-gradient-to-br from-blue-900 to-black" />
-          )}
-          <div className="detail-hero-scrim" />
-          <div className="detail-hero-content">
-            {anime.type && <div className="detail-hero-tag">{anime.type}</div>}
-            <h1 className="detail-hero-title">{anime.title ?? "Untitled"}</h1>
-            <div className="detail-hero-meta">
-              {(anime as any).aired && <span>{(anime as any).aired}</span>}
-              {(anime as any).aired && <span className="detail-dot" />}
-              {(anime as any).score && (
-                <>
-                  <span>★ {(anime as any).score}</span>
-                  <span className="detail-dot" />
-                </>
-              )}
-              {(anime as any).totalEpisodes && (
-                <>
-                  <span>{(anime as any).totalEpisodes} Episodes</span>
-                  <span className="detail-dot" />
-                </>
-              )}
-              {!hasEnrichedData && episodes.length > 0 && (
-                <>
-                  <span>{episodes.length} Episodes</span>
-                  <span className="detail-dot" />
-                </>
-              )}
-              {(anime as any).status && <span>{(anime as any).status}</span>}
-              <div className="detail-language-badges">
-                {anime.language?.sub && (
-                  <Badge variant="outline" className="border-gray-500 text-gray-300 bg-transparent h-5 text-[10px]">
-                    SUB
-                  </Badge>
-                )}
-                {anime.language?.dub && (
-                  <Badge variant="outline" className="border-gray-500 text-gray-300 bg-transparent h-5 text-[10px]">
-                    DUB
-                  </Badge>
-                )}
-              </div>
-            </div>
-            
-            {/* Genres - V2 enriched data */}
-            {(anime as any).genres && (anime as any).genres.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {(anime as any).genres.slice(0, 5).map((genre: string, idx: number) => (
-                  <Badge key={idx} variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
-                    {genre}
-                  </Badge>
-                ))}
-              </div>
-            )}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+          {/* Header Section */}
+          <InfoModalHeader 
+            anime={anime} 
+            episodeCount={episodes.length} 
+            onPlayFirst={() => episodes.length > 0 && onPlayEpisode(episodes[0])} 
+          />
 
-            {/* Studios - V2 enriched data */}
-            {(anime as any).studios && (anime as any).studios.length > 0 && (
-              <div className="mt-2 text-sm text-gray-400">
-                <span className="font-semibold">Studio:</span> {(anime as any).studios.join(", ")}
-              </div>
-            )}
+          {/* Broadcast & Audio Section */}
+          <InfoModalBroadcast 
+            broadcastInfo={broadcastInfo}
+            broadcastLoading={broadcastLoading}
+            audioPreference={audioPreference}
+            onAudioPreferenceChange={onAudioPreferenceChange}
+            hasSub={!!anime.language?.sub}
+            hasDub={!!anime.language?.dub}
+          />
 
-            {/* Audio Preference Toggle */}
-            {onAudioPreferenceChange && (anime.language?.sub || anime.language?.dub) && (
-              <div className="flex items-center gap-3 mt-3">
-                <span className="text-sm font-semibold text-gray-300">Audio:</span>
-                <div className="inline-flex rounded-lg border border-white/20 p-1 bg-black/30">
-                  <button
-                    onClick={() => onAudioPreferenceChange("sub")}
-                    disabled={!anime.language?.sub}
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold tracking-wider uppercase transition-all ${
-                      audioPreference === "sub"
-                        ? "bg-blue-600 text-white shadow-lg"
-                        : "text-gray-400 hover:text-gray-200"
-                    } ${!anime.language?.sub ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
-                  >
-                    SUB
-                  </button>
-                  <button
-                    onClick={() => onAudioPreferenceChange("dub")}
-                    disabled={!anime.language?.dub}
-                    className={`px-4 py-1.5 rounded-md text-xs font-bold tracking-wider uppercase transition-all ${
-                      audioPreference === "dub"
-                        ? "bg-blue-600 text-white shadow-lg"
-                        : "text-gray-400 hover:text-gray-200"
-                    } ${!anime.language?.dub ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
-                  >
-                    DUB
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {shouldShowBroadcast && (
-              <div className="mt-2 flex items-start gap-2 text-sm text-blue-300">
-                <Clock3 className="h-4 w-4 mt-0.5" />
-                {broadcastLoading ? (
-                  <span>Fetching upcoming schedule...</span>
-                ) : (
-                  <div className="space-y-1">
-                    <span className="block font-semibold text-white">
-                      Next broadcast: {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
-                    </span>
-                    {broadcastDetails?.countdown && (
-                      <span className="block text-xs text-blue-200">
-                        {broadcastDetails.countdown}
-                      </span>
-                    )}
-                    {!broadcastDetails?.istLabel && broadcastInfo?.summary && (
-                      <span className="block text-xs text-blue-200">{broadcastInfo.summary}</span>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-            
-            {/* Synopsis - V2 enriched data or fallback */}
-            <p className="detail-hero-description">
-              {(anime as any).synopsis 
-                ? (anime as any).synopsis.slice(0, 250) + ((anime as any).synopsis.length > 250 ? "..." : "")
-                : "Experience the thrill of this epic saga. Watch the latest episodes in high definition with multiple audio options available."}
-            </p>
-            
-            <div className="detail-hero-actions">
-              <Button
-                className="btn btn-primary w-full sm:w-auto justify-center"
-                onClick={() => {
-                  if (episodes.length > 0) {
-                    onPlayEpisode(episodes[0]);
-                  }
-                }}
-                disabled={episodes.length === 0}
-              >
-                <Play className="h-5 w-5 fill-white mr-2" />
-                Watch Now
-              </Button>
-              <Button
-                className="btn btn-secondary w-full sm:w-auto justify-center"
-                onClick={onToggleWatchlist}
-              >
-                {isInWatchlist ? (
-                  <>
-                    <Check className="h-5 w-5 mr-2" />
-                    In Watchlist
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-5 w-5 mr-2" />
-                    Watchlist
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* BOTTOM CONTENT (tabs + episodes) */}
-        <div className="detail-body">
-          <div className="detail-tabs">
-            <button
-              className={"detail-tab" + (activeTab === "episodes" ? " is-active" : "")}
-              onClick={() => setActiveTab("episodes")}
-            >
-              Episodes
-            </button>
-            <button
-              className={"detail-tab" + (activeTab === "more" ? " is-active" : "")}
-              onClick={() => setActiveTab("more")}
-            >
-              More Like This
-            </button>
-            <button
-              className={"detail-tab" + (activeTab === "trailers" ? " is-active" : "")}
-              onClick={() => setActiveTab("trailers")}
-            >
-              Trailers & More
-            </button>
-          </div>
-
-          {activeTab === "episodes" && (
-            <div className="detail-episodes">
-              <div className="detail-season-header">
-                <span className="detail-season-title">All Episodes</span>
-                {episodeRanges.length > 0 && (
-                  <Select
-                    value={String(episodeRange)}
-                    onValueChange={(value) => setEpisodeRange(Number(value))}
-                  >
-                    <SelectTrigger className="ml-3 h-8 w-32 bg-white/5 border-white/10 text-white text-xs tracking-wide uppercase">
-                      <SelectValue placeholder="Episodes range" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-black/95 border-white/10 text-white z-[100]">
-                      {episodeRanges.map((range, idx) => (
-                        <SelectItem
-                          key={range.label}
-                          value={String(idx)}
-                          className="cursor-pointer focus:bg-white/10 data-[state=checked]:bg-blue-600/20 data-[state=checked]:text-blue-400"
-                        >
-                          Episodes {range.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-              {episodesLoading ? (
-                <div className="detail-placeholder">Loading episodes...</div>
-              ) : displayedEpisodes.length > 0 ? (
-                <div className="detail-episode-list">
-                  {displayedEpisodes.map((ep, idx) => {
-                    const progressPercentage = ep.currentTime && ep.duration 
-                      ? (ep.currentTime / ep.duration) * 100 
-                      : 0;
-
-                    return (
-                      <button
-                        key={ep.id}
-                        onClick={() => onPlayEpisode(ep)}
-                        className="group relative w-full text-left p-4 rounded-lg border transition-all bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-                      >
-                        <div className="detail-episode-thumb-wrapper">
-                          <div className="detail-episode-thumb placeholder relative">
-                            <span className="play-icon">
-                              <Play className="h-4 w-4 fill-white" />
-                            </span>
-                            {progressPercentage > 0 && (
-                              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/80">
-                                <div 
-                                  className="h-full bg-blue-500 transition-all"
-                                  style={{ width: `${progressPercentage}%` }}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="detail-episode-info">
-                          <div className="detail-episode-title-row">
-                            <span className="detail-episode-title">
-                              {ep.title || `Episode ${ep.number ?? "?"}`}
-                            </span>
-                            <span className="detail-episode-meta">
-                              Episode {ep.number ?? "?"}
-                              {progressPercentage > 0 && (
-                                <span className="ml-2 text-blue-400">
-                                  • {Math.round(progressPercentage)}% watched
-                                </span>
-                              )}
-                            </span>
-                          </div>
-                          <p className="detail-episode-description">
-                            Watch this exciting episode now in high quality.
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="detail-placeholder">No episodes available</div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "more" && (
-            <div className="detail-placeholder">More Like This (coming soon)</div>
-          )}
-
-          {activeTab === "trailers" && (
-            <div className="detail-placeholder">Trailers & More (coming soon)</div>
-          )}
+          {/* Episodes Section */}
+          <InfoModalEpisodes 
+            episodes={episodes}
+            episodesLoading={episodesLoading}
+            onPlayEpisode={onPlayEpisode}
+          />
         </div>
       </div>
     </div>
