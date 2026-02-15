@@ -64,6 +64,7 @@ export function InfoModalBroadcast({
 
   const isBroadcastActive = broadcastInfo?.status === "airing" || broadcastInfo?.status === "upcoming";
   const shouldShowBroadcast = broadcastLoading || isBroadcastActive;
+  const showBroadcastInfo = shouldShowBroadcast || (!broadcastLoading && !broadcastInfo);
 
   if (!shouldShowBroadcast && !hasSub && !hasDub) return null;
 
@@ -101,7 +102,7 @@ export function InfoModalBroadcast({
        )}
        
        {/* Broadcast */}
-       {shouldShowBroadcast && (
+       {showBroadcastInfo && (
          <div className="flex items-center gap-3 text-center md:text-right w-full md:w-auto justify-center md:justify-end">
             <div className="hidden md:block w-px h-10 bg-white/10 mx-2" />
             <div className="flex flex-col items-center md:items-end">
@@ -110,7 +111,7 @@ export function InfoModalBroadcast({
                  <span className="text-sm text-white/60 animate-pulse">Syncing schedule...</span>
                ) : (
                  <>
-                   <span className="text-sm font-medium text-white">{broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}</span>
+                   <span className="text-sm font-medium text-white">{broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "No broadcast info available"}</span>
                    {broadcastDetails?.countdown && (
                      <span className="text-xs text-[#ff4d4f] font-medium">{broadcastDetails.countdown}</span>
                    )}

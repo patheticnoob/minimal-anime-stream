@@ -184,10 +184,10 @@ export default function NothingWatch() {
       
       // Lazy load broadcast info after episodes are ready (non-critical)
       if (storedAnime) {
-        const animeData = JSON.parse(storedAnime);
-        if (animeData.title) {
+        const storedTitle = JSON.parse(storedAnime)?.title;
+        if (storedTitle) {
           setTimeout(() => {
-            loadBroadcastInfo(animeData.title);
+            loadBroadcastInfo(storedTitle);
           }, 500);
         }
       }
@@ -236,10 +236,10 @@ export default function NothingWatch() {
 
     // Lazy load broadcast info (non-critical data)
     if (storedAnime) {
-      const animeData = JSON.parse(storedAnime);
-      if (animeData.title) {
+      const storedTitle = JSON.parse(storedAnime)?.title;
+      if (storedTitle) {
         setTimeout(() => {
-          loadBroadcastInfo(animeData.title);
+          loadBroadcastInfo(storedTitle);
         }, 500);
       }
     }

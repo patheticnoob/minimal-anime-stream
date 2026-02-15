@@ -1,4 +1,4 @@
-import { Home, Clock, Bookmark, User, Moon, Sun, LogOut } from "lucide-react";
+import { Home, Search, Tv, Film, Sparkles, User, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 import { GamepadSettings } from "@/components/GamepadSettings";

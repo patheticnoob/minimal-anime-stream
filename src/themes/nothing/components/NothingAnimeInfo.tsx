@@ -25,6 +25,8 @@ export function NothingAnimeInfo({
   audioPreference,
   onAudioPreferenceChange
 }: NothingAnimeInfoProps) {
+  const showBroadcastInfo = shouldShowBroadcast || (!isBroadcastLoading && !broadcastInfo);
+
   return (
     <div className="space-y-4">
       {/* Main Info Card - Horizontal Layout */}
@@ -124,7 +126,7 @@ export function NothingAnimeInfo({
           )}
 
           {/* Broadcast Info */}
-          {shouldShowBroadcast && (
+          {showBroadcastInfo && (
             <div className="flex flex-col items-end text-right flex-1 min-w-0">
               <span className="text-[10px] font-bold tracking-[0.2em] text-black/40 dark:text-white/40 uppercase mb-1">
                 Next Broadcast
@@ -134,7 +136,7 @@ export function NothingAnimeInfo({
               ) : (
                 <>
                   <span className="text-sm font-medium text-black dark:text-white">
-                    {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
+                    {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "No broadcast info available"}
                   </span>
                   {broadcastDetails?.countdown && (
                     <span className="text-xs text-[#ff4d4f] font-medium">{broadcastDetails.countdown}</span>
