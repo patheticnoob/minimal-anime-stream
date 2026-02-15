@@ -1,5 +1,5 @@
-import { Play, Film, ArrowUpDown } from "lucide-react";
-import { useState, useRef } from "react";
+import { Play, Film, ArrowUpDown, Search } from "lucide-react";
+import { useState, useRef, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,17 +26,44 @@ export function NothingEpisodeList({
 }: NothingEpisodeListProps) {
   const [jumpToEpisode, setJumpToEpisode] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [episodeRange, setEpisodeRange] = useState(0);
   const episodeListRef = useRef<HTMLDivElement>(null);
 
-  const sortedEpisodes = [...episodes].sort((a, b) => {
-    const aNum = a.number ?? 0;
-    const bNum = b.number ?? 0;
-    return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
-  });
+  // Calculate episode ranges (100 episodes per range)
+  const episodeRanges = useMemo(() => {
+    if (episodes.length <= 100) return [];
+    
+    const ranges: Array<{ label: string; start: number; end: number }> = [];
+    for (let i = 0; i < episodes.length; i += 100) {
+      const start = i + 1;
+      const end = Math.min(i + 100, episodes.length);
+      ranges.push({
+        label: `${start}-${end}`,
+        start: i,
+        end: Math.min(i + 100, episodes.length),
+      });
+    }
+    return ranges;
+  }, [episodes.length]);
 
-  const toggleSortOrder = () => {
-    setSortOrder(prev => prev === "asc" ? "desc" : "asc");
-  };
+  // Filter and sort episodes
+  const displayedEpisodes = useMemo(() => {
+    let filtered = episodes;
+    
+    if (episodeRanges.length > 0) {
+      const currentIndex = episodeRange >= episodeRanges.length ? 0 : episodeRange;
+      const range = episodeRanges[currentIndex];
+      if (range) {
+        filtered = episodes.slice(range.start, range.end);
+      }
+    }
+
+    return [...filtered].sort((a, b) => {
+      const aNum = a.number ?? 0;
+      const bNum = b.number ?? 0;
+      return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
+    });
+  }, [episodes, episodeRange, episodeRanges, sortOrder]);
 
   const handleJumpToEpisode = () => {
     const episodeNum = parseInt(jumpToEpisode);
@@ -45,61 +72,36 @@ export function NothingEpisodeList({
       return;
     }
 
-    const targetEpisode = sortedEpisodes.find(ep => ep.number === episodeNum);
-    if (!targetEpisode) {
-      toast.error(`Episode ${episodeNum} not found`);
-      return;
+    // Find which range this episode is in
+    if (episodeRanges.length > 0) {
+      const rangeIndex = episodeRanges.findIndex(r => episodeNum >= (r.start + 1) && episodeNum <= r.end);
+      if (rangeIndex !== -1) {
+        setEpisodeRange(rangeIndex);
+        setTimeout(() => scrollToEpisode(episodeNum), 100);
+        return;
+      }
     }
 
-    const targetIndex = sortedEpisodes.findIndex(ep => ep.number === episodeNum);
-    if (targetIndex !== -1 && episodeListRef.current) {
-      const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
-      if (episodeElement) {
-        episodeElement.scrollIntoView({ behavior: "smooth", block: "center" });
-        toast.success(`Scrolled to Episode ${episodeNum}`);
-        setJumpToEpisode("");
+    scrollToEpisode(episodeNum);
+  };
+
+  const scrollToEpisode = (episodeNum: number) => {
+    const element = document.getElementById(`episode-${episodeNum}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      toast.success(`Scrolled to Episode ${episodeNum}`);
+      setJumpToEpisode("");
+    } else {
+      const exists = episodes.some(ep => ep.number === episodeNum);
+      if (!exists) {
+        toast.error(`Episode ${episodeNum} not found`);
       }
     }
   };
 
-  const handleRangeClick = (startEpisode: number) => {
-    const targetEpisode = sortedEpisodes.find(ep => ep.number === startEpisode);
-    if (!targetEpisode) {
-      const closestEpisode = sortedEpisodes.find(ep => (ep.number ?? 0) >= startEpisode);
-      if (closestEpisode) {
-        const targetIndex = sortedEpisodes.findIndex(ep => ep.id === closestEpisode.id);
-        if (targetIndex !== -1 && episodeListRef.current) {
-          const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
-          if (episodeElement) {
-            episodeElement.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }
-      }
-      return;
-    }
-
-    const targetIndex = sortedEpisodes.findIndex(ep => ep.number === startEpisode);
-    if (targetIndex !== -1 && episodeListRef.current) {
-      const episodeElement = episodeListRef.current.querySelector(`[data-episode-index="${targetIndex}"]`);
-      if (episodeElement) {
-        episodeElement.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === "asc" ? "desc" : "asc");
   };
-
-  const getEpisodeRanges = () => {
-    const totalEpisodes = episodes.length;
-    if (totalEpisodes <= 100) return [];
-
-    const ranges = [];
-    for (let i = 1; i <= totalEpisodes; i += 100) {
-      const end = Math.min(i + 99, totalEpisodes);
-      ranges.push({ start: i, end, label: `${i}-${end}` });
-    }
-    return ranges;
-  };
-
-  const episodeRanges = getEpisodeRanges();
 
   return (
     <div id="episode-list-container" className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col shadow-sm transition-colors duration-300">
@@ -109,55 +111,63 @@ export function NothingEpisodeList({
           <span className="text-xs font-mono text-black/30 dark:text-white/30">{episodes.length} TOTAL</span>
         </div>
 
-        {/* Jump to Episode */}
-        <div className="flex gap-2 mb-3">
-          <Input
-            type="number"
-            placeholder="Jump to episode..."
-            value={jumpToEpisode}
-            onChange={(e) => setJumpToEpisode(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleJumpToEpisode();
-              }
-            }}
-            className="flex-1 bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/40 rounded-xl"
-            min="1"
-          />
-          <Button
-            onClick={handleJumpToEpisode}
-            size="sm"
-            className="px-4 bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white rounded-xl"
-          >
-            Go
-          </Button>
-        </div>
+        {/* Controls Container */}
+        <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-3 space-y-3 border border-black/5 dark:border-white/10">
+          {/* Jump Row */}
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/20 dark:text-white/20" />
+              <Input
+                type="number"
+                placeholder="Jump to episode..."
+                value={jumpToEpisode}
+                onChange={(e) => setJumpToEpisode(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleJumpToEpisode()}
+                className="pl-9 bg-black/10 dark:bg-black/20 border-black/10 dark:border-white/5 text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/20 rounded-xl h-10 focus-visible:ring-[#ff4d4f]/50 focus-visible:border-[#ff4d4f]/50"
+                min="1"
+              />
+            </div>
+            <Button
+              onClick={handleJumpToEpisode}
+              className="bg-[#ff4d4f] hover:bg-[#ff4d4f]/90 text-white rounded-xl px-6 font-bold h-10"
+            >
+              GO
+            </Button>
+          </div>
 
-        {/* Range Dropdown and Sort Button */}
-        <div className="flex gap-2 mb-3">
-          {episodeRanges.length > 0 && (
-            <Select onValueChange={(value) => handleRangeClick(parseInt(value))}>
-              <SelectTrigger size="sm" className="flex-1 bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-black dark:text-white rounded-xl">
-                <SelectValue placeholder="Select range" />
-              </SelectTrigger>
-              <SelectContent>
-                {episodeRanges.map((range) => (
-                  <SelectItem key={range.start} value={range.start.toString()}>
-                    {range.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          <Button
-            onClick={toggleSortOrder}
-            size="sm"
-            variant="outline"
-            className={`bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-[#ff4d4f] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white rounded-xl ${episodeRanges.length === 0 ? 'ml-auto' : ''}`}
-          >
-            <ArrowUpDown className="h-4 w-4 mr-2" />
-            {sortOrder === "asc" ? "Oldest" : "Latest"}
-          </Button>
+          {/* Filter Row */}
+          <div className="flex gap-2">
+            {episodeRanges.length > 0 ? (
+              <Select
+                value={String(episodeRange)}
+                onValueChange={(value) => setEpisodeRange(Number(value))}
+              >
+                <SelectTrigger className="flex-1 bg-black/10 dark:bg-black/20 border-black/10 dark:border-white/5 text-black/80 dark:text-white/80 rounded-xl h-10">
+                  <SelectValue placeholder="Select Range" />
+                </SelectTrigger>
+                <SelectContent className="bg-white dark:bg-[#0B0F19] border-black/10 dark:border-white/10 text-black dark:text-white">
+                  {episodeRanges.map((range, idx) => (
+                    <SelectItem key={range.label} value={String(idx)}>
+                      Episodes {range.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="flex-1 bg-black/10 dark:bg-black/20 border border-black/10 dark:border-white/5 rounded-xl h-10 flex items-center px-3 text-sm text-black/40 dark:text-white/40 cursor-not-allowed">
+                All Episodes
+              </div>
+            )}
+
+            <Button
+              onClick={toggleSortOrder}
+              variant="outline"
+              className="bg-black/10 dark:bg-black/20 border-black/10 dark:border-white/5 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/20 dark:hover:bg-white/10 rounded-xl h-10 px-4"
+            >
+              <ArrowUpDown className="h-4 w-4 mr-2" />
+              {sortOrder === "asc" ? "Oldest" : "Latest"}
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -168,9 +178,9 @@ export function NothingEpisodeList({
             <p className="text-sm text-black/40 dark:text-white/40 tracking-wider uppercase">Loading episodes...</p>
           </div>
         </div>
-      ) : sortedEpisodes.length > 0 ? (
-        <div ref={episodeListRef} className="space-y-3 overflow-y-auto flex-1">
-          {sortedEpisodes.map((ep, idx) => {
+      ) : displayedEpisodes.length > 0 ? (
+        <div ref={episodeListRef} className="space-y-2 overflow-y-auto flex-1 pr-2 custom-scrollbar">
+          {displayedEpisodes.map((ep) => {
             const progressPercentage =
               ep.currentTime && ep.duration ? (ep.currentTime / ep.duration) * 100 : 0;
             const isCurrentEpisode = currentEpisodeId === ep.id;
@@ -178,47 +188,42 @@ export function NothingEpisodeList({
             return (
               <button
                 key={ep.id}
-                data-episode-index={idx}
+                id={`episode-${ep.number}`}
                 onClick={() => onPlayEpisode(ep)}
-                className={`group relative w-full text-left p-4 rounded-xl border transition-all duration-300 ${
+                className={`group w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 text-left ${
                   isCurrentEpisode
-                    ? "bg-[#ff4d4f]/5 dark:bg-[#ff4d4f]/10 border-[#ff4d4f] shadow-[0_0_20px_rgba(255,77,79,0.1)]"
-                    : "bg-black/5 dark:bg-white/5 border-transparent hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/10"
+                    ? "bg-[#ff4d4f]/5 dark:bg-[#ff4d4f]/10 border-[#ff4d4f]/50 shadow-[0_0_15px_rgba(255,77,79,0.1)]"
+                    : "bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/10"
                 }`}
               >
-                <div className="flex items-center gap-4 relative z-10">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full font-mono text-sm font-bold ${
-                    isCurrentEpisode ? "bg-[#ff4d4f] text-white" : "bg-white dark:bg-[#2A2F3A] text-black/40 dark:text-white/40 group-hover:text-black dark:group-hover:text-white shadow-sm"
-                  }`}>
-                    {ep.number ?? "#"}
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-mono text-sm font-bold shrink-0 ${
+                  isCurrentEpisode ? "bg-[#ff4d4f] text-white" : "bg-black/10 dark:bg-white/10 text-black/40 dark:text-white/40 group-hover:text-black dark:group-hover:text-white group-hover:bg-black/20 dark:group-hover:bg-white/20"
+                }`}>
+                  {ep.number ?? "#"}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <h4 className={`font-medium truncate ${isCurrentEpisode ? "text-[#ff4d4f]" : "text-[#050814] dark:text-white group-hover:text-black dark:group-hover:text-white"}`}>
+                    {ep.title || `Episode ${ep.number}`}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-black/40 dark:text-white/40 font-mono">EP {ep.number ?? "?"}</span>
+                    {progressPercentage > 0 && (
+                      <div className="h-1 w-16 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-[#ff4d4f]" 
+                          style={{ width: `${Math.min(progressPercentage, 100)}%` }} 
+                        />
+                      </div>
+                    )}
                   </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-medium truncate ${isCurrentEpisode ? "text-[#ff4d4f]" : "text-[#050814] dark:text-white group-hover:text-black dark:group-hover:text-white"}`}>
-                      {ep.title || `Episode ${ep.number ?? "?"}`}
-                    </p>
-                    <p className="text-xs text-black/40 dark:text-white/40 font-mono mt-0.5">
-                      EP {ep.number ?? "?"}
-                    </p>
-                  </div>
-
-                  {isCurrentEpisode ? (
-                    <div className="w-2 h-2 rounded-full bg-[#ff4d4f] animate-pulse" />
-                  ) : (
-                    <Play className="h-4 w-4 text-black/0 dark:text-white/0 group-hover:text-black/40 dark:group-hover:text-white/40 transition-all transform translate-x-2 group-hover:translate-x-0" />
-                  )}
                 </div>
 
-                {progressPercentage > 0 && (
-                  <div className="absolute inset-x-5 bottom-3 pointer-events-none">
-                    <div className="h-1 rounded-full bg-[#ff4d4f]/15 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-[#ff4d4f] transition-all"
-                        style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                  isCurrentEpisode ? "bg-[#ff4d4f] text-white" : "bg-black/5 dark:bg-white/5 text-black/20 dark:text-white/20 group-hover:bg-black/20 dark:group-hover:bg-white/20 group-hover:text-black dark:group-hover:text-white"
+                }`}>
+                  <Play className="h-3.5 w-3.5 fill-current" />
+                </div>
               </button>
             );
           })}
