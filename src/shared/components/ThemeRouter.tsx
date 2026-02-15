@@ -15,36 +15,39 @@ import NothingWatch from "@/themes/nothing/pages/Watch";
 export function ThemedLanding() {
   const { theme } = useTheme();
   
+  // Always render a theme - default to "nothing"
   return theme === "retro" ? (
     <RetroLanding />
-  ) : theme === "nothing" ? (
-    <NothingLanding />
-  ) : (
+  ) : theme === "classic" ? (
     <ClassicLanding />
+  ) : (
+    <NothingLanding />
   );
 }
 
 export function ThemedAuth(props: { redirectAfterAuth: string }) {
   const { theme } = useTheme();
   
+  // Always render a theme - default to "nothing"
   return theme === "retro" ? (
     <RetroAuth {...props} />
-  ) : theme === "nothing" ? (
-    <NothingAuth {...props} />
-  ) : (
+  ) : theme === "classic" ? (
     <ClassicAuth {...props} />
+  ) : (
+    <NothingAuth {...props} />
   );
 }
 
 export function ThemedWatchHistory() {
   const { theme } = useTheme();
   
+  // Always render a theme - default to "nothing"
   return theme === "retro" ? (
     <RetroWatchHistory />
-  ) : theme === "nothing" ? (
-    <NothingWatchHistory />
-  ) : (
+  ) : theme === "classic" ? (
     <ClassicWatchHistory />
+  ) : (
+    <NothingWatchHistory />
   );
 }
 

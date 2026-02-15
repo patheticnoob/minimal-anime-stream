@@ -6,11 +6,14 @@ export function useTheme() {
   const currentTheme = useQuery(api.themes.getUserTheme);
   const setThemeMutation = useMutation(api.themes.setUserTheme);
 
+  // Default to "nothing" theme if no theme is set
+  const theme = currentTheme || "nothing";
+
   useEffect(() => {
-    if (currentTheme) {
-      document.documentElement.setAttribute("data-theme", currentTheme);
+    if (theme) {
+      document.documentElement.setAttribute("data-theme", theme);
     }
-  }, [currentTheme]);
+  }, [theme]);
 
   const setTheme = async (theme: "classic" | "retro" | "nothing") => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -18,7 +21,7 @@ export function useTheme() {
   };
 
   return {
-    theme: currentTheme || "nothing",
+    theme,
     setTheme,
   };
 }
