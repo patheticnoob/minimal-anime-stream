@@ -178,17 +178,21 @@ export default function NothingWatch() {
       
         // Prefetch first or last watched episode immediately
         if (normalizedEpisodes.length > 0 && storedAnime) {
-          const _parsedAnime = JSON.parse(storedAnime);
-          prefetchEpisodeSources(normalizedEpisodes, _parsedAnime);
+          const parsedAnime = JSON.parse(storedAnime);
+          prefetchEpisodeSources(normalizedEpisodes, parsedAnime);
       }
       
       // Lazy load broadcast info after episodes are ready (non-critical)
       if (storedAnime) {
-        const storedTitle = JSON.parse(storedAnime)?.title;
-        if (storedTitle) {
-          setTimeout(() => {
-            loadBroadcastInfo(storedTitle);
-          }, 500);
+        try {
+          const parsedAnime = JSON.parse(storedAnime);
+          if (parsedAnime?.title) {
+            setTimeout(() => {
+              loadBroadcastInfo(parsedAnime.title);
+            }, 500);
+          }
+        } catch (err) {
+          console.error("Failed to parse stored anime for broadcast info:", err);
         }
       }
       
@@ -236,11 +240,15 @@ export default function NothingWatch() {
 
     // Lazy load broadcast info (non-critical data)
     if (storedAnime) {
-      const storedTitle = JSON.parse(storedAnime)?.title;
-      if (storedTitle) {
-        setTimeout(() => {
-          loadBroadcastInfo(storedTitle);
-        }, 500);
+      try {
+        const parsedAnime = JSON.parse(storedAnime);
+        if (parsedAnime?.title) {
+          setTimeout(() => {
+            loadBroadcastInfo(parsedAnime.title);
+          }, 500);
+        }
+      } catch (err) {
+        console.error("Failed to parse stored anime for broadcast info:", err);
       }
     }
   }, [animeId, fetchEpisodes, navigate, dataFlow]);
