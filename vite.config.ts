@@ -17,7 +17,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router'],
-          'convex-vendor': ['convex', '@convex-dev/auth'],
+          'convex-vendor': ['convex'],
           'ui-vendor': ['framer-motion', 'lucide-react'],
         },
       },
@@ -26,5 +26,8 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: false,
+  },
+  optimizeDeps: {
+    exclude: ['@convex-dev/auth'],
   },
 });
