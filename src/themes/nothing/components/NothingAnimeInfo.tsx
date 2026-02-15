@@ -33,11 +33,11 @@ export function NothingAnimeInfo({
           <h1 className="text-9xl font-bold tracking-tighter text-black dark:text-white">NOTHING</h1>
         </div>
         
-        {/* Horizontal Layout: Poster + Content */}
-        <div className="flex flex-col sm:flex-row gap-6 items-start relative z-10">
-          {/* Poster */}
+        {/* Horizontal Layout: Poster + Content Side by Side */}
+        <div className="flex gap-6 items-stretch relative z-10">
+          {/* Poster - Left Side */}
           {anime?.image && (
-            <div className="shrink-0 w-[160px] sm:w-[200px] aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-black/5 dark:border-white/5">
+            <div className="shrink-0 w-[200px] aspect-[2/3] rounded-xl overflow-hidden shadow-lg border border-black/5 dark:border-white/5">
               <img
                 src={anime.image}
                 alt={anime.title}
@@ -46,10 +46,10 @@ export function NothingAnimeInfo({
             </div>
           )}
 
-          {/* Content Next to Poster */}
-          <div className="flex-1 flex flex-col justify-between gap-4 min-h-[300px]">
+          {/* Content - Right Side */}
+          <div className="flex-1 flex flex-col gap-4">
             {/* Title */}
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-[#050814] dark:text-white">
+            <h2 className="text-3xl font-bold tracking-tight leading-tight text-[#050814] dark:text-white">
               {anime?.title || "Unknown Title"}
             </h2>
 
@@ -72,6 +72,9 @@ export function NothingAnimeInfo({
               )}
             </div>
 
+            {/* Spacer to push button to bottom */}
+            <div className="flex-1" />
+
             {/* Play Button */}
             {episodeCount > 0 && (
               <Button
@@ -87,7 +90,7 @@ export function NothingAnimeInfo({
         </div>
       </div>
 
-      {/* Broadcast & Audio Section */}
+      {/* Broadcast & Audio Section - Separate Card */}
       {(shouldShowBroadcast || anime?.language?.sub || anime?.language?.dub) && (
         <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-5 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm transition-colors duration-300">
           {/* Audio Toggle */}
