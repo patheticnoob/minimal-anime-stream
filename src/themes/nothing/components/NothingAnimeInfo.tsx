@@ -47,9 +47,9 @@ export function NothingAnimeInfo({
           )}
 
           {/* Content - Right Side */}
-          <div className="flex-1 flex flex-col gap-4">
-            {/* Title */}
-            <h2 className="text-3xl font-bold tracking-tight leading-tight text-[#050814] dark:text-white">
+          <div className="flex-1 flex flex-col gap-4 min-w-0">
+            {/* Title - with proper text wrapping */}
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-[#050814] dark:text-white break-words">
               {anime?.title || "Unknown Title"}
             </h2>
 
@@ -75,22 +75,22 @@ export function NothingAnimeInfo({
             {/* Spacer to push button to bottom */}
             <div className="flex-1" />
 
-            {/* Play Button */}
+            {/* Play Button - constrained width */}
             {episodeCount > 0 && (
               <Button
                 onClick={onPlayFirst}
-                className="w-full h-14 px-8 rounded-full bg-[#ff4d4f] text-white hover:bg-[#ff4d4f]/90 transition-all text-base font-bold tracking-wide shadow-lg shadow-[#ff4d4f]/20 hover:scale-105 active:scale-95"
+                className="w-full max-w-full h-14 px-6 rounded-full bg-[#ff4d4f] text-white hover:bg-[#ff4d4f]/90 transition-all text-sm sm:text-base font-bold tracking-wide shadow-lg shadow-[#ff4d4f]/20 hover:scale-105 active:scale-95"
                 disabled={episodeCount === 0}
               >
-                <Play className="mr-2 h-5 w-5 fill-white" />
-                START WATCHING
+                <Play className="mr-2 h-5 w-5 fill-white shrink-0" />
+                <span className="truncate">START WATCHING</span>
               </Button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Broadcast & Audio Section - Separate Card */}
+      {/* Broadcast & Audio Section - Side by Side Layout */}
       {(shouldShowBroadcast || anime?.language?.sub || anime?.language?.dub) && (
         <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-5 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm transition-colors duration-300">
           {/* Audio Toggle */}
