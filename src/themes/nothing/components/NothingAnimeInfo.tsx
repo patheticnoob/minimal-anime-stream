@@ -92,11 +92,10 @@ export function NothingAnimeInfo({
 
       {/* Broadcast & Audio Section - Side by Side Layout */}
       {(shouldShowBroadcast || anime?.language?.sub || anime?.language?.dub) && (
-        <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-5 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm transition-colors duration-300">
+        <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-5 flex flex-row gap-6 items-center justify-between shadow-sm transition-colors duration-300">
           {/* Audio Toggle */}
           {(anime?.language?.sub || anime?.language?.dub) && (
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-black/60 dark:text-white/60">Audio:</span>
+            <div className="flex items-center gap-3 shrink-0">
               <div className="flex bg-black/20 dark:bg-white/10 rounded-full p-1 border border-black/10 dark:border-white/10">
                 <button
                   onClick={() => onAudioPreferenceChange("sub")}
@@ -126,28 +125,23 @@ export function NothingAnimeInfo({
 
           {/* Broadcast Info */}
           {shouldShowBroadcast && (
-            <>
-              {(anime?.language?.sub || anime?.language?.dub) && (
-                <div className="hidden sm:block w-px h-10 bg-black/10 dark:bg-white/10" />
+            <div className="flex flex-col items-end text-right flex-1 min-w-0">
+              <span className="text-[10px] font-bold tracking-[0.2em] text-black/40 dark:text-white/40 uppercase mb-1">
+                Next Broadcast
+              </span>
+              {isBroadcastLoading ? (
+                <span className="text-sm text-black/60 dark:text-white/60 animate-pulse">Syncing schedule...</span>
+              ) : (
+                <>
+                  <span className="text-sm font-medium text-black dark:text-white">
+                    {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
+                  </span>
+                  {broadcastDetails?.countdown && (
+                    <span className="text-xs text-[#ff4d4f] font-medium">{broadcastDetails.countdown}</span>
+                  )}
+                </>
               )}
-              <div className="flex flex-col items-center sm:items-end text-center sm:text-right">
-                <span className="text-[10px] font-bold tracking-[0.2em] text-black/40 dark:text-white/40 uppercase mb-1">
-                  Next Broadcast
-                </span>
-                {isBroadcastLoading ? (
-                  <span className="text-sm text-black/60 dark:text-white/60 animate-pulse">Syncing schedule...</span>
-                ) : (
-                  <>
-                    <span className="text-sm font-medium text-black dark:text-white">
-                      {broadcastDetails?.istLabel ?? broadcastInfo?.summary ?? "TBA"}
-                    </span>
-                    {broadcastDetails?.countdown && (
-                      <span className="text-xs text-[#ff4d4f] font-medium">{broadcastDetails.countdown}</span>
-                    )}
-                  </>
-                )}
-              </div>
-            </>
+            </div>
           )}
         </div>
       )}
