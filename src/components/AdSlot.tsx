@@ -16,7 +16,7 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
 
     // Wait for AdCash library to load
     const checkAdCash = setInterval(() => {
-      if (typeof (window as any).aclib !== "undefined") {
+      if (typeof (window as any).aclib !== "undefined" && adRef.current) {
         clearInterval(checkAdCash);
         
         try {
