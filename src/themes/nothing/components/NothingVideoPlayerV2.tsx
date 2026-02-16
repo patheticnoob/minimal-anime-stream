@@ -63,7 +63,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [showSkipOutro, setShowSkipOutro] = useState(false);
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const isManualSubtitleChange = useRef(false);
 
   const { isCasting, castAvailable, handleCastClick, changeCastSubtitle, resyncCastSubtitles } = useCast(
     source, 
@@ -675,14 +674,11 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
     console.log(`🎬 Changing subtitle to track ${trackIndex}`);
 
-    // Set flag to prevent auto-update from overriding our manual change
-    isManualSubtitleChange.current = true;
-
-    // First, disable/hide all text tracks
+    // First, disable all text tracks
     for (let i = 0; i < video.textTracks.length; i++) {
       const track = video.textTracks[i];
       if (track.kind === "metadata") continue;
-      track.mode = "hidden";
+      track.mode = "disabled";
     }
 
     // Enable the selected track or disable all if -1
@@ -721,11 +717,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         changeCastSubtitle('');
       }
     }
-
-    // Reset flag after a short delay to allow for future auto-updates
-    setTimeout(() => {
-      isManualSubtitleChange.current = false;
-    }, 500);
 
     setShowSubtitles(false);
   };
@@ -781,7 +772,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         console.log("✅ First available subtitle track enabled as fallback");
       }
 
-      // Force enable the default track and ensure others are hidden
+      // Force enable the default track and ensure others are disabled
       if (video.textTracks && video.textTracks.length > 0) {
         for (let i = 0; i < video.textTracks.length; i++) {
           const track = video.textTracks[i];
@@ -791,7 +782,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
             track.mode = "showing";
             console.log(`✅ Subtitle track ${i} (${track.label}) set to SHOWING`);
           } else {
-            track.mode = "hidden";
+            track.mode = "disabled";
           }
         }
       }
@@ -799,40 +790,15 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       setCurrentSubtitle(defaultTrackIndex >= 0 ? defaultTrackIndex : -1);
     };
 
-    const handleTrackChange = () => {
-      // Don't auto-update if this is a manual subtitle change
-      if (isManualSubtitleChange.current) {
-        console.log('⏭️ Skipping auto-update (manual change in progress)');
-        return;
-      }
-      requestAnimationFrame(updateSubtitles);
-    };
-
     video.addEventListener("loadedmetadata", updateSubtitles);
     video.addEventListener("loadeddata", updateSubtitles);
-    video.textTracks.addEventListener?.("addtrack", handleTrackChange);
-    video.textTracks.addEventListener?.("removetrack", handleTrackChange);
-    video.textTracks.addEventListener?.("change", handleTrackChange);
 
     // Run immediately when tracks change
     const initTimeout = setTimeout(() => {
       updateSubtitles();
     }, 100);
 
-    // Delayed reload after 3 seconds of playback to ensure subtitles are loaded
-    // This fixes cases where initial load attempts failed or tracks weren't ready
-    let playbackTimeout: number | null = null;
-    const handlePlayForDelayedReload = () => {
-      if (playbackTimeout) clearTimeout(playbackTimeout);
-      playbackTimeout = window.setTimeout(() => {
-        if (video.textTracks.length > 0 && !video.paused) {
-          console.log("🔄 Reloading subtitles 3s after playback start");
-          updateSubtitles();
-        }
-      }, 3000);
-    };
-
-    // Also run when video becomes ready after idle
+    // Also run when video becomes ready
     const handleCanPlayThrough = () => {
       if (video.textTracks.length > 0) {
         updateSubtitles();
@@ -843,8 +809,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       if (video.textTracks.length > 0) {
         updateSubtitles();
       }
-      // Schedule delayed reload
-      handlePlayForDelayedReload();
     };
 
     video.addEventListener("canplaythrough", handleCanPlayThrough);
@@ -855,11 +819,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       video.removeEventListener("loadeddata", updateSubtitles);
       video.removeEventListener("canplaythrough", handleCanPlayThrough);
       video.removeEventListener("play", handlePlay);
-      video.textTracks.removeEventListener?.("addtrack", handleTrackChange);
-      video.textTracks.removeEventListener?.("removetrack", handleTrackChange);
-      video.textTracks.removeEventListener?.("change", handleTrackChange);
       clearTimeout(initTimeout);
-      if (playbackTimeout) clearTimeout(playbackTimeout);
     };
   }, [tracks, source]);
 
