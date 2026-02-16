@@ -14,18 +14,24 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
     if (loadedRef.current) return;
     loadedRef.current = true;
 
-    // Wait for AdCash library to load
+    // Wait for AdCash library to load with more robust checking
     const checkAdCash = setInterval(() => {
       if (typeof (window as any).aclib !== "undefined" && adRef.current) {
         clearInterval(checkAdCash);
         
         try {
-          (window as any).aclib.runBanner({
-            zoneId: zoneId,
-            container: adRef.current,
-          });
+          // Ensure the container is in the DOM before calling runBanner
+          if (document.body.contains(adRef.current)) {
+            (window as any).aclib.runBanner({
+              zoneId: zoneId,
+              container: adRef.current,
+            });
+            console.log(`✅ AdCash banner loaded for ${placement}`);
+          } else {
+            console.warn("⚠️ Ad container not in DOM yet");
+          }
         } catch (err) {
-          console.warn("AdCash failed to load:", err);
+          console.error("❌ AdCash failed to load:", err);
         }
       }
     }, 100);
@@ -33,6 +39,7 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
     // Cleanup after 5 seconds if library doesn't load
     const timeout = setTimeout(() => {
       clearInterval(checkAdCash);
+      console.warn("⏱️ AdCash library load timeout");
     }, 5000);
 
     return () => {
