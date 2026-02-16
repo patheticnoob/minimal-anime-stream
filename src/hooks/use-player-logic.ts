@@ -39,6 +39,8 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
   const [lastSelectedAnime, setLastSelectedAnime] = useState<AnimeItem | null>(null);
   const [currentAnimeInfo, setCurrentAnimeInfo] = useState<AnimePlaybackInfo | null>(null);
   const [animeDetails, setAnimeDetails] = useState<Partial<AnimeItem> | null>(null);
+  const [subtitlesLoading, setSubtitlesLoading] = useState(false);
+  const [subtitlesError, setSubtitlesError] = useState<string | null>(null);
   
   // Audio preference state (sub/dub)
   const [audioPreference, setAudioPreference] = useState<"sub" | "dub">(() => {
@@ -56,6 +58,40 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     setAudioPreference(preference);
     localStorage.setItem("audioPreference", preference);
     toast.success(`Switched to ${preference.toUpperCase()}`);
+  };
+
+  // Validate subtitle tracks by attempting to fetch and parse them
+  const validateSubtitleTracks = async (tracks: Array<{ file: string; label: string; kind?: string }>, retryCount = 0): Promise<boolean> => {
+    if (!tracks || tracks.length === 0) {
+      return true; // No subtitles to validate
+    }
+
+    const maxRetries = 2;
+    
+    try {
+      // Test fetch the first subtitle track to ensure it's accessible
+      const testTrack = tracks[0];
+      const response = await fetch(testTrack.file, { 
+        method: 'HEAD',
+        signal: AbortSignal.timeout(3000) // 3 second timeout
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Subtitle fetch failed: ${response.status}`);
+      }
+      
+      return true;
+    } catch (err) {
+      console.warn(`Subtitle validation failed (attempt ${retryCount + 1}/${maxRetries + 1}):`, err);
+      
+      if (retryCount < maxRetries) {
+        // Wait before retry with exponential backoff
+        await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, retryCount)));
+        return validateSubtitleTracks(tracks, retryCount + 1);
+      }
+      
+      return false; // Failed after all retries
+    }
   };
 
   // Prefetch episode sources for faster playback
@@ -241,9 +277,10 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     };
     setCurrentAnimeInfo(animeInfo);
     setCurrentEpisodeData(normalizedEpisode);
+    setSubtitlesLoading(true);
+    setSubtitlesError(null);
 
-    // DON'T set videoSource to null - keep player mounted for seamless transitions
-    // Only clear intro/outro/headers to prepare for new episode
+    // Clear previous video state
     setVideoIntro(null);
     setVideoOutro(null);
     setVideoHeaders(null);
@@ -281,11 +318,20 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           default: t.default || false,
         }));
 
+        // Validate subtitles before setting video source
+        const subtitlesValid = await validateSubtitleTracks(proxiedTracks);
+        
+        if (!subtitlesValid && proxiedTracks.length > 0) {
+          setSubtitlesError("Subtitles failed to load");
+          toast.warning("Subtitles may not be available for this episode");
+        }
+
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         setVideoTracks(proxiedTracks);
         setVideoIntro(sourcesData.intro || null);
         setVideoOutro(sourcesData.outro || null);
+        setSubtitlesLoading(false);
 
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
@@ -312,6 +358,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
 
       if (!targetServers || targetServers.length === 0) {
         toast.error(`No ${audioPreference.toUpperCase()} servers available for this episode`);
+        setSubtitlesLoading(false);
         return;
       }
 
@@ -319,6 +366,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
 
       if (!hd2Server) {
         toast.error("No streaming servers available");
+        setSubtitlesLoading(false);
         return;
       }
 
@@ -350,6 +398,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           }
         } catch (err) {
           console.warn('Failed to fetch subtitles from sub server:', err);
+          setSubtitlesError("Failed to load subtitles from sub server");
         }
       }
 
@@ -382,11 +431,20 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           default: t.default || false,
         }));
 
+        // Validate subtitles before setting video source
+        const subtitlesValid = await validateSubtitleTracks(proxiedTracks);
+        
+        if (!subtitlesValid && proxiedTracks.length > 0) {
+          setSubtitlesError("Subtitles failed to load");
+          toast.warning("Subtitles may not be available for this episode");
+        }
+
         setVideoSource(proxiedUrl);
         setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
         setVideoTracks(proxiedTracks);
         setVideoIntro(sourcesData.intro || null);
         setVideoOutro(sourcesData.outro || null);
+        setSubtitlesLoading(false);
 
         const idx = episodes.findIndex((e) => e.id === episode.id);
         if (idx !== -1) setCurrentEpisodeIndex(idx);
@@ -399,12 +457,11 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         }
       } else {
         toast.error("No video sources available");
+        setSubtitlesLoading(false);
       }
     } catch (err) {
-      // Log detailed error to console for debugging
       console.error('Failed to load video sources:', err);
       
-      // Retry logic for connection errors
       if (retryCount < maxRetries) {
         console.log(`Retrying video load (${retryCount + 1}/${maxRetries})...`);
         const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
@@ -412,8 +469,8 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         return playEpisode(episode, retryCount + 1);
       }
       
-      // Show user-friendly error after all retries exhausted
       toast.error("Unable to load video. Please try again.");
+      setSubtitlesLoading(false);
     }
   };
 
@@ -449,8 +506,8 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     setVideoHeaders(null);
     setCurrentEpisodeData(null);
     setCurrentAnimeInfo(null);
-    // Do not clear animeDetails here as we might want to keep showing info in modal
-    // But if we close modal, selected becomes null, which triggers effect to clear episodes
+    setSubtitlesLoading(false);
+    setSubtitlesError(null);
     if (lastSelectedAnime) setSelected(lastSelectedAnime);
   };
 
@@ -495,5 +552,7 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     animeDetails,
     audioPreference,
     handleAudioPreferenceChange,
+    subtitlesLoading,
+    subtitlesError,
   };
 }
