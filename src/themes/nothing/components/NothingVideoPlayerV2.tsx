@@ -783,8 +783,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
       setSubtitles(tracksList);
       
-      // Mark subtitles as ready once tracks are loaded
-      if (tracksList.length > 0 || (tracks && tracks.filter(t => t.kind !== 'thumbnails').length === 0)) {
+      // Mark subtitles as ready once tracks are loaded OR if no subtitle tracks are expected
+      if (!subtitlesReady) {
         setSubtitlesReady(true);
         console.log("✅ Subtitles ready:", tracksList.length, "tracks loaded");
       }
@@ -853,26 +853,18 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     // CRITICAL: Run immediately when tracks change, even after idle
     // This ensures subtitles load after long idle periods
     const initTimeout = setTimeout(() => {
-      if (video.textTracks.length > 0) {
-        updateSubtitles();
-      } else if (!tracks || tracks.filter(t => t.kind !== 'thumbnails').length === 0) {
-        // No subtitle tracks expected, mark as ready
-        setSubtitlesReady(true);
-        console.log("✅ No subtitle tracks expected, marking as ready");
-      }
+      updateSubtitles();
     }, 100);
 
-    // Safety timeout: Mark subtitles as ready after 2 seconds even if not all loaded
+    // Safety timeout: Mark subtitles as ready after 1 second even if not all loaded
     // This prevents indefinite waiting if subtitle loading fails
     if (subtitleLoadTimeoutRef.current) {
       clearTimeout(subtitleLoadTimeoutRef.current);
     }
     subtitleLoadTimeoutRef.current = window.setTimeout(() => {
-      if (!subtitlesReady) {
-        console.log("⚠️ Subtitle loading timeout - proceeding anyway");
-        setSubtitlesReady(true);
-      }
-    }, 2000);
+      console.log("⚠️ Subtitle loading timeout - proceeding anyway");
+      setSubtitlesReady(true);
+    }, 1000);
 
     // Delayed reload after 3 seconds of playback to ensure subtitles are loaded
     // This fixes cases where initial load attempts failed or tracks weren't ready
