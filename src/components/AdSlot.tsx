@@ -28,12 +28,24 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
         clearInterval(checkAdCash);
         
         try {
-          // Call runBanner with explicit container reference
-          aclib.runBanner({
-            zoneId: zoneId,
-            container: adRef.current,
-          });
-          console.log(`✅ AdCash banner loaded for ${placement}`);
+          // Create a script element and append it to our container
+          // This ensures AdCash can find the parentElement
+          const script = document.createElement('script');
+          script.setAttribute('data-zone', zoneId);
+          script.textContent = `
+            (function() {
+              if (window.aclib && typeof window.aclib.runBanner === 'function') {
+                window.aclib.runBanner({
+                  zoneId: ${zoneId}
+                });
+              }
+            })();
+          `;
+          
+          if (adRef.current) {
+            adRef.current.appendChild(script);
+            console.log(`✅ AdCash banner script injected for ${placement}`);
+          }
         } catch (err) {
           console.error("❌ AdCash failed to load:", err);
         }
