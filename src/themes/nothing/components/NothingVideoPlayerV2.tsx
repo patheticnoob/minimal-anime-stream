@@ -64,8 +64,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
   const [thumbnailCues, setThumbnailCues] = useState<ThumbnailCue[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const isManualSubtitleChange = useRef(false);
-  const [subtitlesReady, setSubtitlesReady] = useState(false);
-  const subtitleLoadTimeoutRef = useRef<number | null>(null);
 
   const { isCasting, castAvailable, handleCastClick, changeCastSubtitle, resyncCastSubtitles } = useCast(
     source, 
@@ -227,25 +225,16 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             setIsLoading(false);
-            // Wait for subtitles to be ready before starting playback
-            const checkSubtitlesAndPlay = () => {
-              if (subtitlesReady || !tracks || tracks.filter(t => t.kind !== 'thumbnails').length === 0) {
-                if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
-                  console.log("📍 Resuming playback from:", resumeFrom, "seconds");
-                  video.currentTime = resumeFrom;
-                  hasRestoredProgress.current = true;
-                } else {
-                  console.log("▶️ Starting from beginning");
-                }
-                video.play().catch((err) => {
-                  console.log("Autoplay prevented:", err);
-                });
-              } else {
-                // Wait a bit more for subtitles
-                setTimeout(checkSubtitlesAndPlay, 100);
-              }
-            };
-            checkSubtitlesAndPlay();
+            if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
+              console.log("📍 Resuming playback from:", resumeFrom, "seconds");
+              video.currentTime = resumeFrom;
+              hasRestoredProgress.current = true;
+            } else {
+              console.log("▶️ Starting from beginning");
+            }
+            video.play().catch((err) => {
+              console.log("Autoplay prevented:", err);
+            });
           });
 
           hls.on(Hls.Events.ERROR, (_event: any, data: any) => {
@@ -264,51 +253,33 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
           video.src = source;
           video.addEventListener("loadedmetadata", () => {
             setIsLoading(false);
-            // Wait for subtitles to be ready before starting playback
-            const checkSubtitlesAndPlay = () => {
-              if (subtitlesReady || !tracks || tracks.filter(t => t.kind !== 'thumbnails').length === 0) {
-                if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
-                  console.log("📍 Resuming playback from:", resumeFrom, "seconds");
-                  video.currentTime = resumeFrom;
-                  hasRestoredProgress.current = true;
-                } else {
-                  console.log("▶️ Starting from beginning");
-                }
-                video.play().catch((err) => {
-                  console.log("Autoplay prevented:", err);
-                });
-              } else {
-                // Wait a bit more for subtitles
-                setTimeout(checkSubtitlesAndPlay, 100);
-              }
-            };
-            checkSubtitlesAndPlay();
+            if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
+              console.log("📍 Resuming playback from:", resumeFrom, "seconds");
+              video.currentTime = resumeFrom;
+              hasRestoredProgress.current = true;
+            } else {
+              console.log("▶️ Starting from beginning");
+            }
+            video.play().catch((err) => {
+              console.log("Autoplay prevented:", err);
+            });
           });
         }
       });
     } else {
       video.src = source;
       video.addEventListener("loadedmetadata", () => {
-        // Wait for subtitles to be ready before starting playback
-        const checkSubtitlesAndPlay = () => {
-          if (subtitlesReady || !tracks || tracks.filter(t => t.kind !== 'thumbnails').length === 0) {
-            if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
-              video.currentTime = resumeFrom;
-              hasRestoredProgress.current = true;
-              console.log("Resuming from:", resumeFrom);
-            }
-            video.play().catch((err) => {
-              console.log("Autoplay prevented:", err);
-            });
-          } else {
-            // Wait a bit more for subtitles
-            setTimeout(checkSubtitlesAndPlay, 100);
-          }
-        };
-        checkSubtitlesAndPlay();
+        if (resumeFrom && resumeFrom > 0 && !hasRestoredProgress.current) {
+          video.currentTime = resumeFrom;
+          hasRestoredProgress.current = true;
+          console.log("Resuming from:", resumeFrom);
+        }
+        video.play().catch((err) => {
+          console.log("Autoplay prevented:", err);
+        });
       });
     }
-  }, [source, subtitlesReady, tracks]);
+  }, [source, tracks]);
 
   // Update progress - save every 5 seconds and on key events
   useEffect(() => {
@@ -413,11 +384,10 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     };
   }, [onProgressUpdate, intro, outro]);
 
-  // Reset skip intro/outro button visibility and subtitle ready state when source changes
+  // Reset skip intro/outro button visibility when source changes
   useEffect(() => {
     setShowSkipIntro(false);
     setShowSkipOutro(false);
-    setSubtitlesReady(false);
   }, [intro, outro, source]);
 
   useEffect(() => {
@@ -782,12 +752,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       }
 
       setSubtitles(tracksList);
-      
-      // Mark subtitles as ready once tracks are loaded OR if no subtitle tracks are expected
-      if (!subtitlesReady) {
-        setSubtitlesReady(true);
-        console.log("✅ Subtitles ready:", tracksList.length, "tracks loaded");
-      }
 
       let defaultTrackIndex = -1;
 
@@ -850,21 +814,10 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     video.textTracks.addEventListener?.("removetrack", handleTrackChange);
     video.textTracks.addEventListener?.("change", handleTrackChange);
 
-    // CRITICAL: Run immediately when tracks change, even after idle
-    // This ensures subtitles load after long idle periods
+    // Run immediately when tracks change
     const initTimeout = setTimeout(() => {
       updateSubtitles();
     }, 100);
-
-    // Safety timeout: Mark subtitles as ready after 1 second even if not all loaded
-    // This prevents indefinite waiting if subtitle loading fails
-    if (subtitleLoadTimeoutRef.current) {
-      clearTimeout(subtitleLoadTimeoutRef.current);
-    }
-    subtitleLoadTimeoutRef.current = window.setTimeout(() => {
-      console.log("⚠️ Subtitle loading timeout - proceeding anyway");
-      setSubtitlesReady(true);
-    }, 1000);
 
     // Delayed reload after 3 seconds of playback to ensure subtitles are loaded
     // This fixes cases where initial load attempts failed or tracks weren't ready
@@ -907,9 +860,8 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
       video.textTracks.removeEventListener?.("change", handleTrackChange);
       clearTimeout(initTimeout);
       if (playbackTimeout) clearTimeout(playbackTimeout);
-      if (subtitleLoadTimeoutRef.current) clearTimeout(subtitleLoadTimeoutRef.current);
     };
-  }, [tracks, source, subtitlesReady]);
+  }, [tracks, source]);
 
   // Add gamepad controls for video player
   useEffect(() => {
