@@ -16,20 +16,24 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
 
     // Wait for AdCash library to load with more robust checking
     const checkAdCash = setInterval(() => {
-      if (typeof (window as any).aclib !== "undefined" && adRef.current) {
+      const aclib = (window as any).aclib;
+      
+      // Check if aclib exists AND has runBanner function AND container is ready
+      if (
+        aclib && 
+        typeof aclib.runBanner === "function" && 
+        adRef.current && 
+        document.body.contains(adRef.current)
+      ) {
         clearInterval(checkAdCash);
         
         try {
-          // Ensure the container is in the DOM before calling runBanner
-          if (document.body.contains(adRef.current)) {
-            (window as any).aclib.runBanner({
-              zoneId: zoneId,
-              container: adRef.current,
-            });
-            console.log(`✅ AdCash banner loaded for ${placement}`);
-          } else {
-            console.warn("⚠️ Ad container not in DOM yet");
-          }
+          // Call runBanner with explicit container reference
+          aclib.runBanner({
+            zoneId: zoneId,
+            container: adRef.current,
+          });
+          console.log(`✅ AdCash banner loaded for ${placement}`);
         } catch (err) {
           console.error("❌ AdCash failed to load:", err);
         }
