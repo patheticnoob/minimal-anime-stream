@@ -6,12 +6,13 @@ type AdSlotProps = {
 };
 
 export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
-  const slotRef = useRef<HTMLDivElement>(null);
-  const scriptExecutedRef = useRef(false);
+  const adRef = useRef<HTMLDivElement>(null);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
-    const container = slotRef.current;
-    if (!container || scriptExecutedRef.current) return;
+    // Prevent re-execution on re-renders
+    if (loadedRef.current) return;
+    loadedRef.current = true;
 
     // Wait for AdCash library to load
     const checkAdCash = setInterval(() => {
@@ -20,9 +21,9 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
         
         try {
           (window as any).aclib.runBanner({
-            zoneId: zoneId
+            zoneId: zoneId,
+            container: adRef.current,
           });
-          scriptExecutedRef.current = true;
         } catch (err) {
           console.warn("AdCash failed to load:", err);
         }
@@ -38,7 +39,7 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
       clearInterval(checkAdCash);
       clearTimeout(timeout);
     };
-  }, [zoneId]);
+  }, []); // Empty dependency array - runs only once
 
   return (
     <div className="ad-container my-6 md:my-8">
@@ -52,11 +53,12 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
           </span>
         </div>
         <div
-          ref={slotRef}
+          ref={adRef}
           className="ad-slot ad-336"
           data-placement={placement}
+          suppressHydrationWarning
         >
-          {/* AdCash banner will render here */}
+          {/* AdCash banner will render here - React will never touch this DOM node */}
         </div>
       </div>
       
@@ -99,7 +101,7 @@ export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
           background: rgba(255, 255, 255, 0.03);
         }
         
-        /* Prevent layout shift */
+        /* Prevent layout shift - maintain space even before ad loads */
         .ad-slot.ad-336::before {
           content: '';
           display: block;
