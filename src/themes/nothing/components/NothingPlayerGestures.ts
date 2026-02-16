@@ -9,7 +9,6 @@ export interface UsePlayerGesturesProps {
   onPlayPause: () => void;
   onVolumeChange: (volume: number) => void;
   onSeek: (time: number) => void;
-  onToggleFullscreen: () => void;
 }
 
 const DOUBLE_TAP_WINDOW = 300;
@@ -24,7 +23,6 @@ export function usePlayerGestures({
   onPlayPause,
   onVolumeChange,
   onSeek,
-  onToggleFullscreen,
 }: UsePlayerGesturesProps) {
   // State for visual feedback
   const [doubleTapAction, setDoubleTapAction] = useState<{ side: 'left' | 'right'; seconds: number } | null>(null);
@@ -171,13 +169,12 @@ export function usePlayerGestures({
     } else {
       // Handle Single Tap (Potential)
       if (zone === 'center') {
-        // Center Tap: Play/Pause + Show Controls (with auto-hide)
+        // Center Tap: Play/Pause ONLY (no fullscreen toggle)
         // Check actual video state for accurate animation
         const video = videoRef.current;
         const willBePlaying = video ? video.paused : !isPlaying;
 
         onPlayPause();
-        onToggleFullscreen();
         setCenterAction({ type: willBePlaying ? 'play' : 'pause' });
         setTimeout(() => setCenterAction(null), 600);
       } else {
@@ -188,8 +185,8 @@ export function usePlayerGestures({
         }
         
         singleTapTimerRef.current = window.setTimeout(() => {
-          // Always show controls and reset the auto-hide timer
-          onToggleFullscreen();
+          // Side tap: Just toggle controls visibility, no fullscreen
+          // This will be handled by the parent component's control visibility logic
           singleTapTimerRef.current = null;
         }, SINGLE_TAP_DELAY);
       }

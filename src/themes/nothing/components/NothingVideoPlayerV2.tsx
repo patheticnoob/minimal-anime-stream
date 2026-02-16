@@ -926,7 +926,6 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     currentTime,
     volume,
     onVolumeChange: handleVolumeChange,
-    onToggleFullscreen: toggleFullscreen,
   });
 
   useEffect(() => {
