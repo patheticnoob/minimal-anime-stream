@@ -42,7 +42,6 @@ interface ProfileDashboardProps {
 
 const themeOptions = [
   { value: "classic", label: "Classic", accentClass: "bg-blue-600 hover:bg-blue-700" },
-  { value: "retro", label: "Retro", accentClass: "bg-purple-600 hover:bg-purple-700" },
   { value: "nothing", label: "NothingOS", accentClass: "bg-red-600 hover:bg-red-700" },
 ] as const;
 

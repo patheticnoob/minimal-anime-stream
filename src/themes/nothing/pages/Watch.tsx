@@ -5,7 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useDataFlow } from "@/hooks/use-data-flow";
-import { NothingVideoPlayerV2 } from "../components/NothingVideoPlayerV2";
+import VideoPlayer from "@/components/VideoPlayer";
 import { type BroadcastInfo } from "@/types/broadcast";
 import { DateTime } from "luxon";
 import { animeCache } from "@/lib/anime-cache";
@@ -819,7 +819,7 @@ export default function NothingWatch() {
             {/* Video Player - Only shown when episode is playing */}
             {videoSource && currentEpisodeData && (
               <div id="video-player-container">
-                <NothingVideoPlayerV2
+                <VideoPlayer
                   key={currentEpisodeData.id}
                   source={videoSource}
                   title={videoTitle}

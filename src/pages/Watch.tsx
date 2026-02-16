@@ -5,9 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { ArrowLeft, Play, Plus, Check, Clock3, ArrowUpDown } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
-import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useAuth } from "@/hooks/use-auth";
-import { useTheme } from "@/hooks/use-theme";
 import { useDataFlow } from "@/hooks/use-data-flow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,7 +70,6 @@ export default function Watch() {
   const { animeId } = useParams<{ animeId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { theme } = useTheme();
   const { dataFlow } = useDataFlow();
   const { buttonPressed } = useGamepad();
 
@@ -645,11 +642,7 @@ export default function Watch() {
           {/* Left: Video Player */}
           <div className="space-y-3">
             {videoSource && currentEpisodeData ? (
-              (() => {
-                const PlayerComponent = theme === "retro" ? RetroVideoPlayer : VideoPlayer;
-
-                return (
-                  <PlayerComponent
+              <VideoPlayer
                     key={currentEpisodeData.id}
                     source={videoSource}
                     title={videoTitle}
@@ -678,9 +671,7 @@ export default function Watch() {
                       setCurrentAnimeInfo(null);
                       setInitialResumeTime(0);
                     }}
-                  />
-                );
-              })()
+              />
             ) : (
               <div className="aspect-video bg-white/5 border border-white/10 rounded-lg flex items-center justify-center">
                 <div className="text-center px-4">

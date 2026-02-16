@@ -33,7 +33,7 @@ export const setUserTheme = mutation({
     }
 
     // Validate theme
-    const validThemes = ["classic", "retro", "nothing"];
+    const validThemes = ["classic", "nothing"];
     if (!validThemes.includes(args.theme)) {
       throw new Error("Invalid theme");
     }
