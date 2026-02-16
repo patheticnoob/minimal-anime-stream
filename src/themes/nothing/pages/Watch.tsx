@@ -15,6 +15,7 @@ import { NothingWatchHeader } from "../components/NothingWatchHeader";
 import { NothingAnimeInfo } from "../components/NothingAnimeInfo";
 import { NothingEpisodeList } from "../components/NothingEpisodeList";
 import { fetchHianimeAnimeDetails, fetchHianimeEpisodes } from "@/lib/external-api-v2";
+import { AdSlot } from "@/components/AdSlot";
 
 type Episode = {
   id: string;
@@ -848,12 +849,19 @@ export default function NothingWatch() {
           </div>
 
           {/* Right: Episode List */}
-          <NothingEpisodeList 
-            episodes={episodesWithProgress}
-            episodesLoading={episodesLoading}
-            currentEpisodeId={currentEpisodeData?.id}
-            onPlayEpisode={playEpisode}
-          />
+          <div className="space-y-6">
+            <NothingEpisodeList 
+              episodes={episodesWithProgress}
+              episodesLoading={episodesLoading}
+              currentEpisodeId={currentEpisodeData?.id}
+              onPlayEpisode={playEpisode}
+            />
+            
+            {/* Ad placement after episode list */}
+            {episodes.length > 0 && (
+              <AdSlot placement="episodePage" />
+            )}
+          </div>
         </div>
       </main>
     </div>

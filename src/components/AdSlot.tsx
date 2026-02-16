@@ -1,47 +1,111 @@
 import { useEffect, useRef } from "react";
 
-const AD_SNIPPET =
-  `(function(solth){var d = document, s = d.createElement('script'), l = d.scripts[d.scripts.length - 1];s.settings = solth || {};s.src = "//excitableminor.com/b.XJVVsed/GIlb0yYHW-ce/aeTmc9Hu/ZcUWlSkSPuTcYT3nMrTQQ/1pNdzEYPtlNyjRc_xyNZDsU/3RNfwg";s.async = true;s.referrerPolicy = 'no-referrer-when-downgrade';l.parentNode.insertBefore(s, l);})({});`;
-
 type AdSlotProps = {
-  placement: "guestHero" | "continueWatching";
+  placement: "guestHero" | "continueWatching" | "episodePage";
+  zoneId?: string;
 };
 
-export function AdSlot({ placement }: AdSlotProps) {
+export function AdSlot({ placement, zoneId = "10979550" }: AdSlotProps) {
   const slotRef = useRef<HTMLDivElement>(null);
+  const scriptExecutedRef = useRef(false);
 
   useEffect(() => {
     const container = slotRef.current;
-    if (!container) return;
+    if (!container || scriptExecutedRef.current) return;
 
-    container.innerHTML = `<span class="text-xs text-gray-400">Loading personalized offers...</span>`;
+    // Wait for AdCash library to load
+    const checkAdCash = setInterval(() => {
+      if (typeof (window as any).aclib !== "undefined") {
+        clearInterval(checkAdCash);
+        
+        try {
+          (window as any).aclib.runBanner({
+            zoneId: zoneId
+          });
+          scriptExecutedRef.current = true;
+        } catch (err) {
+          console.warn("AdCash failed to load:", err);
+        }
+      }
+    }, 100);
 
-    const script = document.createElement("script");
-    script.dataset.adPlacement = placement;
-    script.textContent = AD_SNIPPET;
-    container.appendChild(script);
+    // Cleanup after 5 seconds if library doesn't load
+    const timeout = setTimeout(() => {
+      clearInterval(checkAdCash);
+    }, 5000);
 
     return () => {
-      container.innerHTML = "";
+      clearInterval(checkAdCash);
+      clearTimeout(timeout);
     };
-  }, [placement]);
+  }, [zoneId]);
 
   return (
-    <div className="my-8">
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6 shadow-lg shadow-black/30 overflow-hidden">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400">
+    <div className="ad-container my-6 md:my-8">
+      <div className="ad-wrapper">
+        <div className="flex items-center justify-between mb-2 px-2">
+          <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             Sponsored
           </span>
-          <span className="text-[11px] text-gray-500">Ads keep the portal free</span>
+          <span className="text-[9px] md:text-[11px] text-gray-500 dark:text-gray-600">
+            Ads keep GojoStream free
+          </span>
         </div>
         <div
           ref={slotRef}
-          className="relative rounded-xl border border-white/10 bg-black/40 h-32 flex items-center justify-center text-gray-400 text-xs"
+          className="ad-slot ad-336"
+          data-placement={placement}
         >
-          Loading personalized offers...
+          {/* AdCash banner will render here */}
         </div>
       </div>
+      
+      <style>{`
+        .ad-container {
+          width: 100%;
+          max-width: 100%;
+          overflow: hidden;
+        }
+        
+        .ad-wrapper {
+          max-width: 400px;
+          margin: 0 auto;
+        }
+        
+        .ad-slot.ad-336 {
+          width: 336px;
+          min-height: 280px;
+          max-width: 100%;
+          margin: 0 auto;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.05);
+          border-radius: 12px;
+          overflow: hidden;
+          position: relative;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 400px) {
+          .ad-slot.ad-336 {
+            transform: scale(0.9);
+            transform-origin: center;
+          }
+        }
+        
+        /* Dark mode */
+        [data-theme="nothing"].dark .ad-slot.ad-336 {
+          background: rgba(255, 255, 255, 0.03);
+        }
+        
+        /* Prevent layout shift */
+        .ad-slot.ad-336::before {
+          content: '';
+          display: block;
+          padding-bottom: 83.33%; /* 280/336 aspect ratio */
+        }
+      `}</style>
     </div>
   );
 }
