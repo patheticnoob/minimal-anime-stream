@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { parseVTTThumbnails, findThumbnailForTime, type ThumbnailCue } from "@/lib/vttParser";
 import { useCast } from "@/hooks/use-cast";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
+import { useVideoAds } from "@/hooks/use-video-ads";
 
 interface VideoPlayerProps {
   source: string;
@@ -44,20 +45,7 @@ interface VideoPlayerProps {
   resumeFrom?: number;
 }
 
-export default function VideoPlayer({
-  source,
-  title,
-  tracks = [],
-  intro,
-  outro,
-  headers,
-  onClose,
-  resumeFrom = 0,
-  onProgressUpdate,
-  onNext,
-  nextTitle,
-  info,
-}: VideoPlayerProps) {
+export function VideoPlayer({ source, title, tracks, intro, outro, headers, onProgressUpdate, resumeFrom, info, onNext, nextTitle, onClose }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<any>(null);
@@ -101,6 +89,14 @@ export default function VideoPlayer({
     info?.image,
     info?.description
   );
+
+  // Add video ads integration
+  const { isAdPlaying } = useVideoAds({
+    videoElement: videoRef.current,
+    adTagUrl: "https://youradexchange.com/video/select.php?r=10987246",
+    shouldTrigger: showSkipIntro,
+    triggerDelay: 3000,
+  });
 
   // Pause video when casting starts and sync time
   useEffect(() => {
@@ -1042,8 +1038,14 @@ export default function VideoPlayer({
         exit={{ opacity: 0 }}
         onMouseMove={handleMouseMove}
         onMouseLeave={() => isPlaying && setShowControls(false)}
-        data-testid="video-player-container"
       >
+        {/* Ad container for IMA SDK */}
+        <div
+          id="ad-container"
+          className="absolute inset-0 z-50 pointer-events-none"
+          style={{ display: isAdPlaying ? 'block' : 'none' }}
+        />
+
         {/* Gamepad indicator */}
         {gamepadControlsActive && (
           <motion.div
@@ -1090,7 +1092,7 @@ export default function VideoPlayer({
           onClick={handleVideoClick}
           crossOrigin="anonymous"
           playsInline
-          data-testid="video-element"
+          data-classic-player="true"
         >
           {tracks?.map((track, idx) => (
             <track
@@ -1111,9 +1113,8 @@ export default function VideoPlayer({
           </div>
         )}
 
-        {/* Skip Intro Button */}
         <AnimatePresence>
-          {showSkipIntro && (
+          {showSkipIntro && !isAdPlaying && (
             <motion.div
               className="absolute bottom-24 right-8 z-20"
               initial={{ opacity: 0, x: 20 }}
@@ -1130,9 +1131,8 @@ export default function VideoPlayer({
           )}
         </AnimatePresence>
 
-        {/* Skip Outro & Next Episode Buttons */}
         <AnimatePresence>
-          {showSkipOutro && (
+          {showSkipOutro && !isAdPlaying && (
             <motion.div
               className="absolute bottom-24 right-8 z-20 flex gap-3"
               initial={{ opacity: 0, x: 20 }}
@@ -1157,9 +1157,8 @@ export default function VideoPlayer({
           )}
         </AnimatePresence>
 
-        {/* Center Play/Pause Button */}
         <AnimatePresence>
-          {showControls && !isPlaying && (
+          {showControls && !isPlaying && !isAdPlaying && (
             <motion.div
               className="absolute inset-0 flex items-center justify-center z-15 pointer-events-none"
               initial={{ opacity: 0 }}
@@ -1177,9 +1176,8 @@ export default function VideoPlayer({
           )}
         </AnimatePresence>
 
-        {/* Controls Overlay */}
         <motion.div
-          className={`absolute inset-0 z-10 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          className={`absolute inset-0 z-10 transition-opacity duration-300 ${showControls && !isAdPlaying ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           data-testid="video-controls"
         >
           {/* Top Gradient */}

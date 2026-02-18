@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useCast } from "@/hooks/use-cast";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
+import { useVideoAds } from "@/hooks/use-video-ads";
 
 interface RetroVideoPlayerProps {
   source: string;
@@ -79,6 +80,14 @@ export function RetroVideoPlayer({
   );
 
   const { buttonPressed } = useGamepad({ enableButtonEvents: true });
+
+  // Add video ads integration
+  const { isAdPlaying } = useVideoAds({
+    videoElement: videoRef.current,
+    adTagUrl: "https://youradexchange.com/video/select.php?r=10987246",
+    shouldTrigger: showSkipIntro,
+    triggerDelay: 3000,
+  });
 
   // Pause video when casting starts and sync time
   useEffect(() => {
@@ -681,6 +690,13 @@ export function RetroVideoPlayer({
         onMouseMove={handleMouseMove}
         onMouseLeave={() => isPlaying && setShowControls(false)}
       >
+        {/* Ad container for IMA SDK */}
+        <div
+          id="ad-container"
+          className="absolute inset-0 z-50 pointer-events-none"
+          style={{ display: isAdPlaying ? 'block' : 'none' }}
+        />
+
         <motion.div
           className="absolute top-4 right-4 z-[100]"
           initial={{ opacity: 0, y: -20 }}
@@ -739,7 +755,7 @@ export function RetroVideoPlayer({
         )}
 
         <AnimatePresence>
-          {showSkipIntro && (
+          {showSkipIntro && !isAdPlaying && (
             <motion.div
               className="absolute bottom-24 right-8 z-20"
               initial={{ opacity: 0, x: 20 }}
@@ -757,7 +773,7 @@ export function RetroVideoPlayer({
         </AnimatePresence>
 
         <AnimatePresence>
-          {showSkipOutro && (
+          {showSkipOutro && !isAdPlaying && (
             <motion.div
               className="absolute bottom-24 right-8 z-20 flex gap-3"
               initial={{ opacity: 0, x: 20 }}
@@ -783,7 +799,7 @@ export function RetroVideoPlayer({
         </AnimatePresence>
 
         <AnimatePresence>
-          {showControls && !isPlaying && (
+          {showControls && !isPlaying && !isAdPlaying && (
             <motion.div
               className="absolute inset-0 flex items-center justify-center z-15 pointer-events-none"
               initial={{ opacity: 0 }}
@@ -804,7 +820,7 @@ export function RetroVideoPlayer({
         </AnimatePresence>
 
         <motion.div
-          className={`absolute inset-0 z-10 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          className={`absolute inset-0 z-10 transition-opacity duration-300 ${showControls && !isAdPlaying ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           <div className="absolute bottom-0 left-0 right-0 bg-black/90 border-t-2 border-[#FF69B4]">
             <div

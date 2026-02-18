@@ -7,6 +7,7 @@ import { NothingGestureOverlay } from "./NothingGestureOverlay";
 import { usePlayerGestures } from "./NothingPlayerGestures";
 import { useCast } from "@/hooks/use-cast";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
+import { useVideoAds } from "@/hooks/use-video-ads";
 
 interface NothingVideoPlayerV2Props {
   source: string;
@@ -94,6 +95,14 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
     },
     [isLocked],
   );
+
+  // Add video ads integration
+  const { isAdPlaying } = useVideoAds({
+    videoElement: videoRef.current,
+    adTagUrl: "https://youradexchange.com/video/select.php?r=10987246",
+    shouldTrigger: showSkipIntro,
+    triggerDelay: 3000, // 3 seconds after skip intro appears
+  });
 
   // Pause video when casting starts and sync time
   useEffect(() => {
@@ -944,15 +953,22 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         data-testid="video-player-container"
         {...gestureHandlers}
       >
+        {/* Ad container for IMA SDK */}
+        <div
+          id="ad-container"
+          className="absolute inset-0 z-50 pointer-events-none"
+          style={{ display: isAdPlaying ? 'block' : 'none' }}
+        />
+
         <NothingGestureOverlay {...overlayProps} />
 
         <NothingPlayerOverlay
           title={title}
-          showControls={showControls}
+          showControls={showControls && !isAdPlaying}
           isPlaying={isPlaying}
           isLoading={isLoading}
-          showSkipIntro={showSkipIntro}
-          showSkipOutro={showSkipOutro}
+          showSkipIntro={showSkipIntro && !isAdPlaying}
+          showSkipOutro={showSkipOutro && !isAdPlaying}
           onSkipIntro={skipIntro}
           onSkipOutro={skipOutro}
           onNext={onNext}
@@ -981,7 +997,7 @@ export function NothingVideoPlayerV2({ source, title, tracks, intro, outro, head
         </video>
 
         <NothingPlayerControls
-          showControls={showControls}
+          showControls={showControls && !isAdPlaying}
           isPlaying={isPlaying}
           onTogglePlay={togglePlay}
           currentTime={currentTime}
