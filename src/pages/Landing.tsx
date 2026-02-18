@@ -17,7 +17,7 @@ import { HomeSections } from "@/components/landing/HomeSections";
 import { AnimeItem } from "@/shared/types";
 import { useAnimeListsRouter } from "@/hooks/use-anime-lists-router";
 import { usePlayerLogic } from "@/hooks/use-player-logic";
-import { VideoPlayer } from "@/components/VideoPlayer";
+import VideoPlayer from "@/components/VideoPlayer";
 import { RetroVideoPlayer } from "@/components/RetroVideoPlayer";
 import { useDataFlow } from "@/hooks/use-data-flow";
 import { AnimatePresence } from "framer-motion";
