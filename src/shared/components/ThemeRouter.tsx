@@ -1,6 +1,4 @@
 import { useTheme } from "@/hooks/use-theme";
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
 import ClassicLanding from "@/themes/classic/pages/Landing";
 import RetroLanding from "@/themes/retro/pages/Landing";
 import NothingLanding from "@/themes/nothing/pages/Landing";
@@ -11,6 +9,7 @@ import ClassicWatchHistory from "@/themes/classic/pages/WatchHistory";
 import RetroWatchHistory from "@/themes/retro/pages/WatchHistory";
 import NothingWatchHistory from "@/themes/nothing/pages/WatchHistory";
 import NothingWatch from "@/themes/nothing/pages/Watch";
+import ClassicWatch from "@/themes/classic/pages/Watch";
 
 export function ThemedLanding() {
   const { theme } = useTheme();
@@ -53,14 +52,11 @@ export function ThemedWatchHistory() {
 
 export function ThemedWatch() {
   const { theme } = useTheme();
-  const navigate = useNavigate();
   
-  useEffect(() => {
-    // Redirect non-NothingOS themes back to landing
-    if (theme !== "nothing") {
-      navigate("/", { replace: true });
-    }
-  }, [theme, navigate]);
-  
-  return theme === "nothing" ? <NothingWatch /> : null;
+  // Route to theme-specific watch pages
+  return theme === "classic" ? (
+    <ClassicWatch />
+  ) : theme === "nothing" ? (
+    <NothingWatch />
+  ) : null;
 }
