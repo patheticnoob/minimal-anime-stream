@@ -10,6 +10,7 @@ import RetroWatchHistory from "@/themes/retro/pages/WatchHistory";
 import NothingWatchHistory from "@/themes/nothing/pages/WatchHistory";
 import NothingWatch from "@/themes/nothing/pages/Watch";
 import ClassicWatch from "@/themes/classic/pages/Watch";
+import RetroWatch from "@/themes/retro/pages/Watch";
 
 export function ThemedLanding() {
   const { theme } = useTheme();
@@ -53,10 +54,13 @@ export function ThemedWatchHistory() {
 export function ThemedWatch() {
   const { theme } = useTheme();
   
-  // Route to theme-specific watch pages
-  return theme === "classic" ? (
-    <ClassicWatch />
-  ) : theme === "nothing" ? (
-    <NothingWatch />
-  ) : null;
+  // Route to theme-specific watch pages - default to classic if theme is undefined
+  if (theme === "nothing") {
+    return <NothingWatch />;
+  } else if (theme === "retro") {
+    return <RetroWatch />;
+  } else {
+    // Default to classic theme
+    return <ClassicWatch />;
+  }
 }
