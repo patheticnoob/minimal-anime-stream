@@ -23,7 +23,6 @@ import { useDataFlow } from "@/hooks/use-data-flow";
 import { AnimatePresence } from "framer-motion";
 import { pageCache } from "@/lib/page-cache";
 import { preloadOnHomepage } from "@/lib/video-player-preload";
-import { AdSlot } from "@/components/AdSlot";
 
 // Track if this is the first load
 const getHasLoadedBefore = () => {
@@ -477,9 +476,6 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                     onMoreInfo={() => heroAnime && openAnime(heroAnime)}
                     isLoading={!heroAnime || loading}
                   />
-                  
-                  {/* Ad placement after hero banner for guest users */}
-                  {!isAuthenticated && <AdSlot placement="guestHero" />}
                 </>
               )}
 
