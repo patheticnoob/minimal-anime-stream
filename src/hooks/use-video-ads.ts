@@ -92,12 +92,18 @@ export function useVideoAds({
       return;
     }
 
+    const google = window.google;
+    if (!google || !google.ima) {
+      console.warn('Google IMA SDK not loaded');
+      return;
+    }
+
     try {
       // Initialize ad display container
       adDisplayContainerRef.current.initialize();
 
       // Create ads request
-      const adsRequest = new window.google.ima.AdsRequest();
+      const adsRequest = new google.ima.AdsRequest();
       adsRequest.adTagUrl = adTagUrl;
       adsRequest.linearAdSlotWidth = videoElement?.clientWidth || 640;
       adsRequest.linearAdSlotHeight = videoElement?.clientHeight || 360;
@@ -113,14 +119,14 @@ export function useVideoAds({
 
   const onAdsManagerLoaded = (adsManagerLoadedEvent: any) => {
     try {
-      if (!window.google || !window.google.ima) {
+      const google = window.google;
+      if (!google || !google.ima) {
         console.warn('Google IMA SDK not loaded');
         return;
       }
-      
-      const google = window.google;
-      // At this point, google and google.ima are guaranteed to exist
-      const adsRenderingSettings = new google.ima.AdsRenderingSettings();
+
+      const ima = google.ima;
+      const adsRenderingSettings = new ima.AdsRenderingSettings();
       adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
 
       const adsManager = adsManagerLoadedEvent.getAdsManager(
@@ -131,19 +137,19 @@ export function useVideoAds({
 
       // Add event listeners
       adsManager.addEventListener(
-        window.google!.ima.AdErrorEvent.Type.AD_ERROR,
+        ima.AdErrorEvent.Type.AD_ERROR,
         onAdError
       );
       adsManager.addEventListener(
-        window.google!.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
+        ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
         onContentPauseRequested
       );
       adsManager.addEventListener(
-        window.google!.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED,
+        ima.AdEvent.Type.CONTENT_RESUME_REQUESTED,
         onContentResumeRequested
       );
       adsManager.addEventListener(
-        window.google!.ima.AdEvent.Type.ALL_ADS_COMPLETED,
+        ima.AdEvent.Type.ALL_ADS_COMPLETED,
         onAdComplete
       );
 
@@ -151,7 +157,7 @@ export function useVideoAds({
       adsManager.init(
         videoElement?.clientWidth || 640,
         videoElement?.clientHeight || 360,
-        window.google!.ima.ViewMode.NORMAL
+        ima.ViewMode.NORMAL
       );
       adsManager.start();
 
