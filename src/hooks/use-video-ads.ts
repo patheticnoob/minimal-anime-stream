@@ -19,6 +19,43 @@ export function useVideoAds({
   const [isAdPlaying, setIsAdPlaying] = useState(false);
   const hasTriggeredRef = useRef(false);
   const triggerTimeoutRef = useRef<number | null>(null);
+  const hasInitializedRef = useRef(false);
+
+  const initializeAdDisplay = () => {
+    if (!adDisplayContainerRef.current || hasInitializedRef.current) return;
+    try {
+      adDisplayContainerRef.current.initialize();
+      hasInitializedRef.current = true;
+      console.log('✅ Ad display container initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize ad display container:', error);
+    }
+  };
+
+  useEffect(() => {
+    const adContainer = document.getElementById('ad-container');
+    if (adContainer) {
+      adContainer.style.display = 'block';
+      adContainer.style.opacity = isAdPlaying ? '1' : '0';
+      adContainer.style.pointerEvents = isAdPlaying ? 'auto' : 'none';
+    }
+  }, [isAdPlaying]);
+
+  useEffect(() => {
+    if (!videoElement) return;
+
+    const handleUserGesture = () => initializeAdDisplay();
+
+    videoElement.addEventListener('play', handleUserGesture);
+    videoElement.addEventListener('click', handleUserGesture);
+    videoElement.addEventListener('touchstart', handleUserGesture);
+
+    return () => {
+      videoElement.removeEventListener('play', handleUserGesture);
+      videoElement.removeEventListener('click', handleUserGesture);
+      videoElement.removeEventListener('touchstart', handleUserGesture);
+    };
+  }, [videoElement]);
 
   // Initialize IMA SDK
   useEffect(() => {
@@ -28,18 +65,21 @@ export function useVideoAds({
     }
 
     try {
-      // Create ad display container
+      const adContainer = document.getElementById('ad-container');
+      if (!adContainer) {
+        console.warn('❌ Ad container not found');
+        return;
+      }
+
       const adDisplayContainer = new window.google.ima.AdDisplayContainer(
-        document.getElementById('ad-container'),
+        adContainer,
         videoElement
       );
       adDisplayContainerRef.current = adDisplayContainer;
 
-      // Create ads loader
       const adsLoader = new window.google.ima.AdsLoader(adDisplayContainer);
       adsLoaderRef.current = adsLoader;
 
-      // Add event listeners
       adsLoader.addEventListener(
         window.google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
         onAdsManagerLoaded,
@@ -99,10 +139,8 @@ export function useVideoAds({
     }
 
     try {
-      // Initialize ad display container
-      adDisplayContainerRef.current.initialize();
+      initializeAdDisplay();
 
-      // Create ads request
       const adsRequest = new google.ima.AdsRequest();
       adsRequest.adTagUrl = adTagUrl;
       adsRequest.linearAdSlotWidth = videoElement?.clientWidth || 640;
