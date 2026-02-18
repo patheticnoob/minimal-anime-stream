@@ -79,7 +79,6 @@
     "three": "^0.177.0",
     "vaul": "^1.1.2",
     "video.js": "^8.23.7",
-    "videojs-ima": "^2.6.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
