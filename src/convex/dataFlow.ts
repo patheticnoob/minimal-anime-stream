@@ -4,18 +4,13 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 export const getUserDataFlow = query({
   args: {},
-  handler: async () => {
-    // EMERGENCY: Force v1 API due to Yumaapi outage
-    // Yumaapi is down, so v3 and v4 (which depend on it) won't work
-    return "v1"; // Force Hianime API for all users
-
-    // Original logic (commented out during outage):
-    // const userId = await getAuthUserId(ctx);
-    // if (!userId) {
-    //   return "v4"; // Default flow for non-authenticated users
-    // }
-    // const user = await ctx.db.get(userId);
-    // return user?.dataFlow || "v4"; // Default to v4 if not set
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return "v1"; // Default for unauthenticated users
+    }
+    const user = await ctx.db.get(userId);
+    return user?.dataFlow || "v1"; // Default to v1 if not set
   },
 });
 
