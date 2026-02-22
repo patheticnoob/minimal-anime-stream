@@ -21,5 +21,6 @@ export function useDataFlow() {
     isV2: dataFlow === "v2",
     isV3: dataFlow === "v3",
     isV4: dataFlow === "v4",
+    isV5: dataFlow === "v5",
   };
 }

@@ -108,3 +108,25 @@ export const getServers = action({
     }
   },
 });
+
+export const getStream = action({
+  args: {
+    episodeId: v.string(),
+    server: v.optional(v.string()),
+    type: v.optional(v.string()),
+  },
+  handler: async (_, args) => {
+    try {
+      const server = args.server ?? "hd-2";
+      const type = args.type ?? "sub";
+      const response = await fetch(
+        `${GOJO_API_BASE}/stream?id=${encodeURIComponent(args.episodeId)}&server=${server}&type=${type}`
+      );
+      if (!response.ok) throw new Error(`Gojo API returned ${response.status}`);
+      return await response.json();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch stream";
+      throw new Error(`Unable to load stream from Gojo: ${message}`);
+    }
+  },
+});

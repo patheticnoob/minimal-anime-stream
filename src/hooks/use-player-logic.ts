@@ -22,6 +22,8 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
   const fetchEpisodes = useAction(api.hianime.episodes);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
+  const fetchGojoEpisodes = useAction(api.gojoApi.getEpisodes);
+  const fetchGojoStream = useAction(api.gojoApi.getStream);
   
   const saveProgress = useMutation(api.watchProgress.saveProgress);
 
@@ -63,17 +65,16 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
   // Validate subtitle tracks by attempting to fetch and parse them
   const validateSubtitleTracks = async (tracks: Array<{ file: string; label: string; kind?: string }>, retryCount = 0): Promise<boolean> => {
     if (!tracks || tracks.length === 0) {
-      return true; // No subtitles to validate
+      return true;
     }
 
     const maxRetries = 2;
     
     try {
-      // Test fetch the first subtitle track to ensure it's accessible
       const testTrack = tracks[0];
       const response = await fetch(testTrack.file, { 
         method: 'HEAD',
-        signal: AbortSignal.timeout(3000) // 3 second timeout
+        signal: AbortSignal.timeout(3000)
       });
       
       if (!response.ok) {
@@ -85,12 +86,11 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
       console.warn(`Subtitle validation failed (attempt ${retryCount + 1}/${maxRetries + 1}):`, err);
       
       if (retryCount < maxRetries) {
-        // Wait before retry with exponential backoff
         await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, retryCount)));
         return validateSubtitleTracks(tracks, retryCount + 1);
       }
       
-      return false; // Failed after all retries
+      return false;
     }
   };
 
@@ -98,6 +98,19 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
   const prefetchEpisodeSources = useCallback(async (episodeId: string) => {
     const cacheKey = `sources_${episodeId}_${audioPreference}`;
     if (animeCache.has(cacheKey)) return;
+
+    if (dataFlow === "v5") {
+      // Gojo stream prefetch
+      try {
+        const result = await fetchGojoStream({ episodeId, server: "hd-2", type: audioPreference });
+        if (result?.success && result?.data) {
+          animeCache.set(cacheKey, result.data, 5);
+        }
+      } catch (err) {
+        console.warn('Gojo prefetch failed for episode:', episodeId, err);
+      }
+      return;
+    }
 
     try {
       const servers = await fetchServers({ episodeId });
@@ -116,7 +129,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           headers?: Record<string, string>;
         };
 
-        // If dub is selected, also fetch subtitles from sub server
         let finalTracks = sourcesData.tracks || [];
         if (audioPreference === "dub") {
           try {
@@ -138,14 +150,13 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           }
         }
 
-        // Cache with merged subtitles if dub
         const cacheData = { ...sourcesData, tracks: finalTracks };
         animeCache.set(cacheKey, cacheData, 5);
       }
     } catch (err) {
       console.warn('Prefetch failed for episode:', episodeId, err);
     }
-  }, [fetchServers, fetchSources, audioPreference]);
+  }, [fetchServers, fetchSources, fetchGojoStream, audioPreference, dataFlow]);
 
   useEffect(() => {
     if (!selected?.dataId) {
@@ -154,7 +165,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
       return;
     }
 
-    // Check cache first
     const cacheKey = `episodes_${selected.dataId}_${dataFlow}`;
     const cachedEpisodes = animeCache.get<Episode[]>(cacheKey);
     
@@ -166,7 +176,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
       setEpisodes(normalizedEpisodes);
       setEpisodesLoading(false);
       
-      // Prefetch first episode or last watched episode
       if (normalizedEpisodes.length > 0) {
         const targetEpisode = animeProgress?.episodeId 
           ? normalizedEpisodes.find(ep => ep.id === animeProgress.episodeId)
@@ -175,7 +184,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         if (targetEpisode) {
           prefetchEpisodeSources(targetEpisode.id);
           
-          // Also prefetch next episode
           const targetIndex = normalizedEpisodes.findIndex(ep => ep.id === targetEpisode.id);
           if (targetIndex !== -1 && normalizedEpisodes[targetIndex + 1]) {
             prefetchEpisodeSources(normalizedEpisodes[targetIndex + 1].id);
@@ -193,20 +201,36 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
 
     const fetchWithRetry = async () => {
       try {
-        const eps = await fetchEpisodes({ dataId: selected.dataId! });
+        let eps: Episode[];
+
+        if (dataFlow === "v5") {
+          // Gojo episodes: returns { success, data: GojoEpisode[] }
+          const result = await fetchGojoEpisodes({ animeId: selected.dataId! });
+          const gojoData = result as { success: boolean; data: Array<{ id: string; title: string; episodeNumber: number; isFiller: boolean }> };
+          if (!gojoData.success || !gojoData.data) {
+            throw new Error("Gojo episodes returned no data");
+          }
+          eps = gojoData.data.map((ep) => ({
+            id: ep.id,
+            title: ep.title,
+            number: ep.episodeNumber,
+            isFiller: ep.isFiller,
+          }));
+        } else {
+          eps = await fetchEpisodes({ dataId: selected.dataId! }) as Episode[];
+        }
+
         if (cancelled) return;
         
-        const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
+        const normalizedEpisodes = eps.map((ep) => ({
           ...ep,
           number: normalizeEpisodeNumber(ep.number),
         }));
         setEpisodes(normalizedEpisodes);
         setCurrentEpisodeIndex(null);
         
-        // Cache episodes
-        animeCache.set(cacheKey, eps, 10);
+        animeCache.set(cacheKey, normalizedEpisodes, 10);
         
-        // Prefetch first episode or last watched episode
         if (normalizedEpisodes.length > 0) {
           const targetEpisode = animeProgress?.episodeId 
             ? normalizedEpisodes.find(ep => ep.id === animeProgress.episodeId)
@@ -215,7 +239,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           if (targetEpisode) {
             prefetchEpisodeSources(targetEpisode.id);
             
-            // Also prefetch next episode
             const targetIndex = normalizedEpisodes.findIndex(ep => ep.id === targetEpisode.id);
             if (targetIndex !== -1 && normalizedEpisodes[targetIndex + 1]) {
               prefetchEpisodeSources(normalizedEpisodes[targetIndex + 1].id);
@@ -225,10 +248,8 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
       } catch (err) {
         if (cancelled) return;
         
-        // Log detailed error to console for debugging
         console.error('Failed to fetch episodes:', err);
         
-        // Retry logic for connection errors
         if (retryCount < maxRetries) {
           retryCount++;
           console.log(`Retrying episode fetch (${retryCount}/${maxRetries})...`);
@@ -237,7 +258,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           return fetchWithRetry();
         }
         
-        // Show user-friendly error after all retries exhausted
         toast.error("Unable to load episodes. Please try again.");
         setEpisodes([]);
       } finally {
@@ -252,7 +272,109 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     return () => {
       cancelled = true;
     };
-  }, [selected?.dataId, fetchEpisodes, animeProgress?.episodeId, prefetchEpisodeSources, dataFlow]);
+  }, [selected?.dataId, fetchEpisodes, fetchGojoEpisodes, animeProgress?.episodeId, prefetchEpisodeSources, dataFlow]);
+
+  const playEpisodeV5 = async (episode: Episode, normalizedEpisodeNumber: number, retryCount = 0) => {
+    const maxRetries = 3;
+    const cacheKey = `sources_${episode.id}_${audioPreference}`;
+    const cachedData = animeCache.get<any>(cacheKey);
+
+    const processGojoStreamData = async (streamData: any) => {
+      const hlsUrl = streamData.link?.file;
+      if (!hlsUrl) {
+        toast.error("No video source available");
+        setSubtitlesLoading(false);
+        return;
+      }
+
+      const raw = import.meta.env.VITE_CONVEX_URL as string;
+      let base = raw;
+      try {
+        const u = new URL(raw);
+        const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
+        base = `${u.protocol}//${hostname}`;
+      } catch {
+        base = raw.replace("convex.cloud", "convex.site");
+      }
+      base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+
+      const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(hlsUrl)}`;
+
+      const rawTracks = (streamData.tracks || []) as Array<{ file: string; label?: string; kind?: string; default?: boolean }>;
+      const subtitleTracks = rawTracks.filter(t => t.kind !== "thumbnails");
+      const proxiedTracks = subtitleTracks.map((t) => ({
+        ...t,
+        label: t.label || "Unknown",
+        kind: t.kind || "subtitles",
+        file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+        default: t.default || false,
+      }));
+
+      const subtitlesValid = await validateSubtitleTracks(proxiedTracks);
+      if (!subtitlesValid && proxiedTracks.length > 0) {
+        setSubtitlesError("Subtitles failed to load");
+        toast.warning("Subtitles may not be available for this episode");
+      }
+
+      setVideoSource(proxiedUrl);
+      setVideoTitle(`${selected?.title} - Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
+      setVideoTracks(proxiedTracks);
+      setVideoIntro(streamData.intro || null);
+      setVideoOutro(streamData.outro || null);
+      setVideoHeaders(null);
+      setSubtitlesLoading(false);
+
+      const idx = episodes.findIndex((e) => e.id === episode.id);
+      if (idx !== -1) setCurrentEpisodeIndex(idx);
+
+      toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
+
+      if (idx !== -1 && episodes[idx + 1]) {
+        prefetchEpisodeSources(episodes[idx + 1].id);
+      }
+    };
+
+    if (cachedData) {
+      await processGojoStreamData(cachedData);
+      return;
+    }
+
+    try {
+      const result = await fetchGojoStream({ episodeId: episode.id, server: "hd-2", type: audioPreference });
+      const streamResult = result as { success: boolean; data: any };
+
+      if (!streamResult.success || !streamResult.data) {
+        // If dub not available, fallback to sub
+        if (audioPreference === "dub") {
+          toast.warning("DUB not available, falling back to SUB");
+          const subResult = await fetchGojoStream({ episodeId: episode.id, server: "hd-2", type: "sub" });
+          const subStreamResult = subResult as { success: boolean; data: any };
+          if (subStreamResult.success && subStreamResult.data) {
+            animeCache.set(cacheKey, subStreamResult.data, 5);
+            await processGojoStreamData(subStreamResult.data);
+            return;
+          }
+        }
+        toast.error("No video sources available");
+        setSubtitlesLoading(false);
+        return;
+      }
+
+      animeCache.set(cacheKey, streamResult.data, 5);
+      await processGojoStreamData(streamResult.data);
+    } catch (err) {
+      console.error('Failed to load Gojo stream:', err);
+      
+      if (retryCount < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return playEpisodeV5(episode, normalizedEpisodeNumber, retryCount + 1);
+      }
+      
+      toast.error("Unable to load video. Please try again.");
+      setSubtitlesLoading(false);
+    }
+  };
 
   const playEpisode = async (episode: Episode, retryCount = 0) => {
     if (!isAuthenticated) {
@@ -280,17 +402,21 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     setSubtitlesLoading(true);
     setSubtitlesError(null);
 
-    // Clear previous video state
     setVideoIntro(null);
     setVideoOutro(null);
     setVideoHeaders(null);
 
-    // Check cache first with audio preference
+    // V5 (Gojo) streaming path
+    if (dataFlow === "v5") {
+      await playEpisodeV5(episode, normalizedEpisodeNumber, retryCount);
+      return;
+    }
+
+    // Original HiAnime streaming path (v1-v4)
     const cacheKey = `sources_${episode.id}_${audioPreference}`;
     const cachedSources = animeCache.get<any>(cacheKey);
 
     if (cachedSources) {
-      // Use cached sources immediately (already has merged subtitles if dub)
       const sourcesData = cachedSources;
 
       if (sourcesData.sources && sourcesData.sources.length > 0) {
@@ -318,7 +444,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           default: t.default || false,
         }));
 
-        // Validate subtitles before setting video source
         const subtitlesValid = await validateSubtitleTracks(proxiedTracks);
         
         if (!subtitlesValid && proxiedTracks.length > 0) {
@@ -338,7 +463,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
 
         toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
 
-        // Prefetch next episode
         if (idx !== -1 && episodes[idx + 1]) {
           prefetchEpisodeSources(episodes[idx + 1].id);
         }
@@ -353,7 +477,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
       const servers = await fetchServers({ episodeId: episode.id });
       const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
 
-      // Select servers based on audio preference
       const targetServers = audioPreference === "sub" ? serverData.sub : serverData.dub;
 
       if (!targetServers || targetServers.length === 0) {
@@ -379,7 +502,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         headers?: Record<string, string>;
       };
 
-      // If dub is selected, always fetch subtitles from sub server (dub never has subtitles)
       let finalTracks = sourcesData.tracks || [];
       if (audioPreference === "dub") {
         try {
@@ -402,7 +524,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
         }
       }
 
-      // Cache the sources with audio preference (with merged subtitles if dub)
       const cacheData = { ...sourcesData, tracks: finalTracks };
       animeCache.set(cacheKey, cacheData, 5);
 
@@ -431,7 +552,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
           default: t.default || false,
         }));
 
-        // Validate subtitles before setting video source
         const subtitlesValid = await validateSubtitleTracks(proxiedTracks);
         
         if (!subtitlesValid && proxiedTracks.length > 0) {
@@ -451,7 +571,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
 
         toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
 
-        // Prefetch next episode
         if (idx !== -1 && episodes[idx + 1]) {
           prefetchEpisodeSources(episodes[idx + 1].id);
         }
@@ -511,7 +630,6 @@ export function usePlayerLogic(isAuthenticated: boolean, dataFlow: string = "v1"
     if (lastSelectedAnime) setSelected(lastSelectedAnime);
   };
 
-  // Clear details when selected changes
   useEffect(() => {
     if (!selected) {
       setAnimeDetails(null);
