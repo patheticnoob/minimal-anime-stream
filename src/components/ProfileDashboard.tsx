@@ -239,6 +239,13 @@ export function ProfileDashboard({
           >
             v4 ⚡
           </Button>
+          <Button
+            variant={dataFlow === "v5" ? "default" : "outline"}
+            onClick={() => setDataFlow("v5")}
+            className={dataFlow === "v5" ? "bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700" : ""}
+          >
+            v5 🔥
+          </Button>
         </div>
         <p className="text-sm text-[var(--nothing-gray-4,gray-400)] mt-3">
           Current API: <span className="font-semibold text-[var(--nothing-fg,white)] uppercase">{dataFlow}</span>
@@ -248,6 +255,7 @@ export function ProfileDashboard({
           {dataFlow === "v2" && "Enhanced version with better metadata"}
           {dataFlow === "v3" && "Direct API calls with spotlight features"}
           {dataFlow === "v4" && "🚀 Best of Both Worlds - Rich home page data + reliable streaming"}
+          {dataFlow === "v5" && "🔥 Gojo API - Rich spotlight, top ten, genres + MAL scores"}
         </p>
       </div>
 
