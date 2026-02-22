@@ -64,12 +64,14 @@ export default function NothingWatch() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isDarkMode, toggleTheme } = useNothingTheme();
-  const { dataFlow } = useDataFlow();
+  const { dataFlow, isLoading: dataFlowLoading } = useDataFlow();
   const { buttonPressed } = useGamepad();
 
   const fetchEpisodes = useAction(api.hianime.episodes);
+  const fetchGojoEpisodes = useAction(api.gojoApi.getEpisodes);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
+  const fetchGojoStream = useAction(api.gojoApi.getStream);
   const fetchBroadcastInfo = useAction(api.jikan.searchBroadcast);
 
   const [anime, setAnime] = useState<AnimeDetail | null>(null);
@@ -121,6 +123,9 @@ export default function NothingWatch() {
       navigate("/");
       return;
     }
+
+    // Wait for dataFlow to resolve before fetching episodes
+    if (dataFlowLoading) return;
 
     const storedAnime = localStorage.getItem(`anime_${animeId}`);
     if (storedAnime) {
@@ -201,17 +206,31 @@ export default function NothingWatch() {
     // Only fetch if not in cache
     setEpisodesLoading(true);
 
-    // Use v2 API if dataFlow is v2, otherwise use v1 Convex API
-    const fetchPromise = dataFlow === "v2"
-      ? fetchHianimeEpisodes(animeId).then((hianimeEps) => {
-          // Convert Hianime episodes to our Episode format
-          return hianimeEps.map((ep) => ({
-            id: ep.id,
-            title: ep.title,
-            number: ep.episodeNumber,
-          }));
-        })
-      : fetchEpisodes({ dataId: animeId }).then((eps) => eps as Episode[]);
+    let fetchPromise: Promise<Episode[]>;
+
+    if (dataFlow === "v5") {
+      // Gojo API episodes
+      fetchPromise = fetchGojoEpisodes({ animeId }).then((result) => {
+        const rawEps = (result as { success?: boolean; data?: Array<{ id: string; title?: string; episodeNumber?: number }> })?.data ?? [];
+        return rawEps.map((ep) => ({
+          id: ep.id,
+          title: ep.title,
+          number: normalizeEpisodeNumber(ep.episodeNumber),
+        }));
+      });
+    } else if (dataFlow === "v2") {
+      // Use v2 API if dataFlow is v2
+      fetchPromise = fetchHianimeEpisodes(animeId).then((hianimeEps) => {
+        return hianimeEps.map((ep) => ({
+          id: ep.id,
+          title: ep.title,
+          number: ep.episodeNumber,
+        }));
+      });
+    } else {
+      // v1, v3, v4 - use Convex hianime API
+      fetchPromise = fetchEpisodes({ dataId: animeId }).then((eps) => eps as Episode[]);
+    }
 
     fetchPromise
       .then((eps) => {
@@ -249,7 +268,7 @@ export default function NothingWatch() {
         console.error("Failed to parse stored anime for broadcast info:", err);
       }
     }
-  }, [animeId, fetchEpisodes, navigate, dataFlow]);
+  }, [animeId, fetchEpisodes, fetchGojoEpisodes, navigate, dataFlow, dataFlowLoading]);
 
   // Helper function to prefetch episode sources
   const prefetchEpisodeSources = async (normalizedEpisodes: Episode[]) => {
@@ -488,13 +507,6 @@ export default function NothingWatch() {
     const resumeTime = shouldResume ? animeProgress.currentTime : 0;
     setInitialResumeTime(resumeTime);
 
-    console.log('🎬 Loading episode:', {
-      episodeId: episode.id,
-      savedEpisodeId: animeProgress?.episodeId,
-      shouldResume,
-      resumeTime
-    });
-
     // DON'T set videoSource to null - keep player mounted for seamless transitions
     // Only clear intro/outro to prepare for new episode
     setVideoIntro(null);
@@ -510,7 +522,98 @@ export default function NothingWatch() {
       }, 100);
     }
 
-    // Check cache first
+    // V5 (Gojo API) streaming path
+    if (dataFlow === "v5") {
+      try {
+        const streamResult = await fetchGojoStream({
+          episodeId: episode.id,
+          server: "hd-2",
+          type: audioPreference,
+        });
+        const streamData = streamResult as {
+          success?: boolean;
+          data?: {
+            link?: { file?: string };
+            tracks?: Array<{ file: string; label: string; kind?: string }>;
+            intro?: { start: number; end: number };
+            outro?: { start: number; end: number };
+          };
+        };
+
+        const hlsUrl = streamData?.data?.link?.file;
+        if (!hlsUrl) {
+          // Try fallback to sub if dub not available
+          if (audioPreference === "dub") {
+            const subResult = await fetchGojoStream({
+              episodeId: episode.id,
+              server: "hd-2",
+              type: "sub",
+            });
+            const subData = subResult as typeof streamData;
+            const subHlsUrl = subData?.data?.link?.file;
+            if (!subHlsUrl) {
+              toast.error("No video source available");
+              return;
+            }
+            const raw = import.meta.env.VITE_CONVEX_URL as string;
+            let base = raw;
+            try {
+              const u = new URL(raw);
+              const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
+              base = `${u.protocol}//${hostname}`;
+            } catch {
+              base = raw.replace("convex.cloud", "convex.site");
+            }
+            base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+            setVideoSource(`${base}/proxy?url=${encodeURIComponent(subHlsUrl)}`);
+            setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber} (SUB)`);
+            setVideoTracks((subData?.data?.tracks || []).map((t) => ({
+              ...t,
+              kind: t.kind || "subtitles",
+              file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+            })));
+            setVideoIntro(subData?.data?.intro || null);
+            setVideoOutro(subData?.data?.outro || null);
+            const idx = episodes.findIndex((e) => e.id === episode.id);
+            if (idx !== -1) setCurrentEpisodeIndex(idx);
+            toast.success(`Playing Episode ${normalizedEpisodeNumber} (SUB fallback)`);
+            return;
+          }
+          toast.error("No video source available");
+          return;
+        }
+
+        const raw = import.meta.env.VITE_CONVEX_URL as string;
+        let base = raw;
+        try {
+          const u = new URL(raw);
+          const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
+          base = `${u.protocol}//${hostname}`;
+        } catch {
+          base = raw.replace("convex.cloud", "convex.site");
+        }
+        base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+
+        setVideoSource(`${base}/proxy?url=${encodeURIComponent(hlsUrl)}`);
+        setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
+        setVideoTracks((streamData?.data?.tracks || []).map((t) => ({
+          ...t,
+          kind: t.kind || "subtitles",
+          file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+        })));
+        setVideoIntro(streamData?.data?.intro || null);
+        setVideoOutro(streamData?.data?.outro || null);
+        const idx = episodes.findIndex((e) => e.id === episode.id);
+        if (idx !== -1) setCurrentEpisodeIndex(idx);
+        toast.success(`Playing Episode ${normalizedEpisodeNumber} (${audioPreference.toUpperCase()})`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Failed to load video";
+        toast.error(msg);
+      }
+      return;
+    }
+
+    // Check cache first (v1-v4 path)
     const cacheKey = `sources_${episode.id}_${audioPreference}`;
     const cachedSources = animeCache.get<any>(cacheKey);
 

@@ -73,12 +73,14 @@ export default function Watch() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
-  const { dataFlow } = useDataFlow();
+  const { dataFlow, isLoading: dataFlowLoading } = useDataFlow();
   const { buttonPressed } = useGamepad();
 
   const fetchEpisodes = useAction(api.hianime.episodes);
+  const fetchGojoEpisodes = useAction(api.gojoApi.getEpisodes);
   const fetchServers = useAction(api.hianime.episodeServers);
   const fetchSources = useAction(api.hianime.episodeSources);
+  const fetchGojoStream = useAction(api.gojoApi.getStream);
   
   // V3 Actions Removed
 
@@ -125,6 +127,9 @@ export default function Watch() {
       return;
     }
 
+    // Wait for dataFlow to resolve before fetching episodes
+    if (dataFlowLoading) return;
+
     // Try to get anime data from localStorage (passed from Landing page)
     const storedAnime = localStorage.getItem(`anime_${animeId}`);
     if (storedAnime) {
@@ -141,25 +146,32 @@ export default function Watch() {
 
     const fetchWithRetry = async (retryCount = 0, maxRetries = 3) => {
       try {
-        const eps = await fetchEpisodes({ dataId: animeId });
-        const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
-          ...ep,
-          number: normalizeEpisodeNumber(ep.number),
-        }));
-        setEpisodes(normalizedEpisodes);
+        if (dataFlow === "v5") {
+          // Gojo API episodes
+          const result = await fetchGojoEpisodes({ animeId });
+          const rawEps = (result as { success?: boolean; data?: Array<{ id: string; title?: string; episodeNumber?: number }> })?.data ?? [];
+          const normalizedEpisodes = rawEps.map((ep) => ({
+            id: ep.id,
+            title: ep.title,
+            number: normalizeEpisodeNumber(ep.episodeNumber),
+          }));
+          setEpisodes(normalizedEpisodes);
+        } else {
+          const eps = await fetchEpisodes({ dataId: animeId });
+          const normalizedEpisodes = (eps as Episode[]).map((ep) => ({
+            ...ep,
+            number: normalizeEpisodeNumber(ep.number),
+          }));
+          setEpisodes(normalizedEpisodes);
+        }
       } catch (err) {
-        // Log detailed error to console for debugging
         console.error('Failed to fetch episodes:', err);
-        
-        // Retry logic for connection errors
         if (retryCount < maxRetries) {
           console.log(`Retrying episode fetch (${retryCount + 1}/${maxRetries})...`);
           const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
           await new Promise(resolve => setTimeout(resolve, delay));
           return fetchWithRetry(retryCount + 1, maxRetries);
         }
-        
-        // Show user-friendly error after all retries exhausted
         toast.error("Unable to load episodes. Please try again.");
       } finally {
         setEpisodesLoading(false);
@@ -215,7 +227,7 @@ export default function Watch() {
           .finally(() => setIsBroadcastLoading(false));
       }
     }
-  }, [animeId, fetchEpisodes, fetchBroadcastInfo, dataFlow, navigate]);
+  }, [animeId, fetchEpisodes, fetchGojoEpisodes, fetchBroadcastInfo, dataFlow, dataFlowLoading, navigate]);
 
   // Save scroll position for episode list
   useEffect(() => {
@@ -349,7 +361,6 @@ export default function Watch() {
     setCurrentAnimeInfo(animeInfo);
     setCurrentEpisodeData(normalizedEpisode);
 
-    // Calculate and store the initial resume time for this episode ONCE
     const shouldResume =
       animeProgress &&
       animeProgress.episodeId === episode.id &&
@@ -359,41 +370,34 @@ export default function Watch() {
     const resumeTime = shouldResume ? animeProgress.currentTime : 0;
     setInitialResumeTime(resumeTime);
 
-    console.log('🎬 Loading episode:', {
-      episodeId: episode.id,
-      savedEpisodeId: animeProgress?.episodeId,
-      shouldResume,
-      resumeTime
-    });
-
     setVideoSource(null);
     setVideoIntro(null);
     setVideoOutro(null);
 
     const loadVideoWithRetry = async (retryCount = 0, maxRetries = 3) => {
       try {
-        const servers = await fetchServers({ episodeId: episode.id });
-        const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
+        if (dataFlow === "v5") {
+          // Gojo API streaming
+          const streamResult = await fetchGojoStream({
+            episodeId: episode.id,
+            server: "hd-2",
+            type: "sub",
+          });
+          const streamData = streamResult as {
+            success?: boolean;
+            data?: {
+              link?: { file?: string };
+              tracks?: Array<{ file: string; label: string; kind?: string }>;
+              intro?: { start: number; end: number };
+              outro?: { start: number; end: number };
+            };
+          };
 
-        const subServers = serverData.sub || [];
-        const preferredServer = subServers.find(s => s.name === "HD-2") || subServers[0];
-
-        if (!preferredServer) {
-          toast.error("No streaming servers available");
-          return;
-        }
-
-        const sources = await fetchSources({ serverId: preferredServer.id });
-        const sourcesData = sources as {
-          sources: Array<{ file: string; type: string }>;
-          tracks?: Array<{ file: string; label: string; kind?: string }>;
-          intro?: { start: number; end: number };
-          outro?: { start: number; end: number };
-        };
-
-        if (sourcesData.sources && sourcesData.sources.length > 0) {
-          const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
-          const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
+          const hlsUrl = streamData?.data?.link?.file;
+          if (!hlsUrl) {
+            toast.error("No video source available from Gojo");
+            return;
+          }
 
           const raw = import.meta.env.VITE_CONVEX_URL as string;
           let base = raw;
@@ -406,8 +410,8 @@ export default function Watch() {
           }
           base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
 
-          const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
-          const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
+          const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(hlsUrl)}`;
+          const proxiedTracks = (streamData?.data?.tracks || []).map((t) => ({
             ...t,
             kind: t.kind || "subtitles",
             file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
@@ -416,29 +420,78 @@ export default function Watch() {
           setVideoSource(proxiedUrl);
           setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber}`);
           setVideoTracks(proxiedTracks);
-          setVideoIntro(sourcesData.intro || null);
-          setVideoOutro(sourcesData.outro || null);
+          setVideoIntro(streamData?.data?.intro || null);
+          setVideoOutro(streamData?.data?.outro || null);
 
           const idx = episodes.findIndex((e) => e.id === episode.id);
           if (idx !== -1) setCurrentEpisodeIndex(idx);
 
           toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
         } else {
-          toast.error("No video sources available");
+          // HiAnime streaming (v1-v4)
+          const servers = await fetchServers({ episodeId: episode.id });
+          const serverData = servers as { sub: Array<{ id: string; name: string }>; dub: Array<{ id: string; name: string }> };
+
+          const subServers = serverData.sub || [];
+          const preferredServer = subServers.find(s => s.name === "HD-2") || subServers[0];
+
+          if (!preferredServer) {
+            toast.error("No streaming servers available");
+            return;
+          }
+
+          const sources = await fetchSources({ serverId: preferredServer.id });
+          const sourcesData = sources as {
+            sources: Array<{ file: string; type: string }>;
+            tracks?: Array<{ file: string; label: string; kind?: string }>;
+            intro?: { start: number; end: number };
+            outro?: { start: number; end: number };
+          };
+
+          if (sourcesData.sources && sourcesData.sources.length > 0) {
+            const m3u8Source = sourcesData.sources.find(s => s.file.includes(".m3u8"));
+            const originalUrl = m3u8Source?.file || sourcesData.sources[0].file;
+
+            const raw = import.meta.env.VITE_CONVEX_URL as string;
+            let base = raw;
+            try {
+              const u = new URL(raw);
+              const hostname = u.hostname.replace(".convex.cloud", ".convex.site");
+              base = `${u.protocol}//${hostname}`;
+            } catch {
+              base = raw.replace("convex.cloud", "convex.site");
+            }
+            base = base.replace("/.well-known/convex.json", "").replace(/\/$/, "");
+
+            const proxiedUrl = `${base}/proxy?url=${encodeURIComponent(originalUrl)}`;
+            const proxiedTracks = (sourcesData.tracks || []).map((t) => ({
+              ...t,
+              kind: t.kind || "subtitles",
+              file: `${base}/proxy?url=${encodeURIComponent(t.file)}`,
+            }));
+
+            setVideoSource(proxiedUrl);
+            setVideoTitle(`${anime?.title} - Episode ${normalizedEpisodeNumber}`);
+            setVideoTracks(proxiedTracks);
+            setVideoIntro(sourcesData.intro || null);
+            setVideoOutro(sourcesData.outro || null);
+
+            const idx = episodes.findIndex((e) => e.id === episode.id);
+            if (idx !== -1) setCurrentEpisodeIndex(idx);
+
+            toast.success(`Playing Episode ${normalizedEpisodeNumber}`);
+          } else {
+            toast.error("No video sources available");
+          }
         }
       } catch (err) {
-        // Log detailed error to console for debugging
         console.error('Failed to load video sources:', err);
-        
-        // Retry logic for connection errors
         if (retryCount < maxRetries) {
           console.log(`Retrying video load (${retryCount + 1}/${maxRetries})...`);
           const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
           await new Promise(resolve => setTimeout(resolve, delay));
           return loadVideoWithRetry(retryCount + 1, maxRetries);
         }
-        
-        // Show user-friendly error after all retries exhausted
         toast.error("Unable to load video. Please try again.");
       }
     };

@@ -2,8 +2,10 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 export function useDataFlow() {
-  // Force v1 due to Yumaapi outage (fallback changed from v4 to v1)
-  const dataFlow = useQuery(api.dataFlow.getUserDataFlow) || "v1";
+  const dataFlowQuery = useQuery(api.dataFlow.getUserDataFlow);
+  // undefined = still loading, string = resolved
+  const isLoading = dataFlowQuery === undefined;
+  const dataFlow = dataFlowQuery ?? "v1";
   const setDataFlowMutation = useMutation(api.dataFlow.setUserDataFlow);
 
   const setDataFlow = async (flow: string) => {
@@ -16,6 +18,7 @@ export function useDataFlow() {
 
   return {
     dataFlow,
+    isLoading,
     setDataFlow,
     isV1: dataFlow === "v1",
     isV2: dataFlow === "v2",
