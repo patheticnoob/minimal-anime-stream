@@ -1,4 +1,4 @@
-import { Play } from "lucide-react";
+import { Play, Star, Calendar, Clock, Tv } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type BroadcastInfo } from "@/types/broadcast";
 
@@ -27,6 +27,18 @@ export function NothingAnimeInfo({
 }: NothingAnimeInfoProps) {
   const showBroadcastInfo = shouldShowBroadcast || (!isBroadcastLoading && !broadcastInfo);
 
+  const airedFrom = anime?.aired?.from
+    ? new Date(anime.aired.from).getFullYear()
+    : null;
+  const airedTo = anime?.aired?.to
+    ? new Date(anime.aired.to).getFullYear()
+    : null;
+  const airedLabel = airedFrom
+    ? airedTo && airedTo !== airedFrom
+      ? `${airedFrom}–${airedTo}`
+      : String(airedFrom)
+    : null;
+
   return (
     <div className="space-y-4">
       {/* Main Info Card - Horizontal Layout */}
@@ -49,11 +61,48 @@ export function NothingAnimeInfo({
           )}
 
           {/* Content - Right Side */}
-          <div className="flex-1 flex flex-col gap-4 min-w-0">
-            {/* Title - with proper text wrapping */}
+          <div className="flex-1 flex flex-col gap-3 min-w-0">
+            {/* Title */}
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-[#050814] dark:text-white break-words">
               {anime?.title || "Unknown Title"}
             </h2>
+
+            {/* Meta row: MAL score, type, status, aired */}
+            <div className="flex items-center gap-3 flex-wrap text-xs text-black/50 dark:text-white/50">
+              {anime?.malScore && (
+                <span className="flex items-center gap-1 text-yellow-500 font-bold">
+                  <Star className="w-3.5 h-3.5 fill-yellow-500" />
+                  {Number(anime.malScore).toFixed(2)}
+                </span>
+              )}
+              {anime?.type && (
+                <span className="flex items-center gap-1">
+                  <Tv className="w-3 h-3" />
+                  {anime.type}
+                </span>
+              )}
+              {anime?.status && (
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                  anime.status.toLowerCase().includes("airing")
+                    ? "bg-green-500/15 text-green-500"
+                    : "bg-black/10 dark:bg-white/10 text-black/60 dark:text-white/60"
+                }`}>
+                  {anime.status}
+                </span>
+              )}
+              {airedLabel && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  {airedLabel}
+                </span>
+              )}
+              {anime?.duration && (
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {anime.duration}
+                </span>
+              )}
+            </div>
 
             {/* Badges Row */}
             <div className="flex items-center gap-2 flex-wrap">
@@ -72,12 +121,50 @@ export function NothingAnimeInfo({
                   {episodeCount} EPISODES
                 </span>
               )}
+              {anime?.rating && (
+                <span className="px-3 py-1.5 rounded-full bg-black/10 dark:bg-white/10 text-xs font-medium tracking-wider uppercase text-black/80 dark:text-white/80">
+                  {anime.rating}
+                </span>
+              )}
             </div>
+
+            {/* Genres */}
+            {anime?.genres && anime.genres.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {anime.genres.slice(0, 6).map((genre: string) => (
+                  <span
+                    key={genre}
+                    className="px-2.5 py-1 rounded-full bg-[#ff4d4f]/10 text-[#ff4d4f] text-[10px] font-semibold tracking-wider uppercase"
+                  >
+                    {genre}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Studios / Producers */}
+            {(anime?.studios?.length > 0 || anime?.producers?.length > 0) && (
+              <div className="flex flex-col gap-1 text-xs text-black/50 dark:text-white/40">
+                {anime?.studios?.length > 0 && (
+                  <span>
+                    <span className="font-semibold text-black/70 dark:text-white/60">Studio: </span>
+                    {anime.studios.join(", ")}
+                  </span>
+                )}
+                {anime?.producers?.length > 0 && (
+                  <span>
+                    <span className="font-semibold text-black/70 dark:text-white/60">Producers: </span>
+                    {anime.producers.slice(0, 3).join(", ")}
+                    {anime.producers.length > 3 ? ` +${anime.producers.length - 3}` : ""}
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Spacer to push button to bottom */}
             <div className="flex-1" />
 
-            {/* Play Button - constrained width */}
+            {/* Play Button */}
             {episodeCount > 0 && (
               <Button
                 onClick={onPlayFirst}
@@ -92,7 +179,7 @@ export function NothingAnimeInfo({
         </div>
       </div>
 
-      {/* Broadcast & Audio Section - Side by Side Layout */}
+      {/* Broadcast & Audio Section */}
       {(shouldShowBroadcast || anime?.language?.sub || anime?.language?.dub) && (
         <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-5 flex flex-row gap-6 items-center justify-between shadow-sm transition-colors duration-300">
           {/* Audio Toggle */}

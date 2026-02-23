@@ -7,23 +7,10 @@ import {
   fetchGojoSpotlight,
   fetchGojoCategory,
   searchGojo,
+  fetchGojoTopTen,
 } from "@/lib/gojo-api";
 
-/**
- * Gojo API Hook - Home page data from gojoback.zeabur.app
- *
- * Uses the Gojo API for home page data (spotlight, trending, topAiring, etc.)
- * Episodes and streaming still use the hianime package via convex actions.
- *
- * Key differences from v4 (Yuma):
- * - Richer spotlight data (synopsis, quality, rank, aired)
- * - Top Ten endpoint (today/week/month)
- * - Genres list
- * - MAL score, studios, producers in anime details
- * - Episode IDs use format: {animeId}::ep={episodeNumber}
- */
 export function useAnimeListsGojo(isActive: boolean = true) {
-  // Maintain same hook call order as v4 to avoid React Hooks Rules violations
   useAction(api.hianime.topAiring);
   useAction(api.hianime.mostPopular);
   useAction(api.hianime.movies);
@@ -37,6 +24,14 @@ export function useAnimeListsGojo(isActive: boolean = true) {
   const [tvShowItems, setTVShowItems] = useState<AnimeItem[]>([]);
   const [spotlightItems, setSpotlightItems] = useState<AnimeItem[]>([]);
   const [heroAnime, setHeroAnime] = useState<AnimeItem | null>(null);
+
+  // V5-only extra categories
+  const [mostFavoriteItems, setMostFavoriteItems] = useState<AnimeItem[]>([]);
+  const [latestCompletedItems, setLatestCompletedItems] = useState<AnimeItem[]>([]);
+  const [newAddedItems, setNewAddedItems] = useState<AnimeItem[]>([]);
+  const [topUpcomingItems, setTopUpcomingItems] = useState<AnimeItem[]>([]);
+  const [topTenItems, setTopTenItems] = useState<AnimeItem[]>([]);
+  const [genres, setGenres] = useState<string[]>([]);
 
   const [popularLoading, setPopularLoading] = useState(true);
   const [airingLoading, setAiringLoading] = useState(true);
@@ -53,13 +48,11 @@ export function useAnimeListsGojo(isActive: boolean = true) {
   const [tvShowHasMore] = useState(false);
   const [loadingMore] = useState<string | null>(null);
 
-  // Load content from Gojo API
   useEffect(() => {
     if (!isActive) return;
 
     let mounted = true;
 
-    // Load Spotlight
     logInfo("Fetching spotlight from Gojo API", "Gojo Initial Load");
     fetchGojoSpotlight()
       .then(({ results }) => {
@@ -75,71 +68,78 @@ export function useAnimeListsGojo(isActive: boolean = true) {
         setLoading(false);
       });
 
-    // Load Most Popular
     fetchGojoCategory("mostPopular")
       .then(({ results }) => {
         if (!mounted) return;
         setPopularItems(results);
         setPopularLoading(false);
-        logInfo("✅ Gojo Most Popular loaded", "Gojo Initial Load");
       })
-      .catch((err) => {
-        if (!mounted) return;
-        logError("Gojo mostPopular failed", "Gojo API", err instanceof Error ? err : undefined);
-        setPopularLoading(false);
-      });
+      .catch(() => { if (mounted) setPopularLoading(false); });
 
-    // Load Top Airing as "airing"
     fetchGojoCategory("topAiring")
       .then(({ results }) => {
         if (!mounted) return;
         setAiringItems(results);
         setAiringLoading(false);
-        logInfo("✅ Gojo Top Airing loaded", "Gojo Initial Load");
       })
-      .catch((err) => {
-        if (!mounted) return;
-        logError("Gojo topAiring failed", "Gojo API", err instanceof Error ? err : undefined);
-        setAiringLoading(false);
-      });
+      .catch(() => { if (mounted) setAiringLoading(false); });
 
-    // Load Latest Episodes as "recentEpisodes"
     fetchGojoCategory("latestEpisode")
       .then(({ results }) => {
         if (!mounted) return;
         setRecentEpisodeItems(results);
         setRecentEpisodesLoading(false);
-        logInfo("✅ Gojo Latest Episodes loaded", "Gojo Initial Load");
       })
-      .catch((err) => {
-        if (!mounted) return;
-        logError("Gojo latestEpisode failed", "Gojo API", err instanceof Error ? err : undefined);
-        setRecentEpisodesLoading(false);
-      });
+      .catch(() => { if (mounted) setRecentEpisodesLoading(false); });
 
-    // Load Trending as "tvShows"
     fetchGojoCategory("trending")
       .then(({ results }) => {
         if (!mounted) return;
         setTVShowItems(results);
         setTVShowsLoading(false);
-        logInfo("✅ Gojo Trending loaded", "Gojo Initial Load");
       })
-      .catch((err) => {
-        if (!mounted) return;
-        logError("Gojo trending failed", "Gojo API", err instanceof Error ? err : undefined);
-        setTVShowsLoading(false);
-      });
+      .catch(() => { if (mounted) setTVShowsLoading(false); });
 
-    return () => {
-      mounted = false;
-    };
+    // V5-only extra categories — fetch from home endpoint
+    fetchGojoCategory("mostFavorite")
+      .then(({ results }) => { if (mounted) setMostFavoriteItems(results); })
+      .catch(() => {});
+
+    fetchGojoCategory("latestCompleted")
+      .then(({ results }) => { if (mounted) setLatestCompletedItems(results); })
+      .catch(() => {});
+
+    fetchGojoCategory("newAdded")
+      .then(({ results }) => { if (mounted) setNewAddedItems(results); })
+      .catch(() => {});
+
+    fetchGojoCategory("topUpcoming")
+      .then(({ results }) => { if (mounted) setTopUpcomingItems(results); })
+      .catch(() => {});
+
+    // Top Ten today
+    fetchGojoTopTen("today")
+      .then(({ results }) => { if (mounted) setTopTenItems(results); })
+      .catch(() => {});
+
+    // Genres from home
+    import("@/lib/gojo-api").then(({ fetchGojoHome: _fetchGojoHome }) => {
+      fetch("https://gojoback.zeabur.app/api/v1/home")
+        .then(r => r.json())
+        .then((data: any) => {
+          if (mounted && data?.success && Array.isArray(data?.data?.genres)) {
+            setGenres(data.data.genres);
+          }
+        })
+        .catch(() => {});
+    });
+
+    return () => { mounted = false; };
   }, [isActive]);
 
   // Auto-rotate hero banner
   useEffect(() => {
     if (!heroAnime || spotlightItems.length === 0) return;
-
     const interval = setInterval(() => {
       setHeroAnime((prev) => {
         const currentIndex = spotlightItems.findIndex(item => item.id === prev?.id);
@@ -147,7 +147,6 @@ export function useAnimeListsGojo(isActive: boolean = true) {
         return spotlightItems[nextIndex];
       });
     }, 5000);
-
     return () => clearInterval(interval);
   }, [heroAnime, spotlightItems]);
 
@@ -158,30 +157,21 @@ export function useAnimeListsGojo(isActive: boolean = true) {
       setIsSearching(false);
       return;
     }
-
     setIsSearching(true);
     const timeoutId = setTimeout(async () => {
-      logInfo(`Searching Gojo for: ${query}`, "Gojo Search");
       try {
         const { results } = await searchGojo(query.trim());
         setSearchResults(results);
-        logInfo(`✅ Gojo search completed: ${results.length} results`, "Gojo Search");
-      } catch (err) {
-        logError("Gojo search failed", "Gojo API", err instanceof Error ? err : undefined);
+      } catch {
         setSearchResults([]);
       } finally {
         setIsSearching(false);
       }
     }, 500);
-
     return () => clearTimeout(timeoutId);
   }, [query]);
 
-  // loadMoreItems is a no-op for now (Gojo home endpoint doesn't paginate categories)
-  const loadMoreItems = async (_category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => {
-    // Gojo home categories don't support pagination
-    logInfo("Gojo API: loadMore not supported for home categories", "Gojo Pagination");
-  };
+  const loadMoreItems = async (_category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => {};
 
   return {
     loading,
@@ -206,5 +196,12 @@ export function useAnimeListsGojo(isActive: boolean = true) {
       recentEpisodes: recentEpisodesHasMore,
       tvShows: tvShowHasMore,
     },
+    // V5-only extras
+    mostFavoriteItems,
+    latestCompletedItems,
+    newAddedItems,
+    topUpcomingItems,
+    topTenItems,
+    genres,
   };
 }

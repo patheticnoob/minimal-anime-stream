@@ -1,5 +1,5 @@
-import { Play, Film, ArrowUpDown, Search } from "lucide-react";
-import { useState, useRef, useMemo } from "react";
+import { Film, ArrowUpDown, Search } from "lucide-react";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +27,6 @@ export function NothingEpisodeList({
   const [jumpToEpisode, setJumpToEpisode] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [episodeRange, setEpisodeRange] = useState(0);
-  const episodeListRef = useRef<HTMLDivElement>(null);
 
   // Calculate episode ranges (100 episodes per range)
   const episodeRanges = useMemo(() => {
@@ -104,7 +103,8 @@ export function NothingEpisodeList({
   };
 
   return (
-    <div id="episode-list-container" className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] p-6 h-fit max-h-[calc(100vh-120px)] flex flex-col shadow-sm transition-colors duration-300">
+    <div className="bg-white dark:bg-[#1A1D24] border border-black/5 dark:border-white/10 rounded-[24px] overflow-hidden shadow-sm transition-colors duration-300">
+      {/* Header */}
       <div className="sticky top-0 bg-white dark:bg-[#1A1D24] z-10 pb-4 transition-colors duration-300">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-black/40 dark:text-white/40">Episodes</h3>
@@ -181,54 +181,43 @@ export function NothingEpisodeList({
           </div>
         </div>
       ) : displayedEpisodes.length > 0 ? (
-        <div ref={episodeListRef} className="space-y-2 overflow-y-auto flex-1 pr-2 custom-scrollbar">
-          {displayedEpisodes.map((ep) => {
-            const progressPercentage =
-              ep.currentTime && ep.duration ? (ep.currentTime / ep.duration) * 100 : 0;
-            const isCurrentEpisode = currentEpisodeId === ep.id;
+        <div className="p-4">
+          <div className="grid grid-cols-1 gap-1.5 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-black/10 dark:scrollbar-thumb-white/10">
+            {displayedEpisodes.map((episode: any) => {
+              const epNum = episode.episodeNumber ?? episode.number ?? episode.episode_no;
+              const epTitle = episode.title ?? episode.name ?? `Episode ${epNum}`;
+              const epId = episode.id ?? episode.episodeId;
+              const isActive = epId === currentEpisodeId;
+              const isFiller = episode.isFiller === true;
 
-            return (
-              <button
-                key={ep.id}
-                id={`episode-${ep.number}`}
-                onClick={() => onPlayEpisode(ep)}
-                className={`group w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 text-left ${
-                  isCurrentEpisode
-                    ? "bg-[#ff4d4f]/5 dark:bg-[#ff4d4f]/10 border-[#ff4d4f]/50 shadow-[0_0_15px_rgba(255,77,79,0.1)]"
-                    : "bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/5 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/10"
-                }`}
-              >
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-mono text-sm font-bold shrink-0 ${
-                  isCurrentEpisode ? "bg-[#ff4d4f] text-white" : "bg-black/10 dark:bg-white/10 text-black/40 dark:text-white/40 group-hover:text-black dark:group-hover:text-white group-hover:bg-black/20 dark:group-hover:bg-white/20"
-                }`}>
-                  {ep.number ?? "#"}
-                </div>
-                
-                <div className="flex-1 min-w-0">
-                  <h4 className={`font-medium truncate ${isCurrentEpisode ? "text-[#ff4d4f]" : "text-[#050814] dark:text-white group-hover:text-black dark:group-hover:text-white"}`}>
-                    {ep.title || `Episode ${ep.number}`}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-black/40 dark:text-white/40 font-mono">EP {ep.number ?? "?"}</span>
-                    {progressPercentage > 0 && (
-                      <div className="h-1 w-16 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-[#ff4d4f]" 
-                          style={{ width: `${Math.min(progressPercentage, 100)}%` }} 
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                  isCurrentEpisode ? "bg-[#ff4d4f] text-white" : "bg-black/5 dark:bg-white/5 text-black/20 dark:text-white/20 group-hover:bg-black/20 dark:group-hover:bg-white/20 group-hover:text-black dark:group-hover:text-white"
-                }`}>
-                  <Play className="h-3.5 w-3.5 fill-current" />
-                </div>
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={epId ?? epNum}
+                  id={`episode-${epNum}`}
+                  onClick={() => onPlayEpisode(episode)}
+                  className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 group ${
+                    isActive
+                      ? "bg-[#ff4d4f] text-white shadow-md"
+                      : "hover:bg-black/5 dark:hover:bg-white/5 text-black/80 dark:text-white/80"
+                  }`}
+                >
+                  <span className={`text-xs font-bold w-8 shrink-0 ${isActive ? "text-white/80" : "text-black/40 dark:text-white/30"}`}>
+                    {epNum}
+                  </span>
+                  <span className="flex-1 text-sm font-medium truncate">{epTitle}</span>
+                  {isFiller && (
+                    <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase ${
+                      isActive
+                        ? "bg-white/20 text-white"
+                        : "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400"
+                    }`}>
+                      FILLER
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-black/20 dark:text-white/20">
