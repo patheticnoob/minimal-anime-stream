@@ -2,6 +2,7 @@ import { ContentRail } from "@/components/ContentRail";
 import { AnimeItem } from "@/shared/types";
 import { useTheme } from "@/hooks/use-theme";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDataFlow } from "@/hooks/use-data-flow";
 
 interface HomeSectionsProps {
   isAuthenticated: boolean;
@@ -27,17 +28,21 @@ interface HomeSectionsProps {
   focusedRailIndex?: number;
   focusedItemIndex?: number;
   isNavigatingRails?: boolean;
+  // V5-only extras
+  mostFavoriteItems?: AnimeItem[];
+  latestCompletedItems?: AnimeItem[];
+  newAddedItems?: AnimeItem[];
+  topUpcomingItems?: AnimeItem[];
+  topTenItems?: AnimeItem[];
+  genres?: string[];
 }
 
 function LoadingSkeleton() {
   const { theme } = useTheme();
   return (
     <div className="space-y-8">
-      {/* Section Title Skeleton */}
       <div className="space-y-4">
         <Skeleton className={`h-8 w-48 ${theme === "nothing" ? "bg-[var(--nothing-elevated)]" : "bg-white/10"}`} />
-        
-        {/* Rail Skeleton */}
         <div className="flex gap-3 overflow-hidden">
           {Array.from({ length: 6 }).map((_, idx) => (
             <div key={idx} className="flex-none w-[95px] md:w-[120px] space-y-2">
@@ -71,8 +76,16 @@ export function HomeSections({
   focusedRailIndex = -1,
   focusedItemIndex = 0,
   isNavigatingRails = false,
+  mostFavoriteItems = [],
+  latestCompletedItems = [],
+  newAddedItems = [],
+  topUpcomingItems = [],
+  topTenItems = [],
+  genres = [],
 }: HomeSectionsProps) {
   const { theme } = useTheme();
+  const { dataFlow } = useDataFlow();
+  const isV5 = dataFlow === "v5";
   
   // Calculate rail indices accounting for hero banner (index 0)
   let currentRailIndex = 1;
@@ -186,6 +199,87 @@ export function HomeSections({
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
+      )}
+
+      {/* V5-only: Most Favorite */}
+      {isV5 && mostFavoriteItems.length > 0 && (
+        <ContentRail
+          title="Most Favorite"
+          items={mostFavoriteItems}
+          onItemClick={onOpenAnime}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
+        />
+      )}
+
+      {/* V5-only: New Additions */}
+      {isV5 && newAddedItems.length > 0 && (
+        <ContentRail
+          title="New Additions"
+          items={newAddedItems}
+          onItemClick={onOpenAnime}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
+        />
+      )}
+
+      {/* V5-only: Latest Completed */}
+      {isV5 && latestCompletedItems.length > 0 && (
+        <ContentRail
+          title="Latest Completed"
+          items={latestCompletedItems}
+          onItemClick={onOpenAnime}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
+        />
+      )}
+
+      {/* V5-only: Top Upcoming */}
+      {isV5 && topUpcomingItems.length > 0 && (
+        <ContentRail
+          title="Top Upcoming"
+          items={topUpcomingItems}
+          onItemClick={onOpenAnime}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
+        />
+      )}
+
+      {/* V5-only: Top Ten Today */}
+      {isV5 && topTenItems.length > 0 && (
+        <ContentRail
+          title="Top 10 Today"
+          items={topTenItems}
+          onItemClick={onOpenAnime}
+          isFocused={focusedRailIndex === getRailIndex() - 1}
+          focusedItemIndex={focusedItemIndex}
+          isNavigatingRails={isNavigatingRails}
+        />
+      )}
+
+      {/* V5-only: Genres Strip */}
+      {isV5 && genres.length > 0 && (
+        <div>
+          <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Browse by Genre</h2>
+          <div className="flex flex-wrap gap-2">
+            {genres.map((genre) => (
+              <span
+                key={genre}
+                className={`px-4 py-2 rounded-full text-sm font-semibold cursor-default select-none transition-colors ${
+                  theme === "nothing"
+                    ? "bg-[#ff4d4f]/10 text-[#ff4d4f] border border-[#ff4d4f]/20 hover:bg-[#ff4d4f]/20"
+                    : "bg-white/10 text-white/80 border border-white/10 hover:bg-white/20"
+                }`}
+              >
+                {genre}
+              </span>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

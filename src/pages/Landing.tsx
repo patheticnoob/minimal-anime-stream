@@ -513,6 +513,12 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                   onLoadMore={loadMoreItems}
                   loadingMore={loadingMore}
                   hasMore={hasMore}
+                  mostFavoriteItems={(animeData as any).mostFavoriteItems}
+                  latestCompletedItems={(animeData as any).latestCompletedItems}
+                  newAddedItems={(animeData as any).newAddedItems}
+                  topUpcomingItems={(animeData as any).topUpcomingItems}
+                  topTenItems={(animeData as any).topTenItems}
+                  genres={(animeData as any).genres}
                 />
               )}
             </>

@@ -18,5 +18,13 @@ export function useAnimeListsRouter() {
     return v5Data;
   }
 
-  return v1Data;
+  return {
+    ...v1Data,
+    mostFavoriteItems: [],
+    latestCompletedItems: [],
+    newAddedItems: [],
+    topUpcomingItems: [],
+    topTenItems: [],
+    genres: [],
+  };
 }
