@@ -31,9 +31,8 @@ export function useAnimeListsGojo(isActive: boolean = true) {
 
   const [loadingMore] = useState<string | null>(null);
 
+  // Always fetch data (not gated by isActive) so data is ready when needed
   useEffect(() => {
-    if (!isActive) return;
-
     let mounted = true;
 
     logInfo("Fetching all home data from Gojo API (single request)", "Gojo Initial Load");
@@ -75,7 +74,7 @@ export function useAnimeListsGojo(isActive: boolean = true) {
       });
 
     return () => { mounted = false; };
-  }, [isActive]);
+  }, []); // Run once on mount, always
 
   // Auto-rotate hero banner
   useEffect(() => {
@@ -112,6 +111,35 @@ export function useAnimeListsGojo(isActive: boolean = true) {
   }, [query]);
 
   const loadMoreItems = async (_category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => {};
+
+  // If not active, return empty/loading state so other hooks can be used
+  if (!isActive) {
+    return {
+      loading: true,
+      popularItems: [] as AnimeItem[],
+      airingItems: [] as AnimeItem[],
+      recentEpisodeItems: [] as AnimeItem[],
+      tvShowItems: [] as AnimeItem[],
+      heroAnime: null,
+      popularLoading: true,
+      airingLoading: true,
+      recentEpisodesLoading: true,
+      tvShowsLoading: true,
+      query,
+      setQuery,
+      searchResults,
+      isSearching,
+      loadMoreItems,
+      loadingMore,
+      hasMore: { popular: false, airing: false, recentEpisodes: false, tvShows: false },
+      mostFavoriteItems: [] as AnimeItem[],
+      latestCompletedItems: [] as AnimeItem[],
+      newAddedItems: [] as AnimeItem[],
+      topUpcomingItems: [] as AnimeItem[],
+      topTenItems: [] as AnimeItem[],
+      genres: [] as string[],
+    };
+  }
 
   return {
     loading,
