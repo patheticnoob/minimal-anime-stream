@@ -1,17 +1,9 @@
 import { useState, useEffect } from "react";
-import { useAction } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { AnimeItem } from "@/shared/types";
 import { logError, logInfo } from "@/lib/error-logger";
 import { fetchGojoHomeAll, searchGojo } from "@/lib/gojo-api";
 
 export function useAnimeListsGojo(isActive: boolean = true) {
-  useAction(api.hianime.topAiring);
-  useAction(api.hianime.mostPopular);
-  useAction(api.hianime.movies);
-  useAction(api.hianime.tvShows);
-  useAction(api.hianime.search);
-
   const [loading, setLoading] = useState(true);
   const [popularItems, setPopularItems] = useState<AnimeItem[]>([]);
   const [airingItems, setAiringItems] = useState<AnimeItem[]>([]);
@@ -37,10 +29,6 @@ export function useAnimeListsGojo(isActive: boolean = true) {
   const [searchResults, setSearchResults] = useState<AnimeItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const [popularHasMore] = useState(false);
-  const [airingHasMore] = useState(false);
-  const [recentEpisodesHasMore] = useState(false);
-  const [tvShowHasMore] = useState(false);
   const [loadingMore] = useState<string | null>(null);
 
   useEffect(() => {
@@ -143,10 +131,10 @@ export function useAnimeListsGojo(isActive: boolean = true) {
     loadMoreItems,
     loadingMore,
     hasMore: {
-      popular: popularHasMore,
-      airing: airingHasMore,
-      recentEpisodes: recentEpisodesHasMore,
-      tvShows: tvShowHasMore,
+      popular: false,
+      airing: false,
+      recentEpisodes: false,
+      tvShows: false,
     },
     // V5-only extras
     mostFavoriteItems,

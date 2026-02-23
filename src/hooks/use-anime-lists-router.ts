@@ -20,11 +20,11 @@ export function useAnimeListsRouter() {
 
   return {
     ...v1Data,
-    mostFavoriteItems: [],
-    latestCompletedItems: [],
-    newAddedItems: [],
-    topUpcomingItems: [],
-    topTenItems: [],
-    genres: [],
+    mostFavoriteItems: [] as any[],
+    latestCompletedItems: [] as any[],
+    newAddedItems: [] as any[],
+    topUpcomingItems: [] as any[],
+    topTenItems: [] as any[],
+    genres: [] as string[],
   };
 }

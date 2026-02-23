@@ -2,7 +2,6 @@ import { ContentRail } from "@/components/ContentRail";
 import { AnimeItem } from "@/shared/types";
 import { useTheme } from "@/hooks/use-theme";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDataFlow } from "@/hooks/use-data-flow";
 
 interface HomeSectionsProps {
   isAuthenticated: boolean;
@@ -84,13 +83,7 @@ export function HomeSections({
   genres = [],
 }: HomeSectionsProps) {
   const { theme } = useTheme();
-  const { dataFlow } = useDataFlow();
-  const isV5 = dataFlow === "v5";
-  
-  // Calculate rail indices accounting for hero banner (index 0)
-  let currentRailIndex = 1;
-  const getRailIndex = () => currentRailIndex++;
-  
+
   return (
     <div className="space-y-8">
       {/* Continue Watching */}
@@ -99,7 +92,7 @@ export function HomeSections({
           title="Continue Watching"
           items={continueWatchingItems}
           onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 0}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
@@ -111,7 +104,7 @@ export function HomeSections({
           title="My Watchlist"
           items={watchlistItems}
           onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 1}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
@@ -123,7 +116,7 @@ export function HomeSections({
           <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Trending Now</h2>
           <LoadingSkeleton />
         </div>
-      ) : (
+      ) : popularItems.length > 0 && (
         <ContentRail
           title="Trending Now"
           items={popularItems}
@@ -132,7 +125,7 @@ export function HomeSections({
           onLoadMore={() => onLoadMore('popular')}
           hasMore={hasMore.popular}
           isLoadingMore={loadingMore === 'popular'}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 2}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
@@ -144,7 +137,7 @@ export function HomeSections({
           <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Top Airing</h2>
           <LoadingSkeleton />
         </div>
-      ) : (
+      ) : airingItems.length > 0 && (
         <ContentRail
           title="Top Airing"
           items={airingItems}
@@ -153,7 +146,7 @@ export function HomeSections({
           onLoadMore={() => onLoadMore('airing')}
           hasMore={hasMore.airing}
           isLoadingMore={loadingMore === 'airing'}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 3}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
@@ -165,7 +158,7 @@ export function HomeSections({
           <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Recent Episodes</h2>
           <LoadingSkeleton />
         </div>
-      ) : (
+      ) : recentEpisodeItems.length > 0 && (
         <ContentRail
           title="Recent Episodes"
           items={recentEpisodeItems}
@@ -174,7 +167,7 @@ export function HomeSections({
           onLoadMore={() => onLoadMore('recentEpisodes')}
           hasMore={hasMore.recentEpisodes}
           isLoadingMore={loadingMore === 'recentEpisodes'}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 4}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
@@ -186,7 +179,7 @@ export function HomeSections({
           <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>TV Series</h2>
           <LoadingSkeleton />
         </div>
-      ) : (
+      ) : tvShowItems.length > 0 && (
         <ContentRail
           title="TV Series"
           items={tvShowItems}
@@ -195,74 +188,74 @@ export function HomeSections({
           onLoadMore={() => onLoadMore('tvShows')}
           hasMore={hasMore.tvShows}
           isLoadingMore={loadingMore === 'tvShows'}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 5}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
       )}
 
-      {/* V5-only: Most Favorite */}
-      {isV5 && mostFavoriteItems.length > 0 && (
+      {/* Most Favorite */}
+      {mostFavoriteItems.length > 0 && (
         <ContentRail
           title="Most Favorite"
           items={mostFavoriteItems}
           onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 6}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
       )}
 
-      {/* V5-only: New Additions */}
-      {isV5 && newAddedItems.length > 0 && (
+      {/* New Additions */}
+      {newAddedItems.length > 0 && (
         <ContentRail
           title="New Additions"
           items={newAddedItems}
           onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 7}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
       )}
 
-      {/* V5-only: Latest Completed */}
-      {isV5 && latestCompletedItems.length > 0 && (
+      {/* Latest Completed */}
+      {latestCompletedItems.length > 0 && (
         <ContentRail
           title="Latest Completed"
           items={latestCompletedItems}
           onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 8}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
       )}
 
-      {/* V5-only: Top Upcoming */}
-      {isV5 && topUpcomingItems.length > 0 && (
+      {/* Top Upcoming */}
+      {topUpcomingItems.length > 0 && (
         <ContentRail
           title="Top Upcoming"
           items={topUpcomingItems}
           onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 9}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
       )}
 
-      {/* V5-only: Top Ten Today */}
-      {isV5 && topTenItems.length > 0 && (
+      {/* Top Ten Today */}
+      {topTenItems.length > 0 && (
         <ContentRail
           title="Top 10 Today"
           items={topTenItems}
           onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === getRailIndex() - 1}
+          isFocused={focusedRailIndex === 10}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
       )}
 
-      {/* V5-only: Genres Strip */}
-      {isV5 && genres.length > 0 && (
+      {/* Genres Strip */}
+      {genres.length > 0 && (
         <div>
           <h2 className={`text-2xl font-bold mb-4 ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"}`}>Browse by Genre</h2>
           <div className="flex flex-wrap gap-2">
