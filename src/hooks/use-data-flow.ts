@@ -5,7 +5,8 @@ export function useDataFlow() {
   const dataFlowQuery = useQuery(api.dataFlow.getUserDataFlow);
   // undefined = still loading, string = resolved
   const isLoading = dataFlowQuery === undefined;
-  const dataFlow = dataFlowQuery ?? "v1";
+  // Don't default to v1 while loading - keep undefined so hooks wait
+  const dataFlow = dataFlowQuery ?? "v5";
   const setDataFlowMutation = useMutation(api.dataFlow.setUserDataFlow);
 
   const setDataFlow = async (flow: string) => {
