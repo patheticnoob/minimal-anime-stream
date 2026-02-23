@@ -3,12 +3,7 @@ import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { AnimeItem } from "@/shared/types";
 import { logError, logInfo } from "@/lib/error-logger";
-import {
-  fetchGojoSpotlight,
-  fetchGojoCategory,
-  searchGojo,
-  fetchGojoTopTen,
-} from "@/lib/gojo-api";
+import { fetchGojoHomeAll, searchGojo } from "@/lib/gojo-api";
 
 export function useAnimeListsGojo(isActive: boolean = true) {
   useAction(api.hianime.topAiring);
@@ -53,86 +48,43 @@ export function useAnimeListsGojo(isActive: boolean = true) {
 
     let mounted = true;
 
-    logInfo("Fetching spotlight from Gojo API", "Gojo Initial Load");
-    fetchGojoSpotlight()
-      .then(({ results }) => {
+    logInfo("Fetching all home data from Gojo API (single request)", "Gojo Initial Load");
+
+    fetchGojoHomeAll()
+      .then((data) => {
         if (!mounted) return;
-        setSpotlightItems(results);
-        if (results.length > 0) setHeroAnime(results[0]);
+
+        setSpotlightItems(data.spotlight);
+        if (data.spotlight.length > 0) setHeroAnime(data.spotlight[0]);
+
+        setPopularItems(data.popular);
+        setAiringItems(data.airing);
+        setRecentEpisodeItems(data.latestEpisode);
+        setTVShowItems(data.trending);
+        setMostFavoriteItems(data.mostFavorite);
+        setLatestCompletedItems(data.latestCompleted);
+        setNewAddedItems(data.newAdded);
+        setTopUpcomingItems(data.topUpcoming);
+        setTopTenItems(data.topTenToday);
+        setGenres(data.genres);
+
         setLoading(false);
-        logInfo(`✅ Gojo Spotlight loaded - ${results.length} items`, "Gojo Initial Load");
+        setPopularLoading(false);
+        setAiringLoading(false);
+        setRecentEpisodesLoading(false);
+        setTVShowsLoading(false);
+
+        logInfo(`✅ Gojo HomeAll loaded - spotlight:${data.spotlight.length} popular:${data.popular.length}`, "Gojo Initial Load");
       })
       .catch((err) => {
         if (!mounted) return;
-        logError("Gojo spotlight failed", "Gojo API", err instanceof Error ? err : undefined);
+        logError("Gojo homeAll failed", "Gojo API", err instanceof Error ? err : undefined);
         setLoading(false);
-      });
-
-    fetchGojoCategory("mostPopular")
-      .then(({ results }) => {
-        if (!mounted) return;
-        setPopularItems(results);
         setPopularLoading(false);
-      })
-      .catch(() => { if (mounted) setPopularLoading(false); });
-
-    fetchGojoCategory("topAiring")
-      .then(({ results }) => {
-        if (!mounted) return;
-        setAiringItems(results);
         setAiringLoading(false);
-      })
-      .catch(() => { if (mounted) setAiringLoading(false); });
-
-    fetchGojoCategory("latestEpisode")
-      .then(({ results }) => {
-        if (!mounted) return;
-        setRecentEpisodeItems(results);
         setRecentEpisodesLoading(false);
-      })
-      .catch(() => { if (mounted) setRecentEpisodesLoading(false); });
-
-    fetchGojoCategory("trending")
-      .then(({ results }) => {
-        if (!mounted) return;
-        setTVShowItems(results);
         setTVShowsLoading(false);
-      })
-      .catch(() => { if (mounted) setTVShowsLoading(false); });
-
-    // V5-only extra categories — fetch from home endpoint
-    fetchGojoCategory("mostFavorite")
-      .then(({ results }) => { if (mounted) setMostFavoriteItems(results); })
-      .catch(() => {});
-
-    fetchGojoCategory("latestCompleted")
-      .then(({ results }) => { if (mounted) setLatestCompletedItems(results); })
-      .catch(() => {});
-
-    fetchGojoCategory("newAdded")
-      .then(({ results }) => { if (mounted) setNewAddedItems(results); })
-      .catch(() => {});
-
-    fetchGojoCategory("topUpcoming")
-      .then(({ results }) => { if (mounted) setTopUpcomingItems(results); })
-      .catch(() => {});
-
-    // Top Ten today
-    fetchGojoTopTen("today")
-      .then(({ results }) => { if (mounted) setTopTenItems(results); })
-      .catch(() => {});
-
-    // Genres from home
-    import("@/lib/gojo-api").then(({ fetchGojoHome: _fetchGojoHome }) => {
-      fetch("https://gojoback.zeabur.app/api/v1/home")
-        .then(r => r.json())
-        .then((data: any) => {
-          if (mounted && data?.success && Array.isArray(data?.data?.genres)) {
-            setGenres(data.data.genres);
-          }
-        })
-        .catch(() => {});
-    });
+      });
 
     return () => { mounted = false; };
   }, [isActive]);

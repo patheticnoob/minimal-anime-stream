@@ -341,3 +341,65 @@ export async function fetchGojoServers(episodeId: string): Promise<GojoServersDa
     return null;
   }
 }
+
+/**
+ * Fetch ALL home page data in a single request and return all categories
+ */
+export async function fetchGojoHomeAll(): Promise<{
+  spotlight: AnimeItem[];
+  popular: AnimeItem[];
+  airing: AnimeItem[];
+  latestEpisode: AnimeItem[];
+  trending: AnimeItem[];
+  mostFavorite: AnimeItem[];
+  latestCompleted: AnimeItem[];
+  newAdded: AnimeItem[];
+  topUpcoming: AnimeItem[];
+  topTenToday: AnimeItem[];
+  genres: string[];
+}> {
+  const empty = {
+    spotlight: [],
+    popular: [],
+    airing: [],
+    latestEpisode: [],
+    trending: [],
+    mostFavorite: [],
+    latestCompleted: [],
+    newAdded: [],
+    topUpcoming: [],
+    topTenToday: [],
+    genres: [],
+  };
+
+  try {
+    const [homeRes, spotlightRes] = await Promise.all([
+      fetch(`${GOJO_API_BASE}/home`),
+      fetch(`${GOJO_API_BASE}/spotlight`),
+    ]);
+
+    const homeData: GojoResponse<GojoHomeData> = homeRes.ok ? await homeRes.json() : { success: false, data: {} as GojoHomeData };
+    const spotlightData: GojoResponse<GojoAnimeItem[]> = spotlightRes.ok ? await spotlightRes.json() : { success: false, data: [] };
+
+    if (!homeData.success) return empty;
+
+    const d = homeData.data;
+
+    return {
+      spotlight: spotlightData.success ? spotlightData.data.map(i => convertToAnimeItem(i, "spotlight")) : (d.spotlight || []).map(i => convertToAnimeItem(i, "spotlight")),
+      popular: (d.mostPopular || []).map(i => convertToAnimeItem(i, "mostPopular")),
+      airing: (d.topAiring || []).map(i => convertToAnimeItem(i, "topAiring")),
+      latestEpisode: (d.latestEpisode || []).map(i => convertToAnimeItem(i, "latestEpisode")),
+      trending: (d.trending || []).map(i => convertToAnimeItem(i, "trending")),
+      mostFavorite: (d.mostFavorite || []).map(i => convertToAnimeItem(i, "mostFavorite")),
+      latestCompleted: (d.latestCompleted || []).map(i => convertToAnimeItem(i, "latestCompleted")),
+      newAdded: (d.newAdded || []).map(i => convertToAnimeItem(i, "newAdded")),
+      topUpcoming: (d.topUpcoming || []).map(i => convertToAnimeItem(i, "topUpcoming")),
+      topTenToday: (d.topTen?.today || []).map(i => convertToAnimeItem(i, "topten")),
+      genres: Array.isArray(d.genres) ? d.genres : [],
+    };
+  } catch (error) {
+    console.error("[Gojo API] HomeAll Error:", error);
+    return empty;
+  }
+}
