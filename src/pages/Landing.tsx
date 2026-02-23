@@ -23,6 +23,7 @@ import { useDataFlow } from "@/hooks/use-data-flow";
 import { AnimatePresence } from "framer-motion";
 import { pageCache } from "@/lib/page-cache";
 import { preloadOnHomepage } from "@/lib/video-player-preload";
+import { Footer } from "@/components/Footer";
 
 // Track if this is the first load
 const getHasLoadedBefore = () => {
@@ -547,6 +548,8 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
         audioPreference={audioPreference}
         onAudioPreferenceChange={handleAudioPreferenceChange}
       />
+
+      <Footer />
 
       {videoSource && currentEpisodeData && (
         <>
