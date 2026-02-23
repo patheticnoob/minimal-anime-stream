@@ -15,13 +15,13 @@ export type GojoAnimeItem = {
   alternativeTitle?: string;
   id: string;
   poster: string;
-  episodes: {
+  episodes?: {
     sub: number;
     dub: number;
     eps: number;
   };
   rank?: number;
-  type: string;
+  type?: string;
   quality?: string;
   duration?: string;
   aired?: string;
@@ -51,7 +51,7 @@ export type GojoAnimeDetails = {
   alternativeTitle?: string;
   id: string;
   poster: string;
-  episodes: {
+  episodes?: {
     sub: number;
     dub: number;
     eps: number;
@@ -120,18 +120,19 @@ export type GojoSearchResult = {
 // ─── Converter ───────────────────────────────────────────────────────────────
 
 function convertToAnimeItem(item: GojoAnimeItem, category?: string): AnimeItem {
+  const episodes = item.episodes || { sub: 0, dub: 0, eps: 0 };
   return {
     id: item.id,
     dataId: item.id,
     title: item.title,
     alternativeTitle: item.alternativeTitle,
     image: item.poster,
-    type: item.type,
+    type: item.type || "TV",
     language: {
-      sub: item.episodes.sub > 0 ? String(item.episodes.sub) : null,
-      dub: item.episodes.dub > 0 ? String(item.episodes.dub) : null,
+      sub: episodes.sub > 0 ? String(episodes.sub) : null,
+      dub: episodes.dub > 0 ? String(episodes.dub) : null,
     },
-    totalEpisodes: item.episodes.eps,
+    totalEpisodes: episodes.eps,
     duration: item.duration ? parseFloat(item.duration) : undefined,
     synopsis: item.synopsis,
     aired: item.aired,
@@ -266,18 +267,19 @@ export async function fetchGojoAnimeDetails(animeId: string): Promise<AnimeItem 
     if (!data.success) return null;
 
     const anime = data.data;
+    const episodes = anime.episodes || { sub: 0, dub: 0, eps: 0 };
     return {
       id: anime.id,
       dataId: anime.id,
       title: anime.title,
       alternativeTitle: anime.alternativeTitle,
       image: anime.poster,
-      type: anime.type,
+      type: anime.type || "TV",
       language: {
-        sub: anime.episodes.sub > 0 ? String(anime.episodes.sub) : null,
-        dub: anime.episodes.dub > 0 ? String(anime.episodes.dub) : null,
+        sub: episodes.sub > 0 ? String(episodes.sub) : null,
+        dub: episodes.dub > 0 ? String(episodes.dub) : null,
       },
-      totalEpisodes: anime.episodes.eps,
+      totalEpisodes: episodes.eps,
       duration: anime.duration ? parseFloat(anime.duration) : undefined,
       synopsis: anime.synopsis,
       rating: anime.rating,
