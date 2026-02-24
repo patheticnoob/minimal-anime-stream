@@ -145,7 +145,7 @@ export function HomeSections({
                 {spotlightItems.slice(-4).map((item, idx) => (
                   <div 
                     key={item.id ?? idx} 
-                    className="relative aspect-[16/10] rounded-[24px] overflow-hidden cursor-pointer group bg-[#151821] border border-[var(--nothing-border)] hover:border-[var(--nothing-gray-3)] transition-colors"
+                    className="relative aspect-[16/10] rounded-[24px] overflow-hidden cursor-pointer group bg-[#151821] border border-[var(--nothing-border)] hover:border-[var(--nothing-accent)] hover:shadow-[0_0_20px_rgba(229,9,20,0.2)] transition-all duration-300"
                     onClick={() => onOpenAnime(item)}
                   >
                     {item.image ? (
@@ -168,7 +168,7 @@ export function HomeSections({
                       )}
                       <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-150">
                         <button 
-                          className="px-6 py-2 bg-[var(--nothing-fg)] text-[#0B0F19] rounded-full text-sm font-bold hover:bg-[var(--nothing-gray-2)] transition-colors flex items-center gap-2"
+                          className="px-6 py-2 bg-[var(--nothing-accent)] text-white rounded-full text-sm font-bold hover:bg-red-700 transition-colors flex items-center gap-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             onOpenAnime(item);
@@ -178,7 +178,7 @@ export function HomeSections({
                           Play Now
                         </button>
                         <button 
-                          className="px-6 py-2 bg-[var(--nothing-elevated)] text-[var(--nothing-fg)] rounded-full text-sm font-bold hover:bg-[var(--nothing-gray-5)] transition-colors border border-[var(--nothing-border)]"
+                          className="px-6 py-2 bg-[var(--nothing-elevated)] text-[var(--nothing-fg)] rounded-full text-sm font-bold hover:bg-[var(--nothing-gray-5)] transition-colors border border-[var(--nothing-border)] hover:border-[var(--nothing-accent)] hover:text-[var(--nothing-accent)]"
                           onClick={(e) => {
                             e.stopPropagation();
                             onOpenAnime(item);
@@ -190,7 +190,7 @@ export function HomeSections({
                     </div>
 
                     {/* Top right bookmark icon */}
-                    <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[var(--nothing-elevated)]/80 backdrop-blur-md flex items-center justify-center text-[var(--nothing-gray-4)] hover:text-[var(--nothing-fg)] hover:bg-[var(--nothing-gray-5)] transition-colors border border-[var(--nothing-border)]">
+                    <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[var(--nothing-elevated)]/80 backdrop-blur-md flex items-center justify-center text-[var(--nothing-gray-4)] hover:text-[var(--nothing-accent)] hover:bg-[var(--nothing-gray-5)] transition-colors border border-[var(--nothing-border)] hover:border-[var(--nothing-accent)]">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                     </div>
                   </div>
