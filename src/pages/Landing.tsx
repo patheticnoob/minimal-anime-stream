@@ -454,19 +454,26 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
       <main className={theme === "nothing" ? "pt-24 transition-all duration-300" : "md:ml-20 transition-all duration-300"}>
         <div className="px-6 md:px-10 pb-10 pt-8 max-w-[2000px] mx-auto">
           {activeSection === "search" ? (
-            <div className="mt-8">
-              <h2 className="text-3xl font-bold mb-6 tracking-tight">Search Anime</h2>
-              <div className="relative max-w-2xl mb-8">
+            <div className={`mt-8 ${theme === "nothing" ? "flex flex-col items-center" : ""}`}>
+              <h2 className={`font-bold mb-6 tracking-tight ${theme === "nothing" ? "text-2xl uppercase tracking-[0.2em] font-mono text-center" : "text-3xl"}`}>
+                {theme === "nothing" ? "SEARCH ANIME" : "Search Anime"}
+              </h2>
+              <div className={`relative mb-8 ${theme === "nothing" ? "w-full max-w-2xl" : "max-w-2xl"}`}>
                 <input
                   type="text"
-                  placeholder="Search for anime..."
+                  placeholder={theme === "nothing" ? "SEARCH FOR ANIME..." : "Search for anime..."}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   autoFocus
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-6 py-4 text-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  className={theme === "nothing"
+                    ? "w-full bg-[var(--nothing-elevated)] border-2 border-[var(--nothing-border)] rounded-full px-8 py-4 text-[var(--nothing-fg)] text-base font-mono uppercase tracking-wider placeholder-[var(--nothing-gray-4)] focus:outline-none focus:border-[var(--nothing-accent)] focus:shadow-[0_0_20px_rgba(229,9,20,0.2)] transition-all"
+                    : "w-full bg-white/5 border border-white/10 rounded-lg px-6 py-4 text-white text-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  }
                 />
               </div>
-              <SearchSection query={query} onItemClick={openAnime} />
+              <div className={theme === "nothing" ? "w-full" : ""}>
+                <SearchSection query={query} onItemClick={openAnime} />
+              </div>
             </div>
           ) : activeSection === "profile" ? (
             <ProfileDashboard
