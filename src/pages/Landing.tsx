@@ -89,6 +89,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     setAnimeDataQuery(newQuery);
     if (newQuery) {
       setSearchParams({ section: "search", q: newQuery });
+      setActiveSection("search");
     } else if (activeSection === "search") {
       setSearchParams({ section: "search" });
     }
@@ -467,6 +468,33 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                 setActiveSection("home");
               }}
             />
+          ) : activeSection === "genres" ? (
+            <div className="mt-8 max-w-5xl mx-auto">
+              <h2 className="text-3xl font-bold mb-8 tracking-tight uppercase">Genres</h2>
+              {animeData.genres.length > 0 ? (
+                <div className="flex flex-wrap gap-3 md:gap-4">
+                  {animeData.genres.map((genre) => (
+                    <button
+                      key={genre}
+                      onClick={() => {
+                        setQuery(genre);
+                      }}
+                      className={
+                        theme === "nothing"
+                          ? "px-5 py-2.5 rounded-full text-sm font-semibold transition-colors bg-[#151821] text-[var(--nothing-gray-4)] border border-white/5 hover:text-[var(--nothing-fg)] hover:border-white/20 hover:bg-[#1a1f2e] capitalize"
+                          : "px-5 py-2.5 rounded-full text-sm font-semibold transition-colors bg-white/5 text-white/80 border border-white/10 hover:bg-white/20 hover:text-white capitalize"
+                      }
+                    >
+                      {genre}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 py-20">
+                  No genres available at the moment.
+                </div>
+              )}
+            </div>
           ) : (
             <>
               {activeSection === "home" && (
