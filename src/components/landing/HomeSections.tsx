@@ -2,6 +2,7 @@ import { ContentRail } from "@/components/ContentRail";
 import { AnimeItem } from "@/shared/types";
 import { useTheme } from "@/hooks/use-theme";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CompactListSection, CompactSkeleton } from "./CompactListSection";
 
 interface HomeSectionsProps {
   isAuthenticated: boolean;
@@ -146,47 +147,23 @@ export function HomeSections({
             />
           )}
 
-          {/* Trending Now */}
-          {popularLoading ? (
-            <div className="bg-[#151821] rounded-[24px] p-5 mb-6">
-              <h2 className="text-lg md:text-xl font-bold text-[var(--nothing-fg)] tracking-wide uppercase mb-4 px-2">Trending Now</h2>
-              <LoadingSkeleton />
-            </div>
-          ) : popularItems.length > 0 && (
-            <ContentRail
-              title="Trending Now"
-              items={popularItems}
-              onItemClick={onOpenAnime}
-              enableInfiniteScroll
-              onLoadMore={() => onLoadMore('popular')}
-              hasMore={hasMore.popular}
-              isLoadingMore={loadingMore === 'popular'}
-              isFocused={focusedRailIndex === 2}
-              focusedItemIndex={focusedItemIndex}
-              isNavigatingRails={isNavigatingRails}
-            />
-          )}
+          {/* Compact Sections Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {popularLoading ? (
+              <CompactSkeleton title="Trending Now" theme={theme} />
+            ) : (
+              <CompactListSection title="Trending Now" items={popularItems} onOpenAnime={onOpenAnime} theme={theme} />
+            )}
 
-          {/* Top Airing */}
-          {airingLoading ? (
-            <div className="bg-[#151821] rounded-[24px] p-5 mb-6">
-              <h2 className="text-lg md:text-xl font-bold text-[var(--nothing-fg)] tracking-wide uppercase mb-4 px-2">Top Airing</h2>
-              <LoadingSkeleton />
-            </div>
-          ) : airingItems.length > 0 && (
-            <ContentRail
-              title="Top Airing"
-              items={airingItems}
-              onItemClick={onOpenAnime}
-              enableInfiniteScroll
-              onLoadMore={() => onLoadMore('airing')}
-              hasMore={hasMore.airing}
-              isLoadingMore={loadingMore === 'airing'}
-              isFocused={focusedRailIndex === 3}
-              focusedItemIndex={focusedItemIndex}
-              isNavigatingRails={isNavigatingRails}
-            />
-          )}
+            {airingLoading ? (
+              <CompactSkeleton title="Top Airing" theme={theme} />
+            ) : (
+              <CompactListSection title="Top Airing" items={airingItems} onOpenAnime={onOpenAnime} theme={theme} />
+            )}
+
+            <CompactListSection title="Most Favorite" items={mostFavoriteItems} onOpenAnime={onOpenAnime} theme={theme} />
+            <CompactListSection title="Latest Completed" items={latestCompletedItems} onOpenAnime={onOpenAnime} theme={theme} />
+          </div>
 
           {/* TV Series */}
           {tvShowsLoading ? (
@@ -328,47 +305,23 @@ export function HomeSections({
         />
       )}
 
-      {/* Trending Now */}
-      {popularLoading ? (
-        <div>
-          <h2 className={`text-2xl font-bold mb-4 text-white`}>Trending Now</h2>
-          <LoadingSkeleton />
-        </div>
-      ) : popularItems.length > 0 && (
-        <ContentRail
-          title="Trending Now"
-          items={popularItems}
-          onItemClick={onOpenAnime}
-          enableInfiniteScroll
-          onLoadMore={() => onLoadMore('popular')}
-          hasMore={hasMore.popular}
-          isLoadingMore={loadingMore === 'popular'}
-          isFocused={focusedRailIndex === 2}
-          focusedItemIndex={focusedItemIndex}
-          isNavigatingRails={isNavigatingRails}
-        />
-      )}
+      {/* Compact Sections Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {popularLoading ? (
+          <CompactSkeleton title="Trending Now" theme={theme} />
+        ) : (
+          <CompactListSection title="Trending Now" items={popularItems} onOpenAnime={onOpenAnime} theme={theme} />
+        )}
 
-      {/* Top Airing */}
-      {airingLoading ? (
-        <div>
-          <h2 className={`text-2xl font-bold mb-4 text-white`}>Top Airing</h2>
-          <LoadingSkeleton />
-        </div>
-      ) : airingItems.length > 0 && (
-        <ContentRail
-          title="Top Airing"
-          items={airingItems}
-          onItemClick={onOpenAnime}
-          enableInfiniteScroll
-          onLoadMore={() => onLoadMore('airing')}
-          hasMore={hasMore.airing}
-          isLoadingMore={loadingMore === 'airing'}
-          isFocused={focusedRailIndex === 3}
-          focusedItemIndex={focusedItemIndex}
-          isNavigatingRails={isNavigatingRails}
-        />
-      )}
+        {airingLoading ? (
+          <CompactSkeleton title="Top Airing" theme={theme} />
+        ) : (
+          <CompactListSection title="Top Airing" items={airingItems} onOpenAnime={onOpenAnime} theme={theme} />
+        )}
+
+        <CompactListSection title="Most Favorite" items={mostFavoriteItems} onOpenAnime={onOpenAnime} theme={theme} />
+        <CompactListSection title="Latest Completed" items={latestCompletedItems} onOpenAnime={onOpenAnime} theme={theme} />
+      </div>
 
       {/* Recent Episodes */}
       {recentEpisodesLoading ? (
@@ -412,18 +365,6 @@ export function HomeSections({
         />
       )}
 
-      {/* Most Favorite */}
-      {mostFavoriteItems.length > 0 && (
-        <ContentRail
-          title="Most Favorite"
-          items={mostFavoriteItems}
-          onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === 6}
-          focusedItemIndex={focusedItemIndex}
-          isNavigatingRails={isNavigatingRails}
-        />
-      )}
-
       {/* New Additions */}
       {newAddedItems.length > 0 && (
         <ContentRail
@@ -431,18 +372,6 @@ export function HomeSections({
           items={newAddedItems}
           onItemClick={onOpenAnime}
           isFocused={focusedRailIndex === 7}
-          focusedItemIndex={focusedItemIndex}
-          isNavigatingRails={isNavigatingRails}
-        />
-      )}
-
-      {/* Latest Completed */}
-      {latestCompletedItems.length > 0 && (
-        <ContentRail
-          title="Latest Completed"
-          items={latestCompletedItems}
-          onItemClick={onOpenAnime}
-          isFocused={focusedRailIndex === 8}
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
