@@ -35,7 +35,7 @@ interface AnimeCardProps {
 }
 
 function AnimeCardSkeleton({ variant = "portrait", theme }: { variant?: "portrait" | "landscape"; theme: string }) {
-  const aspectRatioClass = variant === "landscape" ? "aspect-[1.45/1]" : "aspect-[2/3]";
+  const aspectRatioClass = variant === "landscape" ? "aspect-[1.45/1]" : (theme === "nothing" ? "aspect-[3/4]" : "aspect-[2/3]");
   const borderRadiusClass = theme === "nothing" ? "rounded-[28px]" : "rounded-[4px]";
 
   return (

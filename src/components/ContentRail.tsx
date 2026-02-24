@@ -34,8 +34,8 @@ interface ContentRailProps {
 }
 
 function RailSkeleton({ variant = "portrait", theme }: { variant?: "portrait" | "landscape"; theme: string }) {
-  const itemWidth = variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]";
-  const aspectRatio = variant === "landscape" ? "aspect-[1.45/1]" : "aspect-[2/3]";
+  const itemWidth = variant === "landscape" ? "w-[140px] md:w-[170px]" : (theme === "nothing" ? "w-[110px] md:w-[140px]" : "w-[95px] md:w-[120px]");
+  const aspectRatio = variant === "landscape" ? "aspect-[1.45/1]" : (theme === "nothing" ? "aspect-[3/4]" : "aspect-[2/3]");
   const borderRadius = theme === "nothing" ? "rounded-[28px]" : "rounded-[4px]";
   
   return (
@@ -117,8 +117,8 @@ export function ContentRail({
 
   if (isLoading) {
     return (
-      <section className="content-rail mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="content-rail-header flex items-center justify-between mb-4 px-4 md:px-0">
+      <section className={`content-rail animate-in fade-in slide-in-from-bottom-4 duration-500 ${theme === "nothing" ? "bg-[#151821] rounded-[24px] p-5 mb-6" : "mb-8"}`}>
+        <div className={`content-rail-header flex items-center justify-between mb-4 ${theme === "nothing" ? "px-2" : "px-4 md:px-0"}`}>
           <h2 className={`text-lg md:text-xl font-bold ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"} tracking-wide uppercase`}>
             {title}
           </h2>
@@ -149,8 +149,8 @@ export function ContentRail({
   }, [enableInfiniteScroll, hasMore, onLoadMore]);
 
   return (
-    <section className={`content-rail mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ${isFocused && isNavigatingRails ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0B0F19] rounded-lg p-2" : ""}`}>
-      <div className="content-rail-header flex items-center justify-between mb-4 px-4 md:px-0">
+    <section className={`content-rail animate-in fade-in slide-in-from-bottom-4 duration-500 ${isFocused && isNavigatingRails ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0B0F19] rounded-lg p-2" : ""} ${theme === "nothing" ? "bg-[#151821] rounded-[24px] p-5 mb-6" : "mb-8"}`}>
+      <div className={`content-rail-header flex items-center justify-between mb-4 ${theme === "nothing" ? "px-2" : "px-4 md:px-0"}`}>
         <h2 className={`text-lg md:text-xl font-bold ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"} tracking-wide uppercase`}>
           {title}
         </h2>
@@ -197,13 +197,13 @@ export function ContentRail({
 
         <div
           ref={scrollRef}
-          className={`content-rail-scroll flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-4 md:px-0 ${theme === "nothing" ? "pb-0" : "pb-4"}`}
+          className={`content-rail-scroll flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory ${theme === "nothing" ? "px-2 pb-2" : "px-4 md:px-0 pb-4"}`}
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {displayedItems.map((item, idx) => (
             <div
               key={item.id ?? item.dataId ?? idx}
-              className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"} ${
+              className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : (theme === "nothing" ? "w-[110px] md:w-[140px]" : "w-[95px] md:w-[120px]")} ${
                 isFocused && !isNavigatingRails && focusedItemIndex === idx 
                   ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0B0F19] rounded-lg scale-105 transition-all" 
                   : ""
@@ -220,7 +220,7 @@ export function ContentRail({
           
           {/* Show More Button */}
           {(canShowMore || (hasMore && !isLoadingMore)) && (
-            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"} flex items-center justify-center`}>
+            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : (theme === "nothing" ? "w-[110px] md:w-[140px]" : "w-[95px] md:w-[120px]")} flex items-center justify-center`}>
               <Button
                 variant="outline"
                 size="sm"
@@ -235,7 +235,7 @@ export function ContentRail({
           
           {/* Loading Indicator */}
           {isLoadingMore && (
-            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : "w-[95px] md:w-[120px]"} flex items-center justify-center`}>
+            <div className={`content-rail-card flex-none snap-start ${variant === "landscape" ? "w-[140px] md:w-[170px]" : (theme === "nothing" ? "w-[110px] md:w-[140px]" : "w-[95px] md:w-[120px]")} flex items-center justify-center`}>
               <div className={`h-full w-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)] border-2 border-[var(--nothing-border)]" : "bg-white/5 border border-white/10"} rounded-md flex items-center justify-center`}>
                 <div className={`animate-spin h-8 w-8 border-2 ${theme === "nothing" ? "border-[var(--nothing-accent)] border-t-transparent" : "border-blue-500 border-t-transparent"} rounded-full`} />
               </div>
