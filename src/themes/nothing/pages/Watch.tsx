@@ -957,6 +957,7 @@ export default function NothingWatch() {
               episodesLoading={episodesLoading}
               currentEpisodeId={currentEpisodeData?.id}
               onPlayEpisode={playEpisode}
+              animeProgress={animeProgress ?? null}
             />
           </div>
         </div>
