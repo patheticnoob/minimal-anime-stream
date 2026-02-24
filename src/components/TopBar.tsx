@@ -26,6 +26,7 @@ export function TopBar({
 }: TopBarProps) {
   const navItems = [
     { id: "home", label: "HOME" },
+    { id: "genres", label: "GENRES" },
     { id: "tv", label: "BROWSE" },
     { id: "movies", label: "MOVIES" },
     { id: "recent", label: "TV SHOWS" },

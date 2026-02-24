@@ -1,4 +1,4 @@
-import { Home, Search, Tv, Film, Sparkles, User, Menu, X } from "lucide-react";
+import { Home, Search, Tv, Film, Sparkles, User, Menu, X, List } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useGamepad, GAMEPAD_BUTTONS } from "@/hooks/use-gamepad";
 import { GamepadSettings } from "@/components/GamepadSettings";
@@ -15,6 +15,7 @@ export function Sidebar({ activeSection = "home", onSectionChange }: SidebarProp
 
   const navItems = [
     { id: "home", label: "Home", icon: Home },
+    { id: "genres", label: "Genres", icon: List },
     { id: "search", label: "Search", icon: Search },
     { id: "tv", label: "TV", icon: Tv },
     { id: "movies", label: "Movies", icon: Film },

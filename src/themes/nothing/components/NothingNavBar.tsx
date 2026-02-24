@@ -12,6 +12,7 @@ interface NothingNavBarProps {
 
 const navItems = [
   { id: "home", label: "Home" },
+  { id: "genres", label: "Genres" },
   { id: "tv", label: "Browse" },
   { id: "movies", label: "Movies" },
   { id: "recent", label: "Recent" },
