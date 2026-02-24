@@ -111,7 +111,7 @@ importers:
         specifier: ^0.177.0
         version: 0.177.0
       '@vly-ai/integrations':
-        specifier: ^0.6.2
+        specifier: 0.6.2
         version: 0.6.2
       '@zumer/snapdom':
         specifier: ^1.7.1
