@@ -82,6 +82,9 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     setGenreQuery,
     genreResults,
     isGenreLoading,
+    loadMoreGenres,
+    hasMoreGenre,
+    isGenreLoadingMore,
     loadMoreItems,
     loadingMore,
     hasMore
@@ -485,16 +488,36 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                 </div>
               ) : genreResults && genreResults.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-                  {genreResults.map((item, idx) => (
-                    <AnimeCard 
-                      key={item.id ?? idx} 
-                      anime={item} 
-                      onClick={() => openAnime(item)} 
-                      index={idx}
-                    />
-                  ))}
-                </div>
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                    {genreResults.map((item, idx) => (
+                      <AnimeCard 
+                        key={item.id ?? idx} 
+                        anime={item} 
+                        onClick={() => openAnime(item)} 
+                        index={idx}
+                      />
+                    ))}
+                  </div>
+                  {hasMoreGenre && (
+                    <div className="mt-10 flex justify-center">
+                      <button
+                        onClick={loadMoreGenres}
+                        disabled={isGenreLoadingMore}
+                        className="px-8 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {isGenreLoadingMore ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          "Load More"
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="text-center text-gray-500 py-20">
                   No anime found for this genre.
@@ -506,25 +529,36 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
               <h2 className="text-3xl font-bold mb-8 tracking-tight uppercase">Genres</h2>
               {animeData.genres.length > 0 ? (
                 <div className="flex flex-wrap gap-3 md:gap-4">
-                  {animeData.genres.map((genre) => (
-                    <button
-                      key={genre}
-                      onClick={() => {
-                        if (setGenreQuery) {
-                          setGenreQuery(genre);
+                  {animeData.genres.map((genre) => {
+                    const isSelected = genreQuery.toLowerCase() === genre.toLowerCase();
+                    return (
+                      <button
+                        key={genre}
+                        onClick={() => {
+                          if (setGenreQuery) {
+                            setGenreQuery(genre);
+                          }
+                          setSearchParams({ section: "genre", q: genre });
+                          setActiveSection("genre");
+                        }}
+                        className={
+                          theme === "nothing"
+                            ? `px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+                                isSelected 
+                                  ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)] scale-105" 
+                                  : "bg-[#151821] text-[var(--nothing-gray-4)] border border-white/5 hover:text-[var(--nothing-fg)] hover:border-white/20 hover:bg-[#1a1f2e]"
+                              } capitalize`
+                            : `px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+                                isSelected
+                                  ? "bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)] scale-105 border-transparent"
+                                  : "bg-white/5 text-white/80 border border-white/10 hover:bg-white/20 hover:text-white"
+                              } capitalize`
                         }
-                        setSearchParams({ section: "genre", q: genre });
-                        setActiveSection("genre");
-                      }}
-                      className={
-                        theme === "nothing"
-                          ? "px-5 py-2.5 rounded-full text-sm font-semibold transition-colors bg-[#151821] text-[var(--nothing-gray-4)] border border-white/5 hover:text-[var(--nothing-fg)] hover:border-white/20 hover:bg-[#1a1f2e] capitalize"
-                          : "px-5 py-2.5 rounded-full text-sm font-semibold transition-colors bg-white/5 text-white/80 border border-white/10 hover:bg-white/20 hover:text-white capitalize"
-                      }
-                    >
-                      {genre}
-                    </button>
-                  ))}
+                      >
+                        {genre}
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center text-gray-500 py-20">

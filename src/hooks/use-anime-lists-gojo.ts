@@ -32,6 +32,9 @@ export function useAnimeListsGojo(isActive: boolean = true) {
   const [genreQuery, setGenreQuery] = useState("");
   const [genreResults, setGenreResults] = useState<AnimeItem[]>([]);
   const [isGenreLoading, setIsGenreLoading] = useState(false);
+  const [genrePage, setGenrePage] = useState(1);
+  const [hasMoreGenre, setHasMoreGenre] = useState(false);
+  const [isGenreLoadingMore, setIsGenreLoadingMore] = useState(false);
 
   const [loadingMore] = useState<string | null>(null);
 
@@ -119,21 +122,42 @@ export function useAnimeListsGojo(isActive: boolean = true) {
     if (!genreQuery.trim()) {
       setGenreResults([]);
       setIsGenreLoading(false);
+      setGenrePage(1);
+      setHasMoreGenre(false);
       return;
     }
     setIsGenreLoading(true);
+    setGenrePage(1);
     const timeoutId = setTimeout(async () => {
       try {
-        const { results } = await fetchGojoGenre(genreQuery.trim().toLowerCase());
+        const { results, hasNextPage } = await fetchGojoGenre(genreQuery.trim().toLowerCase(), 1);
         setGenreResults(results);
+        setHasMoreGenre(hasNextPage);
       } catch {
         setGenreResults([]);
+        setHasMoreGenre(false);
       } finally {
         setIsGenreLoading(false);
       }
     }, 500);
     return () => clearTimeout(timeoutId);
   }, [genreQuery]);
+
+  const loadMoreGenres = async () => {
+    if (isGenreLoadingMore || !hasMoreGenre || !genreQuery.trim()) return;
+    setIsGenreLoadingMore(true);
+    try {
+      const nextPage = genrePage + 1;
+      const { results, hasNextPage } = await fetchGojoGenre(genreQuery.trim().toLowerCase(), nextPage);
+      setGenreResults(prev => [...prev, ...results]);
+      setGenrePage(nextPage);
+      setHasMoreGenre(hasNextPage);
+    } catch (error) {
+      console.error("Failed to load more genres", error);
+    } finally {
+      setIsGenreLoadingMore(false);
+    }
+  };
 
   const loadMoreItems = async (_category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => {};
 
@@ -158,6 +182,9 @@ export function useAnimeListsGojo(isActive: boolean = true) {
       setGenreQuery,
       genreResults,
       isGenreLoading,
+      loadMoreGenres: async () => {},
+      hasMoreGenre: false,
+      isGenreLoadingMore: false,
       loadMoreItems,
       loadingMore,
       hasMore: { popular: false, airing: false, recentEpisodes: false, tvShows: false },
@@ -189,6 +216,9 @@ export function useAnimeListsGojo(isActive: boolean = true) {
     setGenreQuery,
     genreResults,
     isGenreLoading,
+    loadMoreGenres,
+    hasMoreGenre,
+    isGenreLoadingMore,
     loadMoreItems,
     loadingMore,
     hasMore: {

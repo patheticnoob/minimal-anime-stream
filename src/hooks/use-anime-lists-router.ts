@@ -30,5 +30,8 @@ export function useAnimeListsRouter() {
     setGenreQuery: (_q: string) => {},
     genreResults: [] as any[],
     isGenreLoading: false,
+    loadMoreGenres: async () => {},
+    hasMoreGenre: false,
+    isGenreLoadingMore: false,
   };
 }
