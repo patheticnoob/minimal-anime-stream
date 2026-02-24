@@ -87,7 +87,8 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     isGenreLoadingMore,
     loadMoreItems,
     loadingMore,
-    hasMore
+    hasMore,
+    spotlightItems
   } = animeData;
 
   // Sync query with URL params
@@ -618,6 +619,7 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                   topUpcomingItems={animeData.topUpcomingItems}
                   topTenItems={animeData.topTenItems}
                   genres={animeData.genres}
+                  spotlightItems={spotlightItems}
                 />
               )}
             </>

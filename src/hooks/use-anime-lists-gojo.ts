@@ -194,6 +194,7 @@ export function useAnimeListsGojo(isActive: boolean = true) {
       topUpcomingItems: [] as AnimeItem[],
       topTenItems: [] as AnimeItem[],
       genres: [] as string[],
+      spotlightItems: [] as AnimeItem[],
     };
   }
 
@@ -234,5 +235,6 @@ export function useAnimeListsGojo(isActive: boolean = true) {
     topUpcomingItems,
     topTenItems,
     genres,
+    spotlightItems,
   };
 }

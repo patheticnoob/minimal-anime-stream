@@ -33,5 +33,6 @@ export function useAnimeListsRouter() {
     loadMoreGenres: async () => {},
     hasMoreGenre: false,
     isGenreLoadingMore: false,
+    spotlightItems: [] as any[],
   };
 }

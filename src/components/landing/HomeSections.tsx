@@ -35,6 +35,7 @@ interface HomeSectionsProps {
   topUpcomingItems?: AnimeItem[];
   topTenItems?: AnimeItem[];
   genres?: string[];
+  spotlightItems?: AnimeItem[];
 }
 
 function LoadingSkeleton() {
@@ -82,6 +83,7 @@ export function HomeSections({
   topUpcomingItems = [],
   topTenItems = [],
   genres = [],
+  spotlightItems = [],
 }: HomeSectionsProps) {
   const { theme } = useTheme();
 
@@ -133,6 +135,68 @@ export function HomeSections({
               focusedItemIndex={focusedItemIndex}
               isNavigatingRails={isNavigatingRails}
             />
+          )}
+
+          {/* Spotlight Collage */}
+          {spotlightItems.length >= 4 && (
+            <div className="mb-6">
+              <h2 className="text-lg md:text-xl font-bold text-[var(--nothing-fg)] tracking-wide uppercase mb-4 px-2">Featured Spotlight</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {spotlightItems.slice(-4).map((item, idx) => (
+                  <div 
+                    key={item.id ?? idx} 
+                    className="relative aspect-[16/10] rounded-[24px] overflow-hidden cursor-pointer group bg-[#151821] border border-[var(--nothing-border)] hover:border-[var(--nothing-gray-3)] transition-colors"
+                    onClick={() => onOpenAnime(item)}
+                  >
+                    {item.image ? (
+                      <img 
+                        src={item.image} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[var(--nothing-gray-4)]">No Image</div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-[#0B0F19]/60 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                      <h3 className="text-xl md:text-2xl font-bold text-[var(--nothing-fg)] mb-2 line-clamp-1 tracking-wide">{item.title}</h3>
+                      {item.description && (
+                        <p className="text-sm text-[var(--nothing-gray-4)] line-clamp-2 mb-4 max-w-[90%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                          {item.description}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-150">
+                        <button 
+                          className="px-6 py-2 bg-[var(--nothing-fg)] text-[#0B0F19] rounded-full text-sm font-bold hover:bg-[var(--nothing-gray-2)] transition-colors flex items-center gap-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenAnime(item);
+                          }}
+                        >
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                          Play Now
+                        </button>
+                        <button 
+                          className="px-6 py-2 bg-[var(--nothing-elevated)] text-[var(--nothing-fg)] rounded-full text-sm font-bold hover:bg-[var(--nothing-gray-5)] transition-colors border border-[var(--nothing-border)]"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenAnime(item);
+                          }}
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Top right bookmark icon */}
+                    <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[var(--nothing-elevated)]/80 backdrop-blur-md flex items-center justify-center text-[var(--nothing-gray-4)] hover:text-[var(--nothing-fg)] hover:bg-[var(--nothing-gray-5)] transition-colors border border-[var(--nothing-border)]">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* New Additions */}
