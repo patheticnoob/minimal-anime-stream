@@ -44,29 +44,25 @@ function HeroBannerSkeleton({ theme }: { theme: string }) {
   if (theme === "nothing") {
     return (
       <motion.section
-        className="hero-banner-modern bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden"
+        className="hero-banner-modern bg-[#151821] rounded-[28px] overflow-hidden relative min-h-[500px] lg:min-h-[480px] flex"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <div className="flex flex-col lg:flex-row">
-          <div className="w-full lg:w-3/5 p-8 md:p-12 flex flex-col justify-center space-y-4">
-            <Skeleton className="h-8 w-48 bg-[var(--nothing-elevated)]" />
-            <div className="flex gap-2">
-              <Skeleton className="h-6 w-16 bg-[var(--nothing-elevated)]" />
-              <Skeleton className="h-6 w-20 bg-[var(--nothing-elevated)]" />
-              <Skeleton className="h-6 w-24 bg-[var(--nothing-elevated)]" />
-            </div>
-            <Skeleton className="h-16 w-full max-w-xl bg-[var(--nothing-elevated)]" />
-            <Skeleton className="h-20 w-full max-w-xl bg-[var(--nothing-elevated)]" />
-            <div className="flex gap-3">
-              <Skeleton className="h-12 w-40 rounded-full bg-[var(--nothing-elevated)]" />
-              <Skeleton className="h-12 w-36 rounded-full bg-[var(--nothing-elevated)]" />
-              <Skeleton className="h-12 w-12 rounded-full bg-[var(--nothing-elevated)]" />
-            </div>
+        <div className="w-full lg:w-2/3 p-6 md:p-10 lg:p-12 flex flex-col justify-end lg:justify-center h-full z-20 relative">
+          <Skeleton className="h-6 w-40 bg-white/10 rounded-full mb-6" />
+          <div className="flex gap-2 mb-4">
+            <Skeleton className="h-6 w-12 bg-white/10 rounded-sm" />
+            <Skeleton className="h-6 w-16 bg-white/10 rounded-sm" />
+            <Skeleton className="h-6 w-20 bg-white/10 rounded-sm" />
           </div>
-          <div className="hidden lg:block w-2/5">
-            <Skeleton className="w-full h-full bg-[var(--nothing-elevated)]" />
+          <Skeleton className="h-4 w-32 bg-white/10 mb-2" />
+          <Skeleton className="h-12 md:h-16 w-full max-w-xl bg-white/10 my-2" />
+          <Skeleton className="h-20 w-full max-w-xl bg-white/10 my-6" />
+          <div className="flex gap-3 mt-2">
+            <Skeleton className="h-12 w-40 rounded-full bg-white/10" />
+            <Skeleton className="h-12 w-36 rounded-full bg-white/10" />
+            <Skeleton className="h-12 w-12 rounded-full bg-white/10" />
           </div>
         </div>
       </motion.section>
@@ -145,153 +141,123 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
   if (theme === "nothing") {
     return (
     <motion.section
-      className="hero-banner-modern bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden"
+      className="hero-banner-modern bg-[#151821] rounded-[28px] overflow-hidden relative min-h-[500px] lg:min-h-[480px] flex"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="flex flex-col lg:flex-row">
-        {/* Left Content */}
+      {/* Background Image */}
+      {anime.image && (
         <motion.div
-          className="w-full lg:w-3/5 p-8 md:p-12 flex flex-col justify-center"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
+          className="absolute inset-0 lg:left-1/4 lg:w-3/4 h-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
         >
-          {/* Status Badge */}
-          <div className="mb-4">
-            <span className="inline-block border-2 border-gray-900 dark:border-[#E50914] rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase text-gray-900 dark:text-white bg-white dark:bg-[#E50914]">
-              {heroStatusLabel}
-            </span>
-          </div>
-
-          {/* Compact Meta Info - Small inline tags */}
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            {/* V4 Spotlight Rank */}
-            {anime.rank && (
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 text-[10px] font-black px-2.5 py-1 uppercase tracking-wide rounded border-2 border-yellow-600">
-                {anime.rank}
-              </span>
-            )}
-            {anime.type && (
-              <span className="bg-[#E50914] text-white text-[10px] font-bold px-2.5 py-1 uppercase tracking-wide rounded">
-                {anime.type}
-              </span>
-            )}
-            {/* V4 Duration */}
-            {anime.duration && (
-              <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-900 dark:text-purple-300 text-[10px] font-bold px-2.5 py-1 rounded border border-purple-400">
-                {anime.duration}
-              </span>
-            )}
-            {availableLanguages.length > 0 && (
-              <span className="bg-gray-100 dark:bg-[#E50914] text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide border-2 border-gray-900 dark:border-[#E50914]">
-                {availableLanguages.join(" • ")}
-              </span>
-            )}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-white text-gray-900 dark:text-gray-900 text-[10px] font-bold px-2.5 py-1 rounded border-2 border-gray-900 dark:border-white">
-              <span className="text-yellow-500 text-xs">★</span>
-              <span>{displayScore} / 5</span>
-            </div>
-            {anime.status && (
-              <span className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide">
-                {anime.status}
-              </span>
-            )}
-            {/* V4 Release Date */}
-            {anime.releaseDate && (
-              <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-300 text-[10px] font-bold px-2.5 py-1 rounded border border-blue-400">
-                📅 {anime.releaseDate}
-              </span>
-            )}
-            {anime.quality && (
-              <span className="bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-300 text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wide border-2 border-green-600">
-                {anime.quality}
-              </span>
-            )}
-            {anime.rating && (
-              <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-900 dark:text-orange-300 text-[10px] font-bold px-2.5 py-1 rounded border border-orange-400">
-                {anime.rating}
-              </span>
-            )}
-          </div>
-
-          {/* Genres - V2 enriched data */}
-          {anime.genres && anime.genres.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {anime.genres.slice(0, 4).map((genre: string, idx: number) => (
-                <span key={idx} className="bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-300 text-[10px] font-semibold px-2.5 py-1 rounded border border-blue-300 dark:border-blue-700">
-                  {genre}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Alternative Title or Japanese Title (V4) */}
-          {(anime.alternativeTitle || anime.japaneseTitle) && (
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-2 font-medium">
-              {anime.alternativeTitle || anime.japaneseTitle}
-            </p>
-          )}
-
-          {/* Title */}
-          <h1 className="text-5xl md:text-7xl font-black my-4 leading-none text-gray-900 dark:text-white tracking-tight">
-            {anime.title ?? "Featured Anime"}
-          </h1>
-
-          {/* Description */}
-          <p className="text-gray-600 dark:text-[#D1D5DB] max-w-xl mb-6 text-base leading-relaxed">
-            {displayDescription}
-          </p>
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3">
-            <Button
-              size="lg"
-              onClick={onPlay}
-              className="bg-[#E50914] border-2 border-[#E50914] text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-[#C4070F] hover:border-[#C4070F] transition-colors"
-            >
-              <Play className="h-5 w-5" />
-              WATCH NOW
-            </Button>
-
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={onMoreInfo}
-              className="border-2 border-gray-900 dark:border-white bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full flex items-center gap-2 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
-            >
-              <Info className="h-5 w-5" />
-              MORE INFO
-            </Button>
-
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-2 border-gray-900 dark:border-white bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-white font-bold py-3 px-4 rounded-full hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
-            >
-              <Plus className="h-6 w-6" />
-            </Button>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#151821] via-[#151821]/90 lg:via-[#151821]/30 to-transparent z-10" />
+          <div className="absolute inset-0 bg-[#151821]/30 lg:bg-transparent z-10" />
+          <img
+            src={anime.image}
+            alt={anime.title || "Anime poster"}
+            className="w-full h-full object-cover object-center lg:object-right"
+          />
         </motion.div>
+      )}
 
-        {/* Right Image - Hidden on mobile */}
-        {anime.image && (
-          <motion.div
-            className="hidden lg:block w-2/5 relative hero-banner-art"
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white/50 dark:from-transparent dark:to-[#1A1D24]/80 z-10" />
-            <img
-              src={anime.image}
-              alt={anime.title || "Anime poster"}
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
+      {/* Left Content */}
+      <motion.div
+        className="w-full lg:w-2/3 p-6 md:p-10 lg:p-12 flex flex-col justify-end lg:justify-center z-20 relative"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+      >
+        {/* Status Badge */}
+        <div className="mb-6">
+          <span className="inline-block bg-[#E50914] text-white rounded-full px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase">
+            {heroStatusLabel}
+          </span>
+        </div>
+
+        {/* Compact Meta Info - Small inline tags */}
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          {anime.rank && (
+            <span className="bg-[#E50914] text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide">
+              {anime.rank}
+            </span>
+          )}
+          {anime.type && (
+            <span className="bg-[#E50914] text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide">
+              {anime.type}
+            </span>
+          )}
+          {anime.duration && (
+            <span className="bg-[#E50914] text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide">
+              {anime.duration}
+            </span>
+          )}
+          {availableLanguages.length > 0 && (
+            <span className="bg-[#E50914] text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide">
+              {availableLanguages.join(" + ")}
+            </span>
+          )}
+          <div className="flex items-center gap-1 bg-white text-gray-900 text-[10px] font-bold px-2 py-1 rounded-sm">
+            <span className="text-yellow-500 text-[10px]">★</span>
+            <span>{displayScore} / 5</span>
+          </div>
+          {anime.quality && (
+            <span className="bg-[#E50914] text-white text-[10px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide">
+              {anime.quality}
+            </span>
+          )}
+        </div>
+
+        {/* Alternative Title or Japanese Title (V4) */}
+        {(anime.alternativeTitle || anime.japaneseTitle) && (
+          <p className="text-gray-400 text-xs mb-2 font-mono">
+            {anime.alternativeTitle || anime.japaneseTitle}
+          </p>
         )}
-      </div>
+
+        {/* Title */}
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black my-2 leading-tight text-white tracking-tight">
+          {anime.title ?? "Featured Anime"}
+        </h1>
+
+        {/* Description */}
+        <p className="text-gray-400 max-w-xl my-6 text-sm leading-relaxed font-mono line-clamp-4">
+          {displayDescription}
+        </p>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-3 mt-2">
+          <Button
+            size="lg"
+            onClick={onPlay}
+            className="bg-[#E50914] hover:bg-[#C4070F] text-white font-bold py-6 px-8 rounded-full flex items-center gap-2 transition-colors text-xs tracking-widest uppercase border-0"
+          >
+            <Play className="h-4 w-4 fill-current" />
+            WATCH NOW
+          </Button>
+
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={onMoreInfo}
+            className="border border-gray-600 hover:bg-white/10 bg-transparent text-white font-bold py-6 px-8 rounded-full flex items-center gap-2 transition-colors text-xs tracking-widest uppercase"
+          >
+            <Info className="h-4 w-4" />
+            MORE INFO
+          </Button>
+
+          <Button
+            size="lg"
+            variant="outline"
+            className="border border-gray-600 hover:bg-white/10 bg-transparent text-white font-bold h-12 w-12 rounded-full flex items-center justify-center transition-colors p-0"
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
+        </div>
+      </motion.div>
     </motion.section>
     );
   }
