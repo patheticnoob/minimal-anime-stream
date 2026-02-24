@@ -149,17 +149,17 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
       {/* Background Image */}
       {anime.image && (
         <motion.div
-          className="absolute inset-0 lg:left-1/4 lg:w-3/4 h-full"
+          className="absolute inset-0 w-full h-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.15, duration: 0.5 }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#151821] via-[#151821]/90 lg:via-[#151821]/30 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#151821] via-[#151821]/90 lg:via-[#151821]/60 to-transparent z-10" />
           <div className="absolute inset-0 bg-[#151821]/30 lg:bg-transparent z-10" />
           <img
             src={anime.image}
             alt={anime.title || "Anime poster"}
-            className="w-full h-full object-cover object-center lg:object-right"
+            className="w-full h-full object-cover object-center"
           />
         </motion.div>
       )}
