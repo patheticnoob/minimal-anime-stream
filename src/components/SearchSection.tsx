@@ -99,7 +99,6 @@ export function SearchSection({ query, onItemClick }: SearchSectionProps) {
     setIsLoading(true);
     try {
       if (filterMode || (!searchQuery.trim() && hasActiveFilters(currentFilters))) {
-        // Use filter endpoint
         const data = await fetchGojoFilter({
           keyword: searchQuery.trim() || undefined,
           type: currentFilters.type,
@@ -115,7 +114,6 @@ export function SearchSection({ query, onItemClick }: SearchSectionProps) {
         setResults(data.results);
         setHasNextPage(data.hasNextPage);
       } else if (searchQuery.trim()) {
-        // Use search endpoint
         const data = await searchGojo(searchQuery.trim(), page);
         setResults(data.results);
         setHasNextPage(data.hasNextPage);
@@ -133,7 +131,6 @@ export function SearchSection({ query, onItemClick }: SearchSectionProps) {
     }
   }, []);
 
-  // Debounced search when query changes
   useEffect(() => {
     if (!query.trim() && !isFilterMode) {
       setResults([]);
@@ -169,27 +166,21 @@ export function SearchSection({ query, onItemClick }: SearchSectionProps) {
     setIsFilterMode(false);
     setCurrentPage(1);
     setShowFilters(false);
-    fetchResults(query, 1, DEFAULT_FILTERS, false);
+    if (query.trim()) {
+      fetchResults(query, 1, DEFAULT_FILTERS, false);
+    } else {
+      setResults([]);
+      setHasNextPage(false);
+    }
   };
 
   const updatePending = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
     setPendingFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const showEmpty = !query.trim() && !isFilterMode;
-
-  if (showEmpty) {
-    return (
-      <div className="text-center py-20">
-        <p className="text-[var(--nothing-gray-4,#9CA3AF)] text-base font-mono uppercase tracking-wider">Start typing to search for anime</p>
-        <p className="text-[var(--nothing-gray-4,#9CA3AF)] mt-2 text-sm font-mono opacity-60">Or use filters to browse</p>
-      </div>
-    );
-  }
-
   return (
     <div>
-      {/* Filter Toggle Bar */}
+      {/* Filter Toggle Bar - always visible */}
       <div className="flex items-center gap-3 mb-6">
         <Button
           variant="outline"
@@ -369,6 +360,14 @@ export function SearchSection({ query, onItemClick }: SearchSectionProps) {
         </div>
       )}
 
+      {/* Empty state - no query and no filters */}
+      {!query.trim() && !isFilterMode && !isLoading && results.length === 0 && (
+        <div className="text-center py-20">
+          <p className="text-[var(--nothing-gray-4,#9CA3AF)] text-base font-mono uppercase tracking-wider">Start typing to search for anime</p>
+          <p className="text-[var(--nothing-gray-4,#9CA3AF)] mt-2 text-sm font-mono opacity-60">Or use filters above to browse</p>
+        </div>
+      )}
+
       {/* Loading */}
       {isLoading && (
         <div className="flex items-center justify-center py-20">
@@ -376,8 +375,8 @@ export function SearchSection({ query, onItemClick }: SearchSectionProps) {
         </div>
       )}
 
-      {/* Results */}
-      {!isLoading && results.length === 0 && (
+      {/* No results */}
+      {!isLoading && results.length === 0 && (query.trim() || isFilterMode) && (
         <div className="text-center py-20">
           <p className="text-[var(--nothing-gray-4,#9CA3AF)] text-base font-mono uppercase tracking-wider">No results found</p>
           {query && <p className="text-[var(--nothing-gray-4,#9CA3AF)] mt-2 font-mono text-sm opacity-60">Try a different search term or adjust filters</p>}
