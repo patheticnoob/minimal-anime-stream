@@ -147,24 +147,6 @@ export function HomeSections({
             />
           )}
 
-          {/* Compact Sections Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {popularLoading ? (
-              <CompactSkeleton title="Trending Now" theme={theme} />
-            ) : (
-              <CompactListSection title="Trending Now" items={popularItems} onOpenAnime={onOpenAnime} theme={theme} />
-            )}
-
-            {airingLoading ? (
-              <CompactSkeleton title="Top Airing" theme={theme} />
-            ) : (
-              <CompactListSection title="Top Airing" items={airingItems} onOpenAnime={onOpenAnime} theme={theme} />
-            )}
-
-            <CompactListSection title="Most Favorite" items={mostFavoriteItems} onOpenAnime={onOpenAnime} theme={theme} />
-            <CompactListSection title="Latest Completed" items={latestCompletedItems} onOpenAnime={onOpenAnime} theme={theme} />
-          </div>
-
           {/* TV Series */}
           {tvShowsLoading ? (
             <div className="bg-[#151821] rounded-[24px] p-5 mb-6">
@@ -181,30 +163,6 @@ export function HomeSections({
               hasMore={hasMore.tvShows}
               isLoadingMore={loadingMore === 'tvShows'}
               isFocused={focusedRailIndex === 5}
-              focusedItemIndex={focusedItemIndex}
-              isNavigatingRails={isNavigatingRails}
-            />
-          )}
-
-          {/* Most Favorite */}
-          {mostFavoriteItems.length > 0 && (
-            <ContentRail
-              title="Most Favorite"
-              items={mostFavoriteItems}
-              onItemClick={onOpenAnime}
-              isFocused={focusedRailIndex === 6}
-              focusedItemIndex={focusedItemIndex}
-              isNavigatingRails={isNavigatingRails}
-            />
-          )}
-
-          {/* Latest Completed */}
-          {latestCompletedItems.length > 0 && (
-            <ContentRail
-              title="Latest Completed"
-              items={latestCompletedItems}
-              onItemClick={onOpenAnime}
-              isFocused={focusedRailIndex === 8}
               focusedItemIndex={focusedItemIndex}
               isNavigatingRails={isNavigatingRails}
             />
@@ -274,6 +232,22 @@ export function HomeSections({
               </div>
             </div>
           )}
+
+          {/* Compact Sections (Moved to Sidebar) */}
+          {popularLoading ? (
+            <CompactSkeleton title="Trending Now" theme={theme} />
+          ) : (
+            <CompactListSection title="Trending Now" items={popularItems} onOpenAnime={onOpenAnime} theme={theme} />
+          )}
+
+          {airingLoading ? (
+            <CompactSkeleton title="Top Airing" theme={theme} />
+          ) : (
+            <CompactListSection title="Top Airing" items={airingItems} onOpenAnime={onOpenAnime} theme={theme} />
+          )}
+
+          <CompactListSection title="Most Favorite" items={mostFavoriteItems} onOpenAnime={onOpenAnime} theme={theme} />
+          <CompactListSection title="Latest Completed" items={latestCompletedItems} onOpenAnime={onOpenAnime} theme={theme} />
         </div>
       </div>
     );
