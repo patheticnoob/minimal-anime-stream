@@ -185,7 +185,7 @@ export function NothingEpisodeList({
           </div>
         </div>
       ) : displayedEpisodes.length > 0 ? (
-        <div className="flex flex-col gap-2 max-h-[600px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
+        <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
           {displayedEpisodes.map((episode: any) => {
             const epNum = episode.episodeNumber ?? episode.number ?? episode.episode_no;
             const epTitle = episode.title ?? episode.name ?? `Episode ${epNum}`;
@@ -206,7 +206,7 @@ export function NothingEpisodeList({
                 key={epId ?? epNum}
                 id={`episode-${epNum}`}
                 onClick={() => onPlayEpisode(episode)}
-                className={`w-full text-left rounded-2xl transition-all duration-200 flex items-center gap-4 px-4 py-3 group relative overflow-hidden ${
+                className={`w-full text-left rounded-2xl transition-all duration-200 flex items-center gap-4 px-4 py-4 group relative overflow-hidden ${
                   isActive
                     ? "bg-[#ff4d4f] shadow-lg shadow-[#ff4d4f]/20"
                     : "bg-white/5 hover:bg-white/10"
