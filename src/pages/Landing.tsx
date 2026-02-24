@@ -618,7 +618,6 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                   newAddedItems={animeData.newAddedItems}
                   topUpcomingItems={animeData.topUpcomingItems}
                   topTenItems={animeData.topTenItems}
-                  genres={animeData.genres}
                   spotlightItems={spotlightItems}
                 />
               )}

@@ -34,7 +34,6 @@ interface HomeSectionsProps {
   newAddedItems?: AnimeItem[];
   topUpcomingItems?: AnimeItem[];
   topTenItems?: AnimeItem[];
-  genres?: string[];
   spotlightItems?: AnimeItem[];
 }
 
@@ -82,7 +81,6 @@ export function HomeSections({
   newAddedItems = [],
   topUpcomingItems = [],
   topTenItems = [],
-  genres = [],
   spotlightItems = [],
 }: HomeSectionsProps) {
   const { theme } = useTheme();
@@ -145,9 +143,10 @@ export function HomeSections({
                 {spotlightItems.slice(-4).map((item, idx) => (
                   <div 
                     key={item.id ?? idx} 
-                    className="relative aspect-[16/10] rounded-[24px] overflow-hidden cursor-pointer group bg-[#151821] border border-[var(--nothing-border)] hover:border-[var(--nothing-accent)] hover:shadow-[0_0_20px_rgba(229,9,20,0.2)] transition-all duration-300"
+                    className="relative aspect-[16/10] rounded-[24px] overflow-hidden cursor-pointer group bg-[#151821] hover:shadow-[0_0_20px_rgba(229,9,20,0.2)] transition-all duration-300"
                     onClick={() => onOpenAnime(item)}
                   >
+                    <div className="absolute inset-0 rounded-[24px] border border-[var(--nothing-border)] group-hover:border-2 group-hover:border-[var(--nothing-accent)] pointer-events-none transition-all duration-300 z-20" />
                     {item.image ? (
                       <img 
                         src={item.image} 
@@ -275,23 +274,6 @@ export function HomeSections({
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Genres Strip */}
-          {genres.length > 0 && (
-            <div className="bg-[#151821] rounded-[24px] p-6">
-              <h2 className="text-lg font-bold text-[var(--nothing-fg)] tracking-wide uppercase mb-4">Genres</h2>
-              <div className="flex flex-wrap gap-2">
-                {genres.map((genre) => (
-                  <span
-                    key={genre}
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold cursor-default select-none transition-colors bg-[var(--nothing-elevated)] text-[var(--nothing-gray-4)] border border-[var(--nothing-border)] hover:text-[var(--nothing-fg)] hover:border-[var(--nothing-gray-3)]"
-                  >
-                    {genre}
-                  </span>
                 ))}
               </div>
             </div>
@@ -437,23 +419,6 @@ export function HomeSections({
           focusedItemIndex={focusedItemIndex}
           isNavigatingRails={isNavigatingRails}
         />
-      )}
-
-      {/* Genres Strip */}
-      {genres.length > 0 && (
-        <div>
-          <h2 className={`text-2xl font-bold mb-4 text-white`}>Browse by Genre</h2>
-          <div className="flex flex-wrap gap-2">
-            {genres.map((genre) => (
-              <span
-                key={genre}
-                className={`px-4 py-2 rounded-full text-sm font-semibold cursor-default select-none transition-colors bg-white/10 text-white/80 border border-white/10 hover:bg-white/20`}
-              >
-                {genre}
-              </span>
-            ))}
-          </div>
-        </div>
       )}
     </div>
   );
