@@ -44,7 +44,7 @@ function HeroBannerSkeleton({ theme }: { theme: string }) {
   if (theme === "nothing") {
     return (
       <motion.section
-        className="hero-banner-modern bg-[#151821] rounded-[28px] overflow-hidden relative min-h-[500px] lg:min-h-[480px] flex"
+        className="hero-banner-modern bg-[#151821] rounded-[28px] overflow-hidden relative h-[500px] md:h-[550px] lg:h-[600px] flex w-full"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -141,7 +141,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
   if (theme === "nothing") {
     return (
     <motion.section
-      className="hero-banner-modern bg-[#151821] rounded-[28px] overflow-hidden relative min-h-[500px] lg:min-h-[480px] flex"
+      className="hero-banner-modern bg-[#151821] rounded-[28px] overflow-hidden relative h-[500px] md:h-[550px] lg:h-[600px] flex w-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
