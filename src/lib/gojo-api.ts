@@ -117,6 +117,19 @@ export type GojoSearchResult = {
   response: GojoAnimeItem[];
 };
 
+export type GojoFilterParams = {
+  keyword?: string;
+  type?: "all" | "movie" | "tv" | "ova" | "special" | "music";
+  status?: "all" | "finished_airing" | "currently_airing" | "not_yet_aired";
+  rated?: "all" | "g" | "pg" | "pg-13" | "r" | "r+" | "rx";
+  score?: "all" | "appalling" | "horrible" | "very_bad" | "bad" | "average" | "fine" | "good" | "very_good" | "great" | "masterpiece";
+  season?: "all" | "spring" | "summer" | "fall" | "winter";
+  language?: "all" | "sub" | "dub" | "sub_dub";
+  sort?: "default" | "recently_added" | "recently_updated" | "score" | "name_az" | "release_date" | "most_watched";
+  genres?: string;
+  page?: number;
+};
+
 // ─── Converter ───────────────────────────────────────────────────────────────
 
 function convertToAnimeItem(item: GojoAnimeItem, category?: string): AnimeItem {
@@ -430,5 +443,42 @@ export async function fetchGojoHomeAll(): Promise<{
   } catch (error) {
     console.error("[Gojo API] HomeAll Error:", error);
     return empty;
+  }
+}
+
+/**
+ * Fetch anime using the filter endpoint
+ */
+export async function fetchGojoFilter(
+  params: GojoFilterParams
+): Promise<{ results: AnimeItem[]; hasNextPage: boolean; totalPages: number }> {
+  try {
+    const query = new URLSearchParams();
+    if (params.keyword) query.set("keyword", params.keyword);
+    if (params.type && params.type !== "all") query.set("type", params.type);
+    if (params.status && params.status !== "all") query.set("status", params.status);
+    if (params.rated && params.rated !== "all") query.set("rated", params.rated);
+    if (params.score && params.score !== "all") query.set("score", params.score);
+    if (params.season && params.season !== "all") query.set("season", params.season);
+    if (params.language && params.language !== "all") query.set("language", params.language);
+    if (params.sort && params.sort !== "default") query.set("sort", params.sort);
+    if (params.genres) query.set("genres", params.genres);
+    query.set("page", String(params.page || 1));
+
+    const response = await fetch(`${GOJO_API_BASE}/filter?${query.toString()}`);
+    if (!response.ok) return { results: [], hasNextPage: false, totalPages: 1 };
+
+    const data: { success: boolean; data: { pageInfo: { totalPages: number; currentPage: number; hasNextPage: boolean }; response: GojoAnimeItem[] } } = await response.json();
+    if (!data.success) return { results: [], hasNextPage: false, totalPages: 1 };
+
+    const results = data.data.response.map(item => convertToAnimeItem(item, "filter"));
+    return {
+      results,
+      hasNextPage: data.data.pageInfo.hasNextPage,
+      totalPages: data.data.pageInfo.totalPages,
+    };
+  } catch (error) {
+    console.error("[Gojo API] Filter Error:", error);
+    return { results: [], hasNextPage: false, totalPages: 1 };
   }
 }
