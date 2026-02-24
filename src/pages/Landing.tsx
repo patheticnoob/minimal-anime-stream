@@ -78,6 +78,10 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     tvShowsLoading,
     query: animeDataQuery,
     setQuery: setAnimeDataQuery,
+    genreQuery,
+    setGenreQuery,
+    genreResults,
+    isGenreLoading,
     loadMoreItems,
     loadingMore,
     hasMore
@@ -138,6 +142,11 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
     if (section === "search" && urlQuery) {
       setActiveSection("search");
       setAnimeDataQuery(urlQuery);
+    } else if (section === "genre" && urlQuery) {
+      setActiveSection("genre");
+      if (setGenreQuery) {
+        setGenreQuery(urlQuery);
+      }
     }
   }, []); // Only run once on mount
 
@@ -468,6 +477,30 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                 setActiveSection("home");
               }}
             />
+          ) : activeSection === "genre" ? (
+            <div className="mt-8">
+              <h2 className="text-3xl font-bold mb-6 tracking-tight capitalize">Genre: {genreQuery || searchParams.get("q")}</h2>
+              {isGenreLoading ? (
+                <div className="flex justify-center py-20">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+              ) : genreResults && genreResults.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                  {genreResults.map((item, idx) => (
+                    <AnimeCard 
+                      key={item.id ?? idx} 
+                      anime={item} 
+                      onClick={() => openAnime(item)} 
+                      index={idx}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 py-20">
+                  No anime found for this genre.
+                </div>
+              )}
+            </div>
           ) : activeSection === "genres" ? (
             <div className="mt-8 max-w-5xl mx-auto">
               <h2 className="text-3xl font-bold mb-8 tracking-tight uppercase">Genres</h2>
@@ -477,7 +510,11 @@ export default function Landing({ NavBarComponent }: LandingProps = {}) {
                     <button
                       key={genre}
                       onClick={() => {
-                        setQuery(genre);
+                        if (setGenreQuery) {
+                          setGenreQuery(genre);
+                        }
+                        setSearchParams({ section: "genre", q: genre });
+                        setActiveSection("genre");
                       }}
                       className={
                         theme === "nothing"

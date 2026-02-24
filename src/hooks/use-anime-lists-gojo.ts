@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimeItem } from "@/shared/types";
 import { logError, logInfo } from "@/lib/error-logger";
-import { fetchGojoHomeAll, searchGojo } from "@/lib/gojo-api";
+import { fetchGojoHomeAll, searchGojo, fetchGojoGenre } from "@/lib/gojo-api";
 
 export function useAnimeListsGojo(isActive: boolean = true) {
   const [loading, setLoading] = useState(true);
@@ -28,6 +28,10 @@ export function useAnimeListsGojo(isActive: boolean = true) {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<AnimeItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  const [genreQuery, setGenreQuery] = useState("");
+  const [genreResults, setGenreResults] = useState<AnimeItem[]>([]);
+  const [isGenreLoading, setIsGenreLoading] = useState(false);
 
   const [loadingMore] = useState<string | null>(null);
 
@@ -110,6 +114,27 @@ export function useAnimeListsGojo(isActive: boolean = true) {
     return () => clearTimeout(timeoutId);
   }, [query]);
 
+  // Genre handler
+  useEffect(() => {
+    if (!genreQuery.trim()) {
+      setGenreResults([]);
+      setIsGenreLoading(false);
+      return;
+    }
+    setIsGenreLoading(true);
+    const timeoutId = setTimeout(async () => {
+      try {
+        const { results } = await fetchGojoGenre(genreQuery.trim().toLowerCase());
+        setGenreResults(results);
+      } catch {
+        setGenreResults([]);
+      } finally {
+        setIsGenreLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [genreQuery]);
+
   const loadMoreItems = async (_category: 'popular' | 'airing' | 'recentEpisodes' | 'tvShows') => {};
 
   // If not active, return empty/loading state so other hooks can be used
@@ -129,6 +154,10 @@ export function useAnimeListsGojo(isActive: boolean = true) {
       setQuery,
       searchResults,
       isSearching,
+      genreQuery,
+      setGenreQuery,
+      genreResults,
+      isGenreLoading,
       loadMoreItems,
       loadingMore,
       hasMore: { popular: false, airing: false, recentEpisodes: false, tvShows: false },
@@ -156,6 +185,10 @@ export function useAnimeListsGojo(isActive: boolean = true) {
     setQuery,
     searchResults,
     isSearching,
+    genreQuery,
+    setGenreQuery,
+    genreResults,
+    isGenreLoading,
     loadMoreItems,
     loadingMore,
     hasMore: {

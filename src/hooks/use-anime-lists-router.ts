@@ -26,5 +26,9 @@ export function useAnimeListsRouter() {
     topUpcomingItems: [] as any[],
     topTenItems: [] as any[],
     genres: [] as string[],
+    genreQuery: "",
+    setGenreQuery: (_q: string) => {},
+    genreResults: [] as any[],
+    isGenreLoading: false,
   };
 }

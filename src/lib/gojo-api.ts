@@ -256,6 +256,33 @@ export async function searchGojo(
 }
 
 /**
+ * Fetch anime by genre using Gojo API
+ */
+export async function fetchGojoGenre(
+  genre: string,
+  page: number = 1
+): Promise<{ results: AnimeItem[]; hasNextPage: boolean }> {
+  try {
+    const response = await fetch(
+      `${GOJO_API_BASE}/genre/${encodeURIComponent(genre)}?page=${page}`
+    );
+    if (!response.ok) return { results: [], hasNextPage: false };
+
+    const data: GojoResponse<GojoSearchResult> = await response.json();
+    if (!data.success) return { results: [], hasNextPage: false };
+
+    const results = data.data.response.map(item => convertToAnimeItem(item, "genre"));
+    return {
+      results,
+      hasNextPage: data.data.pageInfo.hasNextPage,
+    };
+  } catch (error) {
+    console.error("[Gojo API] Genre Error:", error);
+    return { results: [], hasNextPage: false };
+  }
+}
+
+/**
  * Fetch detailed anime information from Gojo API
  */
 export async function fetchGojoAnimeDetails(animeId: string): Promise<AnimeItem | null> {
