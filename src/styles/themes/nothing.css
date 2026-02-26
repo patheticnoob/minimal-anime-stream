@@ -1,7 +1,24 @@
 /* NothingOS Theme - Minimalist Design System */
 
 [data-theme="nothing"] {
-  /* Core Colors - Light Mode */
+  /* Core Colors - Dark Mode by Default (Cinematic Premium) */
+  --nothing-bg: #0B0D10;
+  --nothing-fg: #F5F5F7;
+  --nothing-accent: #E50914;
+  --nothing-gray-1: #1F2933;
+  --nothing-gray-2: #151820;
+  --nothing-gray-3: #2A2F3A;
+  --nothing-gray-4: #9CA3AF;
+  --nothing-border: rgba(161, 161, 170, 0.15);
+  --nothing-elevated: #1A1D24;
+  --nothing-soft-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
+  --nothing-card-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+  --nothing-pill-shadow: 0 12px 30px rgba(229, 9, 20, 0.5);
+}
+
+/* Light Mode Override */
+.light[data-theme="nothing"],
+.light [data-theme="nothing"] {
   --nothing-bg: #f5f6fb;
   --nothing-fg: #0a0f1f;
   --nothing-accent: #ff3b3b;
@@ -16,9 +33,9 @@
   --nothing-pill-shadow: 0 12px 30px rgba(255, 59, 59, 0.3);
 }
 
+/* Keep dark class as alias for default (backward compat) */
 .dark[data-theme="nothing"],
 .dark [data-theme="nothing"] {
-  /* Core Colors - Dark Mode - Cinematic Premium */
   --nothing-bg: #0B0D10;
   --nothing-fg: #F5F5F7;
   --nothing-accent: #E50914;
@@ -59,9 +76,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: radial-gradient(circle, rgba(12, 18, 34, 0.08) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(229, 9, 20, 0.03) 1px, transparent 1px);
   background-size: 20px 20px;
-  opacity: 0.12;
+  opacity: 0.15;
   pointer-events: none;
   z-index: 0;
 }
@@ -77,17 +94,6 @@
 }
 
 [data-theme="nothing"] .content-rail:hover {
-  border-color: rgba(229, 9, 20, 0.3);
-  box-shadow: 0 28px 60px rgba(229, 9, 20, 0.15);
-}
-
-.dark[data-theme="nothing"] .content-rail {
-  background: var(--nothing-elevated);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
-  border-color: rgba(161, 161, 170, 0.15);
-}
-
-.dark[data-theme="nothing"] .content-rail:hover {
   border-color: rgba(229, 9, 20, 0.4);
   box-shadow: 0 28px 60px rgba(229, 9, 20, 0.25);
 }
@@ -115,19 +121,9 @@
 }
 
 [data-theme="nothing"] .anime-card:hover .anime-card-poster-frame {
-  border-color: rgba(229, 9, 20, 0.4);
-  box-shadow: 0 8px 24px rgba(229, 9, 20, 0.2), 0 0 20px rgba(229, 9, 20, 0.15);
-  transform: translateY(-2px);
-}
-
-.dark[data-theme="nothing"] .anime-card-poster-frame {
-  background: var(--nothing-gray-1);
-  border-color: rgba(161, 161, 170, 0.15);
-}
-
-.dark[data-theme="nothing"] .anime-card:hover .anime-card-poster-frame {
   border-color: rgba(229, 9, 20, 0.5);
   box-shadow: 0 12px 32px rgba(229, 9, 20, 0.3), 0 0 25px rgba(229, 9, 20, 0.2);
+  transform: translateY(-2px);
 }
 
 [data-theme="nothing"] .anime-card h3 {
@@ -143,7 +139,7 @@
 /* Badges - NothingCN Style */
 [data-theme="nothing"] .badge {
   border-radius: 999px;
-  background: rgba(10, 14, 32, 0.06);
+  background: var(--nothing-gray-1);
   color: var(--nothing-fg);
   font-weight: 600;
   text-transform: uppercase;
@@ -157,16 +153,6 @@
   background: var(--nothing-accent);
   color: #fff;
   border-color: var(--nothing-accent);
-  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
-}
-
-.dark[data-theme="nothing"] .badge {
-  background: var(--nothing-gray-1);
-  border-color: rgba(161, 161, 170, 0.2);
-}
-
-.dark[data-theme="nothing"] .badge-accent {
-  background: var(--nothing-accent);
   box-shadow: 0 6px 16px rgba(229, 9, 20, 0.4);
 }
 
@@ -194,23 +180,12 @@
 }
 
 [data-theme="nothing"] .button-secondary {
-  background: transparent;
+  background: var(--nothing-gray-1);
   color: var(--nothing-fg);
   border: 2px solid var(--nothing-border);
 }
 
 [data-theme="nothing"] .button-secondary:hover {
-  background: var(--nothing-gray-1);
-  color: var(--nothing-fg);
-  border-color: rgba(229, 9, 20, 0.3);
-}
-
-.dark[data-theme="nothing"] .button-secondary {
-  background: var(--nothing-gray-1);
-  border-color: rgba(161, 161, 170, 0.2);
-}
-
-.dark[data-theme="nothing"] .button-secondary:hover {
   background: var(--nothing-gray-3);
   border-color: rgba(229, 9, 20, 0.4);
   box-shadow: 0 8px 20px rgba(229, 9, 20, 0.15);
@@ -222,17 +197,11 @@
   border: 2px solid var(--nothing-border);
   box-shadow: var(--nothing-soft-shadow);
   overflow: hidden;
-  background: white;
-}
-
-.dark[data-theme="nothing"] .hero-banner-modern {
   background: #1A1D24;
   border-color: rgba(161, 161, 170, 0.2);
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
 }
 
-/* Hero Banner Image Overlay for Dark Mode */
-.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-art::after {
+[data-theme="nothing"] .hero-banner-modern .hero-banner-art::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -240,29 +209,26 @@
   pointer-events: none;
 }
 
-/* Hero Banner Text Contrast */
-.dark[data-theme="nothing"] .hero-banner-modern h1 {
+[data-theme="nothing"] .hero-banner-modern h1 {
   color: #FFFFFF !important;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.dark[data-theme="nothing"] .hero-banner-modern p {
+[data-theme="nothing"] .hero-banner-modern p {
   color: #D1D5DB !important;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
-/* Hero Banner Badges */
-.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-pill,
-.dark[data-theme="nothing"] .hero-banner-modern span[class*="border"] {
+[data-theme="nothing"] .hero-banner-modern .hero-banner-pill,
+[data-theme="nothing"] .hero-banner-modern span[class*="border"] {
   background: #E50914 !important;
   color: #FFFFFF !important;
   border-color: #E50914 !important;
   text-shadow: none;
 }
 
-/* Hero Banner Buttons - Critical Fix */
-.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-primary-btn,
-.dark[data-theme="nothing"] .hero-banner-modern button[class*="bg-[#FF3333]"] {
+[data-theme="nothing"] .hero-banner-modern .hero-banner-primary-btn,
+[data-theme="nothing"] .hero-banner-modern button[class*="bg-[#FF3333]"] {
   background: #E50914 !important;
   color: #FFFFFF !important;
   border-color: #E50914 !important;
@@ -270,15 +236,15 @@
   text-shadow: none;
 }
 
-.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-secondary-btn,
-.dark[data-theme="nothing"] .hero-banner-modern button[class*="border-2"][class*="border-gray-900"] {
+[data-theme="nothing"] .hero-banner-modern .hero-banner-secondary-btn,
+[data-theme="nothing"] .hero-banner-modern button[class*="border-2"][class*="border-gray-900"] {
   background: #1C212C !important;
   color: #F5F5F7 !important;
   border-color: rgba(161, 161, 170, 0.3) !important;
   text-shadow: none;
 }
 
-.dark[data-theme="nothing"] .hero-banner-modern .hero-banner-secondary-btn:hover {
+[data-theme="nothing"] .hero-banner-modern .hero-banner-secondary-btn:hover {
   background: #2A2F3A !important;
   border-color: rgba(229, 9, 20, 0.4) !important;
 }
@@ -319,7 +285,7 @@
 [data-theme="nothing"] .detail-episode:hover {
   background: var(--nothing-gray-1);
   border-color: var(--nothing-accent);
-  box-shadow: 0 12px 30px rgba(255, 59, 59, 0.15);
+  box-shadow: 0 12px 30px rgba(229, 9, 20, 0.2);
 }
 
 /* Tabs */
@@ -504,7 +470,7 @@
 [data-theme="nothing"] .nothing-next-banner {
   margin-top: 1rem;
   padding: 1rem 1.5rem;
-  background: white;
+  background: var(--nothing-elevated);
   border: 2px solid var(--nothing-border);
   border-radius: 24px;
   display: flex;
@@ -573,7 +539,7 @@
   border-color: var(--nothing-border) !important;
 }
 
-/* Dark mode cinematic enhancements */
+/* Dark mode cinematic enhancements (same as default now) */
 .dark[data-theme="nothing"] body,
 .dark[data-theme="nothing"] .min-h-screen,
 .dark[data-theme="nothing"] main {

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 
 export function useNothingTheme() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === "undefined") return true;
     const saved = localStorage.getItem("nothing-dark-mode");
-    return saved === "true";
+    // Default to dark mode if no preference saved
+    return saved === null ? true : saved === "true";
   });
 
   useEffect(() => {

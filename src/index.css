@@ -163,8 +163,8 @@ main::after {
 
 html[data-theme="nothing"] body,
 body[data-theme="nothing"] {
-  background: var(--nothing-bg);
-  color: var(--nothing-fg);
+  background: #0B0D10;
+  color: #F5F5F7;
   font-family: "Commit Mono", monospace;
 }
 
