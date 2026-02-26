@@ -117,7 +117,7 @@ export function ContentRail({
 
   if (isLoading) {
     return (
-      <section className={`content-rail animate-in fade-in slide-in-from-bottom-4 duration-500 ${theme === "nothing" ? "bg-[#151821] rounded-[24px] p-5 mb-6" : "mb-8"}`}>
+      <section className={`content-rail animate-in fade-in slide-in-from-bottom-4 duration-500 ${theme === "nothing" ? "bg-[var(--nothing-card-bg)] rounded-[24px] p-5 mb-6" : "mb-8"}`}>
         <div className={`content-rail-header flex items-center justify-between mb-4 ${theme === "nothing" ? "px-2" : "px-4 md:px-0"}`}>
           <h2 className={`text-lg md:text-xl font-bold ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"} tracking-wide uppercase`}>
             {title}
@@ -149,7 +149,7 @@ export function ContentRail({
   }, [enableInfiniteScroll, hasMore, onLoadMore]);
 
   return (
-    <section className={`content-rail animate-in fade-in slide-in-from-bottom-4 duration-500 ${isFocused && isNavigatingRails ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0B0F19] rounded-lg p-2" : ""} ${theme === "nothing" ? "bg-[#151821] rounded-[24px] p-5 mb-6" : "mb-8"}`}>
+    <section className={`content-rail animate-in fade-in slide-in-from-bottom-4 duration-500 ${isFocused && isNavigatingRails ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0B0F19] rounded-lg p-2" : ""} ${theme === "nothing" ? "bg-[var(--nothing-card-bg)] rounded-[24px] p-5 mb-6" : "mb-8"}`}>
       <div className={`content-rail-header flex items-center justify-between mb-4 ${theme === "nothing" ? "px-2" : "px-4 md:px-0"}`}>
         <h2 className={`text-lg md:text-xl font-bold ${theme === "nothing" ? "text-[var(--nothing-fg)]" : "text-white"} tracking-wide uppercase`}>
           {title}
@@ -180,7 +180,7 @@ export function ContentRail({
           <button
             aria-label="Scroll left"
             onClick={() => scrollRail("left")}
-            className={`hidden md:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)] border-2 border-[var(--nothing-border)] text-[var(--nothing-fg)] hover:bg-[var(--nothing-gray-2)]" : "bg-black/60 border border-white/10 text-white hover:bg-black/80"} transition`}
+            className={`hidden md:flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)] border-2 border-[var(--nothing-border)] text-[var(--nothing-fg)] hover:bg-[var(--nothing-gray-3)]" : "bg-black/60 border border-white/10 text-white hover:bg-black/80"} transition`}
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -189,7 +189,7 @@ export function ContentRail({
           <button
             aria-label="Scroll right"
             onClick={() => scrollRail("right")}
-            className={`hidden md:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)] border-2 border-[var(--nothing-border)] text-[var(--nothing-fg)] hover:bg-[var(--nothing-gray-2)]" : "bg-black/60 border border-white/10 text-white hover:bg-black/80"} transition`}
+            className={`hidden md:flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)] border-2 border-[var(--nothing-border)] text-[var(--nothing-fg)] hover:bg-[var(--nothing-gray-3)]" : "bg-black/60 border border-white/10 text-white hover:bg-black/80"} transition`}
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -225,7 +225,7 @@ export function ContentRail({
                 variant="outline"
                 size="sm"
                 onClick={handleShowMore}
-                className={`h-full w-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)] border-2 border-[var(--nothing-border)] text-[var(--nothing-fg)] hover:bg-[var(--nothing-gray-2)]" : "bg-white/5 border-white/10 text-white hover:bg-white/10"} flex flex-col gap-2`}
+                className={`h-full w-full ${theme === "nothing" ? "bg-[var(--nothing-elevated)] border-2 border-[var(--nothing-border)] text-[var(--nothing-fg)] hover:bg-[var(--nothing-gray-3)]" : "bg-white/5 border-white/10 text-white hover:bg-white/10"} flex flex-col gap-2`}
               >
                 <ChevronRight className="h-6 w-6" />
                 <span className="text-xs">Load More</span>

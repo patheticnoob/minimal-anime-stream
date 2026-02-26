@@ -9,8 +9,11 @@
   --nothing-gray-2: #151820;
   --nothing-gray-3: #2A2F3A;
   --nothing-gray-4: #9CA3AF;
+  --nothing-gray-5: #6B7280;
   --nothing-border: rgba(161, 161, 170, 0.15);
   --nothing-elevated: #1A1D24;
+  --nothing-card-bg: #151821;
+  --nothing-card-inner: #1a1f2e;
   --nothing-soft-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
   --nothing-card-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
   --nothing-pill-shadow: 0 12px 30px rgba(229, 9, 20, 0.5);
@@ -27,8 +30,11 @@ html[data-theme="nothing"].dark,
   --nothing-gray-2: #151820;
   --nothing-gray-3: #2A2F3A;
   --nothing-gray-4: #9CA3AF;
+  --nothing-gray-5: #6B7280;
   --nothing-border: rgba(161, 161, 170, 0.15);
   --nothing-elevated: #1A1D24;
+  --nothing-card-bg: #151821;
+  --nothing-card-inner: #1a1f2e;
   --nothing-soft-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
   --nothing-card-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
   --nothing-pill-shadow: 0 12px 30px rgba(229, 9, 20, 0.5);
@@ -37,15 +43,18 @@ html[data-theme="nothing"].dark,
 /* Light Mode - only when .light class is explicitly set */
 html[data-theme="nothing"].light,
 [data-theme="nothing"].light {
-  --nothing-bg: #f5f6fb;
+  --nothing-bg: #f0f2f8;
   --nothing-fg: #0a0f1f;
   --nothing-accent: #E50914;
-  --nothing-gray-1: #ffffff;
-  --nothing-gray-2: #eef1fb;
-  --nothing-gray-3: #cfd4e5;
-  --nothing-gray-4: #5a6070;
+  --nothing-gray-1: #e2e6f3;
+  --nothing-gray-2: #d8dced;
+  --nothing-gray-3: #c5cade;
+  --nothing-gray-4: #4a5068;
+  --nothing-gray-5: #7a8099;
   --nothing-border: rgba(11, 16, 32, 0.12);
-  --nothing-elevated: #ffffff;
+  --nothing-elevated: #e8ecf7;
+  --nothing-card-bg: #ffffff;
+  --nothing-card-inner: #eef1fb;
   --nothing-soft-shadow: 0 25px 80px rgba(8, 10, 24, 0.12);
   --nothing-card-shadow: 0 20px 45px rgba(10, 14, 32, 0.08);
   --nothing-pill-shadow: 0 12px 30px rgba(229, 9, 20, 0.3);

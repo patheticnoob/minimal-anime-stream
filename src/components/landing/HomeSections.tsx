@@ -116,7 +116,7 @@ export function HomeSections({
 
           {/* Recent Episodes */}
           {recentEpisodesLoading ? (
-            <div className="bg-[#151821] rounded-[24px] p-5 mb-6">
+            <div className="bg-[var(--nothing-card-bg)] rounded-[24px] p-5 mb-6">
               <h2 className="text-lg md:text-xl font-bold text-[var(--nothing-fg)] tracking-wide uppercase mb-4 px-2">Recent Episodes</h2>
               <LoadingSkeleton />
             </div>
@@ -143,7 +143,7 @@ export function HomeSections({
                 {spotlightItems.slice(-4).map((item, idx) => (
                   <div 
                     key={item.id ?? idx} 
-                    className="relative aspect-[16/10] rounded-[24px] overflow-hidden cursor-pointer group bg-[#151821] hover:shadow-[0_0_20px_rgba(229,9,20,0.2)] transition-all duration-300"
+                    className="relative aspect-[16/10] rounded-[24px] overflow-hidden cursor-pointer group bg-[var(--nothing-card-bg)] hover:shadow-[0_0_20px_rgba(229,9,20,0.2)] transition-all duration-300"
                     onClick={() => onOpenAnime(item)}
                   >
                     <div className="absolute inset-0 rounded-[24px] border border-[var(--nothing-border)] group-hover:border-2 group-hover:border-[var(--nothing-accent)] pointer-events-none transition-all duration-300 z-20" />
@@ -156,12 +156,12 @@ export function HomeSections({
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-[var(--nothing-gray-4)]">No Image</div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-[#0B0F19]/60 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
                     
                     <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      <h3 className="text-xl md:text-2xl font-bold text-[var(--nothing-fg)] mb-2 line-clamp-1 tracking-wide">{item.title}</h3>
+                      <h3 className="text-xl md:text-2xl font-bold text-white mb-2 line-clamp-1 tracking-wide">{item.title}</h3>
                       {item.description && (
-                        <p className="text-sm text-[var(--nothing-gray-4)] line-clamp-2 mb-4 max-w-[90%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                        <p className="text-sm text-gray-300 line-clamp-2 mb-4 max-w-[90%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
                           {item.description}
                         </p>
                       )}
@@ -177,7 +177,7 @@ export function HomeSections({
                           Play Now
                         </button>
                         <button 
-                          className="px-6 py-2 bg-[var(--nothing-elevated)] text-[var(--nothing-fg)] rounded-full text-sm font-bold hover:bg-[var(--nothing-gray-5)] transition-colors border border-[var(--nothing-border)] hover:border-[var(--nothing-accent)] hover:text-[var(--nothing-accent)]"
+                          className="px-6 py-2 bg-[var(--nothing-elevated)] text-[var(--nothing-fg)] rounded-full text-sm font-bold hover:bg-[var(--nothing-gray-3)] transition-colors border border-[var(--nothing-border)] hover:border-[var(--nothing-accent)] hover:text-[var(--nothing-accent)]"
                           onClick={(e) => {
                             e.stopPropagation();
                             onOpenAnime(item);
@@ -189,7 +189,7 @@ export function HomeSections({
                     </div>
 
                     {/* Top right bookmark icon */}
-                    <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[var(--nothing-elevated)]/80 backdrop-blur-md flex items-center justify-center text-[var(--nothing-gray-4)] hover:text-[var(--nothing-accent)] hover:bg-[var(--nothing-gray-5)] transition-colors border border-[var(--nothing-border)] hover:border-[var(--nothing-accent)]">
+                    <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-[var(--nothing-elevated)]/80 backdrop-blur-md flex items-center justify-center text-[var(--nothing-gray-4)] hover:text-[var(--nothing-accent)] hover:bg-[var(--nothing-gray-3)] transition-colors border border-[var(--nothing-border)] hover:border-[var(--nothing-accent)]">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                     </div>
                   </div>
@@ -212,7 +212,7 @@ export function HomeSections({
 
           {/* TV Series */}
           {tvShowsLoading ? (
-            <div className="bg-[#151821] rounded-[24px] p-5 mb-6">
+            <div className="bg-[var(--nothing-card-bg)] rounded-[24px] p-5 mb-6">
               <h2 className="text-lg md:text-xl font-bold text-[var(--nothing-fg)] tracking-wide uppercase mb-4 px-2">TV Series</h2>
               <LoadingSkeleton />
             </div>
@@ -248,7 +248,7 @@ export function HomeSections({
         <div className="w-full xl:w-[320px] shrink-0 space-y-6">
           {/* Top Ten Today */}
           {topTenItems.length > 0 && (
-            <div className="bg-[#151821] rounded-[24px] p-6">
+            <div className="bg-[var(--nothing-card-bg)] rounded-[24px] p-6">
               <h2 className="text-lg font-bold text-[var(--nothing-fg)] tracking-wide uppercase mb-6">Top 10 Today</h2>
               <div className="space-y-5">
                 {topTenItems.slice(0, 10).map((item, idx) => (
@@ -256,11 +256,11 @@ export function HomeSections({
                     <span className={`text-2xl font-bold w-6 text-center ${idx < 3 ? "text-[var(--nothing-accent)]" : "text-[var(--nothing-gray-4)] group-hover:text-[var(--nothing-accent)]"} transition-colors`}>
                       {idx + 1}
                     </span>
-                    <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-[#1a1f2e]">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-[var(--nothing-card-inner)]">
                       {item.image ? (
                         <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">No Img</div>
+                        <div className="w-full h-full flex items-center justify-center text-xs text-[var(--nothing-gray-4)]">No Img</div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">

@@ -82,7 +82,7 @@ function AnimeCardBase({ anime, onClick, variant = "portrait", isLoading = false
       }}
     >
       <div
-        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} overflow-hidden bg-[#1a1f2e] ${theme === "nothing" ? "" : "shadow-lg"} ${borderRadiusClass}`}
+        className={`anime-card-poster-frame relative w-full ${aspectRatioClass} overflow-hidden bg-[var(--nothing-card-inner,#1a1f2e)] ${theme === "nothing" ? "" : "shadow-lg"} ${borderRadiusClass}`}
       >
         {anime.image ? (
           <img

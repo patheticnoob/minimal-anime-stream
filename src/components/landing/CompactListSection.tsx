@@ -7,16 +7,16 @@ export function CompactListSection({ title, items, onOpenAnime, theme }: { title
   const isNothing = theme === "nothing";
   
   return (
-    <div className={isNothing ? "bg-[#151821] rounded-[24px] p-5" : "bg-white/5 rounded-xl p-5 border border-white/10"}>
+    <div className={isNothing ? "bg-[var(--nothing-card-bg)] rounded-[24px] p-5" : "bg-white/5 rounded-xl p-5 border border-white/10"}>
       <h2 className={`text-base md:text-lg font-bold tracking-wide uppercase mb-4 px-1 ${isNothing ? "text-[var(--nothing-fg)]" : "text-white"}`}>{title}</h2>
       <div className="space-y-3">
         {items.slice(0, 5).map((item, idx) => (
           <div key={item.id ?? idx} className={`flex items-center gap-3 cursor-pointer group p-2 rounded-xl transition-colors ${isNothing ? "hover:bg-[var(--nothing-elevated)]" : "hover:bg-white/10"}`} onClick={() => onOpenAnime(item)}>
-            <div className={`w-10 h-14 shrink-0 overflow-hidden ${isNothing ? "rounded-lg bg-[#1a1f2e]" : "rounded-md bg-black/50"}`}>
+            <div className={`w-10 h-14 shrink-0 overflow-hidden ${isNothing ? "rounded-lg bg-[var(--nothing-card-inner)]" : "rounded-md bg-black/50"}`}>
               {item.image ? (
                 <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">No Img</div>
+                <div className="w-full h-full flex items-center justify-center text-xs text-[var(--nothing-gray-4)]">No Img</div>
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -45,7 +45,7 @@ export function CompactListSection({ title, items, onOpenAnime, theme }: { title
 export function CompactSkeleton({ title, theme }: { title: string, theme: string }) {
   const isNothing = theme === "nothing";
   return (
-    <div className={isNothing ? "bg-[#151821] rounded-[24px] p-5" : "bg-white/5 rounded-xl p-5 border border-white/10"}>
+    <div className={isNothing ? "bg-[var(--nothing-card-bg)] rounded-[24px] p-5" : "bg-white/5 rounded-xl p-5 border border-white/10"}>
       <h2 className={`text-base md:text-lg font-bold tracking-wide uppercase mb-4 px-1 ${isNothing ? "text-[var(--nothing-fg)]" : "text-white"}`}>{title}</h2>
       <div className="space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
