@@ -54,25 +54,25 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Default dark background - applied before JS loads */
+/* Default dark background - applied before JS loads, highest priority */
 html, body {
-  background: #0B0D10;
-  color: #F5F5F7;
+  background: #0B0D10 !important;
+  color: #F5F5F7 !important;
 }
 
 /* Nothing theme - dark mode (default) */
 html[data-theme="nothing"],
 html[data-theme="nothing"] body {
-  background: #0B0D10;
-  color: #F5F5F7;
+  background: #0B0D10 !important;
+  color: #F5F5F7 !important;
   font-family: "Commit Mono", monospace;
 }
 
 /* Nothing theme - light mode */
 html[data-theme="nothing"].light,
 html[data-theme="nothing"].light body {
-  background: #f5f6fb;
-  color: #0a0f1f;
+  background: #f5f6fb !important;
+  color: #0a0f1f !important;
   font-family: "Commit Mono", monospace;
 }
 
@@ -80,7 +80,7 @@ html[data-theme="nothing"].light body {
 html[data-theme="nothing"] body::before,
 html[data-theme="nothing"] body::after,
 html[data-theme="nothing"] main::after {
-  display: none;
+  display: none !important;
 }
 
 body {
