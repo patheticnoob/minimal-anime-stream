@@ -488,11 +488,15 @@ html[data-theme="nothing"].light::before {
 }
 
 /* ===== LIGHT MODE OVERRIDES ===== */
-/* Fix text colors in light mode */
+/* Fix text colors in light mode - comprehensive overrides */
 html[data-theme="nothing"].light .text-white,
 html[data-theme="nothing"].light .text-gray-100,
 html[data-theme="nothing"].light .text-gray-200 {
   color: var(--nothing-fg) !important;
+}
+
+html[data-theme="nothing"].light .text-gray-300 {
+  color: var(--nothing-gray-4) !important;
 }
 
 html[data-theme="nothing"].light .text-gray-400,
@@ -500,12 +504,18 @@ html[data-theme="nothing"].light .text-gray-500 {
   color: var(--nothing-gray-4) !important;
 }
 
+html[data-theme="nothing"].light .text-gray-600,
+html[data-theme="nothing"].light .text-gray-700 {
+  color: var(--nothing-gray-5) !important;
+}
+
 /* Fix dark backgrounds in light mode */
 html[data-theme="nothing"].light .bg-\[#0B0F19\],
 html[data-theme="nothing"].light .bg-\[#050814\],
 html[data-theme="nothing"].light .bg-\[#0B0D10\],
-html[data-theme="nothing"].light .bg-\[#1A1D24\] {
-  background: var(--nothing-bg) !important;
+html[data-theme="nothing"].light .bg-\[#1A1D24\],
+html[data-theme="nothing"].light .bg-\[#151821\] {
+  background: var(--nothing-card-bg) !important;
   color: var(--nothing-fg);
 }
 
@@ -535,6 +545,31 @@ html[data-theme="nothing"].light .badge {
   background: var(--nothing-gray-1);
   color: var(--nothing-fg);
   border-color: var(--nothing-border);
+}
+
+/* Hero banner in light mode - text must stay white since it's on dark overlay */
+html[data-theme="nothing"].light .hero-banner-modern h1,
+html[data-theme="nothing"].light .hero-banner-modern p {
+  color: white !important;
+}
+
+/* Fix border colors in light mode */
+html[data-theme="nothing"].light .border-white\/10,
+html[data-theme="nothing"].light .border-white\/20 {
+  border-color: var(--nothing-border) !important;
+}
+
+/* Fix white/opacity text in light mode for non-overlay contexts */
+html[data-theme="nothing"].light footer .text-white\/80 {
+  color: var(--nothing-fg) !important;
+}
+
+html[data-theme="nothing"].light footer .text-white\/40 {
+  color: var(--nothing-gray-4) !important;
+}
+
+html[data-theme="nothing"].light footer .text-white\/20 {
+  color: var(--nothing-gray-5) !important;
 }
 
 /* ===== DARK MODE OVERRIDES ===== */

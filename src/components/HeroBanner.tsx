@@ -141,7 +141,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
   if (theme === "nothing") {
     return (
     <motion.section
-      className="hero-banner-modern bg-[#151821] rounded-[28px] overflow-hidden relative h-[500px] md:h-[550px] lg:h-[600px] flex w-full"
+      className="hero-banner-modern bg-[var(--nothing-card-bg)] rounded-[28px] overflow-hidden relative h-[500px] md:h-[550px] lg:h-[600px] flex w-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -154,8 +154,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
           animate={{ opacity: 1 }}
           transition={{ delay: 0.15, duration: 0.5 }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#151821] via-[#151821]/90 lg:via-[#151821]/60 to-transparent z-10" />
-          <div className="absolute inset-0 bg-[#151821]/30 lg:bg-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/95 via-black/80 lg:via-black/70 to-black/30 z-10" />
           <img
             src={anime.image}
             alt={anime.title || "Anime poster"}
@@ -164,7 +163,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
         </motion.div>
       )}
 
-      {/* Left Content */}
+      {/* Left Content - always white text since it's on dark overlay */}
       <motion.div
         className="w-full lg:w-2/3 p-6 md:p-10 lg:p-12 flex flex-col justify-end lg:justify-center z-20 relative"
         initial={{ opacity: 0, y: 16 }}
@@ -213,18 +212,18 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
 
         {/* Alternative Title or Japanese Title (V4) */}
         {(anime.alternativeTitle || anime.japaneseTitle) && (
-          <p className="text-gray-400 text-xs mb-2 font-mono">
+          <p className="text-white/60 text-xs mb-2 font-mono">
             {anime.alternativeTitle || anime.japaneseTitle}
           </p>
         )}
 
-        {/* Title */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black my-2 leading-tight text-white tracking-tight">
+        {/* Title - always white since it's on dark overlay */}
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black my-2 leading-tight !text-white tracking-tight drop-shadow-lg">
           {anime.title ?? "Featured Anime"}
         </h1>
 
-        {/* Description */}
-        <p className="text-gray-400 max-w-xl my-6 text-sm leading-relaxed font-mono line-clamp-4">
+        {/* Description - always light since it's on dark overlay */}
+        <p className="!text-white/80 max-w-xl my-6 text-sm leading-relaxed font-mono line-clamp-4 drop-shadow">
           {displayDescription}
         </p>
 
@@ -243,7 +242,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
             size="lg"
             variant="outline"
             onClick={onMoreInfo}
-            className="border border-gray-600 hover:bg-white/10 bg-transparent text-white font-bold py-6 px-8 rounded-full flex items-center gap-2 transition-colors text-xs tracking-widest uppercase"
+            className="border border-white/40 hover:bg-white/10 bg-black/30 text-white font-bold py-6 px-8 rounded-full flex items-center gap-2 transition-colors text-xs tracking-widest uppercase"
           >
             <Info className="h-4 w-4" />
             MORE INFO
@@ -252,7 +251,7 @@ function HeroBannerBase({ anime, onPlay, onMoreInfo, isLoading = false }: HeroBa
           <Button
             size="lg"
             variant="outline"
-            className="border border-gray-600 hover:bg-white/10 bg-transparent text-white font-bold h-12 w-12 rounded-full flex items-center justify-center transition-colors p-0"
+            className="border border-white/40 hover:bg-white/10 bg-black/30 text-white font-bold h-12 w-12 rounded-full flex items-center justify-center transition-colors p-0"
           >
             <Plus className="h-5 w-5" />
           </Button>
