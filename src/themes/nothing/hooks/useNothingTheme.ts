@@ -10,10 +10,14 @@ export function useNothingTheme() {
 
   useEffect(() => {
     const root = document.documentElement;
+    // Always keep data-theme="nothing"
+    root.setAttribute("data-theme", "nothing");
     if (isDarkMode) {
       root.classList.add("dark");
+      root.classList.remove("light");
     } else {
       root.classList.remove("dark");
+      root.classList.add("light");
     }
     localStorage.setItem("nothing-dark-mode", String(isDarkMode));
   }, [isDarkMode]);

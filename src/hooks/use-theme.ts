@@ -1,23 +1,16 @@
-import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { useEffect } from "react";
 
+// Theme is always "nothing" - we only manage dark/light mode via localStorage
 export function useTheme() {
-  const currentTheme = useQuery(api.themes.getUserTheme);
-  const setThemeMutation = useMutation(api.themes.setUserTheme);
-
-  // Default to "nothing" theme if no theme is set
-  const theme = currentTheme || "nothing";
+  const theme = "nothing";
 
   useEffect(() => {
-    if (theme) {
-      document.documentElement.setAttribute("data-theme", theme);
-    }
-  }, [theme]);
+    document.documentElement.setAttribute("data-theme", "nothing");
+  }, []);
 
-  const setTheme = async (theme: "classic" | "retro" | "nothing") => {
-    document.documentElement.setAttribute("data-theme", theme);
-    await setThemeMutation({ theme });
+  // No-op setTheme kept for compatibility
+  const setTheme = async (_theme: "classic" | "retro" | "nothing") => {
+    document.documentElement.setAttribute("data-theme", "nothing");
   };
 
   return {

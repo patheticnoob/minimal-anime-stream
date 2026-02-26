@@ -54,26 +54,38 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Light theme background for classic theme */
-html[data-theme="classic"] body,
-body[data-theme="classic"] {
-  background: #F0F2F5;
-  color: #1C1C1E;
+/* Default dark background - applied before JS loads */
+html, body {
+  background: #0B0D10;
+  color: #F5F5F7;
 }
 
-html[data-theme="classic"] body::before,
-html[data-theme="classic"] body::after,
-html[data-theme="classic"] main::after,
-body[data-theme="classic"]::before,
-body[data-theme="classic"]::after {
+/* Nothing theme - dark mode (default) */
+html[data-theme="nothing"],
+html[data-theme="nothing"] body {
+  background: #0B0D10;
+  color: #F5F5F7;
+  font-family: "Commit Mono", monospace;
+}
+
+/* Nothing theme - light mode */
+html[data-theme="nothing"].light,
+html[data-theme="nothing"].light body {
+  background: #f5f6fb;
+  color: #0a0f1f;
+  font-family: "Commit Mono", monospace;
+}
+
+/* Suppress aurora/grid overlays for nothing theme */
+html[data-theme="nothing"] body::before,
+html[data-theme="nothing"] body::after,
+html[data-theme="nothing"] main::after {
   display: none;
 }
 
 body {
   position: relative;
   min-height: 100vh;
-  background: #0B0D10;
-  color: #F5F5F7;
 }
 
 body::before {
@@ -158,25 +170,4 @@ main::after {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-html[data-theme="nothing"] body,
-body[data-theme="nothing"] {
-  background: #0B0D10;
-  color: #F5F5F7;
-  font-family: "Commit Mono", monospace;
-}
-
-html[data-theme="nothing"] body::before,
-html[data-theme="nothing"] body::after,
-html[data-theme="nothing"] main::after,
-body[data-theme="nothing"]::before,
-body[data-theme="nothing"]::after {
-  display: none;
-}
-
-html[data-theme="nothing"] main,
-body[data-theme="nothing"] main {
-  background: var(--nothing-bg);
-  color: var(--nothing-fg);
 }

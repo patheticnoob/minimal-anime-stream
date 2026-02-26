@@ -1,7 +1,9 @@
 /* NothingOS Theme - Minimalist Design System */
 
-[data-theme="nothing"] {
-  /* Core Colors - Dark Mode by Default (Cinematic Premium) */
+/* Dark mode (default) */
+[data-theme="nothing"],
+.dark[data-theme="nothing"],
+html[data-theme="nothing"].dark {
   --nothing-bg: #0B0D10;
   --nothing-fg: #F5F5F7;
   --nothing-accent: #E50914;
@@ -16,38 +18,22 @@
   --nothing-pill-shadow: 0 12px 30px rgba(229, 9, 20, 0.5);
 }
 
-/* Light Mode Override */
+/* Light Mode */
+html[data-theme="nothing"].light,
 .light[data-theme="nothing"],
 .light [data-theme="nothing"] {
   --nothing-bg: #f5f6fb;
   --nothing-fg: #0a0f1f;
-  --nothing-accent: #ff3b3b;
+  --nothing-accent: #E50914;
   --nothing-gray-1: #ffffff;
   --nothing-gray-2: #eef1fb;
   --nothing-gray-3: #cfd4e5;
-  --nothing-gray-4: #8a90a6;
-  --nothing-border: rgba(11, 16, 32, 0.08);
+  --nothing-gray-4: #5a6070;
+  --nothing-border: rgba(11, 16, 32, 0.12);
   --nothing-elevated: #ffffff;
   --nothing-soft-shadow: 0 25px 80px rgba(8, 10, 24, 0.12);
   --nothing-card-shadow: 0 20px 45px rgba(10, 14, 32, 0.08);
-  --nothing-pill-shadow: 0 12px 30px rgba(255, 59, 59, 0.3);
-}
-
-/* Keep dark class as alias for default (backward compat) */
-.dark[data-theme="nothing"],
-.dark [data-theme="nothing"] {
-  --nothing-bg: #0B0D10;
-  --nothing-fg: #F5F5F7;
-  --nothing-accent: #E50914;
-  --nothing-gray-1: #1F2933;
-  --nothing-gray-2: #151820;
-  --nothing-gray-3: #2A2F3A;
-  --nothing-gray-4: #9CA3AF;
-  --nothing-border: rgba(161, 161, 170, 0.15);
-  --nothing-elevated: #1A1D24;
-  --nothing-soft-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
-  --nothing-card-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
-  --nothing-pill-shadow: 0 12px 30px rgba(229, 9, 20, 0.5);
+  --nothing-pill-shadow: 0 12px 30px rgba(229, 9, 20, 0.3);
 }
 
 /* Base Styles */
@@ -62,13 +48,6 @@
   text-rendering: optimizeSpeed;
 }
 
-.dark[data-theme="nothing"] body,
-.dark[data-theme="nothing"] .min-h-screen,
-.dark[data-theme="nothing"] main {
-  background: var(--nothing-bg);
-  color: var(--nothing-fg);
-}
-
 [data-theme="nothing"]::before {
   content: '';
   position: fixed;
@@ -81,6 +60,12 @@
   opacity: 0.15;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Light mode dot pattern */
+html[data-theme="nothing"].light [data-theme="nothing"]::before,
+html[data-theme="nothing"].light::before {
+  opacity: 0.06;
 }
 
 /* Content Rails - NothingCN Style */
@@ -479,6 +464,37 @@
   gap: 1rem;
 }
 
+/* Light mode text overrides for readability */
+html[data-theme="nothing"].light .text-white,
+html[data-theme="nothing"].light .text-gray-100,
+html[data-theme="nothing"].light .text-gray-200 {
+  color: var(--nothing-fg) !important;
+}
+
+html[data-theme="nothing"].light .text-gray-400,
+html[data-theme="nothing"].light .text-gray-500 {
+  color: var(--nothing-gray-4) !important;
+}
+
+html[data-theme="nothing"].light .bg-\[#0B0F19\],
+html[data-theme="nothing"].light .bg-\[#050814\] {
+  background: var(--nothing-bg) !important;
+  color: var(--nothing-fg);
+}
+
+/* Dark mode text overrides */
+html[data-theme="nothing"].dark .text-white,
+html[data-theme="nothing"].dark .text-gray-100,
+html[data-theme="nothing"].dark .text-gray-200 {
+  color: var(--nothing-fg) !important;
+}
+
+html[data-theme="nothing"].dark .text-gray-400,
+html[data-theme="nothing"].dark .text-gray-500,
+html[data-theme="nothing"].dark .text-gray-600 {
+  color: var(--nothing-gray-4) !important;
+}
+
 /* Mobile Optimizations */
 @media (max-width: 768px) {
   [data-theme="nothing"]::before {
@@ -512,42 +528,4 @@
     padding: 0.4rem 0.75rem;
     font-size: 0.75rem;
   }
-}
-
-/* Override default dark theme colors */
-[data-theme="nothing"] .text-white,
-[data-theme="nothing"] .text-gray-100,
-[data-theme="nothing"] .text-gray-200 {
-  color: var(--nothing-fg) !important;
-}
-
-[data-theme="nothing"] .text-gray-400,
-[data-theme="nothing"] .text-gray-500,
-[data-theme="nothing"] .text-gray-600 {
-  color: var(--nothing-gray-4) !important;
-}
-
-[data-theme="nothing"] .bg-\[#0B0F19\],
-[data-theme="nothing"] .bg-\[#050814\],
-[data-theme="nothing"] .bg-black\/60 {
-  background: var(--nothing-bg) !important;
-  color: var(--nothing-fg);
-}
-
-[data-theme="nothing"] .border-white\/10,
-[data-theme="nothing"] .border-white\/20 {
-  border-color: var(--nothing-border) !important;
-}
-
-/* Dark mode cinematic enhancements (same as default now) */
-.dark[data-theme="nothing"] body,
-.dark[data-theme="nothing"] .min-h-screen,
-.dark[data-theme="nothing"] main {
-  background: var(--nothing-bg);
-  color: var(--nothing-fg);
-}
-
-.dark[data-theme="nothing"]::before {
-  background-image: radial-gradient(circle, rgba(229, 9, 20, 0.03) 1px, transparent 1px);
-  opacity: 0.15;
 }

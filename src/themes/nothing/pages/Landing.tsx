@@ -5,7 +5,6 @@ import { useNothingTheme } from "../hooks/useNothingTheme";
 export default function NothingLanding() {
   const { isDarkMode, toggleTheme } = useNothingTheme();
 
-  // Memoize the component to prevent unnecessary re-renders of the navbar
   const NavBarWithDarkMode = (props: any) => (
     <NothingNavBar
       {...props}
@@ -15,10 +14,8 @@ export default function NothingLanding() {
   );
 
   return (
-    <div data-theme="nothing" className={`w-full min-h-screen ${isDarkMode ? "dark" : "light"}`}>
-      <Landing 
-        NavBarComponent={NavBarWithDarkMode}
-      />
-    </div>
+    <Landing 
+      NavBarComponent={NavBarWithDarkMode}
+    />
   );
 }
