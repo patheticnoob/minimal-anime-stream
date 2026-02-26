@@ -41,3 +41,14 @@ export const setUserTheme = mutation({
     await ctx.db.patch(user._id, { theme: args.theme });
   },
 });
+
+export const resetAllThemesToNothing = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").take(1000);
+    for (const user of users) {
+      await ctx.db.patch(user._id, { theme: "nothing" });
+    }
+    return { updated: users.length };
+  },
+});
