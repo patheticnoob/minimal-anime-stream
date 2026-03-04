@@ -1,0 +1,39 @@
+/* Classic Theme - Blue-Cyan Dark */
+[data-theme="classic"] {
+  --radius: 0.5rem;
+  --background: oklch(0.08 0.03 240);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.12 0.04 240);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.10 0.04 240);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.60 0.20 240);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.20 0.04 240);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.18 0.04 240);
+  --muted-foreground: oklch(0.70 0.02 240);
+  --accent: oklch(0.22 0.04 240);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.20 0.04 240);
+  --input: oklch(0.20 0.04 240);
+  --ring: oklch(0.60 0.20 240);
+  
+  --font-heading: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  
+  --animation-speed: 0.3s;
+  --card-hover-scale: 1.03;
+  --blur-amount: 60px;
+}
+
+[data-theme="classic"] body {
+  background: radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15), transparent 50%),
+    radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.12), transparent 55%),
+    linear-gradient(135deg, #050a14 0%, #0a0f1d 50%, #0d1425 100%);
+}
+
+[data-theme="classic"] .anime-card {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(14, 165, 233, 0.15));
+}

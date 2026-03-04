@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-theme="nothing" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GojoStream</title>
+    <!-- Apply dark theme immediately before any JS loads -->
+    <style>
+      html, body { background: #0B0D10 !important; color: #F5F5F7 !important; }
+    </style>
+    <script>
+      (function() {
+        // Always set data-theme to nothing
+        document.documentElement.setAttribute('data-theme', 'nothing');
+        // Check localStorage for dark/light preference, default to dark
+        var saved = localStorage.getItem('nothing-dark-mode');
+        var isDark = saved === null ? true : saved === 'true';
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+          document.body && (document.body.style.background = '#0B0D10');
+        } else {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+          document.body && (document.body.style.background = '#f5f6fb');
+        }
+      })();
+    </script>
+    <!-- Google Cast SDK -->
+    <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

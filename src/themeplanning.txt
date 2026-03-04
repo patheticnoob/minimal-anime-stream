@@ -1,0 +1,27 @@
+# Theme Architecture Planning
+
+## Structure
+- src/themes/{theme}/pages/ - Theme-specific page implementations
+- src/themes/{theme}/components/ - Theme-specific components (future)
+- src/shared/ - Shared logic, types, and hooks
+- src/components/ - Shared, theme-agnostic components
+
+## Current Status
+✅ Theme routing infrastructure complete
+✅ Placeholder pages created for both themes
+✅ Shared types and hooks established
+🔄 Currently wrapping existing Landing page for both themes
+📋 Next: Create distinct UI implementations per theme
+
+## Architecture Benefits
+- Complete UI flexibility per theme
+- Easier maintenance and testing
+- Better code organization
+- Lazy loading for performance
+- Shared business logic via hooks
+
+## Next Steps
+1. Gradually create theme-specific components
+2. Migrate shared components to theme-specific versions
+3. Implement unique layouts per theme
+4. Add theme-specific animations and interactions

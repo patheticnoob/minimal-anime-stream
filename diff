@@ -1,0 +1,16 @@
+--- src/components/VideoPlayer.tsx
++++ src/components/VideoPlayer.tsx
+@@ -420,15 +420,13 @@
+                         src={thumbnailPreview.url}
+                         alt="Video preview"
+                         crossOrigin="anonymous"
+                         className="absolute top-0 left-0"
+                         style={{
+                           width: `${(thumbnailPreview as any).width}px`,
+                           height: `${(thumbnailPreview as any).height}px`,
+                           objectFit: 'none',
+                           objectPosition: `-${(thumbnailPreview as any).spriteX}px -${(thumbnailPreview as any).spriteY}px`,
+                         }}
+                         onError={(e) => {
+                           console.error('Thumbnail failed to load:', thumbnailPreview.url);
+                           e.currentTarget.style.display = 'none';

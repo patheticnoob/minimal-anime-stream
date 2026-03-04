@@ -1,0 +1,631 @@
+@import "tailwindcss";
+
+/* Custom scrollbar styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--accent) / 0.3) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--accent) / 0.3);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--accent) / 0.5);
+}
+
+.scrollbar-thin::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Theme Preset Card Enhancements */
+.theme-preset-card {
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.02) 0%, transparent 50%),
+    linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)/0.95) 100%);
+}
+
+.theme-preset-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, 
+    rgba(255,255,255,0.1) 0%, 
+    transparent 50%, 
+    rgba(0,0,0,0.05) 100%);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  pointer-events: none;
+}
+
+/* Staggered reveal animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Enhanced pulse animation for active indicators */
+@keyframes enhanced-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.animate-enhanced-pulse {
+  animation: enhanced-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Direct font face declarations */
+@font-face {
+  font-family: "Ndot";
+  src: url("/fonts/ndot/Web Fonts/d7a74ed36ff0603a3e41b6da32c47f03.woff2")
+      format("woff2"),
+    url("/fonts/ndot/Web Fonts/d7a74ed36ff0603a3e41b6da32c47f03.woff")
+      format("woff"),
+    url("/fonts/ndot/Web Fonts/d7a74ed36ff0603a3e41b6da32c47f03.ttf")
+      format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CommitMono";
+  src: url("/fonts/commit-mono/CommitMono-400-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CommitMono";
+  src: url("/fonts/commit-mono/CommitMono-400-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CommitMono";
+  src: url("/fonts/commit-mono/CommitMono-700-Regular.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CommitMono";
+  src: url("/fonts/commit-mono/CommitMono-700-Italic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 0%;
+
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 0%;
+
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+
+  --accent: 0 84% 60%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 0 0% 90%;
+  --input: 0 0% 96%;
+  --ring: 0 84% 60%;
+
+  --radius: 0rem;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius: var(--radius);
+
+  /* Font Family Definitions */
+  --font-ndot: "Ndot", "SF Mono", Monaco, "Cascadia Code", "Roboto Mono",
+    Consolas, "Courier New", monospace;
+  --font-commit-mono: "CommitMono", "SF Mono", Monaco, "Cascadia Code",
+    "Roboto Mono", Consolas, "Courier New", monospace;
+  --font-system: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Default font assignments */
+  --font-sans: var(--font-system);
+  --font-mono: var(--font-commit-mono);
+
+  /* Tailwind font families */
+  --font-family-ndot: var(--font-ndot);
+  --font-family-commit-mono: var(--font-commit-mono);
+  --font-family-system: var(--font-system);
+  --font-family-brand: var(--font-ndot);
+  --font-family-code: var(--font-commit-mono);
+  --font-family-ui: var(--font-system);
+}
+
+.dark {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
+
+  --popover: 0 0% 0%;
+  --popover-foreground: 0 0% 100%;
+
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 65%;
+
+  --accent: 0 84% 60%;
+  --accent-foreground: 0 0% 0%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 0%;
+
+  --border: 0 0% 20%;
+  --input: 0 0% 10%;
+  --ring: 0 84% 60%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Only apply transitions after the app has loaded to prevent flashing */
+body.theme-loaded {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Nothing OS inspired animations */
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px hsl(var(--accent)), 0 0 10px hsl(var(--accent)),
+      0 0 15px hsl(var(--accent));
+  }
+  50% {
+    box-shadow: 0 0 10px hsl(var(--accent)), 0 0 20px hsl(var(--accent)),
+      0 0 30px hsl(var(--accent));
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fallingRain {
+  from {
+    transform: translateY(-100vh);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes searchFocus {
+  from {
+    box-shadow: 0 0 0 0 hsl(var(--accent) / 0.2);
+    border-color: hsl(var(--border));
+  }
+  to {
+    box-shadow: 0 0 0 4px hsl(var(--accent) / 0.2);
+    border-color: hsl(var(--accent));
+  }
+}
+
+@keyframes categoryPill {
+  from {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 hsl(var(--accent) / 0.3);
+  }
+  to {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 2px hsl(var(--accent) / 0.3);
+  }
+}
+
+@keyframes contentReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes staggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chevronRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes floatUp {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-falling-rain {
+  animation: fallingRain 2s linear infinite;
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-search-focus {
+  animation: searchFocus 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-category-pill {
+  animation: categoryPill 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-content-reveal {
+  animation: contentReveal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-stagger-in {
+  animation: staggerIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-chevron-rotate {
+  animation: chevronRotate 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-gradient-shift {
+  animation: gradientShift 3s ease-in-out infinite;
+  background-size: 200% 200%;
+}
+
+.animate-float-up {
+  animation: floatUp 3s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent-foreground));
+}
+
+/* Custom prose styles */
+.prose {
+  color: hsl(var(--foreground));
+  max-width: none;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: hsl(var(--foreground));
+}
+
+.prose a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.prose blockquote {
+  border-left: 4px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+}
+
+.prose code {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: var(--font-commit-mono);
+}
+
+.prose pre {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  font-family: var(--font-commit-mono);
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Container */
+.container {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+/* Component preview styles */
+.component-preview {
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  background: hsl(var(--background));
+}
+
+.component-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
+  border-radius: 8px 8px 0 0;
+}
+
+.component-preview-content {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* Primary font utilities */
+
+/* Ndot font utility - for branding, headers, and special UI elements */
+.font-ndot {
+  font-family: var(--font-ndot) !important;
+  font-feature-settings: normal;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
+
+/* Commit Mono font utility - for code, technical text, and monospace needs */
+.font-commit-mono {
+  font-family: var(--font-commit-mono);
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  font-variant-ligatures: normal;
+}
+
+/* System font utility - for body text and general UI */
+.font-system {
+  font-family: var(--font-system);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* Semantic font utilities */
+.font-brand {
+  font-family: var(--font-ndot);
+  font-feature-settings: normal;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.05em;
+}
+
+.font-code {
+  font-family: var(--font-commit-mono);
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  font-variant-ligatures: normal;
+}
+
+.font-ui {
+  font-family: var(--font-system);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* Responsive preview containers */
+.mobile-preview {
+  --tw-breakpoint-sm: 0px;
+  --tw-breakpoint-md: 0px;
+  --tw-breakpoint-lg: 0px;
+  --tw-breakpoint-xl: 0px;
+}
+
+.mobile-preview .grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.mobile-preview .md\:grid-cols-2 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.mobile-preview .lg\:grid-cols-4 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.tablet-preview .grid {
+  display: grid;
+}
+
+.tablet-preview .md\:grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tablet-preview .lg\:grid-cols-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}

@@ -1,0 +1,835 @@
+@import url("https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap");
+
+[data-theme="retro"] {
+  --radius: 0.125rem;
+  --background: oklch(0.12 0.02 240);
+  --foreground: oklch(0.95 0.05 180);
+  --card: oklch(0.15 0.03 240);
+  --card-foreground: oklch(0.95 0.05 180);
+  --popover: oklch(0.15 0.03 240);
+  --popover-foreground: oklch(0.95 0.05 180);
+  --primary: oklch(0.75 0.25 330);
+  --primary-foreground: oklch(0.12 0.02 240);
+  --secondary: oklch(0.65 0.22 180);
+  --secondary-foreground: oklch(0.12 0.02 240);
+  --muted: oklch(0.2 0.03 240);
+  --muted-foreground: oklch(0.6 0.05 180);
+  --accent: oklch(0.7 0.25 150);
+  --accent-foreground: oklch(0.12 0.02 240);
+  --destructive: oklch(0.6 0.25 20);
+  --border: oklch(0.3 0.05 240);
+  --input: oklch(0.25 0.05 240);
+  --ring: oklch(0.75 0.25 330);
+  --chart-1: oklch(0.75 0.25 330);
+  --chart-2: oklch(0.65 0.22 180);
+  --chart-3: oklch(0.7 0.25 150);
+  --chart-4: oklch(0.8 0.2 60);
+  --chart-5: oklch(0.7 0.22 280);
+  --sidebar: oklch(0.15 0.03 240);
+  --sidebar-foreground: oklch(0.95 0.05 180);
+  --sidebar-primary: oklch(0.75 0.25 330);
+  --sidebar-primary-foreground: oklch(0.12 0.02 240);
+  --sidebar-accent: oklch(0.2 0.03 240);
+  --sidebar-accent-foreground: oklch(0.95 0.05 180);
+  --sidebar-border: oklch(0.3 0.05 240);
+  --sidebar-ring: oklch(0.75 0.25 330);
+  --font-heading: "Courier Prime", "Courier New", monospace;
+  --font-body: "Courier Prime", "Courier New", monospace;
+}
+
+/* Retro Grid Background */
+@keyframes retroScan {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 8px;
+  }
+}
+
+@keyframes retroPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.7), 0 0 30px rgba(255, 105, 180, 0.5);
+  }
+}
+
+[data-theme="retro"] body {
+  font-family: var(--font-body);
+  letter-spacing: 0.1em;
+  color: oklch(0.95 0.05 180);
+  position: relative;
+  background-color: #040615 !important;
+  background-image:
+    radial-gradient(circle at 12% 22%, rgba(255, 105, 180, 0.28), transparent 55%),
+    radial-gradient(circle at 80% 8%, rgba(0, 255, 213, 0.22), transparent 45%),
+    radial-gradient(circle at 64% 80%, rgba(0, 132, 255, 0.18), transparent 50%),
+    linear-gradient(120deg, rgba(255, 105, 180, 0.16), rgba(5, 8, 18, 0) 45%),
+    linear-gradient(300deg, rgba(0, 229, 255, 0.16), rgba(5, 8, 18, 0) 50%),
+    linear-gradient(180deg, rgba(5, 9, 20, 0) 0%, rgba(3, 5, 12, 0.88) 60%, rgba(2, 4, 10, 1) 100%) !important;
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+[data-theme="retro"] body::before,
+[data-theme="retro"] body::after {
+  content: none;
+}
+
+/* Retro Grid Background - Optimized with will-change */
+[data-theme="retro"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(136, 163, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(136, 163, 255, 0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.4;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 1;
+  will-change: opacity;
+}
+
+/* Scanline Effect - Simplified for performance */
+[data-theme="retro"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.2) 50%);
+  background-size: 100% 4px;
+  mix-blend-mode: screen;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 2;
+  will-change: opacity;
+}
+
+/* Typography */
+[data-theme="retro"] h1,
+[data-theme="retro"] h2,
+[data-theme="retro"] h3,
+[data-theme="retro"] h4,
+[data-theme="retro"] h5,
+[data-theme="retro"] h6 {
+  font-family: var(--font-heading);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px currentColor;
+}
+
+[data-theme="retro"] p,
+[data-theme="retro"] span,
+[data-theme="retro"] button,
+[data-theme="retro"] input,
+[data-theme="retro"] label {
+  font-family: var(--font-body);
+}
+
+[data-theme="retro"] button {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Retro Hero Banner - VHS Style */
+[data-theme="retro"] .hero-banner,
+[data-theme="retro"] .hero-banner-inner {
+  min-height: auto;
+  height: auto;
+  padding-top: clamp(2rem, 4vw, 3.5rem);
+  padding-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+[data-theme="retro"] .hero-banner-inner {
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+}
+
+[data-theme="retro"] .hero-banner {
+  position: relative;
+  border: 2px solid oklch(0.75 0.25 330);
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  overflow: hidden;
+}
+
+[data-theme="retro"] .hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 105, 180, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 105, 180, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+[data-theme="retro"] .hero-banner::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 105, 180, 0.1) 20%,
+    rgba(0, 255, 170, 0.1) 40%,
+    rgba(255, 215, 0, 0.1) 60%,
+    rgba(255, 105, 180, 0.2) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+[data-theme="retro"] .hero-banner-art {
+  flex: 0 0 auto;
+  width: clamp(220px, 28vw, 320px);
+  aspect-ratio: 2 / 3;
+  min-height: auto;
+  max-height: none;
+  border-radius: 0.125rem;
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  contain: paint;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+[data-theme="retro"] .hero-banner-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+[data-theme="retro"] .hero-banner-art:hover {
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.7), 0 0 30px rgba(255, 105, 180, 0.5);
+}
+
+[data-theme="retro"] .hero-banner-art:hover img {
+  transform: scale(1.1);
+}
+
+[data-theme="retro"] .hero-banner-art-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 6, 21, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  border-radius: 0.125rem;
+}
+
+[data-theme="retro"] .hero-banner-art:hover .hero-banner-art-overlay {
+  opacity: 1;
+}
+
+[data-theme="retro"] .hero-banner-art-play {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  border: 2px solid oklch(0.75 0.25 330);
+  background: rgba(0, 0, 0, 0.65);
+  color: oklch(0.75 0.25 330);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+[data-theme="retro"] .hero-banner-art-play svg {
+  width: 22px;
+  height: 22px;
+}
+
+[data-theme="retro"] .hero-banner-copy {
+  flex: 1;
+  max-width: 600px;
+}
+
+[data-theme="retro"] .hero-banner-copy h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: oklch(0.75 0.25 330);
+  text-shadow: 
+    0 0 10px oklch(0.75 0.25 330),
+    0 0 20px oklch(0.75 0.25 330),
+    0 0 30px oklch(0.75 0.25 330);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+[data-theme="retro"] .hero-banner-copy p {
+  color: oklch(0.65 0.22 180);
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 5px oklch(0.65 0.22 180);
+  line-height: 1.6;
+}
+
+[data-theme="retro"] .hero-banner button {
+  background: oklch(0.75 0.25 330) !important;
+  border: 2px solid oklch(0.75 0.25 330);
+  color: oklch(0.12 0.02 240) !important;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+[data-theme="retro"] .hero-banner button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.7), 0 0 30px rgba(255, 105, 180, 0.5);
+}
+
+[data-theme="retro"] .hero-banner-copy .flex.flex-wrap span,
+[data-theme="retro"] .hero-banner-copy .flex.flex-wrap .badge {
+  border-radius: 0.125rem;
+  border: 1px solid oklch(0.3 0.05 240);
+  background: oklch(0.2 0.03 240);
+  padding: 2px 10px;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Anime Cards */
+[data-theme="retro"] .anime-card {
+  border-radius: 0.125rem;
+  border: 2px solid oklch(0.75 0.25 330);
+  background: oklch(0.15 0.03 240);
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.4), 0 0 16px rgba(255, 105, 180, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 0;
+  overflow: visible;
+  will-change: transform;
+  contain: paint;
+}
+
+[data-theme="retro"] .anime-card::before {
+  background: none;
+}
+
+[data-theme="retro"] .anime-card:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(255, 105, 180, 0.6), 0 0 24px rgba(255, 105, 180, 0.4);
+  border-color: oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .anime-card-inner {
+  background: oklch(0.15 0.03 240);
+}
+
+[data-theme="retro"] .anime-card-poster {
+  filter: saturate(1) contrast(1.1);
+}
+
+[data-theme="retro"] .anime-card .text-gray-100 {
+  color: oklch(0.95 0.05 180);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-theme="retro"] .anime-card .text-[#8f9aa3] {
+  color: oklch(0.6 0.05 180);
+  letter-spacing: 0.1em;
+}
+
+[data-theme="retro"] .anime-card .bg-[#1977F3] {
+  background: oklch(0.75 0.25 330) !important;
+}
+
+[data-theme="retro"] .anime-card .bg-black\\/60 {
+  background: oklch(0.2 0.03 240) !important;
+  border: 1px solid oklch(0.3 0.05 240);
+}
+
+[data-theme="retro"] .anime-card-retro-overlay {
+  opacity: 0.12;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.1), transparent 50%);
+  mix-blend-mode: screen;
+  z-index: 2;
+  will-change: opacity;
+  transition: opacity 0.3s ease;
+}
+
+[data-theme="retro"] .anime-card-retro-scanlines {
+  opacity: 0.25;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.12) 0px,
+    rgba(255, 255, 255, 0.12) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode: screen;
+  z-index: 3;
+  will-change: opacity;
+  transition: opacity 0.3s ease;
+}
+
+[data-theme="retro"] .anime-card:hover .anime-card-retro-overlay {
+  opacity: 0.25;
+}
+
+[data-theme="retro"] .anime-card:hover .anime-card-retro-scanlines {
+  opacity: 0.45;
+}
+
+[data-theme="retro"] .anime-card-poster-frame {
+  border-radius: 0.125rem;
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  overflow: hidden;
+}
+
+[data-theme="retro"] .anime-card-play-overlay {
+  background: rgba(4, 6, 21, 0.75);
+}
+
+[data-theme="retro"] .anime-card-play-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  border: 2px solid oklch(0.75 0.25 330);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.85));
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.6), 0 0 30px rgba(255, 105, 180, 0.4);
+  transition: transform 0.2s ease;
+}
+
+[data-theme="retro"] .anime-card-play-button svg {
+  color: oklch(0.75 0.25 330);
+  fill: currentColor;
+}
+
+[data-theme="retro"] .anime-card-play-button:hover {
+  transform: scale(1.05);
+}
+
+/* Scrollbar */
+[data-theme="retro"] .scrollbar-hide::-webkit-scrollbar {
+  height: 6px;
+}
+
+[data-theme="retro"] .scrollbar-hide::-webkit-scrollbar-thumb {
+  background: oklch(0.75 0.25 330);
+  border-radius: 0;
+}
+
+/* Inputs */
+[data-theme="retro"] input,
+[data-theme="retro"] textarea {
+  background: oklch(0.25 0.05 240);
+  border: 1px solid oklch(0.75 0.25 330);
+  color: oklch(0.95 0.05 180);
+  border-radius: 0.125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: var(--font-body);
+}
+
+/* Modals and Sidebar */
+[data-theme="retro"] .detail-sheet,
+[data-theme="retro"] .sidebar {
+  background: oklch(0.15 0.03 240);
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  border-radius: 0.125rem;
+}
+
+[data-theme="retro"] .sidebar .text-gray-400,
+[data-theme="retro"] .detail-sheet p {
+  color: oklch(0.6 0.05 180);
+}
+
+[data-theme="retro"] .detail-episode {
+  border: 2px solid oklch(0.3 0.05 240);
+  background: oklch(0.15 0.03 240);
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+[data-theme="retro"] .detail-episode:hover {
+  border-color: oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+  transform: translateX(4px);
+}
+
+[data-theme="retro"] .detail-episode-title {
+  color: oklch(0.95 0.05 180);
+  font-family: 'Courier Prime', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.9rem;
+}
+
+[data-theme="retro"] .detail-episode-meta {
+  color: oklch(0.6 0.05 180);
+  font-family: 'Courier Prime', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+}
+
+/* Info Modal Retro Styling */
+[data-theme="retro"] .detail-sheet {
+  background: oklch(0.12 0.02 240);
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+}
+
+[data-theme="retro"] .detail-hero-title {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-family: 'Courier Prime', monospace;
+}
+
+[data-theme="retro"] .detail-hero-tag {
+  background: oklch(0.2 0.03 240);
+  border: 2px solid oklch(0.75 0.25 330);
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .detail-hero-actions button {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: 'Courier Prime', monospace;
+}
+
+/* Retro Tabs Styling */
+[data-theme="retro"] .detail-tabs {
+  border-bottom: 2px solid oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .detail-tab {
+  color: oklch(0.6 0.05 180);
+  font-family: 'Courier Prime', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+[data-theme="retro"] .detail-tab:hover {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .detail-tab.is-active {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .detail-tab.is-active::after {
+  background: oklch(0.75 0.25 330);
+  height: 3px;
+  box-shadow: 0 0 10px oklch(0.75 0.25 330);
+}
+
+/* Retro Button Styling in Info Modal */
+[data-theme="retro"] .btn-primary,
+[data-theme="retro"] .detail-hero-actions .btn-primary {
+  background: oklch(0.75 0.25 330) !important;
+  border: 2px solid oklch(0.75 0.25 330) !important;
+  color: oklch(0.12 0.02 240) !important;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5), 0 0 20px rgba(255, 105, 180, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-family: 'Courier Prime', monospace;
+}
+
+[data-theme="retro"] .btn-primary:hover,
+[data-theme="retro"] .detail-hero-actions .btn-primary:hover {
+  background: oklch(0.8 0.25 330) !important;
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.7), 0 0 30px rgba(255, 105, 180, 0.5);
+  transform: scale(1.02);
+}
+
+[data-theme="retro"] .btn-secondary,
+[data-theme="retro"] .detail-hero-actions .btn-secondary {
+  background: oklch(0.2 0.03 240) !important;
+  border: 2px solid oklch(0.75 0.25 330) !important;
+  color: oklch(0.75 0.25 330) !important;
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-family: 'Courier Prime', monospace;
+}
+
+[data-theme="retro"] .btn-secondary:hover,
+[data-theme="retro"] .detail-hero-actions .btn-secondary:hover {
+  background: oklch(0.25 0.03 240) !important;
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+  transform: scale(1.02);
+}
+
+/* Progress Bars */
+[data-theme="retro"] .progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+}
+
+[data-theme="retro"] .progress-bar:hover {
+  height: 8px;
+}
+
+[data-theme="retro"] .progress-fill {
+  background: linear-gradient(to right, oklch(0.65 0.22 180), oklch(0.75 0.25 330));
+}
+
+/* Badges */
+[data-theme="retro"] .badge {
+  border-radius: 0.125rem;
+  border: 1px solid oklch(0.3 0.05 240);
+  background: oklch(0.2 0.03 240);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.65rem;
+}
+
+/* Backdrop Blur */
+[data-theme="retro"] .hero-banner,
+[data-theme="retro"] .anime-card,
+[data-theme="retro"] .detail-episode,
+[data-theme="retro"] .sidebar {
+  backdrop-filter: none;
+}
+
+/* Green Glow Variant */
+[data-theme="retro"] .retro-glow-green {
+  box-shadow: 0 0 10px rgba(0, 255, 150, 0.5), 0 0 20px rgba(0, 255, 150, 0.3);
+}
+
+/* Accent Color Elements */
+[data-theme="retro"] .text-accent {
+  color: oklch(0.7 0.25 150);
+  text-shadow: 0 0 10px oklch(0.7 0.25 150);
+}
+
+[data-theme="retro"] .bg-accent {
+  background: oklch(0.7 0.25 150);
+}
+
+/* Retro Sidebar - Desktop */
+[data-theme="retro"] .sidebar {
+  background: #0a1628;
+  border-right: 2px solid oklch(0.3 0.05 240);
+}
+
+[data-theme="retro"] .sidebar-inner {
+  background: #0a1628;
+  border-right: 2px solid oklch(0.3 0.05 240);
+  box-shadow: none;
+}
+
+[data-theme="retro"] .sidebar-inner::before {
+  display: none;
+}
+
+[data-theme="retro"] .sidebar-logo {
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+  background: radial-gradient(circle at top, oklch(0.75 0.25 330), oklch(0.65 0.22 280));
+}
+
+[data-theme="retro"] .nav-item {
+  color: oklch(0.6 0.15 220);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.8rem;
+  border-radius: 0.125rem;
+}
+
+[data-theme="retro"] .nav-item::before {
+  background: linear-gradient(160deg, oklch(0.75 0.25 330), oklch(0.65 0.22 280));
+  border-radius: 0.125rem;
+}
+
+[data-theme="retro"] .nav-item:hover {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .nav-item--active {
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .nav-item--active::before {
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+/* Retro Mobile Navigation */
+[data-theme="retro"] .mobile-top-nav {
+  background: #0a1628;
+  border-bottom: 2px solid oklch(0.3 0.05 240);
+  backdrop-filter: none;
+}
+
+[data-theme="retro"] .mobile-menu-button,
+[data-theme="retro"] .mobile-nav-icon-btn {
+  color: oklch(0.6 0.15 220);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+[data-theme="retro"] .mobile-menu-button:hover,
+[data-theme="retro"] .mobile-nav-icon-btn:hover {
+  color: oklch(0.75 0.25 330);
+  background: rgba(255, 105, 180, 0.1);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-nav-icon-btn.active {
+  color: oklch(0.75 0.25 330);
+  background: rgba(255, 105, 180, 0.15);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-side-panel {
+  background: #0a1628;
+  border-right: 2px solid oklch(0.3 0.05 240);
+}
+
+[data-theme="retro"] .mobile-side-panel-header {
+  border-bottom: 2px solid oklch(0.3 0.05 240);
+}
+
+[data-theme="retro"] .mobile-side-panel-logo {
+  border: 2px solid oklch(0.75 0.25 330);
+  box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+[data-theme="retro"] .mobile-side-panel-close {
+  color: oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-side-panel-close:hover {
+  background: rgba(255, 105, 180, 0.1);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-side-panel-item {
+  color: oklch(0.6 0.15 220);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.85rem;
+  border-radius: 0.125rem;
+}
+
+[data-theme="retro"] .mobile-side-panel-item:hover {
+  background: rgba(255, 105, 180, 0.1);
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 5px oklch(0.75 0.25 330);
+}
+
+[data-theme="retro"] .mobile-side-panel-item.active {
+  background: rgba(255, 105, 180, 0.15);
+  color: oklch(0.75 0.25 330);
+  text-shadow: 0 0 10px oklch(0.75 0.25 330);
+  border: 1px solid oklch(0.75 0.25 330);
+}
+
+/* Mobile Performance Optimizations */
+@media (max-width: 768px) {
+  /* Disable expensive effects on mobile */
+  [data-theme="retro"] body::before {
+    opacity: 0.2;
+    background-size: 80px 80px;
+  }
+
+  [data-theme="retro"] body::after {
+    opacity: 0.15;
+  }
+
+  /* Simplify anime card effects on mobile */
+  [data-theme="retro"] .anime-card {
+    box-shadow: 0 0 4px rgba(255, 105, 180, 0.3);
+    will-change: auto;
+  }
+
+  [data-theme="retro"] .anime-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 6px rgba(255, 105, 180, 0.4);
+  }
+
+  [data-theme="retro"] .anime-card-retro-overlay,
+  [data-theme="retro"] .anime-card-retro-scanlines {
+    display: none;
+  }
+
+  /* Simplify hero banner on mobile */
+  [data-theme="retro"] .hero-banner::before {
+    opacity: 0.3;
+    background-size: 60px 60px;
+  }
+
+  [data-theme="retro"] .hero-banner::after {
+    display: none;
+  }
+
+  /* Reduce text shadows on mobile */
+  [data-theme="retro"] h1,
+  [data-theme="retro"] h2,
+  [data-theme="retro"] h3 {
+    text-shadow: 0 0 5px currentColor;
+  }
+
+  /* Simplify sidebar effects on mobile */
+  [data-theme="retro"] .mobile-side-panel-logo {
+    box-shadow: 0 0 5px rgba(255, 105, 180, 0.3);
+  }
+
+  /* Disable backdrop filters on mobile (expensive) */
+  [data-theme="retro"] .mobile-top-nav {
+    backdrop-filter: none;
+    background: #0a1628;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="retro"] * {
+    animation: none !important;
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  [data-theme="retro"] .hero-banner,
+  [data-theme="retro"] .hero-banner-art,
+  [data-theme="retro"] .anime-card,
+  [data-theme="retro"] .detail-episode {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  [data-theme="retro"] body {
+    background-attachment: scroll !important;
+  }
+}

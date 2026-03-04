@@ -1,0 +1,369 @@
+/* ───────── Modern Hero Banner ───────── */
+.hero-banner-modern {
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem;
+  padding: 0;
+}
+
+.hero-banner-modern h1 {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #1C1C1E;
+  line-height: 0.95;
+}
+
+.hero-banner-modern p {
+  line-height: 1.6;
+}
+
+.hero-banner-modern .font-display {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+}
+
+@media (max-width: 1024px) {
+  .hero-banner-modern {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-banner-modern h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-banner-modern h1 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+}
+
+/* ───────── Legacy Hero Banner (Keep for other themes) ───────── */
+.hero-banner {
+  position: relative;
+  width: 100%;
+  min-height: clamp(360px, 50vh, 500px);
+  margin-bottom: 2.5rem;
+  border-radius: 32px;
+  overflow: hidden;
+  isolation: isolate;
+  padding: clamp(1.4rem, 3vw, 3rem);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 35px 120px rgba(3, 5, 15, 0.85);
+  background:
+    radial-gradient(circle at top left, #252b4a 0%, #050714 45%, #050714 100%),
+    linear-gradient(90deg, #050b1f 0%, #151845 55%, #24093b 100%);
+}
+
+.hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: none;
+}
+
+.hero-banner::after {
+  content: none;
+}
+
+.hero-banner-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: clamp(300px, 46vh, 420px);
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1.75rem, 3vw, 2.75rem);
+}
+
+.hero-banner-copy {
+  flex: 0 0 46%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.35rem;
+}
+
+.hero-banner-art {
+  flex: 1 1 auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 32px 32px 0;
+  background-color: #0b0f19;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: clamp(240px, 38vh, 380px);
+  max-height: 420px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.hero-banner-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.hero-banner-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      circle at 70% 50%,
+      rgba(5, 7, 20, 0) 0%,
+      rgba(5, 7, 20, 0) 55%,
+      rgba(5, 7, 20, 0.7) 85%,
+      rgba(5, 7, 20, 0.96) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(5, 7, 20, 0.98) 0%,
+      rgba(5, 7, 20, 0.9) 18%,
+      rgba(5, 7, 20, 0.3) 45%,
+      rgba(5, 7, 20, 0) 70%
+    );
+  background-size: 150% 150%, 100% 100%;
+  background-position: center center, left center;
+  background-repeat: no-repeat;
+}
+
+.hero-banner-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #9dbff7;
+  background: rgba(147, 197, 253, 0.08);
+  border: 1px solid rgba(147, 197, 253, 0.2);
+}
+
+.hero-banner-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #c9d4ff;
+}
+
+.hero-banner-type-chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hero-banner-language-chip {
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: #8fb4ff;
+  background: rgba(79, 139, 255, 0.08);
+  border: 1px solid rgba(79, 139, 255, 0.25);
+}
+
+.hero-banner-meta-divider {
+  width: 1.5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.hero-banner-meta-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.hero-banner-title {
+  margin-top: 1rem;
+  font-size: clamp(2.6rem, 5vw, 4.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1.05;
+  text-shadow: 0 20px 40px rgba(5, 7, 20, 0.6);
+}
+
+.hero-banner-description {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(226, 232, 255, 0.8);
+}
+
+.hero-banner-stats-grid {
+  margin-top: 1.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.85rem;
+}
+
+.hero-banner-stat-card {
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  background: rgba(10, 14, 32, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.hero-banner-stat-label {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 255, 0.6);
+}
+
+.hero-banner-stat-value {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.hero-banner-server-row {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.hero-banner-server-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 255, 0.6);
+}
+
+.hero-banner-server-chips {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.hero-banner-server-chip {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a6beff;
+  border: 1px solid rgba(166, 190, 255, 0.35);
+  background: rgba(166, 190, 255, 0.08);
+}
+
+.hero-banner-actions {
+  margin-top: 1.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.hero-banner-primary-btn {
+  flex: 1 1 180px;
+  height: 3.25rem;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #5a5bf3, #612dd8);
+  border: none;
+  box-shadow: 0 15px 45px rgba(90, 91, 243, 0.35);
+}
+
+.hero-banner-secondary-btn {
+  flex: 1 1 180px;
+  height: 3.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: #fff;
+}
+
+.hero-banner-icon-btn {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.hero-banner-footnote {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.hero-banner-footnote-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #52d8ff;
+  box-shadow: 0 0 12px rgba(82, 216, 255, 0.8);
+}
+
+@media (max-width: 1024px) {
+  .hero-banner {
+    border-radius: 22px;
+    padding: clamp(1.75rem, 6vw, 3rem);
+  }
+
+  .hero-banner-inner {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .hero-banner-copy {
+    flex: none;
+    max-width: 100%;
+  }
+
+  .hero-banner-art {
+    order: -1;
+    width: 100%;
+    min-height: 260px;
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-banner {
+    padding: 1.5rem;
+  }
+
+  .hero-banner-art {
+    min-height: 220px;
+    border-radius: 20px;
+  }
+
+  .hero-banner-copy h1 {
+    font-size: clamp(2rem, 8vw, 2.75rem);
+  }
+}
+
+@keyframes auroraFloat {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-3%, 4%, 0);
+  }
+}
