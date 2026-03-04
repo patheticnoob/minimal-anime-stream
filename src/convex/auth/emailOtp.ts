@@ -12,19 +12,19 @@ export const emailOtp = Email({
   async sendVerificationRequest({ identifier: email, token }) {
     // 1. Use Resend if configured (Allows custom sender name)
     if (process.env.RESEND_API_KEY) {
-      const appName = process.env.VLY_APP_NAME || "Minimal Anime Stream";
+      const appName = process.env.VLY_APP_NAME || "GojoStream";
       try {
         console.log("🔑 Attempting to send email via Resend...");
         console.log("📧 RESEND_FROM:", process.env.RESEND_FROM);
         console.log("🔐 RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
-        
-        const fromEmail = process.env.RESEND_FROM?.includes('@') 
-          ? process.env.RESEND_FROM 
+
+        const fromEmail = process.env.RESEND_FROM?.includes('@')
+          ? process.env.RESEND_FROM
           : `${process.env.RESEND_FROM || 'Anime'} <onboarding@resend.dev>`;
-        
+
         console.log("📤 Sending from:", fromEmail);
         console.log("📬 Sending to:", email);
-        
+
         await axios.post(
           "https://api.resend.com/emails",
           {
@@ -68,7 +68,7 @@ export const emailOtp = Email({
         {
           to: email,
           otp: token,
-          appName: process.env.VLY_APP_NAME || "Minimal Anime Stream",
+          appName: process.env.VLY_APP_NAME || "GojoStream",
         },
         {
           headers: {
